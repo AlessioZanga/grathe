@@ -9,7 +9,7 @@ license = "GPL-3.0"
 homepage = "https://github.com/AlessioZanga/grathe"
 repository = "https://github.com/AlessioZanga/grathe"
 documentation = "https://github.com/AlessioZanga/grathe"
-keywords = ["graph-theory", "networks"]
+keywords = ["graph", "graph-algorithms", "graph-theory", "networks"]
 categories = ["algorithms", "data-structures", "mathematics", "science"]
 
 # See more keys and their definitions at:
