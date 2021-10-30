@@ -1,0 +1,18 @@
+[package]
+name = "grathe"
+version = "0.1.0"
+edition = "2021"
+authors = ["Alessio Zanga <alessio.zanga@outlook.it>"]
+description = "A Rust implementation of a GRAph THEory library."
+readme = "README.md"
+license-file = "LICENSE"
+homepage = "https://github.com/AlessioZanga/grathe"
+repository = "https://github.com/AlessioZanga/grathe"
+documentation = "https://github.com/AlessioZanga/grathe"
+keywords = ["graph-theory", "networks"]
+categories = ["algorithms", "data-structures", "mathematics", "science"]
+
+# See more keys and their definitions at:
+# https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
