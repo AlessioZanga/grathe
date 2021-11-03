@@ -21,7 +21,7 @@ jobs:
       - name: Test
         run: cargo test
       - name: Publish
-        if: contains(github.ref, "main")
+        if: github.ref == 'refs/heads/main'
         env:
           TOKEN: ${{ secrets.TOKEN }}
         run: |
