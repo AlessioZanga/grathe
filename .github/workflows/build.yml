@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install latest stable
+      - name: Setup
         uses: actions-rs/toolchain@v1
         with:
           override: true
