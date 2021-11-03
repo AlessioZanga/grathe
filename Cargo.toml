@@ -1,6 +1,6 @@
 [package]
 name = "grathe"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Alessio Zanga <alessio.zanga@outlook.it>"]
 description = "A Rust implementation of a GRAph THEory library."
@@ -16,3 +16,4 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 # https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+generic-tests = ">=0.1.0"
