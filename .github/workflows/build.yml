@@ -24,6 +24,7 @@ jobs:
         env:
           CARGO_INCREMENTAL: 0
         run: |
+          rustup install nightly
           rustup default nightly
           cargo install grcov
           RUSTFLAGS="-Z profile" cargo test
