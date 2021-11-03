@@ -1,13 +1,43 @@
 use crate::traits::Graph;
 use crate::types::{Result, VertexError, EID, VID};
+use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
+use std::fmt::{Debug, Formatter};
 
 /// Graph structure based on adjacency list storage.
-struct AdjacencyListGraph {
+pub struct AdjacencyListGraph {
     data: BTreeMap<VID, BTreeSet<VID>>,
 }
 
+impl PartialEq for AdjacencyListGraph {
+    fn eq(&self, other: &Self) -> bool {
+        self.data == other.data
+    }
+}
+
+impl Eq for AdjacencyListGraph {}
+
+impl PartialOrd for AdjacencyListGraph {
+    fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
+        unimplemented!()
+    }
+}
+
 impl Graph for AdjacencyListGraph {
+    fn new() -> Self {
+        AdjacencyListGraph {
+            data: BTreeMap::new(),
+        }
+    }
+
+    fn from(order: usize) -> Self {
+        let mut graph = Self::new();
+        for v in 0..order {
+            graph.add_vertex(&v).unwrap();
+        }
+        graph
+    }
+
     fn order(&self) -> usize {
         self.data.len()
     }
@@ -45,9 +75,7 @@ impl Graph for AdjacencyListGraph {
     }
 
     fn add_edge(&mut self, e: &EID) -> Result<()> {
-        let has_edge = self.has_edge(e);
-        let has_edge = has_edge.is_err() || has_edge.unwrap();
-        if has_edge {
+        if matches!(self.has_edge(e), Ok(true) | Err(_)) {
             return Err(Box::new(VertexError));
         }
         self.data.get_mut(&e.0).unwrap().insert(e.1);
@@ -55,12 +83,16 @@ impl Graph for AdjacencyListGraph {
     }
 
     fn del_edge(&mut self, e: &EID) -> Result<()> {
-        let has_edge = self.has_edge(e);
-        let has_edge = has_edge.is_err() || has_edge.unwrap();
-        if !has_edge {
+        if matches!(self.has_edge(e), Ok(false) | Err(_)) {
             return Err(Box::new(VertexError));
         }
         self.data.get_mut(&e.0).unwrap().remove(&e.1);
         Ok(())
+    }
+}
+
+impl Debug for AdjacencyListGraph {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self.data)
     }
 }
