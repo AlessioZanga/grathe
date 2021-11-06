@@ -3,13 +3,15 @@
 mod tests {
     use crate::structs::AdjacencyListGraph;
     use crate::traits::Graph;
-    use crate::types::VID;
     use all_asserts::*;
 
-    const N: usize = 1e3 as usize;
+    const N: u32 = 1e3 as u32;
 
     #[test]
-    fn eq<T: Graph>() {
+    fn eq<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
         let mut h = T::new();
 
@@ -31,7 +33,10 @@ mod tests {
     }
 
     #[test]
-    fn partial_cmp<T: Graph>() {
+    fn partial_cmp<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
         let h = T::new();
 
@@ -50,29 +55,38 @@ mod tests {
     }
 
     #[test]
-    fn new<T: Graph>() {
+    fn new<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         // Test empty new call.
         let _g = T::new();
     }
 
     #[test]
-    fn from_order<T: Graph>() {
-        let mut g = T::from_order(0);
+    fn from<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
+        let mut g = T::from(0);
 
         // Test min graph order.
         assert_eq!(g.order(), 0);
 
         // Test next graph order.
-        g = T::from_order(1);
+        g = T::from(1);
         assert_eq!(g.order(), 1);
 
         // Test high graph order.
-        g = T::from_order(N);
-        assert_eq!(g.order(), N);
+        g = T::from(N);
+        assert_eq!(g.order(), N as usize);
     }
 
     #[test]
-    fn order<T: Graph>() {
+    fn order<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Test null graph order.
@@ -87,12 +101,15 @@ mod tests {
         assert_eq!(g.order(), 0);
 
         // Test high graph order.
-        g = T::from_order(N);
-        assert_eq!(g.order(), N);
+        g = T::from(N);
+        assert_eq!(g.order(), N as usize);
     }
 
     #[test]
-    fn size<T: Graph>() {
+    fn size<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Test null graph has no size by definition.
@@ -109,15 +126,18 @@ mod tests {
         assert_eq!(g.size(), 0);
 
         // Test sequence size graph.
-        g = T::from_order(N);
+        g = T::from(N);
         for i in 0..N {
             g.add_edge(&(0, i)).unwrap();
-            assert_eq!(g.size(), i + 1);
+            assert_eq!(g.size(), (i + 1) as usize);
         }
     }
 
     #[test]
-    fn has_vertex<T: Graph>() {
+    fn has_vertex<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Test null graph has no vertex by definition.
@@ -132,20 +152,23 @@ mod tests {
         assert_false!(g.has_vertex(&0));
 
         // Test sequence of vertices.
-        g = T::from_order(N);
+        g = T::from(N);
         assert_true!((0..N).all(|i| g.has_vertex(&i)));
     }
 
     #[test]
-    fn add_vertex<T: Graph>() {
+    fn add_vertex<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Add min VID.
-        assert_false!(g.add_vertex(&VID::MIN).is_err());
-        assert_true!(g.has_vertex(&VID::MIN));
+        assert_false!(g.add_vertex(&T::VID::MIN).is_err());
+        assert_true!(g.has_vertex(&T::VID::MIN));
 
         // Test double addition.
-        assert_true!(g.add_vertex(&VID::MIN).is_err());
+        assert_true!(g.add_vertex(&T::VID::MIN).is_err());
 
         // Add contiguous VID.
         assert_false!(g.add_vertex(&1).is_err());
@@ -156,21 +179,24 @@ mod tests {
         assert_true!(g.has_vertex(&N));
 
         // Add max VID.
-        assert_false!(g.add_vertex(&VID::MAX).is_err());
-        assert_true!(g.has_vertex(&VID::MAX));
+        assert_false!(g.add_vertex(&T::VID::MAX).is_err());
+        assert_true!(g.has_vertex(&T::VID::MAX));
     }
 
     #[test]
-    fn del_vertex<T: Graph>() {
+    fn del_vertex<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Del min VID.
-        g.add_vertex(&VID::MIN).unwrap();
-        assert_false!(g.del_vertex(&VID::MIN).is_err());
-        assert_false!(g.has_vertex(&VID::MIN));
+        g.add_vertex(&T::VID::MIN).unwrap();
+        assert_false!(g.del_vertex(&T::VID::MIN).is_err());
+        assert_false!(g.has_vertex(&T::VID::MIN));
 
         // Test double deletion.
-        assert_true!(g.del_vertex(&VID::MIN).is_err());
+        assert_true!(g.del_vertex(&T::VID::MIN).is_err());
 
         // Del contiguous VID.
         g.add_vertex(&1).unwrap();
@@ -183,9 +209,9 @@ mod tests {
         assert_false!(g.has_vertex(&N));
 
         // Del max VID.
-        g.add_vertex(&VID::MAX).unwrap();
-        assert_false!(g.del_vertex(&VID::MAX).is_err());
-        assert_false!(g.has_vertex(&VID::MAX));
+        g.add_vertex(&T::VID::MAX).unwrap();
+        assert_false!(g.del_vertex(&T::VID::MAX).is_err());
+        assert_false!(g.has_vertex(&T::VID::MAX));
 
         // Del vertex and associated edges.
         g.add_vertex(&N).unwrap();
@@ -195,7 +221,10 @@ mod tests {
     }
 
     #[test]
-    fn has_edge<T: Graph>() {
+    fn has_edge<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Test null graph has no edge by definition.
@@ -211,7 +240,7 @@ mod tests {
         assert_false!(g.has_edge(&(0, 0)).unwrap());
 
         // Test sequence of edges.
-        g = T::from_order(N);
+        g = T::from(N);
         for i in 0..N {
             g.add_edge(&(0, i)).unwrap();
         }
@@ -219,20 +248,23 @@ mod tests {
     }
 
     #[test]
-    fn add_edge<T: Graph>() {
+    fn add_edge<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Test missing vertex.
         let mut e = (0, 0);
         assert_true!(g.add_edge(&e).is_err());
 
-        g.add_vertex(&VID::MIN).unwrap();
-        g.add_vertex(&(VID::MIN + 1)).unwrap();
+        g.add_vertex(&T::VID::MIN).unwrap();
+        g.add_vertex(&(T::VID::MIN + 1)).unwrap();
         g.add_vertex(&N).unwrap();
-        g.add_vertex(&VID::MAX).unwrap();
+        g.add_vertex(&T::VID::MAX).unwrap();
 
         // Add min EID.
-        e = (VID::MIN, VID::MIN);
+        e = (T::VID::MIN, T::VID::MIN);
         assert_false!(g.add_edge(&e).is_err());
         assert_true!(g.has_edge(&e).unwrap());
 
@@ -240,7 +272,7 @@ mod tests {
         assert_true!(g.add_edge(&e).is_err());
 
         // Add contiguous EID.
-        e = (VID::MIN, VID::MIN + 1);
+        e = (T::VID::MIN, T::VID::MIN + 1);
         assert_false!(g.add_edge(&e).is_err());
         assert_true!(g.has_edge(&e).unwrap());
 
@@ -250,26 +282,29 @@ mod tests {
         assert_true!(g.has_edge(&e).unwrap());
 
         // Add max VID.
-        e = (VID::MAX, VID::MAX);
+        e = (T::VID::MAX, T::VID::MAX);
         assert_false!(g.add_edge(&e).is_err());
         assert_true!(g.has_edge(&e).unwrap());
     }
 
     #[test]
-    fn del_edge<T: Graph>() {
+    fn del_edge<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
         let mut g = T::new();
 
         // Test missing vertex.
         let mut e = (0, 0);
         assert_true!(g.del_edge(&e).is_err());
 
-        g.add_vertex(&VID::MIN).unwrap();
-        g.add_vertex(&(VID::MIN + 1)).unwrap();
+        g.add_vertex(&T::VID::MIN).unwrap();
+        g.add_vertex(&(T::VID::MIN + 1)).unwrap();
         g.add_vertex(&N).unwrap();
-        g.add_vertex(&VID::MAX).unwrap();
+        g.add_vertex(&T::VID::MAX).unwrap();
 
         // Del min EID.
-        e = (VID::MIN, VID::MIN);
+        e = (T::VID::MIN, T::VID::MIN);
         g.add_edge(&e).unwrap();
         assert_false!(g.del_edge(&e).is_err());
         assert_false!(g.has_edge(&e).unwrap());
@@ -278,7 +313,7 @@ mod tests {
         assert_true!(g.del_edge(&e).is_err());
 
         // Del contiguous EID.
-        e = (VID::MIN, VID::MIN + 1);
+        e = (T::VID::MIN, T::VID::MIN + 1);
         g.add_edge(&e).unwrap();
         assert_false!(g.del_edge(&e).is_err());
         assert_false!(g.has_edge(&e).unwrap());
@@ -290,12 +325,12 @@ mod tests {
         assert_false!(g.has_edge(&e).unwrap());
 
         // Del max VID.
-        e = (VID::MAX, VID::MAX);
+        e = (T::VID::MAX, T::VID::MAX);
         g.add_edge(&e).unwrap();
         assert_false!(g.del_edge(&e).is_err());
         assert_false!(g.has_edge(&e).unwrap());
     }
 
-    #[instantiate_tests(<AdjacencyListGraph>)]
+    #[instantiate_tests(<AdjacencyListGraph<u32>>)]
     mod adjacency_list_graph {}
 }

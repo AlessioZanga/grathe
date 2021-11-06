@@ -1,32 +1,50 @@
 use crate::errors::VertexError;
 use crate::traits::Graph;
-use crate::types::{EID, VID};
+use num::{FromPrimitive, Integer, ToPrimitive};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Debug, Formatter};
 
 /// Graph structure based on adjacency list storage.
-pub struct AdjacencyListGraph {
-    data: BTreeMap<VID, BTreeSet<VID>>,
+pub struct AdjacencyListGraph<T>
+where
+    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+{
+    data: BTreeMap<T, BTreeSet<T>>,
 }
 
-impl PartialEq for AdjacencyListGraph {
+impl<T> PartialEq for AdjacencyListGraph<T>
+where
+    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+{
     fn eq(&self, other: &Self) -> bool {
         // Compare maps.
         self.data == other.data
     }
 }
 
-impl Eq for AdjacencyListGraph {}
+impl<T> Eq for AdjacencyListGraph<T> where
+    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive
+{
+}
 
-impl PartialOrd for AdjacencyListGraph {
+impl<T> PartialOrd for AdjacencyListGraph<T>
+where
+    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+{
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.
         self.data.partial_cmp(&other.data)
     }
 }
 
-impl Graph for AdjacencyListGraph {
+impl<T> Graph for AdjacencyListGraph<T>
+where
+    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+{
+    type VID = T;
+    type EID = (T, T); // TODO: Remove once associated type defaults are stable.
+
     fn new() -> Self {
         AdjacencyListGraph {
             // Initialize default empty map.
@@ -34,10 +52,17 @@ impl Graph for AdjacencyListGraph {
         }
     }
 
-    fn from_order(order: usize) -> Self {
+    fn from<U: Integer + ToPrimitive>(order: U) -> Self {
         let mut graph = Self::new();
         // Iterate over range inserting adjacency lists.
-        graph.data.extend((0..order).map(|i| (i, BTreeSet::new())));
+        let mut i = U::zero();
+        while i < order {
+            graph.data.insert(
+                Self::VID::from_usize(i.to_usize().unwrap()).unwrap(),
+                BTreeSet::new(),
+            );
+            i = i + U::one();
+        }
         graph
     }
 
@@ -49,16 +74,16 @@ impl Graph for AdjacencyListGraph {
     fn size(&self) -> usize {
         self.data
             .iter() // Iterate over the adjacency lists.
-            .map(|(_, adj)| adj.len() as usize)
+            .map(|(_, adj)| adj.len())
             .sum::<usize>() // Accumulate their sizes.
     }
 
-    fn has_vertex(&self, v: &VID) -> bool {
+    fn has_vertex(&self, v: &Self::VID) -> bool {
         // Check if map contains key.
         self.data.contains_key(v)
     }
 
-    fn add_vertex(&mut self, v: &VID) -> Result<(), VertexError> {
+    fn add_vertex(&mut self, v: &Self::VID) -> Result<(), VertexError> {
         // TODO: Update using try_insert once stable.
         if self.has_vertex(v) {
             return Err(VertexError);
@@ -69,7 +94,7 @@ impl Graph for AdjacencyListGraph {
         }
     }
 
-    fn del_vertex(&mut self, v: &VID) -> Result<(), VertexError> {
+    fn del_vertex(&mut self, v: &Self::VID) -> Result<(), VertexError> {
         // Remove vertex from map.
         match self.data.remove(v) {
             // If no vertex found return error.
@@ -79,7 +104,7 @@ impl Graph for AdjacencyListGraph {
         }
     }
 
-    fn has_edge(&self, e: &EID) -> Result<bool, VertexError> {
+    fn has_edge(&self, e: &Self::EID) -> Result<bool, VertexError> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
             // If no vertex found return error.
@@ -94,7 +119,7 @@ impl Graph for AdjacencyListGraph {
         }
     }
 
-    fn add_edge(&mut self, e: &EID) -> Result<(), VertexError> {
+    fn add_edge(&mut self, e: &Self::EID) -> Result<(), VertexError> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
@@ -116,7 +141,7 @@ impl Graph for AdjacencyListGraph {
         }
     }
 
-    fn del_edge(&mut self, e: &EID) -> Result<(), VertexError> {
+    fn del_edge(&mut self, e: &Self::EID) -> Result<(), VertexError> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
@@ -138,7 +163,10 @@ impl Graph for AdjacencyListGraph {
     }
 }
 
-impl Debug for AdjacencyListGraph {
+impl<T> Debug for AdjacencyListGraph<T>
+where
+    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+{
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "{:?}", self.data)
     }
