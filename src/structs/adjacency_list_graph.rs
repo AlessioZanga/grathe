@@ -30,11 +30,9 @@ impl Graph for AdjacencyListGraph {
         }
     }
 
-    fn from(order: usize) -> Self {
+    fn from_order(order: usize) -> Self {
         let mut graph = Self::new();
-        for v in 0..order {
-            graph.add_vertex(&v).unwrap();
-        }
+        graph.data.extend((0..order).map(|i| (i, BTreeSet::new())));
         graph
     }
 

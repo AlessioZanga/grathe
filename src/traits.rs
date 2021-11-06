@@ -7,7 +7,7 @@ pub trait Graph: Eq + PartialOrd + Debug {
     fn new() -> Self;
 
     /// Construct the graph from a given order.
-    fn from(order: usize) -> Self;
+    fn from_order(order: usize) -> Self;
 
     /// Return the graph order (aka. the number of vertices).
     fn order(&self) -> usize;
