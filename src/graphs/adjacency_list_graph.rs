@@ -63,6 +63,7 @@ where
         let mut i = U::zero();
         while i < order {
             graph.data.insert(
+                // TODO: Refactor when Step is stable.
                 Self::VID::from_usize(i.to_usize().unwrap()).unwrap(),
                 BTreeSet::new(),
             );
