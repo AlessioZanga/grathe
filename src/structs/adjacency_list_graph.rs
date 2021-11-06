@@ -18,8 +18,8 @@ impl PartialEq for AdjacencyListGraph {
 impl Eq for AdjacencyListGraph {}
 
 impl PartialOrd for AdjacencyListGraph {
-    fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
-        unimplemented!()
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.data.partial_cmp(&other.data)
     }
 }
 
@@ -54,13 +54,19 @@ impl Graph for AdjacencyListGraph {
     }
 
     fn add_vertex(&mut self, v: &VID) -> Result<()> {
+        if self.has_vertex(v) {
+            return Err(Box::new(VertexError));
+        }
         match self.data.insert(*v, BTreeSet::<VID>::new()) {
-            Some(_) => Ok(()),
-            None => Err(Box::new(VertexError)),
+            Some(_) => Err(Box::new(VertexError)),
+            None => Ok(()),
         }
     }
 
     fn del_vertex(&mut self, v: &VID) -> Result<()> {
+        if !self.has_vertex(v) {
+            return Err(Box::new(VertexError));
+        }
         match self.data.remove(v) {
             Some(_) => Ok(()),
             None => Err(Box::new(VertexError)),

@@ -16,4 +16,5 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 # https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+all_asserts = "*"
 generic-tests = ">=0.1.0"
