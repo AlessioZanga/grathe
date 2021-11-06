@@ -77,7 +77,7 @@ impl Graph for AdjacencyListGraph {
         if !(self.has_vertex(&e.0) && self.has_vertex(&e.1)) {
             return Err(Box::new(VertexError));
         }
-        Ok(self.data.get(&e.0).map(|adj| adj.contains(&e.1)).is_none())
+        Ok(self.data.get(&e.0).map(|adj| adj.contains(&e.1)).unwrap())
     }
 
     fn add_edge(&mut self, e: &EID) -> Result<()> {
