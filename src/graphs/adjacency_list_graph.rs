@@ -1,6 +1,6 @@
 use crate::errors::VertexError;
-use crate::graphs::Graph;
-use num::{FromPrimitive, Integer, ToPrimitive};
+use crate::graphs::{Graph, Vertex};
+use num::{Integer, ToPrimitive};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Debug, Formatter};
@@ -8,14 +8,14 @@ use std::fmt::{Debug, Formatter};
 /// Graph structure based on adjacency list storage.
 pub struct AdjacencyListGraph<T>
 where
-    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+    T: Vertex,
 {
     data: BTreeMap<T, BTreeSet<T>>,
 }
 
 impl<T> PartialEq for AdjacencyListGraph<T>
 where
-    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+    T: Vertex,
 {
     fn eq(&self, other: &Self) -> bool {
         // Compare maps.
@@ -23,14 +23,11 @@ where
     }
 }
 
-impl<T> Eq for AdjacencyListGraph<T> where
-    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive
-{
-}
+impl<T> Eq for AdjacencyListGraph<T> where T: Vertex {}
 
 impl<T> PartialOrd for AdjacencyListGraph<T>
 where
-    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+    T: Vertex,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.
@@ -40,15 +37,15 @@ where
 
 impl<T> Graph for AdjacencyListGraph<T>
 where
-    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+    T: Vertex,
 {
     type VID = T;
     type EID = (T, T); // TODO: Remove once associated type defaults are stable.
+    type Storage = BTreeMap<T, BTreeSet<T>>;
 
     fn new() -> Self {
         AdjacencyListGraph {
-            // Initialize default empty map.
-            data: BTreeMap::new(),
+            data: Self::Storage::new(),
         }
     }
 
@@ -70,6 +67,10 @@ where
             i = i + U::one();
         }
         graph
+    }
+
+    fn data(&self) -> &Self::Storage {
+        &self.data
     }
 
     fn order(&self) -> usize {
@@ -171,7 +172,7 @@ where
 
 impl<T> Debug for AdjacencyListGraph<T>
 where
-    T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive,
+    T: Vertex,
 {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "{:?}", self.data)
