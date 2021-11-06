@@ -10,7 +10,7 @@ pub trait Graph: Eq + PartialOrd + Debug {
     // rather than constructing it from usize using FromPrimitive.
     type VID: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive;
 
-    // Edge identifier type.
+    /// Edge identifier type.
     // TODO: Change to EID = (VID, VID) once associated type defaults are stable.
     type EID: Sized + Eq + Ord + Copy + Debug + Default;
 
