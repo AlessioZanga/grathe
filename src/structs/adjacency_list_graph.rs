@@ -53,6 +53,11 @@ where
     }
 
     fn from<U: Integer + ToPrimitive>(order: U) -> Self {
+        // Check for negative order.
+        if order < U::zero() {
+            panic!("Invalid negative order.");
+        }
+        // Initialize new graph.
         let mut graph = Self::new();
         // Iterate over range inserting adjacency lists.
         let mut i = U::zero();

@@ -60,11 +60,11 @@ mod tests {
         T: Graph<VID = u32, EID = (u32, u32)>,
     {
         // Test empty new call.
-        let _g = T::new();
+        T::new();
     }
 
     #[test]
-    fn from<T>()
+    fn from_order<T>()
     where
         T: Graph<VID = u32, EID = (u32, u32)>,
     {
@@ -80,6 +80,16 @@ mod tests {
         // Test high graph order.
         g = T::from(N);
         assert_eq!(g.order(), N as usize);
+    }
+
+    #[test]
+    #[should_panic]
+    fn from_order_panic<T>()
+    where
+        T: Graph<VID = u32, EID = (u32, u32)>,
+    {
+        // Negative order should panic.
+        T::from(-1 as i32);
     }
 
     #[test]
