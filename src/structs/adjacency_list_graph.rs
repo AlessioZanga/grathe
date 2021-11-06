@@ -1,5 +1,6 @@
+use crate::errors::VertexError;
 use crate::traits::Graph;
-use crate::types::{Result, VertexError, EID, VID};
+use crate::types::{EID, VID};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Debug, Formatter};
@@ -57,57 +58,57 @@ impl Graph for AdjacencyListGraph {
         self.data.contains_key(v)
     }
 
-    fn add_vertex(&mut self, v: &VID) -> Result<()> {
+    fn add_vertex(&mut self, v: &VID) -> Result<(), VertexError> {
         // TODO: Update using try_insert once stable.
         if self.has_vertex(v) {
-            return Err(Box::new(VertexError));
+            return Err(VertexError);
         }
         match self.data.insert(*v, BTreeSet::new()) {
-            Some(_) => Err(Box::new(VertexError)),
+            Some(_) => Err(VertexError),
             None => Ok(()),
         }
     }
 
-    fn del_vertex(&mut self, v: &VID) -> Result<()> {
+    fn del_vertex(&mut self, v: &VID) -> Result<(), VertexError> {
         // Remove vertex from map.
         match self.data.remove(v) {
             // If no vertex found return error.
-            None => Err(Box::new(VertexError)),
+            None => Err(VertexError),
             // Otherwise return successful.
             Some(_) => Ok(()),
         }
     }
 
-    fn has_edge(&self, e: &EID) -> Result<bool> {
+    fn has_edge(&self, e: &EID) -> Result<bool, VertexError> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
             // If no vertex found return error.
-            None => Err(Box::new(VertexError)),
+            None => Err(VertexError),
             // Otherwise check second vertex.
             Some(adj) => match self.data.contains_key(&e.1) {
                 // If no vertex found return error.
-                false => Err(Box::new(VertexError)),
+                false => Err(VertexError),
                 // Otherwise check if it is in the adjacency list.
                 true => Ok(adj.contains(&e.1)),
             },
         }
     }
 
-    fn add_edge(&mut self, e: &EID) -> Result<()> {
+    fn add_edge(&mut self, e: &EID) -> Result<(), VertexError> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
-            false => Err(Box::new(VertexError)),
+            false => Err(VertexError),
             // Otherwise get mutable vertex adjacency list.
             true => match self.data.get_mut(&e.0) {
                 // If no vertex exists return error.
-                None => Err(Box::new(VertexError)),
+                None => Err(VertexError),
                 // Otherwise try to insert vertex into adjacency list.
                 Some(adj) => match adj.insert(e.1) {
                     // If no vertex inserted return error.
                     // FIXME: Change to EdgeError.
-                    false => Err(Box::new(VertexError)),
+                    false => Err(VertexError),
                     // Otherwise return successful.
                     true => Ok(()),
                 },
@@ -115,20 +116,20 @@ impl Graph for AdjacencyListGraph {
         }
     }
 
-    fn del_edge(&mut self, e: &EID) -> Result<()> {
+    fn del_edge(&mut self, e: &EID) -> Result<(), VertexError> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
-            false => Err(Box::new(VertexError)),
+            false => Err(VertexError),
             // Otherwise get mutable vertex adjacency list.
             true => match self.data.get_mut(&e.0) {
                 // If no vertex exists return error.
-                None => Err(Box::new(VertexError)),
+                None => Err(VertexError),
                 // Otherwise try to insert vertex into adjacency list.
                 Some(adj) => match adj.remove(&e.1) {
                     // If no vertex inserted return error.
                     // FIXME: Change to EdgeError.
-                    false => Err(Box::new(VertexError)),
+                    false => Err(VertexError),
                     // Otherwise return successful.
                     true => Ok(()),
                 },

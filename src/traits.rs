@@ -1,4 +1,4 @@
-use crate::types::{Result, EID, VID};
+use crate::errors::VertexError;
 use std::fmt::Debug;
 
 /// The base graph trait.
@@ -19,17 +19,17 @@ pub trait Graph: Eq + PartialOrd + Debug {
     fn has_vertex(&self, v: &VID) -> bool;
 
     /// Add given vertex to the graph.
-    fn add_vertex(&mut self, v: &VID) -> Result<()>;
+    fn add_vertex(&mut self, v: &VID) -> Result<(), VertexError>;
 
     /// Delete given vertex from the graph.
-    fn del_vertex(&mut self, v: &VID) -> Result<()>;
+    fn del_vertex(&mut self, v: &VID) -> Result<(), VertexError>;
 
     /// Checks whether the graph has a given edge or not.
-    fn has_edge(&self, e: &EID) -> Result<bool>;
+    fn has_edge(&self, e: &EID) -> Result<bool, VertexError>;
 
     /// Add given edge to the graph.
-    fn add_edge(&mut self, e: &EID) -> Result<()>;
+    fn add_edge(&mut self, e: &EID) -> Result<(), VertexError>;
 
     /// Delete given edge from the graph.
-    fn del_edge(&mut self, e: &EID) -> Result<()>;
+    fn del_edge(&mut self, e: &EID) -> Result<(), VertexError>;
 }
