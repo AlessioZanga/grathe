@@ -5,9 +5,9 @@ use std::fmt::Debug;
 /// The base graph trait.
 pub trait Graph: Eq + PartialOrd + Debug {
     /// Vertex identifier type.
-    /// TODO: Change FromPrimitive to Step once stable,
-    /// use forward(1) to increase VID in from(order) constructor,
-    /// rather than constructing it from usize using FromPrimitive.
+    // TODO: Change FromPrimitive to Step once stable,
+    // use forward(1) to increase VID in from(order) constructor,
+    // rather than constructing it from usize using FromPrimitive.
     type VID: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive;
 
     // Edge identifier type.
