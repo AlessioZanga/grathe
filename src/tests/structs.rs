@@ -1,8 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::structs::AdjacencyListGraph;
-    use crate::traits::Graph;
+    use crate::graphs::{AdjacencyListGraph, Graph};
     use all_asserts::*;
 
     const N: u32 = 1e3 as u32;

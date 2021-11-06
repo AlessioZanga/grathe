@@ -1,5 +1,5 @@
 use crate::errors::VertexError;
-use crate::traits::Graph;
+use crate::graphs::Graph;
 use num::{FromPrimitive, Integer, ToPrimitive};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
