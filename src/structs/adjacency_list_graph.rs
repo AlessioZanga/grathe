@@ -57,7 +57,7 @@ impl Graph for AdjacencyListGraph {
         if self.has_vertex(v) {
             return Err(Box::new(VertexError));
         }
-        match self.data.insert(*v, BTreeSet::<VID>::new()) {
+        match self.data.insert(*v, BTreeSet::new()) {
             Some(_) => Err(Box::new(VertexError)),
             None => Ok(()),
         }
