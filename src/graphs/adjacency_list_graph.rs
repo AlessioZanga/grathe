@@ -1,5 +1,5 @@
 use crate::errors::VertexError;
-use crate::graphs::{Graph, Vertex};
+use crate::graphs::{GraphTrait, VertexTrait};
 use num::{Integer, ToPrimitive};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
@@ -8,14 +8,14 @@ use std::fmt::{Debug, Formatter};
 /// Graph structure based on adjacency list storage.
 pub struct AdjacencyListGraph<T>
 where
-    T: Vertex,
+    T: VertexTrait,
 {
     data: BTreeMap<T, BTreeSet<T>>,
 }
 
 impl<T> PartialEq for AdjacencyListGraph<T>
 where
-    T: Vertex,
+    T: VertexTrait,
 {
     fn eq(&self, other: &Self) -> bool {
         // Compare maps.
@@ -23,11 +23,11 @@ where
     }
 }
 
-impl<T> Eq for AdjacencyListGraph<T> where T: Vertex {}
+impl<T> Eq for AdjacencyListGraph<T> where T: VertexTrait {}
 
 impl<T> PartialOrd for AdjacencyListGraph<T>
 where
-    T: Vertex,
+    T: VertexTrait,
 {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.
@@ -35,12 +35,12 @@ where
     }
 }
 
-impl<T> Graph for AdjacencyListGraph<T>
+impl<T> GraphTrait for AdjacencyListGraph<T>
 where
-    T: Vertex,
+    T: VertexTrait,
 {
-    type VID = T;
-    type EID = (T, T); // TODO: Remove once associated type defaults are stable.
+    type Vertex = T;
+    type Edge = (T, T); // TODO: Remove once associated type defaults are stable.
     type Storage = BTreeMap<T, BTreeSet<T>>;
 
     fn new() -> Self {
@@ -61,7 +61,7 @@ where
         while i < order {
             graph.data.insert(
                 // TODO: Refactor when Step is stable.
-                Self::VID::from_usize(i.to_usize().unwrap()).unwrap(),
+                Self::Vertex::from_usize(i.to_usize().unwrap()).unwrap(),
                 BTreeSet::new(),
             );
             i = i + U::one();
@@ -85,12 +85,12 @@ where
             .sum::<usize>() // Accumulate their sizes.
     }
 
-    fn has_vertex(&self, v: &Self::VID) -> bool {
+    fn has_vertex(&self, v: &Self::Vertex) -> bool {
         // Check if map contains key.
         self.data.contains_key(v)
     }
 
-    fn add_vertex(&mut self, v: &Self::VID) -> Result<(), VertexError> {
+    fn add_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
         // TODO: Update using try_insert once stable.
         if self.has_vertex(v) {
             return Err(VertexError);
@@ -101,7 +101,7 @@ where
         }
     }
 
-    fn del_vertex(&mut self, v: &Self::VID) -> Result<(), VertexError> {
+    fn del_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
         // Remove vertex from map.
         match self.data.remove(v) {
             // If no vertex found return error.
@@ -111,7 +111,7 @@ where
         }
     }
 
-    fn has_edge(&self, e: &Self::EID) -> Result<bool, VertexError> {
+    fn has_edge(&self, e: &Self::Edge) -> Result<bool, VertexError> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
             // If no vertex found return error.
@@ -126,7 +126,7 @@ where
         }
     }
 
-    fn add_edge(&mut self, e: &Self::EID) -> Result<(), VertexError> {
+    fn add_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
@@ -148,7 +148,7 @@ where
         }
     }
 
-    fn del_edge(&mut self, e: &Self::EID) -> Result<(), VertexError> {
+    fn del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
@@ -172,7 +172,7 @@ where
 
 impl<T> Debug for AdjacencyListGraph<T>
 where
-    T: Vertex,
+    T: VertexTrait,
 {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         write!(f, "{:?}", self.data)

@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::graphs::{AdjacencyListGraph, Graph};
+    use crate::graphs::{AdjacencyListGraph, GraphTrait};
     use all_asserts::*;
 
     const N: u32 = 1e3 as u32;
@@ -9,7 +9,7 @@ mod tests {
     #[test]
     fn eq<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
         let mut h = T::new();
@@ -34,7 +34,7 @@ mod tests {
     #[test]
     fn partial_cmp<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
         let h = T::new();
@@ -56,7 +56,7 @@ mod tests {
     #[test]
     fn new<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         // Test empty new call.
         T::new();
@@ -65,7 +65,7 @@ mod tests {
     #[test]
     fn from_order<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::from(0);
 
@@ -85,7 +85,7 @@ mod tests {
     #[should_panic]
     fn from_order_panic<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         // Negative order should panic.
         T::from(-1 as i32);
@@ -94,7 +94,7 @@ mod tests {
     #[test]
     fn order<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
@@ -117,7 +117,7 @@ mod tests {
     #[test]
     fn size<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn has_vertex<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
@@ -168,59 +168,59 @@ mod tests {
     #[test]
     fn add_vertex<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
-        // Add min VID.
-        assert_false!(g.add_vertex(&T::VID::MIN).is_err());
-        assert_true!(g.has_vertex(&T::VID::MIN));
+        // Add min Vertex.
+        assert_false!(g.add_vertex(&T::Vertex::MIN).is_err());
+        assert_true!(g.has_vertex(&T::Vertex::MIN));
 
         // Test double addition.
-        assert_true!(g.add_vertex(&T::VID::MIN).is_err());
+        assert_true!(g.add_vertex(&T::Vertex::MIN).is_err());
 
-        // Add contiguous VID.
+        // Add contiguous Vertex.
         assert_false!(g.add_vertex(&1).is_err());
         assert_true!(g.has_vertex(&1));
 
-        // Add non contiguous VID.
+        // Add non contiguous Vertex.
         assert_false!(g.add_vertex(&N).is_err());
         assert_true!(g.has_vertex(&N));
 
-        // Add max VID.
-        assert_false!(g.add_vertex(&T::VID::MAX).is_err());
-        assert_true!(g.has_vertex(&T::VID::MAX));
+        // Add max Vertex.
+        assert_false!(g.add_vertex(&T::Vertex::MAX).is_err());
+        assert_true!(g.has_vertex(&T::Vertex::MAX));
     }
 
     #[test]
     fn del_vertex<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
-        // Del min VID.
-        g.add_vertex(&T::VID::MIN).unwrap();
-        assert_false!(g.del_vertex(&T::VID::MIN).is_err());
-        assert_false!(g.has_vertex(&T::VID::MIN));
+        // Del min Vertex.
+        g.add_vertex(&T::Vertex::MIN).unwrap();
+        assert_false!(g.del_vertex(&T::Vertex::MIN).is_err());
+        assert_false!(g.has_vertex(&T::Vertex::MIN));
 
         // Test double deletion.
-        assert_true!(g.del_vertex(&T::VID::MIN).is_err());
+        assert_true!(g.del_vertex(&T::Vertex::MIN).is_err());
 
-        // Del contiguous VID.
+        // Del contiguous Vertex.
         g.add_vertex(&1).unwrap();
         assert_false!(g.del_vertex(&1).is_err());
         assert_false!(g.has_vertex(&1));
 
-        // Del non contiguous VID.
+        // Del non contiguous Vertex.
         g.add_vertex(&N).unwrap();
         assert_false!(g.del_vertex(&N).is_err());
         assert_false!(g.has_vertex(&N));
 
-        // Del max VID.
-        g.add_vertex(&T::VID::MAX).unwrap();
-        assert_false!(g.del_vertex(&T::VID::MAX).is_err());
-        assert_false!(g.has_vertex(&T::VID::MAX));
+        // Del max Vertex.
+        g.add_vertex(&T::Vertex::MAX).unwrap();
+        assert_false!(g.del_vertex(&T::Vertex::MAX).is_err());
+        assert_false!(g.has_vertex(&T::Vertex::MAX));
 
         // Del vertex and associated edges.
         g.add_vertex(&N).unwrap();
@@ -232,7 +232,7 @@ mod tests {
     #[test]
     fn has_edge<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
@@ -259,7 +259,7 @@ mod tests {
     #[test]
     fn add_edge<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
@@ -267,31 +267,31 @@ mod tests {
         let mut e = (0, 0);
         assert_true!(g.add_edge(&e).is_err());
 
-        g.add_vertex(&T::VID::MIN).unwrap();
-        g.add_vertex(&(T::VID::MIN + 1)).unwrap();
+        g.add_vertex(&T::Vertex::MIN).unwrap();
+        g.add_vertex(&(T::Vertex::MIN + 1)).unwrap();
         g.add_vertex(&N).unwrap();
-        g.add_vertex(&T::VID::MAX).unwrap();
+        g.add_vertex(&T::Vertex::MAX).unwrap();
 
-        // Add min EID.
-        e = (T::VID::MIN, T::VID::MIN);
+        // Add min Edge.
+        e = (T::Vertex::MIN, T::Vertex::MIN);
         assert_false!(g.add_edge(&e).is_err());
         assert_true!(g.has_edge(&e).unwrap());
 
         // Test double addition.
         assert_true!(g.add_edge(&e).is_err());
 
-        // Add contiguous EID.
-        e = (T::VID::MIN, T::VID::MIN + 1);
+        // Add contiguous Edge.
+        e = (T::Vertex::MIN, T::Vertex::MIN + 1);
         assert_false!(g.add_edge(&e).is_err());
         assert_true!(g.has_edge(&e).unwrap());
 
-        // Add non contiguous EID.
+        // Add non contiguous Edge.
         e = (N, N);
         assert_false!(g.add_edge(&e).is_err());
         assert_true!(g.has_edge(&e).unwrap());
 
-        // Add max VID.
-        e = (T::VID::MAX, T::VID::MAX);
+        // Add max Vertex.
+        e = (T::Vertex::MAX, T::Vertex::MAX);
         assert_false!(g.add_edge(&e).is_err());
         assert_true!(g.has_edge(&e).unwrap());
     }
@@ -299,7 +299,7 @@ mod tests {
     #[test]
     fn del_edge<T>()
     where
-        T: Graph<VID = u32, EID = (u32, u32)>,
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
         let mut g = T::new();
 
@@ -307,13 +307,13 @@ mod tests {
         let mut e = (0, 0);
         assert_true!(g.del_edge(&e).is_err());
 
-        g.add_vertex(&T::VID::MIN).unwrap();
-        g.add_vertex(&(T::VID::MIN + 1)).unwrap();
+        g.add_vertex(&T::Vertex::MIN).unwrap();
+        g.add_vertex(&(T::Vertex::MIN + 1)).unwrap();
         g.add_vertex(&N).unwrap();
-        g.add_vertex(&T::VID::MAX).unwrap();
+        g.add_vertex(&T::Vertex::MAX).unwrap();
 
-        // Del min EID.
-        e = (T::VID::MIN, T::VID::MIN);
+        // Del min Edge.
+        e = (T::Vertex::MIN, T::Vertex::MIN);
         g.add_edge(&e).unwrap();
         assert_false!(g.del_edge(&e).is_err());
         assert_false!(g.has_edge(&e).unwrap());
@@ -321,20 +321,20 @@ mod tests {
         // Test double deletion.
         assert_true!(g.del_edge(&e).is_err());
 
-        // Del contiguous EID.
-        e = (T::VID::MIN, T::VID::MIN + 1);
+        // Del contiguous Edge.
+        e = (T::Vertex::MIN, T::Vertex::MIN + 1);
         g.add_edge(&e).unwrap();
         assert_false!(g.del_edge(&e).is_err());
         assert_false!(g.has_edge(&e).unwrap());
 
-        // Del non contiguous EID.
+        // Del non contiguous Edge.
         e = (N, N);
         g.add_edge(&e).unwrap();
         assert_false!(g.del_edge(&e).is_err());
         assert_false!(g.has_edge(&e).unwrap());
 
-        // Del max VID.
-        e = (T::VID::MAX, T::VID::MAX);
+        // Del max Vertex.
+        e = (T::Vertex::MAX, T::Vertex::MAX);
         g.add_edge(&e).unwrap();
         assert_false!(g.del_edge(&e).is_err());
         assert_false!(g.has_edge(&e).unwrap());

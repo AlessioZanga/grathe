@@ -3,28 +3,28 @@ use num::{FromPrimitive, Integer, ToPrimitive};
 use std::fmt::Debug;
 
 /// The base vertex trait.
-pub trait Vertex: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive {}
+pub trait VertexTrait: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive {}
 
 // Blanket implementation of the vertex trait.
-impl<T> Vertex for T where T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive {}
+impl<T> VertexTrait for T where T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive {}
 
 /// The base edge trait.
-pub trait Edge: Sized + Eq + Ord + Copy + Debug + Default {}
+pub trait EdgeTrait: Sized + Eq + Ord + Copy + Debug + Default {}
 
 // Blanket implementation of the edge trait.
-impl<T> Edge for T where T: Sized + Eq + Ord + Copy + Debug + Default {}
+impl<T> EdgeTrait for T where T: Sized + Eq + Ord + Copy + Debug + Default {}
 
 /// The base graph trait.
-pub trait Graph: Eq + PartialOrd + Debug {
+pub trait GraphTrait: Eq + PartialOrd + Debug {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable,
-    // use forward(1) to increase VID in from(order) constructor,
+    // use forward(1) to increase Vertex in from(order) constructor,
     // rather than constructing it from usize using FromPrimitive.
-    type VID: Vertex;
+    type Vertex: VertexTrait;
 
     /// Edge identifier type.
-    // TODO: Change to EID = (VID, VID) once associated type defaults are stable.
-    type EID: Edge;
+    // TODO: Change to Edge = (Vertex, Vertex) once associated type defaults are stable.
+    type Edge: EdgeTrait;
 
     /// Storage type.
     type Storage;
@@ -45,20 +45,20 @@ pub trait Graph: Eq + PartialOrd + Debug {
     fn size(&self) -> usize;
 
     /// Checks whether the graph has a given vertex or not.
-    fn has_vertex(&self, v: &Self::VID) -> bool;
+    fn has_vertex(&self, v: &Self::Vertex) -> bool;
 
     /// Add given vertex to the graph.
-    fn add_vertex(&mut self, v: &Self::VID) -> Result<(), VertexError>;
+    fn add_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError>;
 
     /// Delete given vertex from the graph.
-    fn del_vertex(&mut self, v: &Self::VID) -> Result<(), VertexError>;
+    fn del_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError>;
 
     /// Checks whether the graph has a given edge or not.
-    fn has_edge(&self, e: &Self::EID) -> Result<bool, VertexError>;
+    fn has_edge(&self, e: &Self::Edge) -> Result<bool, VertexError>;
 
     /// Add given edge to the graph.
-    fn add_edge(&mut self, e: &Self::EID) -> Result<(), VertexError>;
+    fn add_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError>;
 
     /// Delete given edge from the graph.
-    fn del_edge(&mut self, e: &Self::EID) -> Result<(), VertexError>;
+    fn del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError>;
 }

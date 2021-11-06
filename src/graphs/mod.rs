@@ -1,5 +1,5 @@
 mod adjacency_list_graph;
-mod graph;
+mod graph_trait;
 
 pub use adjacency_list_graph::AdjacencyListGraph;
-pub use graph::{Edge, Graph, Vertex};
+pub use graph_trait::{EdgeTrait, GraphTrait, VertexTrait};
