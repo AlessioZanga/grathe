@@ -1,1 +1,1 @@
-mod structs;
+mod graphs;
