@@ -5,12 +5,15 @@ use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Debug, Formatter};
 
+/// Adjacency list type.
+type AdjacencyList<T> = BTreeMap<T, BTreeSet<T>>;
+
 /// Graph structure based on adjacency list storage.
 pub struct AdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
-    data: BTreeMap<T, BTreeSet<T>>,
+    data: AdjacencyList<T>,
 }
 
 impl<T> PartialEq for AdjacencyListGraph<T>
