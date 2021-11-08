@@ -77,18 +77,8 @@ mod tests {
         assert_eq!(g.order(), 1);
 
         // Test high graph order.
-        g = T::from(N);
+        g = T::from(N as usize);
         assert_eq!(g.order(), N as usize);
-    }
-
-    #[test]
-    #[should_panic]
-    fn from_order_panic<T>()
-    where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
-    {
-        // Negative order should panic.
-        T::from(-1 as i32);
     }
 
     #[test]
@@ -110,7 +100,7 @@ mod tests {
         assert_eq!(g.order(), 0);
 
         // Test high graph order.
-        g = T::from(N);
+        g = T::from(N as usize);
         assert_eq!(g.order(), N as usize);
     }
 
@@ -135,7 +125,7 @@ mod tests {
         assert_eq!(g.size(), 0);
 
         // Test sequence size graph.
-        g = T::from(N);
+        g = T::from(N as usize);
         for i in 0..N {
             g.add_edge(&(0, i)).unwrap();
             assert_eq!(g.size(), (i + 1) as usize);
@@ -161,7 +151,7 @@ mod tests {
         assert_false!(g.has_vertex(&0));
 
         // Test sequence of vertices.
-        g = T::from(N);
+        g = T::from(N as usize);
         assert_true!((0..N).all(|i| g.has_vertex(&i)));
     }
 
@@ -249,7 +239,7 @@ mod tests {
         assert_false!(g.has_edge(&(0, 0)).unwrap());
 
         // Test sequence of edges.
-        g = T::from(N);
+        g = T::from(N as usize);
         for i in 0..N {
             g.add_edge(&(0, i)).unwrap();
         }

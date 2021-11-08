@@ -1,6 +1,5 @@
 use crate::errors::VertexError;
 use crate::graphs::{GraphTrait, VertexTrait};
-use num::{Integer, ToPrimitive};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::{Debug, Formatter};
@@ -38,6 +37,34 @@ where
     }
 }
 
+impl<T> Debug for AdjacencyListGraph<T>
+where
+    T: VertexTrait,
+{
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        write!(f, "{:?}", self.data)
+    }
+}
+
+impl<T> From<usize> for AdjacencyListGraph<T>
+where
+    T: VertexTrait,
+{
+    fn from(other: usize) -> Self {
+        // Initialize new graph.
+        let mut graph = Self::new();
+        // Iterate over range inserting adjacency lists.
+        for i in 0..other {
+            graph.data.insert(
+                // TODO: Refactor when Step is stable.
+                T::from_usize(i).unwrap(),
+                BTreeSet::new(),
+            );
+        }
+        graph
+    }
+}
+
 impl<T> GraphTrait for AdjacencyListGraph<T>
 where
     T: VertexTrait,
@@ -50,26 +77,6 @@ where
         AdjacencyListGraph {
             data: Self::Storage::new(),
         }
-    }
-
-    fn from<U: Integer + ToPrimitive>(order: U) -> Self {
-        // Check for negative order.
-        if order < U::zero() {
-            panic!("Invalid negative order.");
-        }
-        // Initialize new graph.
-        let mut graph = Self::new();
-        // Iterate over range inserting adjacency lists.
-        let mut i = U::zero();
-        while i < order {
-            graph.data.insert(
-                // TODO: Refactor when Step is stable.
-                Self::Vertex::from_usize(i.to_usize().unwrap()).unwrap(),
-                BTreeSet::new(),
-            );
-            i = i + U::one();
-        }
-        graph
     }
 
     fn data(&self) -> &Self::Storage {
@@ -170,14 +177,5 @@ where
                 },
             },
         }
-    }
-}
-
-impl<T> Debug for AdjacencyListGraph<T>
-where
-    T: VertexTrait,
-{
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self.data)
     }
 }

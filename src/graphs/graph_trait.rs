@@ -1,5 +1,5 @@
 use crate::errors::VertexError;
-use num::{FromPrimitive, Integer, ToPrimitive};
+use num::FromPrimitive;
 use std::fmt::Debug;
 
 /// The base vertex trait.
@@ -15,7 +15,7 @@ pub trait EdgeTrait: Sized + Eq + Ord + Copy + Debug + Default {}
 impl<T> EdgeTrait for T where T: Sized + Eq + Ord + Copy + Debug + Default {}
 
 /// The base graph trait.
-pub trait GraphTrait: Eq + PartialOrd + Debug {
+pub trait GraphTrait: Eq + PartialOrd + Debug + From<usize> {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable,
     // use forward(1) to increase Vertex in from(order) constructor,
@@ -31,9 +31,6 @@ pub trait GraphTrait: Eq + PartialOrd + Debug {
 
     /// Default constructor.
     fn new() -> Self;
-
-    /// Construct the graph from a given order.
-    fn from<U: Integer + ToPrimitive>(order: U) -> Self;
 
     /// Return immutable reference to data storage.
     fn data(&self) -> &Self::Storage;
