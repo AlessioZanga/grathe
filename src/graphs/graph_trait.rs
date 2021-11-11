@@ -32,6 +32,9 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + From<usize> {
     /// Default constructor.
     fn new() -> Self;
 
+    /// Vertex iterator.
+    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a Self::Vertex> + 'a>;
+
     /// Return immutable reference to data storage.
     fn data(&self) -> &Self::Storage;
 

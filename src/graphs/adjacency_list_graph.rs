@@ -1,7 +1,7 @@
 use crate::errors::VertexError;
 use crate::graphs::{GraphTrait, VertexTrait};
 use std::cmp::Ordering;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{btree_map, BTreeMap, BTreeSet};
 use std::fmt::{Debug, Formatter};
 
 /// Adjacency list type.
@@ -65,18 +65,46 @@ where
     }
 }
 
+/// Helper struct for vertex iterator on adjacency list graph.
+pub struct VertexIterator<'a, T>
+where
+    T: VertexTrait,
+{
+    base: btree_map::Iter<'a, T, BTreeSet<T>>,
+}
+
+impl<'a, T> Iterator for VertexIterator<'a, T>
+where
+    T: VertexTrait,
+{
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.base.next() {
+            Some((x, _)) => Some(x),
+            None => None,
+        }
+    }
+}
+
 impl<T> GraphTrait for AdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
     type Vertex = T;
     type Edge = (T, T); // TODO: Remove once associated type defaults are stable.
-    type Storage = BTreeMap<T, BTreeSet<T>>;
+    type Storage = AdjacencyList<T>;
 
     fn new() -> Self {
         AdjacencyListGraph {
             data: Self::Storage::new(),
         }
+    }
+
+    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a Self::Vertex> + 'a> {
+        Box::new(VertexIterator {
+            base: self.data.iter(),
+        })
     }
 
     fn data(&self) -> &Self::Storage {

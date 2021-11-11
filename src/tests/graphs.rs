@@ -63,6 +63,17 @@ mod tests {
     }
 
     #[test]
+    fn v_iter<T>()
+    where
+        T: GraphTrait,
+    {
+        let g = T::from(32);
+        for v in g.v_iter() {
+            g.has_vertex(v);
+        }
+    }
+
+    #[test]
     fn from_order<T>()
     where
         T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
