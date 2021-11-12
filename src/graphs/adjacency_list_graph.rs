@@ -112,7 +112,7 @@ where
         self.data.contains_key(v)
     }
 
-    fn add_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
+    fn try_add_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
         // TODO: Update using try_insert once stable.
         if self.has_vertex(v) {
             return Err(VertexError);
@@ -123,7 +123,7 @@ where
         }
     }
 
-    fn del_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
+    fn try_del_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
         // Remove vertex from map.
         match self.data.remove(v) {
             // If no vertex found return error.
@@ -133,7 +133,7 @@ where
         }
     }
 
-    fn has_edge(&self, e: &Self::Edge) -> Result<bool, VertexError> {
+    fn try_has_edge(&self, e: &Self::Edge) -> Result<bool, VertexError> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
             // If no vertex found return error.
@@ -148,7 +148,7 @@ where
         }
     }
 
-    fn add_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
+    fn try_add_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
@@ -170,7 +170,7 @@ where
         }
     }
 
-    fn del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
+    fn try_del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
