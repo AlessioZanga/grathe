@@ -50,27 +50,27 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + From<usize> {
     /// Checks whether the graph has a given vertex or not.
     fn has_vertex(&self, v: &Self::Vertex) -> bool;
 
-    /// Add given vertex to the graph, panic error on invalid argument.
+    /// Add given vertex to the graph, panic on invalid argument.
     fn add_vertex(&mut self, v: &Self::Vertex) -> () {
         return self.try_add_vertex(v).unwrap();
     }
 
-    /// Delete given vertex from the graph, panic error on invalid argument.
+    /// Delete given vertex from the graph, panic on invalid argument.
     fn del_vertex(&mut self, v: &Self::Vertex) -> () {
         return self.try_del_vertex(v).unwrap();
     }
 
-    /// Checks whether the graph has a given edge or not, panic error on invalid argument.
+    /// Checks whether the graph has a given edge or not, panic on invalid argument.
     fn has_edge(&self, e: &Self::Edge) -> bool {
         return self.try_has_edge(e).unwrap();
     }
 
-    /// Add given edge to the graph, panic error on invalid argument.
+    /// Add given edge to the graph, panic on invalid argument.
     fn add_edge(&mut self, e: &Self::Edge) -> () {
         return self.try_add_edge(e).unwrap();
     }
 
-    /// Delete given edge from the graph, panic error on invalid argument.
+    /// Delete given edge from the graph, panic on invalid argument.
     fn del_edge(&mut self, e: &Self::Edge) -> () {
         return self.try_del_edge(e).unwrap();
     }
