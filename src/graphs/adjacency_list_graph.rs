@@ -79,8 +79,16 @@ where
         }
     }
 
-    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a Self::Vertex> + 'a> {
-        Box::new(self.data.iter().map(|(x, _)| x))
+    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
+        Box::new(self.data.iter().map(|(x, _)| *x))
+    }
+
+    fn e_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a> {
+        Box::new(
+            self.data
+                .iter()
+                .flat_map(|(x, ys)| std::iter::repeat(*x).zip(ys.iter().copied())),
+        )
     }
 
     fn data(&self) -> &Self::Storage {

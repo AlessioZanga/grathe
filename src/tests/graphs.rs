@@ -2,9 +2,29 @@
 #[generic_tests::define]
 mod tests {
     use crate::graphs::{AdjacencyListGraph, GraphTrait};
+    use crate::{E, V};
     use all_asserts::*;
 
     const N: u32 = 1e3 as u32;
+
+    // TODO: Replace with is_sorted method on iterators once stable.
+    fn is_sorted<I>(data: I) -> bool
+    where
+        I: IntoIterator,
+        I::Item: Ord,
+    {
+        let mut it = data.into_iter();
+        match it.next() {
+            None => true,
+            Some(first) => it
+                .scan(first, |state, next| {
+                    let cmp = *state <= next;
+                    *state = next;
+                    Some(cmp)
+                })
+                .all(|b| b),
+        }
+    }
 
     #[test]
     fn eq<T>()
@@ -67,10 +87,34 @@ mod tests {
     where
         T: GraphTrait,
     {
-        let g = T::from(32);
-        for v in g.v_iter() {
-            g.has_vertex(v);
-        }
+        let mut g = T::from(0);
+        assert_eq!(V!(g).count(), 0);
+
+        g = T::from(N as usize);
+        assert_eq!(V!(g).count(), N as usize);
+
+        assert_true!(V!(g).eq(g.v_iter()));
+        assert_true!(V!(g).all(|x| g.has_vertex(&x)));
+        assert_true!(is_sorted(V!(g)));
+    }
+
+    #[test]
+    fn e_iter<T>()
+    where
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+    {
+        let mut g = T::from(0);
+        assert_eq!(E!(g).count(), 0);
+
+        g = T::from(N as usize);
+        g.add_edge(&(1, 1)).unwrap();
+        g.add_edge(&(0, 1)).unwrap();
+        g.add_edge(&(0, 0)).unwrap();
+        assert_eq!(E!(g).count(), 3);
+
+        assert_true!(E!(g).eq(g.e_iter()));
+        assert_true!(E!(g).all(|x| g.has_edge(&x).unwrap()));
+        assert_true!(is_sorted(E!(g)));
     }
 
     #[test]

@@ -33,7 +33,10 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + From<usize> {
     fn new() -> Self;
 
     /// Vertex iterator.
-    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = &'a Self::Vertex> + 'a>;
+    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
+
+    /// Edge iterator.
+    fn e_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a>;
 
     /// Return immutable reference to data storage.
     fn data(&self) -> &Self::Storage;
@@ -61,4 +64,20 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + From<usize> {
 
     /// Delete given edge from the graph.
     fn del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError>;
+}
+
+/// Return the vertex iterator.
+#[macro_export]
+macro_rules! V {
+    ($x:expr) => {
+        $x.v_iter()
+    };
+}
+
+/// Return the edge iterator.
+#[macro_export]
+macro_rules! E {
+    ($x:expr) => {
+        $x.e_iter()
+    };
 }
