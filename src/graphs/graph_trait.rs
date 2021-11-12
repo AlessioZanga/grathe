@@ -17,8 +17,8 @@ impl<T> EdgeTrait for T where T: Sized + Eq + Ord + Copy + Debug + Default {}
 /// The base graph trait.
 pub trait GraphTrait: Eq + PartialOrd + Debug + Default + From<usize> {
     /// Vertex identifier type.
-    // TODO: Change FromPrimitive to Step once stable, use combination of v = T::default()
-    // and v = Step::forward(v, 1) to increase Vertex in from(order) constructor,
+    // TODO: Change FromPrimitive to Step once stable, use combination of x = T::default()
+    // and x = Step::forward(x, 1) to increase Vertex in from(order) constructor,
     // rather than constructing it from usize using FromPrimitive.
     type Vertex: VertexTrait;
 
@@ -29,65 +29,160 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default + From<usize> {
     /// Storage type.
     type Storage;
 
-    /// Default constructor.
+    /// Base constructor.
+    ///
+    /// Returns a null graph.
+    ///
     fn new() -> Self;
 
     /// Vertex iterator.
+    /// 
+    /// Iterates over the vertex set $V$ ordered by identifier value.
+    /// 
     fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
 
     /// Edge iterator.
+    /// 
+    /// Iterates over the edge set $E$ order by identifier values.
+    /// 
     fn e_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a>;
 
-    /// Return immutable reference to data storage.
+    /// Data storage.
+    /// 
+    /// Return immutable reference to internal data storage.
+    /// 
     fn data(&self) -> &Self::Storage;
 
-    /// Return the graph order (aka. the number of vertices).
+    /// Order of the graph.
+    /// 
+    /// Return the graph order (aka. $|V|$).
+    /// 
     fn order(&self) -> usize;
 
-    /// Return the graph size (aka. the number of edges).
+    /// Size of the graph.
+    /// 
+    /// Return the graph size (aka. $|E|$).
+    /// 
     fn size(&self) -> usize;
 
+    /// Checks vertex in the graph.
+    ///
     /// Checks whether the graph has a given vertex or not.
-    fn has_vertex(&self, v: &Self::Vertex) -> bool;
+    ///
+    fn has_vertex(&self, x: &Self::Vertex) -> bool;
 
-    /// Add given vertex to the graph, panic on invalid argument.
-    fn add_vertex(&mut self, v: &Self::Vertex) -> () {
-        return self.try_add_vertex(v).unwrap();
+    /// Adds vertex to the graph
+    ///
+    /// Insert given vertex identifier into the graph.
+    ///
+    /// # Panics
+    ///
+    /// The vertex identifier already exists in the graph.
+    ///
+    fn add_vertex(&mut self, x: &Self::Vertex) -> () {
+        return self.try_add_vertex(x).unwrap();
     }
 
-    /// Delete given vertex from the graph, panic on invalid argument.
-    fn del_vertex(&mut self, v: &Self::Vertex) -> () {
-        return self.try_del_vertex(v).unwrap();
+    /// Deletes vertex from the graph
+    ///
+    /// Remove given vertex identifier from the graph.
+    ///
+    /// # Panics
+    ///
+    /// The vertex identifier does not exists in the graph.
+    ///
+    fn del_vertex(&mut self, x: &Self::Vertex) -> () {
+        return self.try_del_vertex(x).unwrap();
     }
 
-    /// Checks whether the graph has a given edge or not, panic on invalid argument.
+    /// Checks edge in the graph.
+    ///
+    /// Checks whether the graph has a given edge or not.
+    ///
+    /// # Panics
+    ///
+    /// At least one of the vertex identifiers do not exist in the graph.
+    ///
     fn has_edge(&self, e: &Self::Edge) -> bool {
         return self.try_has_edge(e).unwrap();
     }
 
-    /// Add given edge to the graph, panic on invalid argument.
+    /// Adds edge to the graph.
+    ///
+    /// Insert given edge identifier into the graph.
+    ///
+    /// # Panics
+    ///
+    /// At least one of the vertex identifiers do not exist in the graph,
+    /// or the edge identifier already exists in the graph.
+    ///
     fn add_edge(&mut self, e: &Self::Edge) -> () {
         return self.try_add_edge(e).unwrap();
     }
 
-    /// Delete given edge from the graph, panic on invalid argument.
+    /// Deletes edge from the graph.
+    ///
+    /// Remove given edge identifier from the graph.
+    ///
+    /// # Panics
+    ///
+    /// At least one of the vertex identifiers do not exist in the graph,
+    /// or the edge identifier does not exists in the graph.
+    ///
     fn del_edge(&mut self, e: &Self::Edge) -> () {
         return self.try_del_edge(e).unwrap();
     }
 
-    /// Add given vertex to the graph, return error on invalid argument.
-    fn try_add_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError>;
+    /// Adds vertex to the graph
+    ///
+    /// Insert given vertex identifier into the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier already exists in the graph.
+    ///
+    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError>;
 
-    /// Delete given vertex from the graph, return error on invalid argument.
-    fn try_del_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError>;
+    /// Deletes vertex from the graph
+    ///
+    /// Remove given vertex identifier from the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exists in the graph.
+    ///
+    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError>;
 
-    /// Checks whether the graph has a given edge or not, return error on invalid argument.
+    /// Checks edge in the graph.
+    ///
+    /// Checks whether the graph has a given edge or not.
+    ///
+    /// # Errors
+    ///
+    /// At least one of the vertex identifiers do not exist in the graph.
+    ///
     fn try_has_edge(&self, e: &Self::Edge) -> Result<bool, VertexError>;
 
-    /// Add given edge to the graph, return error on invalid argument.
+    /// Adds edge to the graph.
+    ///
+    /// Insert given edge identifier into the graph.
+    ///
+    /// # Errors
+    ///
+    /// At least one of the vertex identifiers do not exist in the graph,
+    /// or the edge identifier already exists in the graph.
+    ///
     fn try_add_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError>;
 
-    /// Delete given edge from the graph, return error on invalid argument.
+    /// Deletes edge from the graph.
+    ///
+    /// Remove given edge identifier from the graph.
+    ///
+    /// # Errors
+    ///
+    /// At least one of the vertex identifiers do not exist in the graph,
+    /// or the edge identifier does not exists in the graph.
+    ///
     fn try_del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError>;
 }
 

@@ -19,3 +19,6 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 all_asserts = "*"
 generic-tests = ">=0.1.0"
 num = "*"
+
+[package.metadata.docs.rs]
+rustdoc-args = [ "--html-in-header", "./src/docs-header.html" ]

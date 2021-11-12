@@ -19,6 +19,27 @@ impl<T> PartialEq for AdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
+    /// Equality operator.
+    /// 
+    /// Let $G$ and $H$ be two graphs, then $G$ is equal to $H$ if and only if
+    /// they have the same vertex set $V$ and the same edge set $E$:
+    /// $$G = H \iff V(G) = V(H) \wedge E(G) = E(H)$$
+    /// 
+    /// # Complexity
+    /// 
+    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    ///     use grathe::graphs::AdjacencyListGraph;
+    /// 
+    ///     let g = AdjacencyListGraph::<u32>::default();
+    ///     let h = AdjacencyListGraph::<u32>::default();
+    /// 
+    ///     assert_eq!(g, h);
+    /// ```
+    /// 
     fn eq(&self, other: &Self) -> bool {
         // Compare maps.
         self.data == other.data
@@ -116,25 +137,25 @@ where
             .sum::<usize>() // Accumulate their sizes.
     }
 
-    fn has_vertex(&self, v: &Self::Vertex) -> bool {
+    fn has_vertex(&self, x: &Self::Vertex) -> bool {
         // Check if map contains key.
-        self.data.contains_key(v)
+        self.data.contains_key(x)
     }
 
-    fn try_add_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
+    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError> {
         // TODO: Update using try_insert once stable.
-        if self.has_vertex(v) {
+        if self.has_vertex(x) {
             return Err(VertexError);
         }
-        match self.data.insert(*v, BTreeSet::new()) {
+        match self.data.insert(*x, BTreeSet::new()) {
             Some(_) => Err(VertexError),
             None => Ok(()),
         }
     }
 
-    fn try_del_vertex(&mut self, v: &Self::Vertex) -> Result<(), VertexError> {
+    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError> {
         // Remove vertex from map.
-        match self.data.remove(v) {
+        match self.data.remove(x) {
             // If no vertex found return error.
             None => Err(VertexError),
             // Otherwise return successful.

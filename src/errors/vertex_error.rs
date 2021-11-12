@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 
+/// Invalid vertex error.
 #[derive(Debug)]
 pub struct VertexError;
 
