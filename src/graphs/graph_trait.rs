@@ -15,7 +15,7 @@ pub trait EdgeTrait: Sized + Eq + Ord + Copy + Debug + Default {}
 impl<T> EdgeTrait for T where T: Sized + Eq + Ord + Copy + Debug + Default {}
 
 /// The base graph trait.
-pub trait GraphTrait: Eq + PartialOrd + Debug + From<usize> {
+pub trait GraphTrait: Eq + PartialOrd + Debug + Default + From<usize> {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable, use combination of v = T::default()
     // and v = Step::forward(v, 1) to increase Vertex in from(order) constructor,

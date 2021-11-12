@@ -46,6 +46,15 @@ where
     }
 }
 
+impl<T> Default for AdjacencyListGraph<T>
+where
+    T: VertexTrait,
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl<T> From<usize> for AdjacencyListGraph<T>
 where
     T: VertexTrait,

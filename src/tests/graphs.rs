@@ -83,6 +83,36 @@ mod tests {
     }
 
     #[test]
+    fn default<T>()
+    where
+        T: GraphTrait,
+    {
+        // Test default call.
+        let g = T::default();
+        assert_eq!(g.order(), 0 as usize);
+        assert_eq!(g.size(), 0 as usize);
+    }
+
+    #[test]
+    fn from_order<T>()
+    where
+        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+    {
+        let mut g = T::from(0);
+
+        // Test min graph order.
+        assert_eq!(g.order(), 0);
+
+        // Test next graph order.
+        g = T::from(1);
+        assert_eq!(g.order(), 1);
+
+        // Test high graph order.
+        g = T::from(N as usize);
+        assert_eq!(g.order(), N as usize);
+    }
+
+    #[test]
     fn v_iter<T>()
     where
         T: GraphTrait,
@@ -115,25 +145,6 @@ mod tests {
         assert_true!(E!(g).eq(g.e_iter()));
         assert_true!(E!(g).all(|x| g.has_edge(&x)));
         assert_true!(is_sorted(E!(g)));
-    }
-
-    #[test]
-    fn from_order<T>()
-    where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
-    {
-        let mut g = T::from(0);
-
-        // Test min graph order.
-        assert_eq!(g.order(), 0);
-
-        // Test next graph order.
-        g = T::from(1);
-        assert_eq!(g.order(), 1);
-
-        // Test high graph order.
-        g = T::from(N as usize);
-        assert_eq!(g.order(), N as usize);
     }
 
     #[test]
