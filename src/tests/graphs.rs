@@ -113,7 +113,7 @@ mod tests {
     }
 
     #[test]
-    fn v_iter<T>()
+    fn vertices_iter<T>()
     where
         T: GraphTrait,
     {
@@ -123,13 +123,13 @@ mod tests {
         g = T::from(N as usize);
         assert_eq!(V!(g).count(), N as usize);
 
-        assert_true!(V!(g).eq(g.v_iter()));
+        assert_true!(V!(g).eq(g.vertices_iter()));
         assert_true!(V!(g).all(|x| g.has_vertex(&x)));
         assert_true!(is_sorted(V!(g)));
     }
 
     #[test]
-    fn e_iter<T>()
+    fn edges_iter<T>()
     where
         T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
     {
@@ -142,7 +142,7 @@ mod tests {
         g.add_edge(&(0, 0));
         assert_eq!(E!(g).count(), 3);
 
-        assert_true!(E!(g).eq(g.e_iter()));
+        assert_true!(E!(g).eq(g.edges_iter()));
         assert_true!(E!(g).all(|x| g.has_edge(&x)));
         assert_true!(is_sorted(E!(g)));
     }

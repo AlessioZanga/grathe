@@ -109,11 +109,11 @@ where
         }
     }
 
-    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
+    fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
         Box::new(self.data.iter().map(|(x, _)| *x))
     }
 
-    fn e_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a> {
+    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a> {
         Box::new(
             self.data
                 .iter()

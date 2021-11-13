@@ -39,13 +39,13 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default + From<usize> {
     /// 
     /// Iterates over the vertex set $V$ ordered by identifier value.
     /// 
-    fn v_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
+    fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
 
     /// Edge iterator.
     /// 
     /// Iterates over the edge set $E$ order by identifier values.
     /// 
-    fn e_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a>;
+    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a>;
 
     /// Data storage.
     /// 
@@ -186,18 +186,24 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default + From<usize> {
     fn try_del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError>;
 }
 
-/// Return the vertex iterator.
+/// Vertex iterator.
+/// 
+/// Return the vertices iterator representing $V(G)$.
+/// 
 #[macro_export]
 macro_rules! V {
     ($x:expr) => {
-        $x.v_iter()
+        $x.vertices_iter()
     };
 }
 
-/// Return the edge iterator.
+/// Edge iterator.
+/// 
+/// Return the edges iterator representing $E(G)$.
+/// 
 #[macro_export]
 macro_rules! E {
     ($x:expr) => {
-        $x.e_iter()
+        $x.edges_iter()
     };
 }
