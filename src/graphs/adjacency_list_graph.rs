@@ -122,6 +122,13 @@ where
         )
     }
 
+    fn adjacents_iter<'a>(
+        &'a self,
+        x: &Self::Vertex,
+    ) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
+        Box::new(self.data.get(x).unwrap().iter().copied())
+    }
+
     fn as_data(&self) -> &Self::Storage {
         &self.data
     }

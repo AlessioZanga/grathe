@@ -3,7 +3,7 @@
 mod tests {
     use crate::graphs::{AdjacencyListGraph, GraphTrait};
     use crate::types::*;
-    use crate::{E, V};
+    use crate::{Adj, E, V};
     use all_asserts::*;
 
     const N: u32 = 1e3 as u32;
@@ -139,7 +139,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn from_vertices_panic<T>()
+    fn from_vertices_panics<T>()
     where
         T: GraphTrait<Vertex = u32>,
     {
@@ -173,7 +173,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn from_edges_panic<T>()
+    fn from_edges_panics<T>()
     where
         T: GraphTrait<Vertex = u32>,
     {
@@ -215,6 +215,35 @@ mod tests {
         assert_true!(E!(g).eq(g.edges_iter()));
         assert_true!(E!(g).all(|x| g.has_edge(&x)));
         assert_true!(is_sorted(E!(g)));
+    }
+
+    #[test]
+    fn adjacents_iter<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::from_order(1);
+        assert_eq!(Adj!(g, &0).count(), 0);
+
+        g = T::from_order(N as usize);
+        g.add_edge(&(1, 1));
+        g.add_edge(&(0, 1));
+        g.add_edge(&(0, 0));
+        assert_eq!(Adj!(g, &0).count(), 2);
+
+        assert_true!(Adj!(g, &0).eq(g.adjacents_iter(&0)));
+        assert_true!(Adj!(g, &0).all(|x| g.has_edge(&(0, x))));
+        assert_true!(is_sorted(Adj!(g, &0)));
+    }
+
+    #[test]
+    #[should_panic]
+    fn adjacents_iter_panics<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_order(0);
+        assert_eq!(Adj!(g, &0).count(), 0);
     }
 
     #[test]
@@ -271,7 +300,10 @@ mod tests {
         for (x, y) in E {
             a[(x as usize, y as usize)] = 1;
         }
-        assert_eq!(g.as_sparse_adjacency_matrix(), SparseAdjacencyMatrix::from(&a));
+        assert_eq!(
+            g.as_sparse_adjacency_matrix(),
+            SparseAdjacencyMatrix::from(&a)
+        );
     }
 
     #[test]

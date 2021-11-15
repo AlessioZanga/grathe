@@ -41,7 +41,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// # Panics
     ///
-    /// The vertex identifiers are not unique.
+    /// Panics if the vertex identifiers are not unique.
     ///
     fn from_vertices<Iter>(vertices: Iter) -> Self
     where
@@ -60,7 +60,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// # Panics
     ///
-    /// The edge identifiers are not unique.
+    /// Panics if the edge identifiers are not unique.
     ///
     fn from_edges<Iter>(edges: Iter) -> Self
     where
@@ -86,6 +86,19 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// Iterates over the edge set $E$ order by identifier values.
     ///
     fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a>;
+
+    /// Adjacents iterator.
+    ///
+    /// Iterates over the adjacent vertices set $Adj(G, X)$ of a given vertex $X$.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifier does not exists in the graph.
+    ///
+    fn adjacents_iter<'a>(
+        &'a self,
+        x: &Self::Vertex,
+    ) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
 
     /// Data storage.
     ///
@@ -204,7 +217,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// # Panics
     ///
-    /// The vertex identifier already exists in the graph.
+    /// Panics if the vertex identifier already exists in the graph.
     ///
     fn add_vertex(&mut self, x: &Self::Vertex) -> () {
         return self.try_add_vertex(x).unwrap();
@@ -216,7 +229,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// # Panics
     ///
-    /// The vertex identifier does not exists in the graph.
+    /// Panics if the vertex identifier does not exists in the graph.
     ///
     fn del_vertex(&mut self, x: &Self::Vertex) -> () {
         return self.try_del_vertex(x).unwrap();
@@ -228,7 +241,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// # Panics
     ///
-    /// At least one of the vertex identifiers do not exist in the graph.
+    /// Panics if at least one of the vertex identifiers do not exist in the graph.
     ///
     fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> bool {
         return self.try_has_edge(e).unwrap();
@@ -240,7 +253,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// # Panics
     ///
-    /// At least one of the vertex identifiers do not exist in the graph,
+    /// Panics if at least one of the vertex identifiers do not exist in the graph,
     /// or the edge identifier already exists in the graph.
     ///
     fn add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> () {
@@ -253,7 +266,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// # Panics
     ///
-    /// At least one of the vertex identifiers do not exist in the graph,
+    /// Panics if at least one of the vertex identifiers do not exist in the graph,
     /// or the edge identifier does not exists in the graph.
     ///
     fn del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> () {
@@ -332,5 +345,16 @@ macro_rules! V {
 macro_rules! E {
     ($g:expr) => {
         $g.edges_iter()
+    };
+}
+
+/// Adjacency iterator.
+///
+/// Return the vertices iterator representing $Adj(G, X)$.
+///
+#[macro_export]
+macro_rules! Adj {
+    ($g:expr, $x:expr) => {
+        $g.adjacents_iter($x)
     };
 }
