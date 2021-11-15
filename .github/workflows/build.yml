@@ -40,4 +40,4 @@ jobs:
           TOKEN: ${{ secrets.TOKEN }}
         run: |
           cargo login "$TOKEN"
-          cargo publish
+          cargo publish --allow-dirty
