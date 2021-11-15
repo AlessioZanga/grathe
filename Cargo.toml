@@ -16,9 +16,9 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 # https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-all_asserts = "*"
+all_asserts = ">=2.0.0"
 generic-tests = ">=0.1.0"
-num = "*"
+num = ">=0.4.0"
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "./src/docs-header.html" ]
