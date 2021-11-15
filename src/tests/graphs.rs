@@ -29,7 +29,7 @@ mod tests {
     #[test]
     fn eq<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
         let mut h = T::new();
@@ -54,7 +54,7 @@ mod tests {
     #[test]
     fn partial_cmp<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
         let h = T::new();
@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn new<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         // Test empty new call.
         T::new();
@@ -96,20 +96,88 @@ mod tests {
     #[test]
     fn from_order<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::from(0);
+        let mut g = T::from_order(0);
 
         // Test min graph order.
         assert_eq!(g.order(), 0);
 
         // Test next graph order.
-        g = T::from(1);
+        g = T::from_order(1);
         assert_eq!(g.order(), 1);
 
         // Test high graph order.
-        g = T::from(N as usize);
+        g = T::from_order(N as usize);
         assert_eq!(g.order(), N as usize);
+    }
+
+    #[test]
+    fn from_vertices<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::from_vertices([]);
+
+        // Test min graph vertex set.
+        assert_eq!(g.order(), 0);
+
+        // Test next graph vertex set.
+        g = T::from_vertices([0]);
+        assert_eq!(g.order(), 1);
+
+        // Test next graph unordered vertex set.
+        g = T::from_vertices([0, 4, 2, 3, 1]);
+        assert_eq!(g.order(), 5);
+
+        // Test high graph vertex set.
+        g = T::from_vertices(0..N);
+        assert_eq!(g.order(), N as usize);
+    }
+
+    #[test]
+    #[should_panic]
+    fn from_vertices_panic<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        // Test next graph duplicated vertex set.
+        let g = T::from_vertices([0, 4, 2, 3, 1, 4, 3]);
+        assert_eq!(g.order(), 5);
+    }
+
+    #[test]
+    fn from_edges<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::from_edges([]);
+
+        // Test min graph vertex set.
+        assert_eq!(g.size(), 0);
+
+        // Test next graph vertex set.
+        g = T::from_edges([(0, 0)]);
+        assert_eq!(g.size(), 1);
+
+        // Test next graph unordered vertex set.
+        g = T::from_edges([(0, 1), (2, 3), (3, 2), (1, 4), (5, 6)]);
+        assert_eq!(g.size(), 5);
+
+        // Test high graph vertex set.
+        g = T::from_edges((0..N).zip(0..N));
+        assert_eq!(g.size(), N as usize);
+    }
+
+    #[test]
+    #[should_panic]
+    fn from_edges_panic<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        // Test next graph duplicated vertex set.
+        let g = T::from_edges([(0, 1), (2, 3), (3, 2), (1, 4), (5, 6)]);
+        assert_eq!(g.order(), 5);
     }
 
     #[test]
@@ -117,10 +185,10 @@ mod tests {
     where
         T: GraphTrait,
     {
-        let mut g = T::from(0);
+        let mut g = T::from_order(0);
         assert_eq!(V!(g).count(), 0);
 
-        g = T::from(N as usize);
+        g = T::from_order(N as usize);
         assert_eq!(V!(g).count(), N as usize);
 
         assert_true!(V!(g).eq(g.vertices_iter()));
@@ -131,12 +199,12 @@ mod tests {
     #[test]
     fn edges_iter<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::from(0);
+        let mut g = T::from_order(0);
         assert_eq!(E!(g).count(), 0);
 
-        g = T::from(N as usize);
+        g = T::from_order(N as usize);
         g.add_edge(&(1, 1));
         g.add_edge(&(0, 1));
         g.add_edge(&(0, 0));
@@ -150,7 +218,7 @@ mod tests {
     #[test]
     fn order<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 
@@ -166,14 +234,14 @@ mod tests {
         assert_eq!(g.order(), 0);
 
         // Test high graph order.
-        g = T::from(N as usize);
+        g = T::from_order(N as usize);
         assert_eq!(g.order(), N as usize);
     }
 
     #[test]
     fn size<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 
@@ -191,7 +259,7 @@ mod tests {
         assert_eq!(g.size(), 0);
 
         // Test sequence size graph.
-        g = T::from(N as usize);
+        g = T::from_order(N as usize);
         for i in 0..N {
             g.add_edge(&(0, i));
             assert_eq!(g.size(), (i + 1) as usize);
@@ -201,7 +269,7 @@ mod tests {
     #[test]
     fn has_vertex<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 
@@ -217,14 +285,14 @@ mod tests {
         assert_false!(g.has_vertex(&0));
 
         // Test sequence of vertices.
-        g = T::from(N as usize);
+        g = T::from_order(N as usize);
         assert_true!((0..N).all(|i| g.has_vertex(&i)));
     }
 
     #[test]
     fn add_vertex<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 
@@ -251,7 +319,7 @@ mod tests {
     #[test]
     fn del_vertex<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 
@@ -288,7 +356,7 @@ mod tests {
     #[test]
     fn has_edge<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 
@@ -305,7 +373,7 @@ mod tests {
         assert_false!(g.has_edge(&(0, 0)));
 
         // Test sequence of edges.
-        g = T::from(N as usize);
+        g = T::from_order(N as usize);
         for i in 0..N {
             g.add_edge(&(0, i));
         }
@@ -315,7 +383,7 @@ mod tests {
     #[test]
     fn add_edge<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 
@@ -355,7 +423,7 @@ mod tests {
     #[test]
     fn del_edge<T>()
     where
-        T: GraphTrait<Vertex = u32, Edge = (u32, u32)>,
+        T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::new();
 

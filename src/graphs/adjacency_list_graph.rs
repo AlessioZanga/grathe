@@ -99,50 +99,11 @@ where
     }
 }
 
-impl<T> From<usize> for AdjacencyListGraph<T>
-where
-    T: VertexTrait,
-{
-    /// From order constructor.
-    ///
-    /// Construct a graph of a given order.
-    ///
-    /// # Complexity
-    ///
-    /// $O(|V|)$ - Linear in the order of the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    ///     use grathe::graphs::{GraphTrait, AdjacencyListGraph};
-    ///
-    ///     let order: usize = 3;
-    ///     let g = AdjacencyListGraph::<u32>::from(order);
-    ///
-    ///     assert_eq!(g.order(), order);
-    /// ```
-    ///
-    fn from(other: usize) -> Self {
-        // Initialize new graph.
-        let mut graph = Self::new();
-        // Iterate over range inserting adjacency lists.
-        for i in 0..other {
-            graph.data.insert(
-                // TODO: Refactor when Step is stable.
-                T::from_usize(i).unwrap(),
-                BTreeSet::new(),
-            );
-        }
-        graph
-    }
-}
-
 impl<T> GraphTrait for AdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
     type Vertex = T;
-    type Edge = (T, T); // TODO: Remove once associated type defaults are stable.
     type Storage = AdjacencyList<T>;
 
     fn new() -> Self {
@@ -155,7 +116,7 @@ where
         Box::new(self.data.iter().map(|(x, _)| *x))
     }
 
-    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Edge> + 'a> {
+    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a> {
         Box::new(
             self.data
                 .iter()
@@ -205,7 +166,7 @@ where
         }
     }
 
-    fn try_has_edge(&self, e: &Self::Edge) -> Result<bool, VertexError> {
+    fn try_has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, VertexError> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
             // If no vertex found return error.
@@ -220,7 +181,7 @@ where
         }
     }
 
-    fn try_add_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
+    fn try_add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
@@ -242,7 +203,7 @@ where
         }
     }
 
-    fn try_del_edge(&mut self, e: &Self::Edge) -> Result<(), VertexError> {
+    fn try_del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
