@@ -20,26 +20,26 @@ where
     T: VertexTrait,
 {
     /// Equality operator.
-    /// 
+    ///
     /// Let $G$ and $H$ be two graphs, then $G$ is equal to $H$ if and only if
     /// they have the same vertex set $V$ and the same edge set $E$:
     /// $$G = H \iff V(G) = V(H) \wedge E(G) = E(H)$$
-    /// 
+    ///
     /// # Complexity
-    /// 
+    ///
     /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     ///     use grathe::graphs::AdjacencyListGraph;
-    /// 
-    ///     let g = AdjacencyListGraph::<u32>::default();
-    ///     let h = AdjacencyListGraph::<u32>::default();
-    /// 
+    ///
+    ///     let g = AdjacencyListGraph::<u32>::new();
+    ///     let h = AdjacencyListGraph::<u32>::new();
+    ///
     ///     assert_eq!(g, h);
     /// ```
-    /// 
+    ///
     fn eq(&self, other: &Self) -> bool {
         // Compare maps.
         self.data == other.data
@@ -52,6 +52,29 @@ impl<T> PartialOrd for AdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
+    /// Equality operator.
+    ///
+    /// Let $G$ and $H$ be two graphs, then $G$ is partially comparable to $H$
+    /// if and only if they have the partially comparable vertex set $V$ and
+    /// partially comparable edge set $E$:
+    /// $$G \leq H \iff V(G) \leq V(H) \wedge E(G) \leq E(H)$$
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    ///     use all_asserts::*;
+    ///     use grathe::graphs::AdjacencyListGraph;
+    ///
+    ///     let g = AdjacencyListGraph::<u32>::new();
+    ///     let h = AdjacencyListGraph::<u32>::new();
+    ///
+    ///     assert_le!(g, h);
+    /// ```
+    ///
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.
         self.data.partial_cmp(&other.data)
@@ -80,6 +103,25 @@ impl<T> From<usize> for AdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
+    /// From order constructor.
+    ///
+    /// Construct a graph of a given order.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V|)$ - Linear in the order of the graph.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    ///     use grathe::graphs::{GraphTrait, AdjacencyListGraph};
+    ///
+    ///     let order: usize = 3;
+    ///     let g = AdjacencyListGraph::<u32>::from(order);
+    ///
+    ///     assert_eq!(g.order(), order);
+    /// ```
+    ///
     fn from(other: usize) -> Self {
         // Initialize new graph.
         let mut graph = Self::new();
