@@ -32,7 +32,7 @@ where
     /// # Examples
     ///
     /// ```
-    ///     use grathe::graphs::AdjacencyListGraph;
+    ///     use grathe::graphs::{GraphTrait, AdjacencyListGraph};
     ///
     ///     let g = AdjacencyListGraph::<u32>::new();
     ///     let h = AdjacencyListGraph::<u32>::new();
@@ -67,7 +67,7 @@ where
     ///
     /// ```
     ///     use all_asserts::*;
-    ///     use grathe::graphs::AdjacencyListGraph;
+    ///     use grathe::graphs::{GraphTrait, AdjacencyListGraph};
     ///
     ///     let g = AdjacencyListGraph::<u32>::new();
     ///     let h = AdjacencyListGraph::<u32>::new();
