@@ -1,6 +1,6 @@
 [package]
 name = "grathe"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Alessio Zanga <alessio.zanga@outlook.it>"]
 description = "A Rust implementation of a GRAph THEory library."
