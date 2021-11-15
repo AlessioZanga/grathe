@@ -1,11 +1,9 @@
 use crate::errors::VertexError;
-use crate::graphs::{GraphTrait, VertexTrait};
+use crate::graphs::GraphTrait;
+use crate::types::*;
 use std::cmp::Ordering;
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::fmt::{Debug, Formatter};
-
-/// Adjacency list type.
-type AdjacencyList<T> = BTreeMap<T, BTreeSet<T>>;
 
 /// Graph structure based on adjacency list storage.
 pub struct AdjacencyListGraph<T>
@@ -113,18 +111,18 @@ where
     }
 
     fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
-        Box::new(self.data.iter().map(|(x, _)| *x))
+        Box::new(self.data.iter().map(|(x, _)| x).copied())
     }
 
     fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a> {
         Box::new(
             self.data
                 .iter()
-                .flat_map(|(x, ys)| std::iter::repeat(*x).zip(ys.iter().copied())),
+                .flat_map(|(x, ys)| std::iter::repeat(x).copied().zip(ys.iter().copied())),
         )
     }
 
-    fn data(&self) -> &Self::Storage {
+    fn as_data(&self) -> &Self::Storage {
         &self.data
     }
 

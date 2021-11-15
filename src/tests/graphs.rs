@@ -2,10 +2,12 @@
 #[generic_tests::define]
 mod tests {
     use crate::graphs::{AdjacencyListGraph, GraphTrait};
+    use crate::types::*;
     use crate::{E, V};
     use all_asserts::*;
 
     const N: u32 = 1e3 as u32;
+    const E: [(u32, u32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
 
     // TODO: Replace with is_sorted method on iterators once stable.
     fn is_sorted<I>(data: I) -> bool
@@ -161,7 +163,7 @@ mod tests {
         assert_eq!(g.size(), 1);
 
         // Test next graph unordered vertex set.
-        g = T::from_edges([(0, 1), (2, 3), (3, 2), (1, 4), (5, 6)]);
+        g = T::from_edges(E);
         assert_eq!(g.size(), 5);
 
         // Test high graph vertex set.
@@ -176,7 +178,7 @@ mod tests {
         T: GraphTrait<Vertex = u32>,
     {
         // Test next graph duplicated vertex set.
-        let g = T::from_edges([(0, 1), (2, 3), (3, 2), (1, 4), (5, 6)]);
+        let g = T::from_edges(E);
         assert_eq!(g.order(), 5);
     }
 
@@ -213,6 +215,63 @@ mod tests {
         assert_true!(E!(g).eq(g.edges_iter()));
         assert_true!(E!(g).all(|x| g.has_edge(&x)));
         assert_true!(is_sorted(E!(g)));
+    }
+
+    #[test]
+    fn as_data<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_edges(E);
+        g.as_data();
+    }
+
+    #[test]
+    fn as_edge_list<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_edges(E);
+        assert_eq!(g.as_edge_list(), EdgeList::from(E));
+    }
+
+    #[test]
+    fn as_adjacency_list<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_edges(E);
+        let mut a = AdjacencyList::new();
+        for (x, y) in E {
+            a.entry(x).or_default().insert(y);
+        }
+        assert_eq!(g.as_adjacency_list(), a);
+    }
+
+    #[test]
+    fn as_dense_adjacency_matrix<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_edges(E);
+        let mut a = DenseAdjacencyMatrix::zeros(8, 8);
+        for (x, y) in E {
+            a[(x as usize, y as usize)] = 1;
+        }
+        assert_eq!(g.as_dense_adjacency_matrix(), a);
+    }
+
+    #[test]
+    fn as_sparse_adjacency_matrix<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_edges(E);
+        let mut a = DenseAdjacencyMatrix::zeros(8, 8);
+        for (x, y) in E {
+            a[(x as usize, y as usize)] = 1;
+        }
+        assert_eq!(g.as_sparse_adjacency_matrix(), SparseAdjacencyMatrix::from(&a));
     }
 
     #[test]

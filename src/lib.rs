@@ -5,5 +5,9 @@
 
 pub mod errors;
 pub mod graphs;
+pub mod types;
 
 mod tests;
+
+extern crate nalgebra as na;
+extern crate nalgebra_sparse as nasparse;

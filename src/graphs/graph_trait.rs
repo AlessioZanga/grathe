@@ -1,18 +1,10 @@
 use crate::errors::VertexError;
-use num::FromPrimitive;
+use crate::types::*;
+use crate::{E, V};
+use nasparse::CooMatrix;
+use num_traits::FromPrimitive;
+use std::collections::HashMap;
 use std::fmt::Debug;
-
-/// The base vertex trait.
-pub trait VertexTrait: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive {}
-
-// Blanket implementation of the vertex trait.
-impl<T> VertexTrait for T where T: Sized + Eq + Ord + Copy + Debug + Default + FromPrimitive {}
-
-/// The base edge trait.
-pub trait EdgeTrait: Sized + Eq + Ord + Copy + Debug + Default {}
-
-// Blanket implementation of the edge trait.
-impl<T> EdgeTrait for T where T: Sized + Eq + Ord + Copy + Debug + Default {}
 
 /// The base graph trait.
 pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
@@ -40,7 +32,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// Construct a graph of a given order.
     ///
     fn from_order(order: usize) -> Self {
-        return Self::from_vertices((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()));
+        Self::from_vertices((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()))
     }
 
     /// From vertices constructor.
@@ -99,11 +91,98 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// Return immutable reference to internal data storage.
     ///
-    fn data(&self) -> &Self::Storage;
+    fn as_data(&self) -> &Self::Storage;
+
+    /// Edge list adapter.
+    ///
+    /// Return the edge list representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|E| \cdot \log |E|)$ - Log-linear in the size of the graph.
+    ///
+    fn as_edge_list(&self) -> EdgeList<Self::Vertex> {
+        let mut out = EdgeList::new();
+        out.extend(E!(self));
+        out
+    }
+
+    /// Adjacency list adapter.
+    ///
+    /// Return the adjacency list representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+    ///
+    fn as_adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
+        let mut out = AdjacencyList::new();
+        for (x, y) in E!(self) {
+            out.entry(x).or_default().insert(y);
+        }
+        out
+    }
+
+    /// Dense adjacency matrix adapter.
+    ///
+    /// Return the (dense) adjacency matrix representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V|^2)$ - Quadratic in the order of the graph.
+    ///
+    fn as_dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
+        let n = self.order();
+        let mut idx = HashMap::new();
+        let mut out = DenseAdjacencyMatrix::zeros(n, n);
+        // Build vid-to-index mapping.
+        idx.extend(
+            V!(self)
+                .into_iter()
+                .enumerate()
+                .map(|(index, vid)| (vid, index)),
+        );
+        // Populate the output value.
+        for (x, y) in E!(self) {
+            out[(idx[&x], idx[&y])] = 1;
+        }
+        out
+    }
+
+    /// Sparse adjacency matrix adapter.
+    ///
+    /// Return the (sparse) adjacency matrix representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+    ///
+    fn as_sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
+        let n = self.order();
+        let mut idx = HashMap::new();
+        let mut out = CooMatrix::<i8>::zeros(n, n);
+        // Build vid-to-index mapping.
+        idx.extend(
+            V!(self)
+                .into_iter()
+                .enumerate()
+                .map(|(index, vid)| (vid, index)),
+        );
+        // Populate the output value.
+        out.reserve(self.size());
+        for (x, y) in E!(self) {
+            out.push(idx[&x], idx[&y], 1);
+        }
+        SparseAdjacencyMatrix::from(&out)
+    }
 
     /// Order of the graph.
     ///
     /// Return the graph order (aka. $|V|$).
+    ///
+    /// # Complexity
+    ///
+    /// $O(1)$ - Constant.
     ///
     fn order(&self) -> usize;
 
@@ -240,8 +319,8 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
 ///
 #[macro_export]
 macro_rules! V {
-    ($x:expr) => {
-        $x.vertices_iter()
+    ($g:expr) => {
+        $g.vertices_iter()
     };
 }
 
@@ -251,7 +330,7 @@ macro_rules! V {
 ///
 #[macro_export]
 macro_rules! E {
-    ($x:expr) => {
-        $x.edges_iter()
+    ($g:expr) => {
+        $g.edges_iter()
     };
 }
