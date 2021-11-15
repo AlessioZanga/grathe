@@ -27,7 +27,7 @@ jobs:
           rustup override set nightly
           cargo install grcov
           RUSTFLAGS="-Z profile" cargo test
-          grcov . --binary-path ./target/debug -s . -t lcov --branch --ignore *tests* --ignore-not-existing -o coverage
+          grcov . --binary-path ./target/debug -s . -t lcov --branch --ignore *tests* --ignore *lib.rs* --ignore-not-existing -o coverage
       - name: CodeCov
         uses: codecov/codecov-action@v2
         with:
