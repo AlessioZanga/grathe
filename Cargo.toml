@@ -17,6 +17,7 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 
 [dependencies]
 all_asserts = ">=2.0.0"
+bimap = ">= 0.6.0"
 generic-tests = ">=0.1.0"
 nalgebra = ">=0.29.0"
 nalgebra-sparse = ">=0.5.0"
