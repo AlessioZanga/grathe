@@ -1,6 +1,7 @@
 use crate::errors::VertexError;
 use crate::graphs::GraphTrait;
 use crate::types::*;
+use bimap::BiHashMap;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Formatter};
@@ -11,6 +12,8 @@ where
     T: VertexTrait,
 {
     data: AdjacencyList<T>,
+    v_labels: BiHashMap<T, String>,
+    e_labels: BiHashMap<(T, T), String>,
 }
 
 impl<T> PartialEq for AdjacencyListGraph<T>
@@ -107,6 +110,8 @@ where
     fn new() -> Self {
         AdjacencyListGraph {
             data: Self::Storage::new(),
+            v_labels: BiHashMap::new(),
+            e_labels: BiHashMap::new(),
         }
     }
 
@@ -133,6 +138,22 @@ where
         &self.data
     }
 
+    fn as_vertices_labels(&self) -> &BiHashMap<Self::Vertex, String> {
+        &self.v_labels
+    }
+
+    fn as_mut_vertices_labels(&mut self) -> &mut BiHashMap<Self::Vertex, String> {
+        &mut self.v_labels
+    }
+
+    fn as_edges_labels(&self) -> &BiHashMap<(Self::Vertex, Self::Vertex), String> {
+        &self.e_labels
+    }
+
+    fn as_mut_edges_labels(&mut self) -> &mut BiHashMap<(Self::Vertex, Self::Vertex), String> {
+        &mut self.e_labels
+    }
+
     fn order(&self) -> usize {
         // Get map size.
         self.data.len()
@@ -150,24 +171,24 @@ where
         self.data.contains_key(x)
     }
 
-    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError> {
+    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, VertexError> {
         // TODO: Update using try_insert once stable.
         if self.has_vertex(x) {
             return Err(VertexError);
         }
         match self.data.insert(*x, BTreeSet::new()) {
             Some(_) => Err(VertexError),
-            None => Ok(()),
+            None => Ok(*x),
         }
     }
 
-    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError> {
+    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, VertexError> {
         // Remove vertex from map.
         match self.data.remove(x) {
             // If no vertex found return error.
             None => Err(VertexError),
             // Otherwise return successful.
-            Some(_) => Ok(()),
+            Some(_) => Ok(*x),
         }
     }
 
@@ -186,7 +207,7 @@ where
         }
     }
 
-    fn try_add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError> {
+    fn try_add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
@@ -202,13 +223,13 @@ where
                     // FIXME: Change to EdgeError.
                     false => Err(VertexError),
                     // Otherwise return successful.
-                    true => Ok(()),
+                    true => Ok(*e),
                 },
             },
         }
     }
 
-    fn try_del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError> {
+    fn try_del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
@@ -223,7 +244,7 @@ where
                     // FIXME: Change to EdgeError.
                     false => Err(VertexError),
                     // Otherwise return successful.
-                    true => Ok(()),
+                    true => Ok(*e),
                 },
             },
         }

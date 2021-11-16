@@ -1,6 +1,7 @@
 use crate::errors::VertexError;
 use crate::types::*;
 use crate::{E, V};
+use bimap::BiHashMap;
 use nasparse::CooMatrix;
 use num_traits::FromPrimitive;
 use std::collections::HashMap;
@@ -49,7 +50,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     {
         let mut g = Self::new();
         for x in vertices {
-            g.add_vertex(&x)
+            g.add_vertex(&x);
         }
         g
     }
@@ -105,6 +106,30 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// Return immutable reference to internal data storage.
     ///
     fn as_data(&self) -> &Self::Storage;
+
+    /// Vertices labels.
+    ///
+    /// Return immutable reference to internal vertices labels.
+    ///
+    fn as_vertices_labels(&self) -> &BiHashMap<Self::Vertex, String>;
+
+    /// Mutable vertices labels.
+    ///
+    /// Return mutable reference to internal vertices labels.
+    ///
+    fn as_mut_vertices_labels(&mut self) -> &mut BiHashMap<Self::Vertex, String>;
+
+    /// Edges labels.
+    ///
+    /// Return immutable reference to internal edges labels.
+    ///
+    fn as_edges_labels(&self) -> &BiHashMap<(Self::Vertex, Self::Vertex), String>;
+
+    /// Mutable edges labels.
+    ///
+    /// Return mutable reference to internal edges labels.
+    ///
+    fn as_mut_edges_labels(&mut self) -> &mut BiHashMap<(Self::Vertex, Self::Vertex), String>;
 
     /// Edge list adapter.
     ///
@@ -219,8 +244,8 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// Panics if the vertex identifier already exists in the graph.
     ///
-    fn add_vertex(&mut self, x: &Self::Vertex) -> () {
-        return self.try_add_vertex(x).unwrap();
+    fn add_vertex(&mut self, x: &Self::Vertex) -> Self::Vertex {
+        self.try_add_vertex(x).unwrap()
     }
 
     /// Deletes vertex from the graph
@@ -231,8 +256,8 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// Panics if the vertex identifier does not exists in the graph.
     ///
-    fn del_vertex(&mut self, x: &Self::Vertex) -> () {
-        return self.try_del_vertex(x).unwrap();
+    fn del_vertex(&mut self, x: &Self::Vertex) -> Self::Vertex {
+        self.try_del_vertex(x).unwrap()
     }
 
     /// Checks edge in the graph.
@@ -244,7 +269,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// Panics if at least one of the vertex identifiers do not exist in the graph.
     ///
     fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> bool {
-        return self.try_has_edge(e).unwrap();
+        self.try_has_edge(e).unwrap()
     }
 
     /// Adds edge to the graph.
@@ -256,8 +281,8 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// Panics if at least one of the vertex identifiers do not exist in the graph,
     /// or the edge identifier already exists in the graph.
     ///
-    fn add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> () {
-        return self.try_add_edge(e).unwrap();
+    fn add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> (Self::Vertex, Self::Vertex) {
+        self.try_add_edge(e).unwrap()
     }
 
     /// Deletes edge from the graph.
@@ -269,8 +294,8 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// Panics if at least one of the vertex identifiers do not exist in the graph,
     /// or the edge identifier does not exists in the graph.
     ///
-    fn del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> () {
-        return self.try_del_edge(e).unwrap();
+    fn del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> (Self::Vertex, Self::Vertex) {
+        self.try_del_edge(e).unwrap()
     }
 
     /// Adds vertex to the graph
@@ -281,7 +306,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The vertex identifier already exists in the graph.
     ///
-    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError>;
+    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, VertexError>;
 
     /// Deletes vertex from the graph
     ///
@@ -291,7 +316,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The vertex identifier does not exists in the graph.
     ///
-    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<(), VertexError>;
+    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, VertexError>;
 
     /// Checks edge in the graph.
     ///
@@ -312,7 +337,10 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// At least one of the vertex identifiers do not exist in the graph,
     /// or the edge identifier already exists in the graph.
     ///
-    fn try_add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError>;
+    fn try_add_edge(
+        &mut self,
+        e: &(Self::Vertex, Self::Vertex),
+    ) -> Result<(Self::Vertex, Self::Vertex), VertexError>;
 
     /// Deletes edge from the graph.
     ///
@@ -323,7 +351,157 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// At least one of the vertex identifiers do not exist in the graph,
     /// or the edge identifier does not exists in the graph.
     ///
-    fn try_del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError>;
+    fn try_del_edge(
+        &mut self,
+        e: &(Self::Vertex, Self::Vertex),
+    ) -> Result<(Self::Vertex, Self::Vertex), VertexError>;
+
+    /// Vertex identifier from label.
+    ///
+    /// Return vertex identifier given its label.
+    ///
+    /// # Errors
+    ///
+    /// The vertex label does not exists in the graph.
+    ///
+    fn get_vertex_id(&self, x: &String) -> Result<Self::Vertex, VertexError> {
+        self.as_vertices_labels()
+            .get_by_right(x)
+            .map(|y| *y)
+            .ok_or(VertexError)
+    }
+
+    /// Vertex label from identifier.
+    ///
+    /// Return vertex label given its identifier.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exists in the graph.
+    ///
+    fn get_vertex_label(&self, x: &Self::Vertex) -> Result<String, VertexError> {
+        self.as_vertices_labels()
+            .get_by_left(x)
+            .map(|y| String::from(y))
+            .ok_or(VertexError)
+    }
+
+    /// Set vertex label.
+    ///
+    /// Sets vertex label given identifier.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exists in the graph,
+    /// or the vertex label is already defined.
+    ///
+    fn set_vertex_label(
+        &mut self,
+        x: &Self::Vertex,
+        y: &String,
+    ) -> Result<Self::Vertex, VertexError> {
+        match self.has_vertex(x) {
+            false => Err(VertexError),
+            true => match self.as_vertices_labels().contains_right(y) {
+                false => Err(VertexError),
+                true => match self
+                    .as_mut_vertices_labels()
+                    .insert_no_overwrite(*x, String::from(y))
+                {
+                    Err(_) => Err(VertexError),
+                    Ok(_) => Ok(*x),
+                },
+            },
+        }
+    }
+
+    /// Unset vertex label.
+    ///
+    /// Un-sets vertex label given identifier.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exists in the graph,
+    /// or the vertex label is not defined.
+    ///
+    fn unset_vertex_label(&mut self, x: &Self::Vertex) -> Result<(), VertexError> {
+        match self.as_mut_vertices_labels().remove_by_left(x) {
+            None => Err(VertexError),
+            Some(_) => Ok(()),
+        }
+    }
+
+    /// Edge identifier from label.
+    ///
+    /// Return edge identifier given its label.
+    ///
+    /// # Errors
+    ///
+    /// The edge label does not exists in the graph.
+    ///
+    fn get_edge_id(&self, x: &String) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+        self.as_edges_labels()
+            .get_by_right(x)
+            .map(|y| *y)
+            .ok_or(VertexError)
+    }
+
+    /// Edge label from identifier.
+    ///
+    /// Return edge label given its identifier.
+    ///
+    /// # Errors
+    ///
+    /// The edge identifier does not exists in the graph.
+    ///
+    fn get_edge_label(&self, x: &(Self::Vertex, Self::Vertex)) -> Result<String, VertexError> {
+        self.as_edges_labels()
+            .get_by_left(x)
+            .map(|y| String::from(y))
+            .ok_or(VertexError)
+    }
+
+    /// Set edge label.
+    ///
+    /// Sets edge label given identifier.
+    ///
+    /// # Errors
+    ///
+    /// The edge identifier does not exists in the graph,
+    /// or the edge label is already defined.
+    ///
+    fn set_edge_label(
+        &mut self,
+        x: &(Self::Vertex, Self::Vertex),
+        y: &String,
+    ) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+        match self.has_edge(x) {
+            false => Err(VertexError),
+            true => match self
+                .as_mut_edges_labels()
+                .insert_no_overwrite(*x, String::from(y))
+            {
+                Err(_) => Err(VertexError),
+                Ok(_) => Ok(*x),
+            },
+        }
+    }
+
+    /// Unset edge label.
+    ///
+    /// Un-sets edge label given identifier.
+    ///
+    /// # Errors
+    ///
+    /// The edge identifier does not exists in the graph,
+    /// or the edge label is not defined.
+    ///
+    fn unset_edge_label(&mut self, x: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError> {
+        match self.as_mut_edges_labels().remove_by_left(x) {
+            None => Err(VertexError),
+            Some(_) => Ok(()),
+        }
+    }
 
     /// Is subgraph of another graph.
     ///

@@ -256,6 +256,42 @@ mod tests {
     }
 
     #[test]
+    fn as_vertices_labels<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::default();
+        g.as_vertices_labels();
+    }
+
+    #[test]
+    fn as_mut_vertices_labels<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+        g.as_mut_vertices_labels();
+    }
+
+    #[test]
+    fn as_edges_labels<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::default();
+        g.as_edges_labels();
+    }
+
+    #[test]
+    fn as_mut_edges_labels<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+        g.as_mut_edges_labels();
+    }
+
+    #[test]
     fn as_edge_list<T>()
     where
         T: GraphTrait<Vertex = u32>,
@@ -553,6 +589,70 @@ mod tests {
         g.add_edge(&e);
         g.del_edge(&e);
         assert_false!(g.has_edge(&e));
+    }
+
+    #[test]
+    fn get_vertex_id<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
+    }
+
+    #[test]
+    fn get_vertex_label<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
+    }
+
+    #[test]
+    fn set_vertex_label<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
+    }
+
+    #[test]
+    fn unset_vertex_label<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
+    }
+
+    #[test]
+    fn get_edge_id<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
+    }
+
+    #[test]
+    fn get_edge_label<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
+    }
+
+    #[test]
+    fn set_edge_label<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
+    }
+
+    #[test]
+    fn unset_edge_label<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        todo!()
     }
 
     #[test]
