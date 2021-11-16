@@ -1,19 +1,16 @@
 use crate::errors::VertexError;
 use crate::graphs::GraphTrait;
 use crate::types::*;
-use bimap::BiHashMap;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Formatter};
 
-/// Graph structure based on adjacency list structure.
+/// Graph structure based on adjacency list storage.
 pub struct AdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
     data: AdjacencyList<T>,
-    v_labels: BiHashMap<T, String>,
-    e_labels: BiHashMap<(T, T), String>,
 }
 
 impl<T> PartialEq for AdjacencyListGraph<T>
@@ -105,13 +102,11 @@ where
     T: VertexTrait,
 {
     type Vertex = T;
-    type Data = AdjacencyList<T>;
+    type Storage = AdjacencyList<T>;
 
     fn new() -> Self {
         AdjacencyListGraph {
-            data: Self::Data::new(),
-            v_labels: BiHashMap::new(),
-            e_labels: BiHashMap::new(),
+            data: Self::Storage::new(),
         }
     }
 
@@ -134,24 +129,8 @@ where
         Box::new(self.data.get(x).unwrap().iter().copied())
     }
 
-    fn as_data(&self) -> &Self::Data {
+    fn as_data(&self) -> &Self::Storage {
         &self.data
-    }
-
-    fn as_vertices_labels(&self) -> &BiHashMap<Self::Vertex, String> {
-        &self.v_labels
-    }
-
-    fn as_vertices_labels_mut(&mut self) -> &mut BiHashMap<Self::Vertex, String> {
-        &mut self.v_labels
-    }
-
-    fn as_edges_labels(&self) -> &BiHashMap<(Self::Vertex, Self::Vertex), String> {
-        &self.e_labels
-    }
-
-    fn as_edges_labels_mut(&mut self) -> &mut BiHashMap<(Self::Vertex, Self::Vertex), String> {
-        &mut self.e_labels
     }
 
     fn order(&self) -> usize {
