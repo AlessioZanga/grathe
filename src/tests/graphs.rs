@@ -555,6 +555,30 @@ mod tests {
         assert_false!(g.has_edge(&e));
     }
 
+    #[test]
+    fn is_subgraph<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_edges([(0, 1)]);
+        let h = T::from_edges([(0, 1), (0, 2)]);
+
+        assert_le!(g, h);
+        assert_eq!((g <= h), g.is_subgraph(&h));
+    }
+
+    #[test]
+    fn is_supergraph<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let g = T::from_edges([(0, 1), (0, 2)]);
+        let h = T::from_edges([(0, 1)]);
+
+        assert_ge!(g, h);
+        assert_eq!((g >= h), g.is_supergraph(&h));
+    }
+
     #[instantiate_tests(<AdjacencyListGraph<u32>>)]
     mod adjacency_list_graph {}
 }

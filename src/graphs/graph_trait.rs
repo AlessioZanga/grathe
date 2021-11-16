@@ -324,6 +324,22 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// or the edge identifier does not exists in the graph.
     ///
     fn try_del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError>;
+
+    /// Is subgraph of another graph.
+    ///
+    /// Checks if this graph is subgraph of given graph.
+    ///
+    fn is_subgraph(&self, other: &Self) -> bool {
+        self <= other
+    }
+
+    /// Is supergraph of another graph.
+    ///
+    /// Checks if this graph is supergraph of given graph.
+    ///
+    fn is_supergraph(&self, other: &Self) -> bool {
+        self >= other
+    }
 }
 
 /// Vertex iterator.
