@@ -207,7 +207,10 @@ where
         }
     }
 
-    fn try_add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+    fn try_add_edge(
+        &mut self,
+        e: &(Self::Vertex, Self::Vertex),
+    ) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
@@ -229,7 +232,10 @@ where
         }
     }
 
-    fn try_del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+    fn try_del_edge(
+        &mut self,
+        e: &(Self::Vertex, Self::Vertex),
+    ) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.

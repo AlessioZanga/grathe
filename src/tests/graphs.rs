@@ -596,7 +596,14 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing vertex label.
+        let mut g = T::default();
+        assert_true!(g.get_vertex_id("0").is_err());
+
+        // Test for existing vertex label.
+        let i = g.add_vertex(&0);
+        g.set_vertex_label(&i, "0").unwrap();
+        assert_eq!(g.get_vertex_id("0").unwrap(), 0);
     }
 
     #[test]
@@ -604,7 +611,14 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing vertex identifier.
+        let mut g = T::default();
+        assert_true!(g.get_vertex_label(&0).is_err());
+
+        // Test for existing vertex identifier.
+        let i = g.add_vertex(&0);
+        g.set_vertex_label(&i, "0").unwrap();
+        assert_eq!(g.get_vertex_label(&0).unwrap(), "0");
     }
 
     #[test]
@@ -612,7 +626,23 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing vertex identifier.
+        let mut g = T::default();
+        assert_true!(g.set_vertex_label(&0, "0").is_err());
+
+        // Test for existing vertex label.
+        let i = g.add_vertex(&0);
+        assert_false!(g.set_vertex_label(&i, "0").is_err());
+        assert_eq!(g.get_vertex_label(&0).unwrap(), "0");
+
+        // Test for vertex label overwriting (identifier).
+        assert_true!(g.set_vertex_label(&i, "1").is_err());
+        assert_eq!(g.get_vertex_label(&0).unwrap(), "0");
+
+        // Test for vertex label overwriting (label).
+        let j = g.add_vertex(&1);
+        assert_true!(g.set_vertex_label(&j, "0").is_err());
+        assert_true!(g.get_vertex_label(&j).is_err());
     }
 
     #[test]
@@ -620,7 +650,18 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing vertex identifier.
+        let mut g = T::default();
+        assert_true!(g.unset_vertex_label(&0).is_err());
+
+        // Test for existing vertex label.
+        let i = g.add_vertex(&0);
+        assert_false!(g.set_vertex_label(&i, "0").is_err());
+        assert_false!(g.unset_vertex_label(&0).is_err());
+
+        // Test for vertex label overdeleting (identifier).
+        assert_true!(g.unset_vertex_label(&0).is_err());
+        assert_true!(g.get_vertex_label(&0).is_err());
     }
 
     #[test]

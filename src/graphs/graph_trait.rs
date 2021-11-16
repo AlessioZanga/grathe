@@ -364,7 +364,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The vertex label does not exists in the graph.
     ///
-    fn get_vertex_id(&self, x: &String) -> Result<Self::Vertex, VertexError> {
+    fn get_vertex_id(&self, x: &str) -> Result<Self::Vertex, VertexError> {
         self.as_vertices_labels()
             .get_by_right(x)
             .map(|y| *y)
@@ -395,22 +395,15 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// The vertex identifier does not exists in the graph,
     /// or the vertex label is already defined.
     ///
-    fn set_vertex_label(
-        &mut self,
-        x: &Self::Vertex,
-        y: &String,
-    ) -> Result<Self::Vertex, VertexError> {
+    fn set_vertex_label(&mut self, x: &Self::Vertex, y: &str) -> Result<Self::Vertex, VertexError> {
         match self.has_vertex(x) {
             false => Err(VertexError),
-            true => match self.as_vertices_labels().contains_right(y) {
-                false => Err(VertexError),
-                true => match self
-                    .as_mut_vertices_labels()
-                    .insert_no_overwrite(*x, String::from(y))
-                {
-                    Err(_) => Err(VertexError),
-                    Ok(_) => Ok(*x),
-                },
+            true => match self
+                .as_mut_vertices_labels()
+                .insert_no_overwrite(*x, String::from(y))
+            {
+                Err(_) => Err(VertexError),
+                Ok(()) => Ok(*x),
             },
         }
     }
@@ -439,7 +432,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The edge label does not exists in the graph.
     ///
-    fn get_edge_id(&self, x: &String) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+    fn get_edge_id(&self, x: &str) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
         self.as_edges_labels()
             .get_by_right(x)
             .map(|y| *y)
@@ -473,7 +466,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     fn set_edge_label(
         &mut self,
         x: &(Self::Vertex, Self::Vertex),
-        y: &String,
+        y: &str,
     ) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
         match self.has_edge(x) {
             false => Err(VertexError),
