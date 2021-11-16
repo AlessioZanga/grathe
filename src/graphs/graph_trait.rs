@@ -417,11 +417,13 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// The vertex identifier does not exists in the graph,
     /// or the vertex label is not defined.
     ///
-    fn unset_vertex_label(&mut self, x: &Self::Vertex) -> Result<(), VertexError> {
-        match self.as_mut_vertices_labels().remove_by_left(x) {
-            None => Err(VertexError),
-            Some(_) => Ok(()),
-        }
+    fn unset_vertex_label(
+        &mut self,
+        x: &Self::Vertex,
+    ) -> Result<(Self::Vertex, String), VertexError> {
+        self.as_mut_vertices_labels()
+            .remove_by_left(x)
+            .ok_or(VertexError)
     }
 
     /// Edge identifier from label.
@@ -489,11 +491,13 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// The edge identifier does not exists in the graph,
     /// or the edge label is not defined.
     ///
-    fn unset_edge_label(&mut self, x: &(Self::Vertex, Self::Vertex)) -> Result<(), VertexError> {
-        match self.as_mut_edges_labels().remove_by_left(x) {
-            None => Err(VertexError),
-            Some(_) => Ok(()),
-        }
+    fn unset_edge_label(
+        &mut self,
+        x: &(Self::Vertex, Self::Vertex),
+    ) -> Result<((Self::Vertex, Self::Vertex), String), VertexError> {
+        self.as_mut_edges_labels()
+            .remove_by_left(x)
+            .ok_or(VertexError)
     }
 
     /// Is subgraph of another graph.
