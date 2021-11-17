@@ -1,38 +1,76 @@
-main = _{ SOI ~ graph ~ EOI }
+graphs = _{ SOI ~ graph* ~ EOI }
 
-graph = { (^"strict")? ~ (^"graph" | ^"digraph") ~ (ID)? ~ "{" ~ stmt_list ~ "}" }
+graph = _{ ^"strict"? ~ (^"graph" | ^"digraph") ~ ID? ~ NEWLINE* ~ "{" ~ NEWLINE* ~ stmt_list? ~ "}" ~ NEWLINE* }
 
-stmt_list = { (stmt ~ (";")? ~ stmt_list)? }
+stmt_list = { stmt ~ ";"? ~ NEWLINE* ~ stmt_list? }
 
-stmt = { node_stmt | edge_stmt | attr_stmt | ID ~ "=" ~ ID | subgraph }
+stmt = { ID ~ "=" ~ ID | subgraph | attr_stmt | edge_stmt | node_stmt }
 
 attr_stmt = { (^"graph" | ^"node" | ^"edge") ~ attr_list }
 
-attr_list = { "[" ~ (a_list)? ~ "]" ~ (attr_list)? }
+attr_list = { "[" ~ NEWLINE* ~ a_list? ~ "]" ~ attr_list? }
 
-a_list = { ID ~ "=" ~ ID ~ (";" | ",")? ~ (a_list)? }
+a_list = { ID ~ "=" ~ ID ~ NEWLINE* ~ (";" | ",")? ~ a_list? }
 
-edge_stmt = { (node_id | subgraph) ~ edgeRHS ~ (attr_list)? }
+edge_stmt = { (node_id | subgraph) ~ edgeRHS ~ attr_list? }
 
-edgeRHS = { edgeop ~ (node_id | subgraph) ~ (edgeRHS)? }
+edgeRHS = { edgeop ~ (node_id | subgraph) ~ edgeRHS? }
 
 edgeop = { ("->" | "--") }
 
-node_stmt = { node_id ~ (attr_list)? }
+node_stmt = { node_id ~ attr_list? }
 
-node_id = { ID ~ (port)? }
+node_id = { ID ~ port? }
 
 port = { (":" ~ ID ~ (":" ~ compass_pt)? | ":" ~ compass_pt) }
 
-subgraph = { (subgraph ~ (ID)?)? ~ "{" ~ stmt_list ~ "}" }
+subgraph = { (^"subgraph" ~ ID?)? ~ "{" ~ NEWLINE* ~ stmt_list ~ "}" }
 
 compass_pt = { "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "c" | "_" }
 
-ID = {
+ID = ${
     !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+
-    | ("-")? ~ ("." ~ (ASCII_DIGIT)+ | (ASCII_DIGIT)+ ~ ("." ~ (ASCII_DIGIT)*)?)
-    | "\"" ~ ANY* ~ "\""
-    | "<" ~ ANY* ~ ">"
+    | "-"? ~ ("." ~ ASCII_DIGIT+ | ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)?)
+    | "\"" ~ (!"\"" ~ "\\\""? ~ ANY)* ~ "\""
+    | "<" ~ label ~ ">"
 }
 
-COMMENT = _{ "/*" ~ (!"\n" ~ ANY)* ~ "*/"  | "//" ~ (!"\n" ~ ANY)* | "#" ~ (!"\n" ~ ANY)* }
+label = { text | fonttable }
+
+text = { textitem ~ text? }
+
+textitem = {
+    (ASCII_ALPHANUMERIC | WHITESPACE)+
+    | "<BR/>"
+    | "<FONT>" ~ text ~ "</FONT>"
+    | "<I>" ~ text ~ "</I>"
+    | "<B>" ~ text ~ "</B>"
+    | "<U>" ~ text ~ "</U>"
+    | "<O>" ~ text ~ "</O>"
+    | "<SUB>" ~ text ~ "</SUB>"
+    | "<SUP>" ~ text ~ "</SUP>"
+    | "<S>" ~ text ~ "</S>"
+}
+
+fonttable = { 
+    table
+    | "<FONT>" ~ table ~ "</FONT>"
+    | "<I>" ~ table ~ "</I>"
+    | "<B>" ~ table ~ "</B>"
+    | "<U>" ~ table ~ "</U>"
+    | "<O>" ~ table ~ "</O>"
+}
+
+table = { "<TABLE>" ~ rows ~ "</TABLE>" }
+
+rows = { row ~ rows? | row ~ "<HR/>" ~ rows }
+
+row	= { "<TR>" ~ cells ~ "</TR>" }
+
+cells =  { cell ~ cells? | cell ~ "<VR/>" ~ cells }
+
+cell = { "<TD>" ~ label ~ "</TD>" | "<TD>" ~ "<IMG/>" ~ "</TD>" }
+
+WHITESPACE = _{ (" " | "\t") }
+
+COMMENT = _{ ("/*" ~ (!"*/" ~ ANY)* ~ "*/"  | "//" ~ (!"\n" ~ ANY)* | "#" ~ (!"\n" ~ ANY)*) ~ NEWLINE? }
