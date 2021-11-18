@@ -1,76 +1,50 @@
-graphs = _{ SOI ~ graph* ~ EOI }
+graphs = _{ SOI ~ graph+ ~ EOI }
 
-graph = _{ ^"strict"? ~ (^"graph" | ^"digraph") ~ ID? ~ NEWLINE* ~ "{" ~ NEWLINE* ~ stmt_list? ~ "}" ~ NEWLINE* }
+graph = _{ strict_type? ~ graph_type ~ ID? ~ "{" ~ statements? ~ "}" }
 
-stmt_list = { stmt ~ ";"? ~ NEWLINE* ~ stmt_list? }
+strict_type = { ^"strict" }
 
-stmt = { ID ~ "=" ~ ID | subgraph | attr_stmt | edge_stmt | node_stmt }
+graph_type = { ^"graph" | ^"digraph" }
 
-attr_stmt = { (^"graph" | ^"node" | ^"edge") ~ attr_list }
+text = @{ (
+    !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+
+    | "\"" ~ (!"\"" ~ "\\\""? ~ ANY)* ~ "\""
+) }
 
-attr_list = { "[" ~ NEWLINE* ~ a_list? ~ "]" ~ attr_list? }
+number = @{ "-"? ~ ("." ~ ASCII_DIGIT+ | ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)?) }
 
-a_list = { ID ~ "=" ~ ID ~ NEWLINE* ~ (";" | ",")? ~ a_list? }
+ID = _{ number | text }
 
-edge_stmt = { (node_id | subgraph) ~ edgeRHS ~ attr_list? }
+pair = { ID ~ "=" ~ ID }
 
-edgeRHS = { edgeop ~ (node_id | subgraph) ~ edgeRHS? }
+statements = { statement+ }
 
-edgeop = { ("->" | "--") }
+statement = _{ (pair | attributes | subgraph | edge | node) ~ ";"? }
 
-node_stmt = { node_id ~ attr_list? }
+attributes = { (graph_type | node_type | edge_type)? ~ "[" ~ (pair ~ (";" | ",")?)* ~ "]" }
+
+subgraph_type = { ^"subgraph" }
+
+subgraph = { (subgraph_type ~ ID?)? ~ "{" ~ statements? ~ "}" }
+
+node_type = { ^"node" }
 
 node_id = { ID ~ port? }
 
-port = { (":" ~ ID ~ (":" ~ compass_pt)? | ":" ~ compass_pt) }
+port = { (":" ~ ID ~ (":" ~ node_direction)? | ":" ~ node_direction) }
 
-subgraph = { (^"subgraph" ~ ID?)? ~ "{" ~ NEWLINE* ~ stmt_list ~ "}" }
+node_direction = { "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "c" | "_" }
 
-compass_pt = { "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "c" | "_" }
+node = { node_id ~ attributes? }
 
-ID = ${
-    !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+
-    | "-"? ~ ("." ~ ASCII_DIGIT+ | ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)?)
-    | "\"" ~ (!"\"" ~ "\\\""? ~ ANY)* ~ "\""
-    | "<" ~ label ~ ">"
-}
+edge_type = { ^"edge" }
 
-label = { text | fonttable }
+edge_id = { (node_id | subgraph) ~ (edge_direction ~ (node_id | subgraph))+ }
 
-text = { textitem ~ text? }
+edge_direction = { ("->" | "--") }
 
-textitem = {
-    (ASCII_ALPHANUMERIC | WHITESPACE)+
-    | "<BR/>"
-    | "<FONT>" ~ text ~ "</FONT>"
-    | "<I>" ~ text ~ "</I>"
-    | "<B>" ~ text ~ "</B>"
-    | "<U>" ~ text ~ "</U>"
-    | "<O>" ~ text ~ "</O>"
-    | "<SUB>" ~ text ~ "</SUB>"
-    | "<SUP>" ~ text ~ "</SUP>"
-    | "<S>" ~ text ~ "</S>"
-}
+edge = { edge_id ~ attributes? }
 
-fonttable = { 
-    table
-    | "<FONT>" ~ table ~ "</FONT>"
-    | "<I>" ~ table ~ "</I>"
-    | "<B>" ~ table ~ "</B>"
-    | "<U>" ~ table ~ "</U>"
-    | "<O>" ~ table ~ "</O>"
-}
+WHITESPACE = _{ (" " | "\t" | NEWLINE) }
 
-table = { "<TABLE>" ~ rows ~ "</TABLE>" }
-
-rows = { row ~ rows? | row ~ "<HR/>" ~ rows }
-
-row	= { "<TR>" ~ cells ~ "</TR>" }
-
-cells =  { cell ~ cells? | cell ~ "<VR/>" ~ cells }
-
-cell = { "<TD>" ~ label ~ "</TD>" | "<TD>" ~ "<IMG/>" ~ "</TD>" }
-
-WHITESPACE = _{ (" " | "\t") }
-
-COMMENT = _{ ("/*" ~ (!"*/" ~ ANY)* ~ "*/"  | "//" ~ (!"\n" ~ ANY)* | "#" ~ (!"\n" ~ ANY)*) ~ NEWLINE? }
+COMMENT = _{ ("/*" ~ (!"*/" ~ ANY)* ~ "*/"  | "//" ~ (!"\n" ~ ANY)* | "#" ~ (!"\n" ~ ANY)*) }
