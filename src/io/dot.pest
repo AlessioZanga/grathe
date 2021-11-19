@@ -1,10 +1,12 @@
 graphs = _{ SOI ~ graph+ ~ EOI }
 
-graph = _{ strict_type? ~ graph_type ~ ID? ~ "{" ~ statements? ~ "}" }
+graph = { strict_attribute ~ graph_type ~ graph_id ~ "{" ~ statements ~ "}" }
 
-strict_type = { ^"strict" }
+strict_attribute = { ^"strict"? }
 
 graph_type = { ^"graph" | ^"digraph" }
+
+graph_id = _{ ID? }
 
 text = @{ (
     !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+
@@ -15,14 +17,13 @@ quoted_text = @{ "\"" ~ (!"\"" ~ "\\\""? ~ ANY)* ~ "\"" }
 
 number = @{ "-"? ~ ("." ~ ASCII_DIGIT+ | ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)?) }
 
-
 ID = _{ number | text }
 
 html = { "<" ~ html_tag+ ~ ">" }
 
 pair = { ID ~ "=" ~ (ID | html) }
 
-statements = { statement+ }
+statements = { statement* }
 
 statement = _{ (pair | attributes | subgraph | edge | node) ~ ";"? }
 
