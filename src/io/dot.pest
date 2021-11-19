@@ -8,14 +8,19 @@ graph_type = { ^"graph" | ^"digraph" }
 
 text = @{ (
     !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+
-    | "\"" ~ (!"\"" ~ "\\\""? ~ ANY)* ~ "\""
+    | quoted_text
 ) }
+
+quoted_text = @{ "\"" ~ (!"\"" ~ "\\\""? ~ ANY)* ~ "\"" }
 
 number = @{ "-"? ~ ("." ~ ASCII_DIGIT+ | ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)?) }
 
+
 ID = _{ number | text }
 
-pair = { ID ~ "=" ~ ID }
+html = { "<" ~ html_tag+ ~ ">" }
+
+pair = { ID ~ "=" ~ (ID | html) }
 
 statements = { statement+ }
 
@@ -44,6 +49,30 @@ edge_id = { (node_id | subgraph) ~ (edge_direction ~ (node_id | subgraph))+ }
 edge_direction = { ("->" | "--") }
 
 edge = { edge_id ~ attributes? }
+
+html_tag = {
+    table_tag
+    | "<FONT>" ~ (html_text | table_tag) ~ "</FONT>"
+    | "<I>" ~ (html_text | table_tag) ~ "</I>"
+    | "<B>" ~ (html_text | table_tag) ~ "</B>"
+    | "<U>" ~ (html_text | table_tag) ~ "</U>"
+    | "<O>" ~ (html_text | table_tag) ~ "</O>"
+    | "<SUB>" ~ html_text ~ "</SUB>"
+    | "<SUP>" ~ html_text ~ "</SUP>"
+    | "<S>" ~ html_text ~ "</S>"
+}
+
+html_text = { ("<BR/>" | (!"<" ~ ANY))+ ~ "<BR/>"* }
+
+table_tag = { "<TABLE" ~ (ID ~ "=" ~ quoted_text)* ~ ">" ~ rows ~ "</TABLE>" }
+
+rows = { row ~ ("<HR/>"? ~ row)* }
+
+row = { "<TR>" ~ cells ~ "</TR>" }
+
+cells = { cell ~ ("<VR/>" ~ cell)* }
+
+cell = { ("<TD>" ~ (html_text | html_tag) ~ "</TD>" | "<TD>" ~ "<IMG/>" ~ "</TD>") }
 
 WHITESPACE = _{ (" " | "\t" | NEWLINE) }
 
