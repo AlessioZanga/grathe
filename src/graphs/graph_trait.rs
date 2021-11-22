@@ -360,14 +360,121 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// Return vertex identifier given its label.
     ///
+    /// # Panics
+    ///
+    /// Panics if the vertex label does not exists in the graph.
+    ///
+    fn get_vertex_id(&self, x: &str) -> Self::Vertex {
+        self.try_get_vertex_id(x).unwrap()
+    }
+
+    /// Vertex label from identifier.
+    ///
+    /// Return vertex label given its identifier.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifier does not exists in the graph.
+    ///
+    fn get_vertex_label(&self, x: &Self::Vertex) -> String {
+        self.try_get_vertex_label(x).unwrap()
+    }
+
+    /// Set vertex label.
+    ///
+    /// Sets vertex label given identifier.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifier does not exists in the graph,
+    /// or the vertex label is already defined.
+    ///
+    fn set_vertex_label(&mut self, x: &Self::Vertex, y: &str) -> Self::Vertex {
+        self.try_set_vertex_label(x, y).unwrap()
+    }
+
+    /// Unset vertex label.
+    ///
+    /// Un-sets vertex label given identifier.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifier does not exists in the graph,
+    /// or the vertex label is not defined.
+    ///
+    fn unset_vertex_label(&mut self, x: &Self::Vertex) -> (Self::Vertex, String) {
+        self.try_unset_vertex_label(x).unwrap()
+    }
+
+    /// Edge identifier from label.
+    ///
+    /// Return edge identifier given its label.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the edge label does not exists in the graph.
+    ///
+    fn get_edge_id(&self, x: &str) -> (Self::Vertex, Self::Vertex) {
+        self.try_get_edge_id(x).unwrap()
+    }
+
+    /// Edge label from identifier.
+    ///
+    /// Return edge label given its identifier.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the edge identifier does not exists in the graph.
+    ///
+    fn get_edge_label(&self, x: &(Self::Vertex, Self::Vertex)) -> String {
+        self.try_get_edge_label(x).unwrap()
+    }
+
+    /// Set edge label.
+    ///
+    /// Sets edge label given identifier.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the edge identifier does not exists in the graph,
+    /// or the edge label is already defined.
+    ///
+    fn set_edge_label(
+        &mut self,
+        x: &(Self::Vertex, Self::Vertex),
+        y: &str,
+    ) -> (Self::Vertex, Self::Vertex) {
+        self.try_set_edge_label(x, y).unwrap()
+    }
+
+    /// Unset edge label.
+    ///
+    /// Un-sets edge label given identifier.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the edge identifier does not exists in the graph,
+    /// or the edge label is not defined.
+    ///
+    fn unset_edge_label(
+        &mut self,
+        x: &(Self::Vertex, Self::Vertex),
+    ) -> ((Self::Vertex, Self::Vertex), String) {
+        self.try_unset_edge_label(x).unwrap()
+    }
+
+    /// Vertex identifier from label.
+    ///
+    /// Return vertex identifier given its label.
+    ///
     /// # Errors
     ///
     /// The vertex label does not exists in the graph.
     ///
-    fn get_vertex_id(&self, x: &str) -> Result<Self::Vertex, VertexError> {
+    fn try_get_vertex_id(&self, x: &str) -> Result<Self::Vertex, VertexError> {
         self.as_vertices_labels()
             .get_by_right(x)
-            .map(|y| *y)
+            .copied()
             .ok_or(VertexError)
     }
 
@@ -379,10 +486,10 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The vertex identifier does not exists in the graph.
     ///
-    fn get_vertex_label(&self, x: &Self::Vertex) -> Result<String, VertexError> {
+    fn try_get_vertex_label(&self, x: &Self::Vertex) -> Result<String, VertexError> {
         self.as_vertices_labels()
             .get_by_left(x)
-            .map(|y| String::from(y))
+            .map(String::from)
             .ok_or(VertexError)
     }
 
@@ -395,7 +502,11 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// The vertex identifier does not exists in the graph,
     /// or the vertex label is already defined.
     ///
-    fn set_vertex_label(&mut self, x: &Self::Vertex, y: &str) -> Result<Self::Vertex, VertexError> {
+    fn try_set_vertex_label(
+        &mut self,
+        x: &Self::Vertex,
+        y: &str,
+    ) -> Result<Self::Vertex, VertexError> {
         match self.has_vertex(x) {
             false => Err(VertexError),
             true => match self
@@ -417,7 +528,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// The vertex identifier does not exists in the graph,
     /// or the vertex label is not defined.
     ///
-    fn unset_vertex_label(
+    fn try_unset_vertex_label(
         &mut self,
         x: &Self::Vertex,
     ) -> Result<(Self::Vertex, String), VertexError> {
@@ -434,7 +545,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The edge label does not exists in the graph.
     ///
-    fn get_edge_id(&self, x: &str) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+    fn try_get_edge_id(&self, x: &str) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
         self.as_edges_labels()
             .get_by_right(x)
             .map(|y| *y)
@@ -449,7 +560,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The edge identifier does not exists in the graph.
     ///
-    fn get_edge_label(&self, x: &(Self::Vertex, Self::Vertex)) -> Result<String, VertexError> {
+    fn try_get_edge_label(&self, x: &(Self::Vertex, Self::Vertex)) -> Result<String, VertexError> {
         self.as_edges_labels()
             .get_by_left(x)
             .map(|y| String::from(y))
@@ -465,7 +576,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// The edge identifier does not exists in the graph,
     /// or the edge label is already defined.
     ///
-    fn set_edge_label(
+    fn try_set_edge_label(
         &mut self,
         x: &(Self::Vertex, Self::Vertex),
         y: &str,
@@ -491,7 +602,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     /// The edge identifier does not exists in the graph,
     /// or the edge label is not defined.
     ///
-    fn unset_edge_label(
+    fn try_unset_edge_label(
         &mut self,
         x: &(Self::Vertex, Self::Vertex),
     ) -> Result<((Self::Vertex, Self::Vertex), String), VertexError> {

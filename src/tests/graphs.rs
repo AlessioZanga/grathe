@@ -598,12 +598,12 @@ mod tests {
     {
         // Test for missing vertex label.
         let mut g = T::default();
-        assert_true!(g.get_vertex_id("0").is_err());
+        assert_true!(g.try_get_vertex_id("0").is_err());
 
         // Test for existing vertex label.
         let i = g.add_vertex(&0);
-        g.set_vertex_label(&i, "0").unwrap();
-        assert_eq!(g.get_vertex_id("0").unwrap(), 0);
+        g.set_vertex_label(&i, "0");
+        assert_eq!(g.get_vertex_id("0"), 0);
     }
 
     #[test]
@@ -613,12 +613,12 @@ mod tests {
     {
         // Test for missing vertex identifier.
         let mut g = T::default();
-        assert_true!(g.get_vertex_label(&0).is_err());
+        assert_true!(g.try_get_vertex_label(&0).is_err());
 
         // Test for existing vertex identifier.
         let i = g.add_vertex(&0);
-        g.set_vertex_label(&i, "0").unwrap();
-        assert_eq!(g.get_vertex_label(&0).unwrap(), "0");
+        g.set_vertex_label(&i, "0");
+        assert_eq!(g.get_vertex_label(&0), "0");
     }
 
     #[test]
@@ -628,21 +628,21 @@ mod tests {
     {
         // Test for missing vertex identifier.
         let mut g = T::default();
-        assert_true!(g.set_vertex_label(&0, "0").is_err());
+        assert_true!(g.try_set_vertex_label(&0, "0").is_err());
 
         // Test for existing vertex label.
         let i = g.add_vertex(&0);
-        assert_false!(g.set_vertex_label(&i, "0").is_err());
-        assert_eq!(g.get_vertex_label(&0).unwrap(), "0");
+        assert_false!(g.try_set_vertex_label(&i, "0").is_err());
+        assert_eq!(g.get_vertex_label(&0), "0");
 
         // Test for vertex label overwriting (identifier).
-        assert_true!(g.set_vertex_label(&i, "1").is_err());
-        assert_eq!(g.get_vertex_label(&0).unwrap(), "0");
+        assert_true!(g.try_set_vertex_label(&i, "1").is_err());
+        assert_eq!(g.get_vertex_label(&0), "0");
 
         // Test for vertex label overwriting (label).
         let j = g.add_vertex(&1);
-        assert_true!(g.set_vertex_label(&j, "0").is_err());
-        assert_true!(g.get_vertex_label(&j).is_err());
+        assert_true!(g.try_set_vertex_label(&j, "0").is_err());
+        assert_true!(g.try_get_vertex_label(&j).is_err());
     }
 
     #[test]
@@ -652,16 +652,16 @@ mod tests {
     {
         // Test for missing vertex identifier.
         let mut g = T::default();
-        assert_true!(g.unset_vertex_label(&0).is_err());
+        assert_true!(g.try_unset_vertex_label(&0).is_err());
 
         // Test for existing vertex label.
         let i = g.add_vertex(&0);
-        assert_false!(g.set_vertex_label(&i, "0").is_err());
-        assert_false!(g.unset_vertex_label(&0).is_err());
+        assert_false!(g.try_set_vertex_label(&i, "0").is_err());
+        assert_false!(g.try_unset_vertex_label(&0).is_err());
 
         // Test for vertex label overdeleting (identifier).
-        assert_true!(g.unset_vertex_label(&0).is_err());
-        assert_true!(g.get_vertex_label(&0).is_err());
+        assert_true!(g.try_unset_vertex_label(&0).is_err());
+        assert_true!(g.try_get_vertex_label(&0).is_err());
     }
 
     #[test]
@@ -671,14 +671,14 @@ mod tests {
     {
         // Test for missing edge label.
         let mut g = T::default();
-        assert_true!(g.get_edge_id("(0, 1)").is_err());
+        assert_true!(g.try_get_edge_id("(0, 1)").is_err());
 
         // Test for existing edge label.
         let i = g.add_vertex(&0);
         let j = g.add_vertex(&1);
         let e = g.add_edge(&(i, j));
-        g.set_edge_label(&e, "(0, 1)").unwrap();
-        assert_eq!(g.get_edge_id("(0, 1)").unwrap(), e);
+        g.set_edge_label(&e, "(0, 1)");
+        assert_eq!(g.get_edge_id("(0, 1)"), e);
     }
 
     #[test]
@@ -688,14 +688,14 @@ mod tests {
     {
         // Test for missing edge identifier.
         let mut g = T::default();
-        assert_true!(g.get_edge_label(&(0, 1)).is_err());
+        assert_true!(g.try_get_edge_label(&(0, 1)).is_err());
 
         // Test for existing edge identifier.
         let i = g.add_vertex(&0);
         let j = g.add_vertex(&1);
         let e = g.add_edge(&(i, j));
-        g.set_edge_label(&e, "(0, 1)").unwrap();
-        assert_eq!(g.get_edge_label(&e).unwrap(), "(0, 1)");
+        g.set_edge_label(&e, "(0, 1)");
+        assert_eq!(g.get_edge_label(&e), "(0, 1)");
     }
 
     #[test]
@@ -707,22 +707,22 @@ mod tests {
         let mut g = T::default();
         let i = g.add_vertex(&0);
         let j = g.add_vertex(&1);
-        assert_true!(g.set_edge_label(&(i, j), "(0, 1)").is_err());
+        assert_true!(g.try_set_edge_label(&(i, j), "(0, 1)").is_err());
 
         // Test for existing edge label.
         let e = g.add_edge(&(i, j));
-        assert_false!(g.set_edge_label(&e, "(0, 1)").is_err());
-        assert_eq!(g.get_edge_label(&e).unwrap(), "(0, 1)");
+        assert_false!(g.try_set_edge_label(&e, "(0, 1)").is_err());
+        assert_eq!(g.get_edge_label(&e), "(0, 1)");
 
         // Test for edge label overwriting (identifier).
-        assert_true!(g.set_edge_label(&e, "(0, 1)").is_err());
-        assert_eq!(g.get_edge_label(&e).unwrap(), "(0, 1)");
+        assert_true!(g.try_set_edge_label(&e, "(0, 1)").is_err());
+        assert_eq!(g.get_edge_label(&e), "(0, 1)");
 
         // Test for edge label overwriting (label).
         let k = g.add_vertex(&2);
         let f = g.add_edge(&(i, k));
-        assert_true!(g.set_edge_label(&f, "(0, 1)").is_err());
-        assert_true!(g.get_edge_label(&f).is_err());
+        assert_true!(g.try_set_edge_label(&f, "(0, 1)").is_err());
+        assert_true!(g.try_get_edge_label(&f).is_err());
     }
 
     #[test]
@@ -734,16 +734,16 @@ mod tests {
         let mut g = T::default();
         let i = g.add_vertex(&0);
         let j = g.add_vertex(&1);
-        assert_true!(g.unset_edge_label(&(i, j)).is_err());
+        assert_true!(g.try_unset_edge_label(&(i, j)).is_err());
 
         // Test for existing edge label.
         let e = g.add_edge(&(i, j));
-        assert_false!(g.set_edge_label(&e, "(0, 1)").is_err());
-        assert_false!(g.unset_edge_label(&e).is_err());
+        assert_false!(g.try_set_edge_label(&e, "(0, 1)").is_err());
+        assert_false!(g.try_unset_edge_label(&e).is_err());
 
         // Test for edge label overdeleting (identifier).
-        assert_true!(g.unset_edge_label(&e).is_err());
-        assert_true!(g.get_edge_label(&e).is_err());
+        assert_true!(g.try_unset_edge_label(&e).is_err());
+        assert_true!(g.try_get_edge_label(&e).is_err());
     }
 
     #[test]
