@@ -669,7 +669,16 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing edge label.
+        let mut g = T::default();
+        assert_true!(g.get_edge_id("(0, 1)").is_err());
+
+        // Test for existing edge label.
+        let i = g.add_vertex(&0);
+        let j = g.add_vertex(&1);
+        let e = g.add_edge(&(i, j));
+        g.set_edge_label(&e, "(0, 1)").unwrap();
+        assert_eq!(g.get_edge_id("(0, 1)").unwrap(), e);
     }
 
     #[test]
@@ -677,7 +686,16 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing edge identifier.
+        let mut g = T::default();
+        assert_true!(g.get_edge_label(&(0, 1)).is_err());
+
+        // Test for existing edge identifier.
+        let i = g.add_vertex(&0);
+        let j = g.add_vertex(&1);
+        let e = g.add_edge(&(i, j));
+        g.set_edge_label(&e, "(0, 1)").unwrap();
+        assert_eq!(g.get_edge_label(&e).unwrap(), "(0, 1)");
     }
 
     #[test]
@@ -685,7 +703,26 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing edge identifier.
+        let mut g = T::default();
+        let i = g.add_vertex(&0);
+        let j = g.add_vertex(&1);
+        assert_true!(g.set_edge_label(&(i, j), "(0, 1)").is_err());
+
+        // Test for existing edge label.
+        let e = g.add_edge(&(i, j));
+        assert_false!(g.set_edge_label(&e, "(0, 1)").is_err());
+        assert_eq!(g.get_edge_label(&e).unwrap(), "(0, 1)");
+
+        // Test for edge label overwriting (identifier).
+        assert_true!(g.set_edge_label(&e, "(0, 1)").is_err());
+        assert_eq!(g.get_edge_label(&e).unwrap(), "(0, 1)");
+
+        // Test for edge label overwriting (label).
+        let k = g.add_vertex(&2);
+        let f = g.add_edge(&(i, k));
+        assert_true!(g.set_edge_label(&f, "(0, 1)").is_err());
+        assert_true!(g.get_edge_label(&f).is_err());
     }
 
     #[test]
@@ -693,7 +730,20 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        todo!()
+        // Test for missing edge identifier.
+        let mut g = T::default();
+        let i = g.add_vertex(&0);
+        let j = g.add_vertex(&1);
+        assert_true!(g.unset_edge_label(&(i, j)).is_err());
+
+        // Test for existing edge label.
+        let e = g.add_edge(&(i, j));
+        assert_false!(g.set_edge_label(&e, "(0, 1)").is_err());
+        assert_false!(g.unset_edge_label(&e).is_err());
+
+        // Test for edge label overdeleting (identifier).
+        assert_true!(g.unset_edge_label(&e).is_err());
+        assert_true!(g.get_edge_label(&e).is_err());
     }
 
     #[test]
