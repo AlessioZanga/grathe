@@ -170,7 +170,7 @@ where
         self.data.contains_key(x)
     }
 
-    fn try_reserve_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>> {
+    fn reserve_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // Increase last key or get default.
         let i = self
             .data
@@ -179,11 +179,11 @@ where
             .next()
             .map(|x| *x.0 + Self::Vertex::one())
             .unwrap_or(Self::Vertex::zero());
-        self.try_add_vertex(&i)
+        self.add_vertex(&i)
     }
 
-    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        // TODO: Update using try_insert once stable.
+    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
+        // TODO: Update using insert once stable.
         if self.has_vertex(x) {
             return Err(Error::VertexAlreadyDefined(*x));
         }
@@ -191,7 +191,7 @@ where
         Ok(*x)
     }
 
-    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
+    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // Remove vertex from map.
         match self.data.remove(x) {
             // If no vertex found return error.
@@ -201,7 +201,7 @@ where
         }
     }
 
-    fn try_has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>> {
+    fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
             // If no vertex found return error.
@@ -216,7 +216,7 @@ where
         }
     }
 
-    fn try_add_edge(
+    fn add_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
@@ -240,7 +240,7 @@ where
         }
     }
 
-    fn try_del_edge(
+    fn del_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
