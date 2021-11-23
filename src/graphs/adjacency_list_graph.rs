@@ -1,7 +1,6 @@
 use crate::errors::VertexError;
 use crate::graphs::GraphTrait;
 use crate::types::*;
-use bimap::BiHashMap;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Formatter};
@@ -12,8 +11,8 @@ where
     T: VertexTrait,
 {
     data: AdjacencyList<T>,
-    v_labels: BiHashMap<T, String>,
-    e_labels: BiHashMap<(T, T), String>,
+    v_labels: LabelMap<T>,
+    e_labels: LabelMap<(T, T)>,
 }
 
 impl<T> PartialEq for AdjacencyListGraph<T>
@@ -110,8 +109,8 @@ where
     fn new() -> Self {
         AdjacencyListGraph {
             data: Self::Storage::new(),
-            v_labels: BiHashMap::new(),
-            e_labels: BiHashMap::new(),
+            v_labels: LabelMap::new(),
+            e_labels: LabelMap::new(),
         }
     }
 
@@ -138,19 +137,19 @@ where
         &self.data
     }
 
-    fn as_vertices_labels(&self) -> &BiHashMap<Self::Vertex, String> {
+    fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex> {
         &self.v_labels
     }
 
-    fn as_mut_vertices_labels(&mut self) -> &mut BiHashMap<Self::Vertex, String> {
+    fn as_mut_vertices_labels(&mut self) -> &mut LabelMap<Self::Vertex> {
         &mut self.v_labels
     }
 
-    fn as_edges_labels(&self) -> &BiHashMap<(Self::Vertex, Self::Vertex), String> {
+    fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)> {
         &self.e_labels
     }
 
-    fn as_mut_edges_labels(&mut self) -> &mut BiHashMap<(Self::Vertex, Self::Vertex), String> {
+    fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)> {
         &mut self.e_labels
     }
 

@@ -1,3 +1,4 @@
+use bimap::BiHashMap;
 use na::{Dynamic, OMatrix};
 use nasparse::CsrMatrix;
 use num_traits::{FromPrimitive, PrimInt};
@@ -13,6 +14,9 @@ impl<T> VertexTrait for T where T: PrimInt + FromPrimitive + Debug + Hash {}
 
 // TODO: Where clauses are not enforced in type aliases,
 // once done we should add "where T: VertexTrait" down here.
+
+/// Label bidirectional map type.
+pub type LabelMap<T> = BiHashMap<T, String>;
 
 /// Edge list type.
 pub type EdgeList<T> = BTreeSet<(T, T)>;

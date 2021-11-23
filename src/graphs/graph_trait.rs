@@ -1,7 +1,6 @@
 use crate::errors::VertexError;
 use crate::types::*;
 use crate::{E, V};
-use bimap::BiHashMap;
 use nasparse::CooMatrix;
 use num_traits::FromPrimitive;
 use std::collections::HashMap;
@@ -111,25 +110,25 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// Return immutable reference to internal vertices labels.
     ///
-    fn as_vertices_labels(&self) -> &BiHashMap<Self::Vertex, String>;
+    fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex>;
 
     /// Mutable vertices labels.
     ///
     /// Return mutable reference to internal vertices labels.
     ///
-    fn as_mut_vertices_labels(&mut self) -> &mut BiHashMap<Self::Vertex, String>;
+    fn as_mut_vertices_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
 
     /// Edges labels.
     ///
     /// Return immutable reference to internal edges labels.
     ///
-    fn as_edges_labels(&self) -> &BiHashMap<(Self::Vertex, Self::Vertex), String>;
+    fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)>;
 
     /// Mutable edges labels.
     ///
     /// Return mutable reference to internal edges labels.
     ///
-    fn as_mut_edges_labels(&mut self) -> &mut BiHashMap<(Self::Vertex, Self::Vertex), String>;
+    fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)>;
 
     /// Edge list adapter.
     ///
