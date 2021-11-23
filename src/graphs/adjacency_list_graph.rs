@@ -115,7 +115,7 @@ where
     }
 
     fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
-        Box::new(self.data.iter().map(|(x, _)| x).copied())
+        Box::new(self.data.iter().map(|x| x.0).copied())
     }
 
     fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a> {
@@ -168,6 +168,21 @@ where
     fn has_vertex(&self, x: &Self::Vertex) -> bool {
         // Check if map contains key.
         self.data.contains_key(x)
+    }
+
+    fn try_reserve_vertex(&mut self) -> Result<Self::Vertex, VertexError> {
+        // Get last key or default.
+        let mut i = self
+            .data
+            .iter()
+            .rev()
+            .next()
+            .map(|x| x.0)
+            .copied()
+            .unwrap_or(Self::Vertex::zero());
+        // Compute next key
+        i = i + Self::Vertex::one();
+        self.try_add_vertex(&i)
     }
 
     fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, VertexError> {

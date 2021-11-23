@@ -299,6 +299,16 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
 
     /// Adds vertex to the graph
     ///
+    /// Insert a new vertex identifier into the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier already exists in the graph.
+    ///
+    fn try_reserve_vertex(&mut self) -> Result<Self::Vertex, VertexError>;
+
+    /// Adds vertex to the graph
+    ///
     /// Insert given vertex identifier into the graph.
     ///
     /// # Errors
@@ -377,6 +387,18 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     fn get_vertex_label(&self, x: &Self::Vertex) -> String {
         self.try_get_vertex_label(x).unwrap()
+    }
+
+    /// Adds vertex to the graph
+    ///
+    /// Insert given vertex label into the graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex label already exists in the graph.
+    ///
+    fn add_vertex_from_label(&mut self, x: &str) -> Self::Vertex {
+        self.try_add_vertex_from_label(x).unwrap()
     }
 
     /// Set vertex label.
@@ -490,6 +512,19 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
             .get_by_left(x)
             .map(String::from)
             .ok_or(VertexError)
+    }
+
+    /// Adds vertex to the graph
+    ///
+    /// Insert given vertex label into the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex label already exists in the graph.
+    ///
+    fn try_add_vertex_from_label(&mut self, x: &str) -> Result<Self::Vertex, VertexError> {
+        let i = self.try_reserve_vertex()?;
+        self.try_set_vertex_label(&i, x)
     }
 
     /// Set vertex label.
