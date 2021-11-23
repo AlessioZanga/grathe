@@ -60,17 +60,17 @@ where
                 }
             }
             Rule::edge => {
-                //TODO: Add edge with attributes
+                // TODO: Add edge with attributes
             }
             Rule::edge_id => {
-                //TODO: Add edge or multiple edges
+                // TODO: Add edge or multiple edges
             }
             Rule::vertex => {
                 // Get iterator on parsed
                 let mut i = pair.into_inner();
                 // Parse vertex identifier
                 match_rules(graph, i.next().unwrap())?;
-                //TODO: Add vertex attributes
+                // TODO: Add vertex attributes
             }
             Rule::vertex_id => {
                 // Get vertex id
@@ -81,16 +81,17 @@ where
                 match id.as_rule() {
                     Rule::text => graph.add_vertex_label(txt).ok(),
                     Rule::quoted_text => graph.add_vertex_label(txt.trim_matches('"')).ok(),
+                    // FIXME: Can Rule::number be a float? Use it as string?
                     Rule::number => match txt.parse::<T::Vertex>() {
                         Err(_) => graph.add_vertex_label(txt).ok(),
                         Ok(y) => graph.add_vertex(&y).ok(),
                     },
                     _ => unreachable!(),
                 };
-                //TODO: Add vertex port
+                // TODO: Add vertex port
             }
             _ => {
-                //TODO: Handle missing rules
+                // TODO: Handle missing rules
             }
         }
         Ok(())
