@@ -1,4 +1,4 @@
-use crate::errors::VertexError;
+use crate::errors::*;
 use crate::graphs::GraphTrait;
 use crate::types::*;
 use std::cmp::Ordering;
@@ -170,7 +170,7 @@ where
         self.data.contains_key(x)
     }
 
-    fn try_reserve_vertex(&mut self) -> Result<Self::Vertex, VertexError> {
+    fn try_reserve_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // Increase last key or get default.
         let i = self
             .data
@@ -182,36 +182,34 @@ where
         self.try_add_vertex(&i)
     }
 
-    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, VertexError> {
+    fn try_add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // TODO: Update using try_insert once stable.
         if self.has_vertex(x) {
-            return Err(VertexError);
+            return Err(Error::VertexAlreadyDefined(*x));
         }
-        match self.data.insert(*x, BTreeSet::new()) {
-            Some(_) => Err(VertexError),
-            None => Ok(*x),
-        }
+        self.data.insert(*x, BTreeSet::new());
+        Ok(*x)
     }
 
-    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, VertexError> {
+    fn try_del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // Remove vertex from map.
         match self.data.remove(x) {
             // If no vertex found return error.
-            None => Err(VertexError),
+            None => Err(Error::VertexNotDefined(*x)),
             // Otherwise return successful.
             Some(_) => Ok(*x),
         }
     }
 
-    fn try_has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, VertexError> {
+    fn try_has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
             // If no vertex found return error.
-            None => Err(VertexError),
+            None => Err(Error::VertexNotDefined(e.0)),
             // Otherwise check second vertex.
             Some(adj) => match self.data.contains_key(&e.1) {
                 // If no vertex found return error.
-                false => Err(VertexError),
+                false => Err(Error::VertexNotDefined(e.1)),
                 // Otherwise check if it is in the adjacency list.
                 true => Ok(adj.contains(&e.1)),
             },
@@ -221,21 +219,20 @@ where
     fn try_add_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
-    ) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
-            false => Err(VertexError),
+            false => Err(Error::VertexNotDefined(e.1)),
             // Otherwise get mutable vertex adjacency list.
             true => match self.data.get_mut(&e.0) {
                 // If no vertex exists return error.
-                None => Err(VertexError),
+                None => Err(Error::VertexNotDefined(e.0)),
                 // Otherwise try to insert vertex into adjacency list.
                 Some(adj) => match adj.insert(e.1) {
-                    // If no vertex inserted return error.
-                    // FIXME: Change to EdgeError.
-                    false => Err(VertexError),
+                    // If edge already defined return error.
+                    false => Err(Error::EdgeAlreadyDefined(*e)),
                     // Otherwise return successful.
                     true => Ok(*e),
                 },
@@ -246,20 +243,19 @@ where
     fn try_del_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
-    ) -> Result<(Self::Vertex, Self::Vertex), VertexError> {
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         // Check if second vertex exists.
         match self.data.contains_key(&e.1) {
             // If no vertex found return error.
-            false => Err(VertexError),
+            false => Err(Error::VertexNotDefined(e.1)),
             // Otherwise get mutable vertex adjacency list.
             true => match self.data.get_mut(&e.0) {
                 // If no vertex exists return error.
-                None => Err(VertexError),
-                // Otherwise try to insert vertex into adjacency list.
+                None => Err(Error::VertexNotDefined(e.0)),
+                // Otherwise try to remove vertex from adjacency list.
                 Some(adj) => match adj.remove(&e.1) {
-                    // If no vertex inserted return error.
-                    // FIXME: Change to EdgeError.
-                    false => Err(VertexError),
+                    // If no edge defined return error.
+                    false => Err(Error::EdgeNotDefined(*e)),
                     // Otherwise return successful.
                     true => Ok(*e),
                 },
