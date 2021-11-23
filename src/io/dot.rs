@@ -23,10 +23,10 @@ where
     // Init result vector
     let mut graphs = vec![];
     // Read DOT file
-    let file = std::fs::read_to_string(path.to_str().unwrap())
+    let file = std::fs::read_to_string(path)
         .unwrap_or_else(|_| panic!("Failed to read file: {:?}", &path));
     // Parse the given dot file
-    let dot = DOTParser::parse(Rule::graphs, &file)?.next().unwrap();
+    let pairs = DOTParser::parse(Rule::graphs, &file.trim())?;
     // Match rules recursively
     fn match_rules<T>(graph: &mut T, pair: Pair<Rule>) -> Result<(), Error<Rule>>
     where
@@ -68,18 +68,26 @@ where
             Rule::vertex => {
                 // Get iterator on parsed
                 let mut i = pair.into_inner();
-                // Parse node identifier
+                // Parse vertex identifier
                 match_rules(graph, i.next().unwrap())?;
-                //TODO: Add node attributes
+                //TODO: Add vertex attributes
             }
             Rule::vertex_id => {
-                // Get matched string
-                let x = pair.as_str();
-                // Check if token can be parsed into identifier
-                match x.parse::<T::Vertex>() {
-                    Err(_) => graph.add_vertex_label(x).ok(),
-                    Ok(y) => graph.add_vertex(&y).ok(),
+                // Get vertex id
+                let id = pair.into_inner().next().unwrap();
+                // Get underlying text representation
+                let txt = id.as_str();
+                // Match ids types
+                match id.as_rule() {
+                    Rule::text => graph.add_vertex_label(txt).ok(),
+                    Rule::quoted_text => graph.add_vertex_label(txt.trim_matches('"')).ok(),
+                    Rule::number => match txt.parse::<T::Vertex>() {
+                        Err(_) => graph.add_vertex_label(txt).ok(),
+                        Ok(y) => graph.add_vertex(&y).ok(),
+                    },
+                    _ => unreachable!(),
                 };
+                //TODO: Add vertex port
             }
             _ => {
                 //TODO: Handle missing rules
@@ -88,7 +96,7 @@ where
         Ok(())
     }
     // Match each graph in dot file
-    for pair in dot.into_inner() {
+    for pair in pairs {
         // Init an empty graph
         let mut graph = T::default();
         // Match rules for this graph

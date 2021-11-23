@@ -3,9 +3,9 @@ use crate::graphs::GraphTrait;
 use crate::types::*;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
-use std::fmt::{Debug, Formatter};
 
 /// Graph structure based on adjacency list storage.
+#[derive(Debug)]
 pub struct AdjacencyListGraph<T>
 where
     T: VertexTrait,
@@ -78,15 +78,6 @@ where
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.
         self.data.partial_cmp(&other.data)
-    }
-}
-
-impl<T> Debug for AdjacencyListGraph<T>
-where
-    T: VertexTrait,
-{
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "{:?}", self.data)
     }
 }
 

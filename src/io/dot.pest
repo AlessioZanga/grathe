@@ -1,4 +1,4 @@
-graphs = _{ SOI ~ graph+ ~ EOI }
+graphs = _{ graph+ }
 
 graph = { strict_attribute ~ graph_type ~ graph_id ~ "{" ~ statements ~ "}" }
 
@@ -8,16 +8,13 @@ graph_type = { ^"graph" | ^"digraph" }
 
 graph_id = { ID? }
 
-text = @{ (
-    !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+
-    | quoted_text
-) }
+text = @{ !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+ }
 
 quoted_text = @{ "\"" ~ (!"\"" ~ "\\\""? ~ ANY)* ~ "\"" }
 
 number = @{ "-"? ~ ("." ~ ASCII_DIGIT+ | ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)?) }
 
-ID = _{ number | text }
+ID = _{ number | text | quoted_text }
 
 html = { "<" ~ html_tag+ ~ ">" }
 

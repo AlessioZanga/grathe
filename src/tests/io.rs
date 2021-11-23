@@ -13,8 +13,9 @@ mod tests {
         for path in paths {
             let file = std::fs::read_to_string(&path)
                 .unwrap_or_else(|_| panic!("Failed to read file: {:?}", &path));
-            DOTParser::parse(Rule::graphs, &file)
+            let parsed = DOTParser::parse(Rule::graphs, &file)
                 .unwrap_or_else(|_| panic!("Failed to parse file: {:?}", &path));
+            println!("{:?}", parsed);
         }
     }
 
@@ -25,7 +26,8 @@ mod tests {
             .map(|x| x.unwrap().path())
             .filter(|x| !x.extension().unwrap().eq("ignore"));
         for path in paths {
-            crate::io::read_dot::<AdjacencyListGraph<usize>>(&path).unwrap();
+            let parsed = crate::io::read_dot::<AdjacencyListGraph<usize>>(&path).unwrap();
+            println!("{:?}", parsed);
         }
     }
 }

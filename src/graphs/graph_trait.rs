@@ -4,10 +4,9 @@ use crate::{E, V};
 use nasparse::CooMatrix;
 use num_traits::FromPrimitive;
 use std::collections::HashMap;
-use std::fmt::Debug;
 
 /// The base graph trait.
-pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
+pub trait GraphTrait: Eq + PartialOrd + Default {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable, use combination of x = T::default()
     // and x = Step::forward(x, 1) to increase Vertex in from(order) constructor,
