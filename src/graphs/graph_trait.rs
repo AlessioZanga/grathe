@@ -341,7 +341,7 @@ pub trait GraphTrait: Eq + PartialOrd + Debug + Default {
     ///
     /// The vertex label already exists in the graph.
     ///
-    fn add_vertex_from_label(&mut self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
+    fn add_vertex_label(&mut self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
         let i = self.reserve_vertex()?;
         self.set_vertex_label(&i, x)
     }

@@ -5,12 +5,13 @@ use num_traits::{FromPrimitive, PrimInt};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
+use std::str::FromStr;
 
 /// The base vertex trait.
-pub trait VertexTrait: PrimInt + FromPrimitive + Debug + Hash {}
+pub trait VertexTrait: PrimInt + FromPrimitive + FromStr + Debug + Hash {}
 
 // Blanket implementation of the vertex trait.
-impl<T> VertexTrait for T where T: PrimInt + FromPrimitive + Debug + Hash {}
+impl<T> VertexTrait for T where T: PrimInt + FromPrimitive + FromStr + Debug + Hash {}
 
 // TODO: Where clauses are not enforced in type aliases,
 // once done we should add "where T: VertexTrait" down here.

@@ -793,12 +793,12 @@ mod tests {
     }
 
     #[test]
-    fn add_vertex_from_label<T>() -> Result<(), Error<u32>>
+    fn add_vertex_label<T>() -> Result<(), Error<u32>>
     where
         T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::default();
-        let i = g.add_vertex_from_label("0")?;
+        let i = g.add_vertex_label("0")?;
         assert_eq!(i, 0);
         assert_eq!(g.get_vertex_id("0")?, i);
         assert_eq!(g.get_vertex_label(&i)?, "0");

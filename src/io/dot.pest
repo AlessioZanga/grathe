@@ -6,7 +6,7 @@ strict_attribute = { ^"strict"? }
 
 graph_type = { ^"graph" | ^"digraph" }
 
-graph_id = _{ ID? }
+graph_id = { ID? }
 
 text = @{ (
     !ASCII_DIGIT ~ ("_" | ASCII_ALPHANUMERIC)+
@@ -25,27 +25,27 @@ pair = { ID ~ "=" ~ (ID | html) }
 
 statements = { statement* }
 
-statement = _{ (pair | attributes | subgraph | edge | node) ~ ";"? }
+statement = _{ (pair | attributes | subgraph | edge | vertex) ~ ";"? }
 
-attributes = { (graph_type | node_type | edge_type)? ~ "[" ~ (pair ~ (";" | ",")?)* ~ "]" }
+attributes = { (graph_type | vertex_type | edge_type)? ~ "[" ~ (pair ~ (";" | ",")?)* ~ "]" }
 
 subgraph_type = { ^"subgraph" }
 
 subgraph = { (subgraph_type ~ ID?)? ~ "{" ~ statements? ~ "}" }
 
-node_type = { ^"node" }
+vertex_type = { ^"node" }
 
-node_id = { ID ~ port? }
+vertex_id = { ID ~ port? }
 
-port = { (":" ~ ID ~ (":" ~ node_direction)? | ":" ~ node_direction) }
+port = { (":" ~ ID ~ (":" ~ vertex_direction)? | ":" ~ vertex_direction) }
 
-node_direction = { "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "c" | "_" }
+vertex_direction = { "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "c" | "_" }
 
-node = { node_id ~ attributes? }
+vertex = { vertex_id ~ attributes? }
 
 edge_type = { ^"edge" }
 
-edge_id = { (node_id | subgraph) ~ (edge_direction ~ (node_id | subgraph))+ }
+edge_id = { (vertex_id | subgraph) ~ (edge_direction ~ (vertex_id | subgraph))+ }
 
 edge_direction = { ("->" | "--") }
 
