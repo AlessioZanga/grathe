@@ -171,17 +171,14 @@ where
     }
 
     fn try_reserve_vertex(&mut self) -> Result<Self::Vertex, VertexError> {
-        // Get last key or default.
-        let mut i = self
+        // Increase last key or get default.
+        let i = self
             .data
             .iter()
             .rev()
             .next()
-            .map(|x| x.0)
-            .copied()
+            .map(|x| *x.0 + Self::Vertex::one())
             .unwrap_or(Self::Vertex::zero());
-        // Compute next key
-        i = i + Self::Vertex::one();
         self.try_add_vertex(&i)
     }
 

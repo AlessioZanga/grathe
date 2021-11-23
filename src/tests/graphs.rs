@@ -33,8 +33,8 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
-        let mut h = T::new();
+        let mut g = T::default();
+        let mut h = T::default();
 
         // Null graphs are equals by definition.
         assert_eq!(g, h); // G = (), H = ()
@@ -58,8 +58,8 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
-        let h = T::new();
+        let mut g = T::default();
+        let h = T::default();
 
         // Null graphs are equals by definition.
         assert_false!(g < h);
@@ -81,7 +81,7 @@ mod tests {
         T: GraphTrait<Vertex = u32>,
     {
         // Test empty new call.
-        T::new();
+        T::default();
     }
 
     #[test]
@@ -306,7 +306,7 @@ mod tests {
         T: GraphTrait<Vertex = u32>,
     {
         let g = T::from_edges(E);
-        let mut a = AdjacencyList::new();
+        let mut a = AdjacencyList::default();
         for (x, y) in E {
             a.entry(x).or_default().insert(y);
         }
@@ -347,7 +347,7 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Test null graph order.
         assert_eq!(g.order(), 0);
@@ -370,7 +370,7 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Test null graph has no size by definition.
         assert_eq!(g.size(), 0);
@@ -398,7 +398,7 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Test null graph has no vertex by definition.
         assert_false!(g.has_vertex(&0));
@@ -417,11 +417,37 @@ mod tests {
     }
 
     #[test]
+    fn reserve_vertex<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        // Add min Vertex.
+        let mut g = T::default();
+        assert_eq!(g.try_reserve_vertex().unwrap() as usize, 0);
+
+        // Add contiguous Vertex.
+        g = T::from_order(N as usize);
+        assert_eq!(g.try_reserve_vertex().unwrap() as usize, N as usize);
+    }
+
+    #[test]
+    #[should_panic]
+    fn reserve_vertex_panics<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        // Panics on overflow.
+        let mut g = T::default();
+        g.add_vertex(&T::Vertex::MAX);
+        assert_true!(g.try_reserve_vertex().is_err());
+    }
+
+    #[test]
     fn add_vertex<T>()
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Add min Vertex.
         g.add_vertex(&T::Vertex::MIN);
@@ -448,7 +474,7 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Del min Vertex.
         g.add_vertex(&T::Vertex::MIN);
@@ -485,7 +511,7 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Test null graph has no edge by definition.
         assert_true!(g.try_has_edge(&(0, 0)).is_err());
@@ -512,7 +538,7 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Test missing vertex.
         let mut e = (0, 0);
@@ -552,7 +578,7 @@ mod tests {
     where
         T: GraphTrait<Vertex = u32>,
     {
-        let mut g = T::new();
+        let mut g = T::default();
 
         // Test missing vertex.
         let mut e = (0, 0);
@@ -696,6 +722,18 @@ mod tests {
         let e = g.add_edge(&(i, j));
         g.set_edge_label(&e, "(0, 1)");
         assert_eq!(g.get_edge_label(&e), "(0, 1)");
+    }
+
+    #[test]
+    fn add_vertex_from_label<T>()
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+        let i = g.add_vertex_from_label("0");
+        assert_eq!(i, 0);
+        assert_eq!(g.get_vertex_id("0"), i);
+        assert_eq!(g.get_vertex_label(&i), "0");
     }
 
     #[test]
