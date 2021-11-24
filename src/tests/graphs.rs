@@ -98,8 +98,8 @@ mod tests {
     {
         // Test default call.
         let g = T::default();
-        assert_eq!(g.order(), 0 as usize);
-        assert_eq!(g.size(), 0 as usize);
+        assert_eq!(g.order(), 0_usize);
+        assert_eq!(g.size(), 0_usize);
 
         Ok(())
     }

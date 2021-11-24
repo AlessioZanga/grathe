@@ -1,5 +1,6 @@
+use crate::errors::*;
 use crate::graphs::GraphTrait;
-use pest::error::Error;
+use itertools::Itertools;
 use pest::iterators::Pair;
 use pest::Parser;
 use std::path::Path;
@@ -12,11 +13,18 @@ use std::path::Path;
 #[grammar = "io/dot.pest"]
 pub struct DOTParser;
 
+/// Enumerator for DOT values.
+enum DOTValue<T> {
+    None,
+    Vertex(T),
+    Edge((T, T)),
+}
+
 /// Read DOT file.
 ///
 /// Read DOT file into sequence of graphs.
 ///
-pub fn read_dot<T>(path: &Path) -> Result<Vec<T>, Error<Rule>>
+pub fn read_dot<T>(path: &Path) -> Result<Vec<T>, pest::error::Error<Rule>>
 where
     T: GraphTrait,
 {
@@ -28,7 +36,10 @@ where
     // Parse the given dot file
     let pairs = DOTParser::parse(Rule::graphs, &file.trim())?;
     // Match rules recursively
-    fn match_rules<T>(graph: &mut T, pair: Pair<Rule>) -> Result<(), Error<Rule>>
+    fn match_rules<T>(
+        graph: &mut T,
+        pair: Pair<Rule>,
+    ) -> Result<DOTValue<T::Vertex>, pest::error::Error<Rule>>
     where
         T: GraphTrait,
     {
@@ -60,9 +71,31 @@ where
                 }
             }
             Rule::edge => {
-                // TODO: Add edge with attributes
+                // Get iterator on parsed
+                let mut i = pair.into_inner();
+                // Parse edge identifier
+                match_rules(graph, i.next().unwrap())?;
+                // TODO: Add edge attributes
             }
             Rule::edge_id => {
+                // Get iterator on parsed
+                let i = pair
+                    .into_inner()
+                    // Discard direction placeholder
+                    .step_by(2)
+                    // Group by tuples of vertices
+                    .tuple_windows();
+                // Insert edge
+                for (x, y) in i {
+                    // Insert vertices if missing
+                    let e = (match_rules(graph, x)?, match_rules(graph, y)?);
+                    // Insert edge
+                    match e {
+                        (DOTValue::Vertex(x), DOTValue::Vertex(y)) => graph.add_edge(&(x, y)).ok(),
+                        // FIXME: Handling subgraphs
+                        _ => unreachable!(),
+                    };
+                }
                 // TODO: Add edge or multiple edges
             }
             Rule::vertex => {
@@ -74,27 +107,39 @@ where
             }
             Rule::vertex_id => {
                 // Get vertex id
-                let id = pair.into_inner().next().unwrap();
+                let i = pair.into_inner().next().unwrap();
                 // Get underlying text representation
-                let txt = id.as_str();
+                let j = i.as_str();
                 // Match ids types
-                match id.as_rule() {
-                    Rule::text => graph.add_vertex_label(txt).ok(),
-                    Rule::quoted_text => graph.add_vertex_label(txt.trim_matches('"')).ok(),
+                let x = match i.as_rule() {
+                    Rule::text => graph.add_vertex_label(j),
+                    Rule::quoted_text => graph.add_vertex_label(j.trim_matches('"')),
                     // FIXME: Can Rule::number be a float? Use it as string?
-                    Rule::number => match txt.parse::<T::Vertex>() {
-                        Err(_) => graph.add_vertex_label(txt).ok(),
-                        Ok(y) => graph.add_vertex(&y).ok(),
+                    Rule::number => match j.parse::<T::Vertex>() {
+                        Err(_) => graph.add_vertex_label(j),
+                        Ok(j) => graph.add_vertex(&j),
                     },
                     _ => unreachable!(),
                 };
+                // Handle errors
+                let x = match x {
+                    // Catch vertex label already defined error
+                    Err(Error::VertexLabelAlreadyDefined(x)) => graph.get_vertex_id(&x).unwrap(),
+                    // Catch vertex identifier already defined error
+                    Err(Error::VertexAlreadyDefined(x)) => x,
+                    // Give up on other errors
+                    Err(_) => unreachable!(),
+                    // Return on success
+                    Ok(j) => j,
+                };
                 // TODO: Add vertex port
+                return Ok(DOTValue::Vertex(x));
             }
             _ => {
                 // TODO: Handle missing rules
             }
         }
-        Ok(())
+        Ok(DOTValue::None)
     }
     // Match each graph in dot file
     for pair in pairs {
