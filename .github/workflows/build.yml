@@ -9,17 +9,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-          - os: windows-latest
-          - os: macos-latest
+        env: ["stable", "beta", "nightly"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v2
       - name: Setup
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: ${{ matrix.env }}
           components: rustfmt, clippy
       - name: Cache
         uses: actions/cache@v2
@@ -37,19 +35,19 @@ jobs:
       - name: Test
         run: cargo test
       - name: Coverage
-        if: runner.os == 'Linux'
+        if: runner.os == "Linux" && matrix.env == "stable"
         run: |
           cargo install cargo-tarpaulin
           cargo tarpaulin --out Lcov --exclude-files tests/* -v
       - name: CodeCov
         uses: codecov/codecov-action@v2
-        if: runner.os == 'Linux'
+        if: runner.os == "Linux" && matrix.env == "stable"
         with:
           files: ./lcov.info
           flags: unittests
           fail_ci_if_error: true
       - name: Publish
-        if: ${{ runner.os == 'Linux' && github.ref == 'refs/heads/main' }}
+        if: ${{ runner.os == "Linux" && matrix.env == "stable" && github.ref == 'refs/heads/main' }}
         env:
           TOKEN: ${{ secrets.TOKEN }}
         run: |
@@ -57,6 +55,7 @@ jobs:
           cargo publish --allow-dirty
       - name: 'Artifacts'
         uses: actions/upload-artifact@v2
+        if: ${{ runner.os == "Linux" && matrix.env == "stable" && github.ref == 'refs/heads/main' }}
         with:
           name: ${{ env.PROJECT_NAME_UNDERSCORE }}
           path: target/release/${{ env.PROJECT_NAME_UNDERSCORE }}
