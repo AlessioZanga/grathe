@@ -1,12 +1,15 @@
 use crate::errors::*;
+use crate::io::*;
 use crate::types::*;
 use crate::{E, V};
 use nasparse::CooMatrix;
 use num_traits::FromPrimitive;
 use std::collections::HashMap;
+use std::fmt::Debug;
+use std::path::Path;
 
 /// The base graph trait.
-pub trait GraphTrait: Eq + PartialOrd + Default {
+pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable, use combination of x = T::default()
     // and x = Step::forward(x, 1) to increase Vertex in from(order) constructor,
@@ -74,6 +77,125 @@ pub trait GraphTrait: Eq + PartialOrd + Default {
         g
     }
 
+    /// From DOT string constructor.
+    ///
+    /// Construct a graph from a given DOT string.
+    /// If more than one graph is parsed, the last one will be returned.
+    ///
+    /// # Errors
+    ///
+    /// The DOT string is invalid.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the DOT string does not contain at least one graph.
+    ///
+    fn from_dot(string: &str) -> Result<Self, pest::error::Error<Rule>> {
+        let mut g = from_dot::<Self>(string)?;
+        Ok(g.pop().unwrap())
+    }
+
+    /// Edge list adapter.
+    ///
+    /// Return the edge list representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|E| \cdot \log |E|)$ - Log-linear in the size of the graph.
+    ///
+    fn to_edge_list(&self) -> EdgeList<Self::Vertex> {
+        let mut out = EdgeList::new();
+        out.extend(E!(self));
+        out
+    }
+
+    /// Adjacency list adapter.
+    ///
+    /// Return the adjacency list representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+    ///
+    fn to_adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
+        let mut out = AdjacencyList::new();
+        for (x, y) in E!(self) {
+            out.entry(x).or_default().insert(y);
+        }
+        out
+    }
+
+    /// Dense adjacency matrix adapter.
+    ///
+    /// Return the (dense) adjacency matrix representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V|^2)$ - Quadratic in the order of the graph.
+    ///
+    fn to_dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
+        let n = self.order();
+        let mut idx = HashMap::new();
+        let mut out = DenseAdjacencyMatrix::zeros(n, n);
+        // Build vid-to-index mapping.
+        idx.extend(
+            V!(self)
+                .into_iter()
+                .enumerate()
+                .map(|(index, vid)| (vid, index)),
+        );
+        // Populate the output value.
+        for (x, y) in E!(self) {
+            out[(idx[&x], idx[&y])] = 1;
+        }
+        out
+    }
+
+    /// Sparse adjacency matrix adapter.
+    ///
+    /// Return the (sparse) adjacency matrix representing the graph.
+    ///
+    /// # Complexity
+    ///
+    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+    ///
+    fn to_sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
+        let n = self.order();
+        let mut idx = HashMap::new();
+        let mut out = CooMatrix::<i8>::zeros(n, n);
+        // Build vid-to-index mapping.
+        idx.extend(
+            V!(self)
+                .into_iter()
+                .enumerate()
+                .map(|(index, vid)| (vid, index)),
+        );
+        // Populate the output value.
+        out.reserve(self.size());
+        for (x, y) in E!(self) {
+            out.push(idx[&x], idx[&y], 1);
+        }
+        SparseAdjacencyMatrix::from(&out)
+    }
+
+    /// Read DOT file constructor.
+    ///
+    /// Construct a graph from a given DOT file.
+    /// If more than one graph is parsed, the last one will be returned.
+    ///
+    /// # Errors
+    ///
+    /// The DOT string is invalid.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the DOT string does not contain at least one graph.
+    ///
+    fn read_dot(path: &Path) -> Result<Self, pest::error::Error<Rule>> {
+        let mut g = read_dot::<Self>(path)?;
+        Ok(g.pop().unwrap())
+    }
+
     /// Vertex iterator.
     ///
     /// Iterates over the vertex set $V$ ordered by identifier value.
@@ -128,89 +250,6 @@ pub trait GraphTrait: Eq + PartialOrd + Default {
     /// Return mutable reference to internal edges labels.
     ///
     fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)>;
-
-    /// Edge list adapter.
-    ///
-    /// Return the edge list representing the graph.
-    ///
-    /// # Complexity
-    ///
-    /// $O(|E| \cdot \log |E|)$ - Log-linear in the size of the graph.
-    ///
-    fn as_edge_list(&self) -> EdgeList<Self::Vertex> {
-        let mut out = EdgeList::new();
-        out.extend(E!(self));
-        out
-    }
-
-    /// Adjacency list adapter.
-    ///
-    /// Return the adjacency list representing the graph.
-    ///
-    /// # Complexity
-    ///
-    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
-    ///
-    fn as_adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
-        let mut out = AdjacencyList::new();
-        for (x, y) in E!(self) {
-            out.entry(x).or_default().insert(y);
-        }
-        out
-    }
-
-    /// Dense adjacency matrix adapter.
-    ///
-    /// Return the (dense) adjacency matrix representing the graph.
-    ///
-    /// # Complexity
-    ///
-    /// $O(|V|^2)$ - Quadratic in the order of the graph.
-    ///
-    fn as_dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
-        let n = self.order();
-        let mut idx = HashMap::new();
-        let mut out = DenseAdjacencyMatrix::zeros(n, n);
-        // Build vid-to-index mapping.
-        idx.extend(
-            V!(self)
-                .into_iter()
-                .enumerate()
-                .map(|(index, vid)| (vid, index)),
-        );
-        // Populate the output value.
-        for (x, y) in E!(self) {
-            out[(idx[&x], idx[&y])] = 1;
-        }
-        out
-    }
-
-    /// Sparse adjacency matrix adapter.
-    ///
-    /// Return the (sparse) adjacency matrix representing the graph.
-    ///
-    /// # Complexity
-    ///
-    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
-    ///
-    fn as_sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
-        let n = self.order();
-        let mut idx = HashMap::new();
-        let mut out = CooMatrix::<i8>::zeros(n, n);
-        // Build vid-to-index mapping.
-        idx.extend(
-            V!(self)
-                .into_iter()
-                .enumerate()
-                .map(|(index, vid)| (vid, index)),
-        );
-        // Populate the output value.
-        out.reserve(self.size());
-        for (x, y) in E!(self) {
-            out.push(idx[&x], idx[&y], 1);
-        }
-        SparseAdjacencyMatrix::from(&out)
-    }
 
     /// Order of the graph.
     ///
