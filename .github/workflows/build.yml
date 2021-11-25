@@ -27,7 +27,7 @@ jobs:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}
       - name: Check
         run: cargo check
       - name: Build
