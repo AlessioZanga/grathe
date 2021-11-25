@@ -341,6 +341,27 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         e: &(Self::Vertex, Self::Vertex),
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>;
 
+    /// Checks vertex label.
+    ///
+    /// Checks whether the graph has a given vertex label or not.
+    ///
+    fn has_vertex_label(&self, x: &str) -> bool {
+        self.as_vertices_labels().contains_right(x)
+    }
+
+    /// Adds vertex to the graph
+    ///
+    /// Insert given vertex label into the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex label already exists in the graph.
+    ///
+    fn add_vertex_label(&mut self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
+        let i = self.reserve_vertex()?;
+        self.set_vertex_label(&i, x)
+    }
+
     /// Vertex identifier from label.
     ///
     /// Return vertex identifier given its label.
@@ -369,19 +390,6 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
             .get_by_left(x)
             .map(String::from)
             .ok_or(Error::VertexNotDefined(*x))
-    }
-
-    /// Adds vertex to the graph
-    ///
-    /// Insert given vertex label into the graph.
-    ///
-    /// # Errors
-    ///
-    /// The vertex label already exists in the graph.
-    ///
-    fn add_vertex_label(&mut self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        let i = self.reserve_vertex()?;
-        self.set_vertex_label(&i, x)
     }
 
     /// Set vertex label.
@@ -426,6 +434,14 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         self.as_mut_vertices_labels()
             .remove_by_left(x)
             .ok_or(Error::VertexNotDefined(*x))
+    }
+
+    /// Checks edge label.
+    ///
+    /// Checks whether the graph has a given edge label or not.
+    ///
+    fn has_edge_label(&self, x: &str) -> bool {
+        self.as_edges_labels().contains_right(x)
     }
 
     /// Edge identifier from label.
