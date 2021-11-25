@@ -14,6 +14,15 @@ jobs:
           override: true
           toolchain: stable
           components: rustfmt, clippy
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            ~/.cargo
+            target
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.lock') }}
       - name: Check
         run: cargo check
       - name: Build
@@ -26,7 +35,7 @@ jobs:
         run: |
           rustup override set nightly
           cargo install grcov
-          RUSTFLAGS="-Z profile" cargo test
+          RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort" cargo test
           grcov . --binary-path ./target/debug -s . -t lcov --branch --ignore *tests* --ignore *lib.rs* --ignore-not-existing -o coverage
       - name: CodeCov
         uses: codecov/codecov-action@v2
