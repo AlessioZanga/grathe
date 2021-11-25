@@ -408,12 +408,13 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ) -> Result<Self::Vertex, Error<Self::Vertex>> {
         match self.has_vertex(x) {
             false => Err(Error::VertexNotDefined(*x)),
-            true => match self
-                .as_mut_vertices_labels()
-                .insert_no_overwrite(*x, String::from(y))
-            {
-                Err(_) => Err(Error::VertexLabelAlreadyDefined(String::from(y))),
-                Ok(()) => Ok(*x),
+            true => match self.as_vertices_labels().contains_right(y) {
+                false => {
+                    // Overwrite previous label if present
+                    self.as_mut_vertices_labels().insert(*x, String::from(y));
+                    Ok(*x)
+                }
+                true => Err(Error::VertexLabelAlreadyDefined(String::from(y))),
             },
         }
     }
@@ -493,12 +494,13 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         match self.has_edge(x)? {
             false => Err(Error::EdgeNotDefined(*x)),
-            true => match self
-                .as_mut_edges_labels()
-                .insert_no_overwrite(*x, String::from(y))
-            {
-                Err(_) => Err(Error::EdgeLabelAlreadyDefined(String::from(y))),
-                Ok(_) => Ok(*x),
+            true => match self.as_edges_labels().contains_right(y) {
+                false => {
+                    // Overwrite previous label if present
+                    self.as_mut_edges_labels().insert(*x, String::from(y));
+                    Ok(*x)
+                }
+                true => Err(Error::EdgeLabelAlreadyDefined(String::from(y))),
             },
         }
     }

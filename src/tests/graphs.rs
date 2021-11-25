@@ -748,13 +748,13 @@ mod tests {
         assert_false!(g.set_vertex_label(&i, "0").is_err());
         assert_eq!(g.get_vertex_label(&i)?, "0");
 
-        // Test for vertex label overwriting (identifier).
-        assert_true!(g.set_vertex_label(&i, "1").is_err());
-        assert_eq!(g.get_vertex_label(&i)?, "0");
+        // Test for vertex label overwriting label.
+        assert_false!(g.set_vertex_label(&i, "1").is_err());
+        assert_eq!(g.get_vertex_label(&i)?, "1");
 
-        // Test for vertex label overwriting (label).
+        // Test for vertex label duplicated label.
         let j = g.add_vertex(&1)?;
-        assert_true!(g.set_vertex_label(&j, "0").is_err());
+        assert_true!(g.set_vertex_label(&j, "1").is_err());
         assert_true!(g.get_vertex_label(&j).is_err());
 
         Ok(())
@@ -849,14 +849,14 @@ mod tests {
         assert_false!(g.set_edge_label(&e, "(0, 1)").is_err());
         assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
 
-        // Test for edge label overwriting (identifier).
-        assert_true!(g.set_edge_label(&e, "(0, 1)").is_err());
-        assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
+        // Test for edge label overwriting label.
+        assert_false!(g.set_edge_label(&e, "(1, 1)").is_err());
+        assert_eq!(g.get_edge_label(&e)?, "(1, 1)");
 
-        // Test for edge label overwriting (label).
+        // Test for edge label duplicated label.
         let k = g.add_vertex(&2)?;
         let f = g.add_edge(&(i, k))?;
-        assert_true!(g.set_edge_label(&f, "(0, 1)").is_err());
+        assert_true!(g.set_edge_label(&f, "(1, 1)").is_err());
         assert_true!(g.get_edge_label(&f).is_err());
 
         Ok(())
