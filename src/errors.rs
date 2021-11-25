@@ -27,4 +27,7 @@ pub enum Error<T> {
     /// Edge label already defined error type.
     #[error("edge label `{0:?}` already defined")]
     EdgeLabelAlreadyDefined(String),
+    /// Parsing error type.
+    #[error("failed to parse graph")]
+    ParseFailed(String)
 }

@@ -4,6 +4,7 @@ use crate::types::*;
 use crate::{E, V};
 use nasparse::CooMatrix;
 use num_traits::FromPrimitive;
+use pest::error::Error as PestError;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::path::Path;
@@ -90,7 +91,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Panics if the DOT string does not contain at least one graph.
     ///
-    fn from_dot(string: &str) -> Result<Self, pest::error::Error<Rule>> {
+    fn from_dot(string: &str) -> Result<Self, PestError<Rule>> {
         let mut g = from_dot::<Self>(string)?;
         Ok(g.pop().unwrap())
     }
@@ -178,6 +179,14 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         SparseAdjacencyMatrix::from(&out)
     }
 
+    /// To DOT string.
+    ///
+    /// Return a DOT string representation of the graph.
+    ///
+    fn to_dot(&self) -> Result<String, Error<Self::Vertex>> {
+        to_dot::<Self>(&self).map_err(|x| Error::ParseFailed(x.to_string()))
+    }
+
     /// Read DOT file constructor.
     ///
     /// Construct a graph from a given DOT file.
@@ -191,9 +200,17 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Panics if the DOT string does not contain at least one graph.
     ///
-    fn read_dot(path: &Path) -> Result<Self, pest::error::Error<Rule>> {
-        let mut g = read_dot::<Self>(path)?;
+    fn read_dot(path: &Path) -> Result<Self, Error<Self::Vertex>> {
+        let mut g = read_dot::<Self>(path).map_err(|x| Error::ParseFailed(x.to_string()))?;
         Ok(g.pop().unwrap())
+    }
+
+    /// Write DOT file.
+    ///
+    /// Write the graph to a given DOT file.
+    ///
+    fn write_dot(&self, path: &Path) -> Result<(), Error<Self::Vertex>> {
+        write_dot::<Self>(path, &self).map_err(|x| Error::ParseFailed(x.to_string()))
     }
 
     /// Vertex iterator.
@@ -443,6 +460,24 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn has_edge_label(&self, x: &str) -> bool {
         self.as_edges_labels().contains_right(x)
+    }
+
+    /// Adds edge to the graph
+    ///
+    /// Insert given edge label into the graph.
+    ///
+    /// # Errors
+    ///
+    /// At least one of the vertex identifiers do not exist in the graph,
+    /// or the edge label already exists in the graph.
+    ///
+    fn add_edge_label(
+        &mut self,
+        x: &(Self::Vertex, Self::Vertex),
+        y: &str,
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
+        self.add_edge(x)?;
+        self.set_edge_label(&x, y)
     }
 
     /// Edge identifier from label.

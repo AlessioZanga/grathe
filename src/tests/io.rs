@@ -1,9 +1,12 @@
 #[cfg(test)]
 mod tests {
-    use crate::graphs::AdjacencyListGraph;
-    use crate::io::*;
-    use pest::Parser;
+    use crate::errors::*;
+    use crate::graphs::{AdjacencyListGraph, GraphTrait};
     use std::path::PathBuf;
+    use tempfile::NamedTempFile;
+
+    // Set DOT string
+    const DOT: &str = "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n\t0 -- 1 [label=\"A -- B\"];\n}\n";
 
     fn load_test_data() -> Vec<PathBuf> {
         std::fs::read_dir("src/tests/data")
@@ -14,21 +17,44 @@ mod tests {
     }
 
     #[test]
-    fn dot_parser() {
-        for path in load_test_data() {
-            let file = std::fs::read_to_string(&path)
-                .unwrap_or_else(|_| panic!("Failed to read file: {:?}", &path));
-            let parsed = DOTParser::parse(Rule::graphs, &file)
-                .unwrap_or_else(|_| panic!("Failed to parse file: {:?}", &path));
-            println!("{:?}", parsed);
-        }
+    fn from_dot() -> Result<(), Error<u32>> {
+        let mut g = AdjacencyListGraph::<u32>::default();
+        let i = g.add_vertex_label("A")?;
+        let j = g.add_vertex_label("B")?;
+        g.add_edge_label(&(i, j), "A -- B")?;
+        let h = crate::io::from_dot::<AdjacencyListGraph<u32>>(&DOT)
+            .unwrap()
+            .pop()
+            .unwrap();
+        assert_eq!(g, h);
+        Ok(())
     }
 
     #[test]
     fn read_dot() {
         for path in load_test_data() {
-            let parsed = crate::io::read_dot::<AdjacencyListGraph<usize>>(&path).unwrap();
+            let parsed = crate::io::read_dot::<AdjacencyListGraph<u32>>(&path).unwrap();
             println!("{:?}", parsed);
         }
+    }
+
+    #[test]
+    fn write_dot() {
+        // Load graph from DOT string
+        let g = crate::io::from_dot::<AdjacencyListGraph<u32>>(&DOT)
+            .unwrap()
+            .pop()
+            .unwrap();
+        // Get temporary file path
+        let path = NamedTempFile::new().unwrap().into_temp_path();
+        // Write to DOT file
+        crate::io::write_dot(&path, &g).unwrap();
+        // Read from DOT file
+        let h = crate::io::read_dot::<AdjacencyListGraph<u32>>(&path)
+            .unwrap()
+            .pop()
+            .unwrap();
+        // Compare
+        assert_eq!(g, h);
     }
 }

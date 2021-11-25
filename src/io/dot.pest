@@ -20,11 +20,13 @@ html = { "<" ~ html_tag+ ~ ">" }
 
 pair = { ID ~ "=" ~ (ID | html) }
 
+pairs = { "[" ~ (pair ~ (";" | ",")?)* ~ "]" }
+
 statements = { statement* }
 
-statement = _{ (pair | attributes | subgraph | edge | vertex) ~ ";"? }
+statement = _{ (pair | attribute | subgraph | path | vertex) ~ ";"? }
 
-attributes = { (graph_type | vertex_type | edge_type)? ~ "[" ~ (pair ~ (";" | ",")?)* ~ "]" }
+attribute = { (graph_type | vertex_type | path_type) ~ pairs }
 
 subgraph_type = { ^"subgraph" }
 
@@ -38,15 +40,15 @@ port = { (":" ~ ID ~ (":" ~ vertex_direction)? | ":" ~ vertex_direction) }
 
 vertex_direction = { "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw" | "c" | "_" }
 
-vertex = { vertex_id ~ attributes? }
+vertex = { vertex_id ~ pairs? }
 
-edge_type = { ^"edge" }
+path_type = { ^"edge" }
 
-edge_id = { (vertex_id | subgraph) ~ (edge_direction ~ (vertex_id | subgraph))+ }
+path_id = { (vertex_id | subgraph) ~ (path_direction ~ (vertex_id | subgraph))+ }
 
-edge_direction = { ("->" | "--") }
+path_direction = { ("->" | "--") }
 
-edge = { edge_id ~ attributes? }
+path = { path_id ~ pairs? }
 
 html_tag = {
     table_tag
