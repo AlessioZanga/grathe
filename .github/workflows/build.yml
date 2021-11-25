@@ -32,7 +32,7 @@ jobs:
       - name: Coverage
         run: |
           cargo install cargo-tarpaulin
-          cargo tarpaulin --out Lcov
+          cargo tarpaulin --out Lcov --exclude-files tests/* -v
       - name: CodeCov
         uses: codecov/codecov-action@v2
         with:
