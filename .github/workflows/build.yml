@@ -14,7 +14,7 @@ jobs:
           override: true
           toolchain: stable
           components: rustfmt, clippy
-      - name: Cache dependencies
+      - name: Cache
         uses: actions/cache@v2
         env:
           cache-name: cache-dependencies
@@ -30,17 +30,13 @@ jobs:
       - name: Test
         run: cargo test
       - name: Coverage
-        env:
-          CARGO_INCREMENTAL: 0
         run: |
-          rustup override set nightly
-          cargo install grcov
-          RUSTFLAGS="-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort" cargo test
-          grcov . --binary-path ./target/debug -s . -t lcov --branch --ignore *tests* --ignore *lib.rs* --ignore-not-existing -o coverage
+          cargo install cargo-tarpaulin
+          cargo tarpaulin --out Lcov
       - name: CodeCov
         uses: codecov/codecov-action@v2
         with:
-          files: ./coverage
+          files: ./lcov.info
           flags: unittests
           fail_ci_if_error: true
       - name: Publish
@@ -50,3 +46,8 @@ jobs:
         run: |
           cargo login "$TOKEN"
           cargo publish --allow-dirty
+      - name: 'Artifacts'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.PROJECT_NAME_UNDERSCORE }}
+          path: target/release/${{ env.PROJECT_NAME_UNDERSCORE }}
