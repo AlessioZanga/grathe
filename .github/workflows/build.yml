@@ -5,7 +5,13 @@ name: build
 jobs:
   build:
     name: grathe
-    runs-on: ubuntu-latest
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+          - os: ubuntu-latest
+          - os: windows-latest
     steps:
       - uses: actions/checkout@v2
       - name: Setup
@@ -30,6 +36,7 @@ jobs:
       - name: Test
         run: cargo test
       - name: Coverage
+        if: runner.os == 'Linux'
         run: |
           cargo install cargo-tarpaulin
           cargo tarpaulin --out Lcov --exclude-files tests/* -v
