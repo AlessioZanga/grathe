@@ -13,7 +13,8 @@ mod tests {
     const E: [(u32, u32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
 
     // Set DOT string
-    const DOT: &str = "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n\t0 -- 1 [label=\"A -- B\"];\n}\n";
+    const DOT: &str =
+        "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n\t0 -- 1 [label=\"A -- B\"];\n}\n";
 
     // TODO: Replace with is_sorted method on iterators once stable.
     fn is_sorted<I>(data: I) -> bool
@@ -204,7 +205,7 @@ mod tests {
     }
 
     #[test]
-    fn from_dot<T>()
+    fn from_dot<T>() -> Result<(), Error<u32>>
     where
         T: GraphTrait<Vertex = u32>,
     {
@@ -213,7 +214,9 @@ mod tests {
         // Load graph using io function
         let g = crate::io::from_dot::<T>(&dot).unwrap().pop().unwrap();
         // Test from DOT string constructor
-        assert_eq!(T::from_dot(&dot).unwrap(), g);
+        assert_eq!(T::from_dot(&dot)?, g);
+
+        Ok(())
     }
 
     #[test]
@@ -531,7 +534,7 @@ mod tests {
     }
 
     #[test]
-    fn reserve_vertex<T>() -> Result<(), Error<u32>>
+    fn add_vertex<T>() -> Result<(), Error<u32>>
     where
         T: GraphTrait<Vertex = u32>,
     {
@@ -548,7 +551,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn reserve_vertex_panics<T>()
+    fn add_vertex_panics<T>()
     where
         T: GraphTrait<Vertex = u32>,
     {
@@ -559,7 +562,7 @@ mod tests {
     }
 
     #[test]
-    fn add_vertex<T>() -> Result<(), Error<u32>>
+    fn reserve_vertex<T>() -> Result<(), Error<u32>>
     where
         T: GraphTrait<Vertex = u32>,
     {
@@ -698,6 +701,27 @@ mod tests {
     }
 
     #[test]
+    fn reserve_edge<T>() -> Result<(), Error<u32>>
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test missing edge and vertices.
+        let e = g.reserve_edge(&(0, 1))?;
+        assert_true!(g.has_vertex(&e.0));
+        assert_true!(g.has_vertex(&e.1));
+        assert_true!(g.has_edge(&e).unwrap());
+
+        // Test already existing vertex
+        let i = g.reserve_vertex(&2)?;
+        assert_true!(g.reserve_edge(&(i, 3)).is_err());
+        assert_true!(g.reserve_edge(&(3, i)).is_err());
+
+        Ok(())
+    }
+
+    #[test]
     fn del_edge<T>() -> Result<(), Error<u32>>
     where
         T: GraphTrait<Vertex = u32>,
@@ -772,6 +796,37 @@ mod tests {
         // Test for existing vertex identifier.
         let i = g.add_vertex()?;
         assert_eq!(g.set_vertex_label(&i, "0")?, i);
+        assert_eq!(g.get_vertex_label(&i)?, "0");
+
+        Ok(())
+    }
+
+    #[test]
+    fn add_vertex_label<T>() -> Result<(), Error<u32>>
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+        let i = g.add_vertex_label("0")?;
+        assert_eq!(i, 0);
+        assert_eq!(g.get_vertex_id("0")?, i);
+        assert_eq!(g.get_vertex_label(&i)?, "0");
+
+        Ok(())
+    }
+
+    #[test]
+    fn reserve_vertex_label<T>() -> Result<(), Error<u32>>
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test missing vertex identifier and label
+        let i = g.reserve_vertex_label(&0, "0")?;
+        assert_true!(g.has_vertex(&i));
+        assert_true!(g.has_vertex_label("0"));
+        assert_eq!(g.get_vertex_id("0")?, i);
         assert_eq!(g.get_vertex_label(&i)?, "0");
 
         Ok(())
@@ -863,15 +918,39 @@ mod tests {
     }
 
     #[test]
-    fn add_vertex_label<T>() -> Result<(), Error<u32>>
+    fn add_edge_label<T>() -> Result<(), Error<u32>>
     where
         T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::default();
-        let i = g.add_vertex_label("0")?;
-        assert_eq!(i, 0);
-        assert_eq!(g.get_vertex_id("0")?, i);
-        assert_eq!(g.get_vertex_label(&i)?, "0");
+
+        // Test for missing edge label
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
+        let e = g.add_edge_label(&(i, j), "(0, 1)")?;
+        assert_true!(g.has_edge(&e)?);
+        assert_true!(g.has_edge_label("(0, 1)"));
+        assert_eq!(g.get_edge_id("(0, 1)")?, e);
+        assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
+
+        Ok(())
+    }
+
+    #[test]
+    fn reserve_edge_label<T>() -> Result<(), Error<u32>>
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test missing vertex identifier and label
+        let e = g.reserve_edge_label(&(0, 1), "(0, 1)")?;
+        assert_true!(g.has_vertex(&e.0));
+        assert_true!(g.has_vertex(&e.1));
+        assert_true!(g.has_edge(&e)?);
+        assert_true!(g.has_edge_label("(0, 1)"));
+        assert_eq!(g.get_edge_id("(0, 1)")?, e);
+        assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
 
         Ok(())
     }

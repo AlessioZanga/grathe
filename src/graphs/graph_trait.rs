@@ -4,7 +4,6 @@ use crate::types::*;
 use crate::{E, V};
 use nasparse::CooMatrix;
 use num_traits::FromPrimitive;
-use pest::error::Error as PestError;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::path::Path;
@@ -91,8 +90,8 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Panics if the DOT string does not contain at least one graph.
     ///
-    fn from_dot(string: &str) -> Result<Self, PestError<Rule>> {
-        let mut g = from_dot::<Self>(string)?;
+    fn from_dot(string: &str) -> Result<Self, Error<Self::Vertex>> {
+        let mut g = from_dot::<Self>(string).map_err(|x| Error::ParseFailed(x.to_string()))?;
         Ok(g.pop().unwrap())
     }
 
@@ -332,7 +331,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
 
     /// Adds edge to the graph.
     ///
-    /// Insert given edge identifier into the graph.
+    /// Add new edge identifier into the graph.
     ///
     /// # Errors
     ///
@@ -343,6 +342,24 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>;
+
+    /// Adds edge to the graph.
+    ///
+    /// Insert given vertex identifiers and edge identifier into the graph.
+    ///
+    /// # Errors
+    ///
+    /// At least one of the vertex identifiers already exists in the graph,
+    /// or the edge identifier already exists in the graph.
+    ///
+    fn reserve_edge(
+        &mut self,
+        e: &(Self::Vertex, Self::Vertex),
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
+        self.reserve_vertex(&e.0)?;
+        self.reserve_vertex(&e.1)?;
+        self.add_edge(e)
+    }
 
     /// Deletes edge from the graph.
     ///
@@ -366,7 +383,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         self.as_vertices_labels().contains_right(x)
     }
 
-    /// Adds vertex to the graph
+    /// Adds vertex label to the graph
     ///
     /// Insert given vertex label into the graph.
     ///
@@ -376,6 +393,23 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn add_vertex_label(&mut self, y: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
         let x = self.add_vertex()?;
+        self.set_vertex_label(&x, y)
+    }
+
+    /// Adds vertex label to the graph
+    ///
+    /// Insert given vertex identifier and label into the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier or label already exists in the graph.
+    ///
+    fn reserve_vertex_label(
+        &mut self,
+        x: &Self::Vertex,
+        y: &str,
+    ) -> Result<Self::Vertex, Error<Self::Vertex>> {
+        self.reserve_vertex(x)?;
         self.set_vertex_label(&x, y)
     }
 
@@ -462,7 +496,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         self.as_edges_labels().contains_right(x)
     }
 
-    /// Adds edge to the graph
+    /// Adds edge label to the graph
     ///
     /// Insert given edge label into the graph.
     ///
@@ -477,6 +511,24 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         y: &str,
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         self.add_edge(x)?;
+        self.set_edge_label(&x, y)
+    }
+
+    /// Adds edge label to the graph
+    ///
+    /// Insert given vertices identifiers, edge identifier and edge label into the graph.
+    ///
+    /// # Errors
+    ///
+    /// At least one of the vertex identifiers already exists in the graph,
+    /// or the edge identifier or label already exists in the graph.
+    ///
+    fn reserve_edge_label(
+        &mut self,
+        x: &(Self::Vertex, Self::Vertex),
+        y: &str,
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
+        self.reserve_edge(x)?;
         self.set_edge_label(&x, y)
     }
 
