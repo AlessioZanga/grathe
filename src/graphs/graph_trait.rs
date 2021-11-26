@@ -289,7 +289,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn has_vertex(&self, x: &Self::Vertex) -> bool;
 
-    /// Adds vertex to the graph
+    /// Adds vertex to the graph.
     ///
     /// Insert a new vertex identifier into the graph.
     ///
@@ -299,7 +299,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
 
-    /// Adds vertex to the graph
+    /// Adds vertex to the graph.
     ///
     /// Insert given vertex identifier into the graph.
     ///
@@ -309,7 +309,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
 
-    /// Deletes vertex from the graph
+    /// Deletes vertex from the graph.
     ///
     /// Remove given vertex identifier from the graph.
     ///
@@ -383,7 +383,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         self.as_vertices_labels().contains_right(x)
     }
 
-    /// Adds vertex label to the graph
+    /// Adds vertex label to the graph.
     ///
     /// Insert given vertex label into the graph.
     ///
@@ -396,7 +396,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         self.set_vertex_label(&x, y)
     }
 
-    /// Adds vertex label to the graph
+    /// Adds vertex label to the graph.
     ///
     /// Insert given vertex identifier and label into the graph.
     ///
@@ -496,7 +496,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         self.as_edges_labels().contains_right(x)
     }
 
-    /// Adds edge label to the graph
+    /// Adds edge label to the graph.
     ///
     /// Insert given edge label into the graph.
     ///
@@ -514,7 +514,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
         self.set_edge_label(&x, y)
     }
 
-    /// Adds edge label to the graph
+    /// Adds edge label to the graph.
     ///
     /// Insert given vertices identifiers, edge identifier and edge label into the graph.
     ///
