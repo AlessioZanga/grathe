@@ -224,7 +224,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a>;
 
-    /// Adjacents iterator.
+    /// Adjacent iterator.
     ///
     /// Iterates over the adjacent vertices set $Adj(G, X)$ of a given vertex $X$.
     ///
@@ -235,7 +235,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
+    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Data storage.
     ///

@@ -120,8 +120,11 @@ where
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
-        Box::new(self.data.get(x).unwrap().iter().copied())
+    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>> {
+        match self.data.get(x) {
+            Some(i) => Ok(Box::new(i.iter().copied())),
+            None => Err(Error::VertexNotDefined(*x)),
+        }
     }
 
     fn as_data(&self) -> &Self::Storage {

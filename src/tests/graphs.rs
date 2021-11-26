@@ -374,17 +374,20 @@ mod tests {
         T: GraphTrait<Vertex = u32>,
     {
         let mut g = T::from_order(1);
-        assert_eq!(Adj!(g, &0).count(), 0);
+        assert_eq!(Adj!(g, &0)?.count(), 0);
+
+        // Test missing vertex identifier
+        assert_true!(Adj!(g, &1).is_err());
 
         g = T::from_order(N as usize);
         g.add_edge(&(1, 1))?;
         g.add_edge(&(0, 1))?;
         g.add_edge(&(0, 0))?;
-        assert_eq!(Adj!(g, &0).count(), 2);
+        assert_eq!(Adj!(g, &0)?.count(), 2);
 
-        assert_true!(Adj!(g, &0).eq(g.adjacents_iter(&0)));
-        assert_true!(Adj!(g, &0).all(|x| g.has_edge(&(0, x)).unwrap()));
-        assert_true!(is_sorted(Adj!(g, &0)));
+        assert_true!(Adj!(g, &0)?.eq(g.adjacents_iter(&0)?));
+        assert_true!(Adj!(g, &0)?.all(|x| g.has_edge(&(0, x)).unwrap()));
+        assert_true!(is_sorted(Adj!(g, &0)?));
 
         Ok(())
     }
@@ -396,7 +399,7 @@ mod tests {
         T: GraphTrait<Vertex = u32>,
     {
         let g = T::from_order(0);
-        assert_eq!(Adj!(g, &0).count(), 0);
+        assert_eq!(Adj!(g, &0).unwrap().count(), 0);
     }
 
     #[test]
