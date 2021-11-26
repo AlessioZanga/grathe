@@ -1043,7 +1043,7 @@ mod tests {
         assert_eq!(g.degree_of(&i)?, 0);
         assert_true!(g.is_isolated_vertex(&i)?);
 
-        // Test for pedant vertex
+        // Test for pendant vertex
         let j = g.add_vertex()?;
         g.add_edge(&(i, j))?;
         assert_eq!(g.degree_of(&i)?, 1);
