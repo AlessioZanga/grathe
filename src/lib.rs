@@ -3,11 +3,25 @@
 
 //! A Rust implementation of a GRAph THEory library.
 
+/// Graph directions trait, such as UndirectedTrait.
+pub mod directions;
+
+/// Error enums declaration.
 pub mod errors;
+
+/// Graphs types, traits and structs.
 pub mod graphs;
+
+/// I/O operations.
 pub mod io;
+
+/// Backend graph storage implementations.
 pub mod storages;
+
+/// Libray-wide types and type-traits.
 pub mod types;
+
+/// Tools, macros, etc.
 pub mod utils;
 
 mod tests;

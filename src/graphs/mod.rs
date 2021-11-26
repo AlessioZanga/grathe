@@ -1,5 +1,5 @@
 mod adjacency_list;
-mod undirected_trait;
+mod graph_trait;
 
 pub use adjacency_list::UndirectedAdjacencyListGraph;
-pub use undirected_trait::UndirectedTrait;
+pub use graph_trait::GraphTrait;

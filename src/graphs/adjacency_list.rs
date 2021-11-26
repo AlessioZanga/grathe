@@ -1,5 +1,5 @@
-use crate::delegate_storage;
-use crate::graphs::UndirectedTrait;
+use crate::impl_graph_trait;
+use crate::directions::UndirectedTrait;
 use crate::storages::{AdjacencyListStorage, StorageTrait};
 use crate::types::*;
 
@@ -9,8 +9,8 @@ pub struct UndirectedAdjacencyListGraph<T>(AdjacencyListStorage<T>)
 where
     T: VertexTrait;
 
-// Storage method delegation.
-delegate_storage!(UndirectedAdjacencyListGraph);
+// Storage delegation and graph trait implementation.
+impl_graph_trait!(UndirectedAdjacencyListGraph);
 
 impl<T> UndirectedAdjacencyListGraph<T>
 where

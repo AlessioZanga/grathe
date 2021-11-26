@@ -1,8 +1,9 @@
-/// Apply method delegation of storage trait.
+/// Storage delegation and graph trait implementation.
 #[macro_export]
-macro_rules! delegate_storage {
+macro_rules! impl_graph_trait {
     ($graph:ident) => {
         use crate::errors::*;
+        use crate::graphs::GraphTrait;
         use delegate::delegate;
         use std::cmp::Ordering;
 
@@ -75,5 +76,7 @@ macro_rules! delegate_storage {
                 }
             }
         }
+
+        impl<T> GraphTrait for $graph<T> where T: VertexTrait {}
     };
 }
