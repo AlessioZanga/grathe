@@ -8,8 +8,8 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::path::Path;
 
-/// The base graph trait.
-pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
+/// The base graph storage trait.
+pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable, use combination of x = T::default()
     // and x = Step::forward(x, 1) to increase Vertex in from(order) constructor,

@@ -1,5 +1,5 @@
 use crate::errors::*;
-use crate::graphs::GraphTrait;
+use crate::storages::StorageTrait;
 use crate::{E, V};
 use itertools::Itertools;
 use pest::error::Error as PestError;
@@ -26,7 +26,7 @@ pub struct DOTParser;
 /// Enumerator for DOT values.
 enum DOTValue<T>
 where
-    T: GraphTrait,
+    T: StorageTrait,
 {
     None,
     Path(Vec<(T::Vertex, T::Vertex)>),
@@ -39,7 +39,7 @@ where
 ///
 pub fn from_dot<T>(string: &str) -> Result<Vec<T>, PestError<Rule>>
 where
-    T: GraphTrait,
+    T: StorageTrait,
 {
     // Init result vector
     let mut graphs = vec![];
@@ -62,7 +62,7 @@ where
     // Match rules recursively
     fn match_rules<T>(graph: &mut T, pair: Pair<Rule>) -> Result<DOTValue<T>, PestError<Rule>>
     where
-        T: GraphTrait,
+        T: StorageTrait,
     {
         match pair.as_rule() {
             Rule::graph => {
@@ -250,7 +250,7 @@ where
 ///
 pub fn to_dot<T>(graph: &T) -> Result<String, std::fmt::Error>
 where
-    T: GraphTrait,
+    T: StorageTrait,
 {
     // Initialize empty string
     let mut dot = String::new();
@@ -283,7 +283,7 @@ where
 ///
 pub fn read_dot<T>(path: &Path) -> Result<Vec<T>, PestError<Rule>>
 where
-    T: GraphTrait,
+    T: StorageTrait,
 {
     // Read DOT file
     let string = read_to_string(path).expect(&format!("Failed to read file \"{:?}\"", &path));
@@ -297,7 +297,7 @@ where
 ///
 pub fn write_dot<T>(path: &Path, graph: &T) -> Result<(), std::fmt::Error>
 where
-    T: GraphTrait,
+    T: StorageTrait,
 {
     // Export a sequence of graph into DOT string.
     let dot = to_dot(graph)?;

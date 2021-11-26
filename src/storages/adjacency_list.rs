@@ -1,12 +1,12 @@
 use crate::errors::*;
-use crate::graphs::GraphTrait;
+use crate::storages::StorageTrait;
 use crate::types::*;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
 /// Graph structure based on adjacency list storage.
 #[derive(Debug)]
-pub struct AdjacencyListGraph<T>
+pub struct AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
@@ -15,7 +15,7 @@ where
     e_labels: LabelMap<(T, T)>,
 }
 
-impl<T> PartialEq for AdjacencyListGraph<T>
+impl<T> PartialEq for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
@@ -32,10 +32,10 @@ where
     /// # Examples
     ///
     /// ```
-    ///     use grathe::graphs::{GraphTrait, AdjacencyListGraph};
+    ///     use grathe::storages::{StorageTrait, AdjacencyListStorage};
     ///
-    ///     let g = AdjacencyListGraph::<u32>::new();
-    ///     let h = AdjacencyListGraph::<u32>::new();
+    ///     let g = AdjacencyListStorage::<u32>::new();
+    ///     let h = AdjacencyListStorage::<u32>::new();
     ///
     ///     assert_eq!(g, h);
     /// ```
@@ -46,9 +46,9 @@ where
     }
 }
 
-impl<T> Eq for AdjacencyListGraph<T> where T: VertexTrait {}
+impl<T> Eq for AdjacencyListStorage<T> where T: VertexTrait {}
 
-impl<T> PartialOrd for AdjacencyListGraph<T>
+impl<T> PartialOrd for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
@@ -67,10 +67,10 @@ where
     ///
     /// ```
     ///     use all_asserts::*;
-    ///     use grathe::graphs::{GraphTrait, AdjacencyListGraph};
+    ///     use grathe::storages::{StorageTrait, AdjacencyListStorage};
     ///
-    ///     let g = AdjacencyListGraph::<u32>::new();
-    ///     let h = AdjacencyListGraph::<u32>::new();
+    ///     let g = AdjacencyListStorage::<u32>::new();
+    ///     let h = AdjacencyListStorage::<u32>::new();
     ///
     ///     assert_le!(g, h);
     /// ```
@@ -81,7 +81,7 @@ where
     }
 }
 
-impl<T> Default for AdjacencyListGraph<T>
+impl<T> Default for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
@@ -90,7 +90,7 @@ where
     }
 }
 
-impl<T> GraphTrait for AdjacencyListGraph<T>
+impl<T> StorageTrait for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
@@ -98,7 +98,7 @@ where
     type Storage = AdjacencyList<T>;
 
     fn new() -> Self {
-        AdjacencyListGraph {
+        AdjacencyListStorage {
             data: Self::Storage::new(),
             v_labels: LabelMap::new(),
             e_labels: LabelMap::new(),

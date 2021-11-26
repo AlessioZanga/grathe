@@ -6,6 +6,7 @@
 pub mod errors;
 pub mod graphs;
 pub mod io;
+pub mod storages;
 pub mod types;
 
 mod tests;

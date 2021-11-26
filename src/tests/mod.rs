@@ -1,2 +1,2 @@
-mod graphs;
+mod storages;
 mod io;

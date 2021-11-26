@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::errors::*;
-    use crate::graphs::{AdjacencyListGraph, GraphTrait};
+    use crate::storages::{AdjacencyListStorage, StorageTrait};
     use std::path::PathBuf;
     use tempfile::NamedTempFile;
 
@@ -18,11 +18,11 @@ mod tests {
 
     #[test]
     fn from_dot() -> Result<(), Error<u32>> {
-        let mut g = AdjacencyListGraph::<u32>::default();
+        let mut g = AdjacencyListStorage::<u32>::default();
         let i = g.add_vertex_label("A")?;
         let j = g.add_vertex_label("B")?;
         g.add_edge_label(&(i, j), "A -- B")?;
-        let h = crate::io::from_dot::<AdjacencyListGraph<u32>>(&DOT)
+        let h = crate::io::from_dot::<AdjacencyListStorage<u32>>(&DOT)
             .unwrap()
             .pop()
             .unwrap();
@@ -33,7 +33,7 @@ mod tests {
     #[test]
     fn read_dot() {
         for path in load_test_data() {
-            let parsed = crate::io::read_dot::<AdjacencyListGraph<u32>>(&path).unwrap();
+            let parsed = crate::io::read_dot::<AdjacencyListStorage<u32>>(&path).unwrap();
             println!("{:?}", parsed);
         }
     }
@@ -41,7 +41,7 @@ mod tests {
     #[test]
     fn write_dot() {
         // Load graph from DOT string
-        let g = crate::io::from_dot::<AdjacencyListGraph<u32>>(&DOT)
+        let g = crate::io::from_dot::<AdjacencyListStorage<u32>>(&DOT)
             .unwrap()
             .pop()
             .unwrap();
@@ -50,7 +50,7 @@ mod tests {
         // Write to DOT file
         crate::io::write_dot(&path, &g).unwrap();
         // Read from DOT file
-        let h = crate::io::read_dot::<AdjacencyListGraph<u32>>(&path)
+        let h = crate::io::read_dot::<AdjacencyListStorage<u32>>(&path)
             .unwrap()
             .pop()
             .unwrap();

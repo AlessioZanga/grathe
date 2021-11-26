@@ -2,7 +2,7 @@
 #[generic_tests::define]
 mod tests {
     use crate::errors::*;
-    use crate::graphs::{AdjacencyListGraph, GraphTrait};
+    use crate::storages::{AdjacencyListStorage, StorageTrait};
     use crate::types::*;
     use crate::{Adj, E, V};
     use all_asserts::*;
@@ -38,7 +38,7 @@ mod tests {
     #[test]
     fn eq<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
         let mut h = T::default();
@@ -66,7 +66,7 @@ mod tests {
     #[test]
     fn partial_cmp<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
         let h = T::default();
@@ -90,7 +90,7 @@ mod tests {
     #[test]
     fn new<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test empty new call.
         T::default();
@@ -101,7 +101,7 @@ mod tests {
     #[test]
     fn default<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait,
+        T: StorageTrait,
     {
         // Test default call.
         let g = T::default();
@@ -114,7 +114,7 @@ mod tests {
     #[test]
     fn from_order<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::from_order(0);
 
@@ -135,7 +135,7 @@ mod tests {
     #[test]
     fn from_vertices<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::from_vertices([]);
 
@@ -161,7 +161,7 @@ mod tests {
     #[should_panic]
     fn from_vertices_panics<T>()
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test next graph duplicated vertex set.
         let g = T::from_vertices([0, 4, 2, 3, 1, 4, 3]);
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn from_edges<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::from_edges([]);
 
@@ -197,7 +197,7 @@ mod tests {
     #[should_panic]
     fn from_edges_panics<T>()
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test next graph duplicated vertex set.
         let g = T::from_edges(E);
@@ -207,7 +207,7 @@ mod tests {
     #[test]
     fn from_dot<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Read DOT file to string
         let dot = std::fs::read_to_string("src/tests/data/14.dot").unwrap();
@@ -222,7 +222,7 @@ mod tests {
     #[test]
     fn to_edge_list<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_edges(E);
         assert_eq!(g.to_edge_list(), EdgeList::from(E));
@@ -233,7 +233,7 @@ mod tests {
     #[test]
     fn to_adjacency_list<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_edges(E);
         let mut a = AdjacencyList::default();
@@ -248,7 +248,7 @@ mod tests {
     #[test]
     fn to_dense_adjacency_matrix<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_edges(E);
         let mut a = DenseAdjacencyMatrix::zeros(8, 8);
@@ -263,7 +263,7 @@ mod tests {
     #[test]
     fn to_sparse_adjacency_matrix<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_edges(E);
         let mut a = DenseAdjacencyMatrix::zeros(8, 8);
@@ -281,7 +281,7 @@ mod tests {
     #[test]
     fn to_dot<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Init graph
         let mut g = T::default();
@@ -297,7 +297,7 @@ mod tests {
     #[test]
     fn read_dot<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Read DOT file to string
         let dot = Path::new("src/tests/data/14.dot");
@@ -312,7 +312,7 @@ mod tests {
     #[test]
     fn write_dot<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Init graph
         let mut g = T::default();
@@ -332,7 +332,7 @@ mod tests {
     #[test]
     fn vertices_iter<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait,
+        T: StorageTrait,
     {
         let mut g = T::from_order(0);
         assert_eq!(V!(g).count(), 0);
@@ -350,7 +350,7 @@ mod tests {
     #[test]
     fn edges_iter<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::from_order(0);
         assert_eq!(E!(g).count(), 0);
@@ -371,7 +371,7 @@ mod tests {
     #[test]
     fn adjacents_iter<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::from_order(1);
         assert_eq!(Adj!(g, &0)?.count(), 0);
@@ -396,7 +396,7 @@ mod tests {
     #[should_panic]
     fn adjacents_iter_panics<T>()
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_order(0);
         assert_eq!(Adj!(g, &0).unwrap().count(), 0);
@@ -405,7 +405,7 @@ mod tests {
     #[test]
     fn as_data<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_edges(E);
         g.as_data();
@@ -416,7 +416,7 @@ mod tests {
     #[test]
     fn as_vertices_labels<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::default();
         g.as_vertices_labels();
@@ -427,7 +427,7 @@ mod tests {
     #[test]
     fn as_mut_vertices_labels<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
         g.as_mut_vertices_labels();
@@ -438,7 +438,7 @@ mod tests {
     #[test]
     fn as_edges_labels<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::default();
         g.as_edges_labels();
@@ -449,7 +449,7 @@ mod tests {
     #[test]
     fn as_mut_edges_labels<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
         g.as_mut_edges_labels();
@@ -460,7 +460,7 @@ mod tests {
     #[test]
     fn order<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -485,7 +485,7 @@ mod tests {
     #[test]
     fn size<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -514,7 +514,7 @@ mod tests {
     #[test]
     fn has_vertex<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -539,7 +539,7 @@ mod tests {
     #[test]
     fn add_vertex<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Add min Vertex.
         let mut g = T::default();
@@ -556,7 +556,7 @@ mod tests {
     #[should_panic]
     fn add_vertex_panics<T>()
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Panics on overflow.
         let mut g = T::default();
@@ -567,7 +567,7 @@ mod tests {
     #[test]
     fn reserve_vertex<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -596,7 +596,7 @@ mod tests {
     #[test]
     fn del_vertex<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -635,7 +635,7 @@ mod tests {
     #[test]
     fn has_edge<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -664,7 +664,7 @@ mod tests {
     #[test]
     fn add_edge<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -706,7 +706,7 @@ mod tests {
     #[test]
     fn reserve_edge<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -727,7 +727,7 @@ mod tests {
     #[test]
     fn del_edge<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -773,7 +773,7 @@ mod tests {
     #[test]
     fn get_vertex_id<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing vertex label.
         let mut g = T::default();
@@ -790,7 +790,7 @@ mod tests {
     #[test]
     fn get_vertex_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing vertex identifier.
         let mut g = T::default();
@@ -807,7 +807,7 @@ mod tests {
     #[test]
     fn add_vertex_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
         let i = g.add_vertex_label("0")?;
@@ -821,7 +821,7 @@ mod tests {
     #[test]
     fn reserve_vertex_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -838,7 +838,7 @@ mod tests {
     #[test]
     fn set_vertex_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing vertex identifier.
         let mut g = T::default();
@@ -864,7 +864,7 @@ mod tests {
     #[test]
     fn unset_vertex_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing vertex identifier.
         let mut g = T::default();
@@ -885,7 +885,7 @@ mod tests {
     #[test]
     fn get_edge_id<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing edge label.
         let mut g = T::default();
@@ -904,7 +904,7 @@ mod tests {
     #[test]
     fn get_edge_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing edge identifier.
         let mut g = T::default();
@@ -923,7 +923,7 @@ mod tests {
     #[test]
     fn add_edge_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -942,7 +942,7 @@ mod tests {
     #[test]
     fn reserve_edge_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -961,7 +961,7 @@ mod tests {
     #[test]
     fn set_edge_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing edge identifier.
         let mut g = T::default();
@@ -990,7 +990,7 @@ mod tests {
     #[test]
     fn unset_edge_label<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         // Test for missing edge identifier.
         let mut g = T::default();
@@ -1013,7 +1013,7 @@ mod tests {
     #[test]
     fn is_subgraph<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_edges([(0, 1)]);
         let h = T::from_edges([(0, 1), (0, 2)]);
@@ -1027,7 +1027,7 @@ mod tests {
     #[test]
     fn is_supergraph<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let g = T::from_edges([(0, 1), (0, 2)]);
         let h = T::from_edges([(0, 1)]);
@@ -1041,7 +1041,7 @@ mod tests {
     #[test]
     fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<u32>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
 
@@ -1062,6 +1062,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<AdjacencyListGraph<u32>>)]
+    #[instantiate_tests(<AdjacencyListStorage<u32>>)]
     mod adjacency_list_graph {}
 }
