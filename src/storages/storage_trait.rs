@@ -343,6 +343,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// At least one of the vertex identifiers already exists in the graph,
     /// or the edge identifier already exists in the graph.
     ///
+    #[inline(always)]
     fn reserve_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
@@ -370,6 +371,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Checks whether the graph has a given vertex label or not.
     ///
+    #[inline(always)]
     fn has_vertex_label(&self, x: &str) -> bool {
         self.as_vertices_labels().contains_right(x)
     }
@@ -382,6 +384,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex label already exists in the graph.
     ///
+    #[inline(always)]
     fn add_vertex_label(&mut self, y: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
         let x = self.add_vertex()?;
         self.set_vertex_label(&x, y)
@@ -395,6 +398,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier or label already exists in the graph.
     ///
+    #[inline(always)]
     fn reserve_vertex_label(
         &mut self,
         x: &Self::Vertex,
@@ -412,6 +416,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex label does not exists in the graph.
     ///
+    #[inline(always)]
     fn get_vertex_id(&self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
         self.as_vertices_labels()
             .get_by_right(x)
@@ -427,6 +432,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier does not exists in the graph.
     ///
+    #[inline(always)]
     fn get_vertex_label(&self, x: &Self::Vertex) -> Result<String, Error<Self::Vertex>> {
         self.as_vertices_labels()
             .get_by_left(x)
@@ -483,6 +489,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Checks whether the graph has a given edge label or not.
     ///
+    #[inline(always)]
     fn has_edge_label(&self, x: &str) -> bool {
         self.as_edges_labels().contains_right(x)
     }
@@ -496,6 +503,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// At least one of the vertex identifiers do not exist in the graph,
     /// or the edge label already exists in the graph.
     ///
+    #[inline(always)]
     fn add_edge_label(
         &mut self,
         x: &(Self::Vertex, Self::Vertex),
@@ -514,6 +522,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// At least one of the vertex identifiers already exists in the graph,
     /// or the edge identifier or label already exists in the graph.
     ///
+    #[inline(always)]
     fn reserve_edge_label(
         &mut self,
         x: &(Self::Vertex, Self::Vertex),
@@ -531,6 +540,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The edge label does not exists in the graph.
     ///
+    #[inline(always)]
     fn get_edge_id(&self, x: &str) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         self.as_edges_labels()
             .get_by_right(x)
@@ -546,6 +556,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The edge identifier does not exists in the graph.
     ///
+    #[inline(always)]
     fn get_edge_label(
         &self,
         x: &(Self::Vertex, Self::Vertex),
@@ -605,6 +616,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Checks if this graph is subgraph of given graph.
     ///
+    #[inline(always)]
     fn is_subgraph(&self, other: &Self) -> bool {
         self <= other
     }
@@ -613,6 +625,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Checks if this graph is supergraph of given graph.
     ///
+    #[inline(always)]
     fn is_supergraph(&self, other: &Self) -> bool {
         self >= other
     }
@@ -625,6 +638,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier does not exists in the graph.
     ///
+    #[inline(always)]
     fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
         Ok(Adj!(self, x)?.count())
     }
@@ -637,6 +651,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier does not exists in the graph.
     ///
+    #[inline(always)]
     fn is_isolated_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         Ok(self.degree_of(x)? == 0)
     }
@@ -649,6 +664,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier does not exists in the graph.
     ///
+    #[inline(always)]
     fn is_pendant_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         Ok(self.degree_of(x)? == 1)
     }

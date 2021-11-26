@@ -25,6 +25,7 @@ where
     /// At least one of the vertex identifiers do not exist in the graph,
     /// or the undirected edge identifier already exists in the graph.
     ///
+    #[inline(always)]
     pub fn add_edge(&mut self, e: &(T, T)) -> Result<(T, T), Error<T>> {
         // Add edge (y, x)
         self.0.add_edge(&(e.1, e.0))?;
@@ -41,6 +42,7 @@ where
     /// At least one of the vertex identifiers do not exist in the graph,
     /// or the undirected edge identifier does not exists in the graph.
     ///
+    #[inline(always)]
     pub fn del_edge(&mut self, e: &(T, T)) -> Result<(T, T), Error<T>> {
         // Del edge (y, x)
         self.0.del_edge(&(e.1, e.0))?;
@@ -53,6 +55,7 @@ impl<T> UndirectedTrait for UndirectedAdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
+    #[inline(always)]
     fn neighbors_iter<'a>(
         &'a self,
         x: &Self::Vertex,
@@ -60,6 +63,7 @@ where
         self.adjacents_iter(&x)
     }
 
+    #[inline(always)]
     fn add_undirected_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),

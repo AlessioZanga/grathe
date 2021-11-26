@@ -40,6 +40,7 @@ where
     ///     assert_eq!(g, h);
     /// ```
     ///
+    #[inline(always)]
     fn eq(&self, other: &Self) -> bool {
         // Compare maps.
         self.data == other.data
@@ -75,6 +76,7 @@ where
     ///     assert_le!(g, h);
     /// ```
     ///
+    #[inline(always)]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.
         self.data.partial_cmp(&other.data)
@@ -85,6 +87,7 @@ impl<T> Default for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
+    #[inline(always)]
     fn default() -> Self {
         Self::new()
     }
@@ -96,6 +99,7 @@ where
 {
     type Vertex = T;
 
+    #[inline(always)]
     fn new() -> Self {
         AdjacencyListStorage {
             data: AdjacencyList::<T>::new(),
@@ -104,10 +108,12 @@ where
         }
     }
 
+    #[inline(always)]
     fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
         Box::new(self.data.iter().map(|x| x.0).copied())
     }
 
+    #[inline(always)]
     fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a> {
         Box::new(
             self.data
@@ -116,6 +122,7 @@ where
         )
     }
 
+    #[inline(always)]
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
@@ -126,27 +133,33 @@ where
         }
     }
 
+    #[inline(always)]
     fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex> {
         &self.v_labels
     }
 
+    #[inline(always)]
     fn as_mut_vertices_labels(&mut self) -> &mut LabelMap<Self::Vertex> {
         &mut self.v_labels
     }
 
+    #[inline(always)]
     fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)> {
         &self.e_labels
     }
 
+    #[inline(always)]
     fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)> {
         &mut self.e_labels
     }
 
+    #[inline(always)]
     fn order(&self) -> usize {
         // Get map size.
         self.data.len()
     }
 
+    #[inline(always)]
     fn size(&self) -> usize {
         self.data
             .iter() // Iterate over the adjacency lists.
@@ -154,11 +167,13 @@ where
             .sum::<usize>() // Accumulate their sizes.
     }
 
+    #[inline(always)]
     fn has_vertex(&self, x: &Self::Vertex) -> bool {
         // Check if map contains key.
         self.data.contains_key(x)
     }
 
+    #[inline(always)]
     fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // Increase last identifier or get default.
         let x = self
@@ -172,6 +187,7 @@ where
         self.reserve_vertex(&x)
     }
 
+    #[inline(always)]
     fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // TODO: Update using insert once stable.
         if self.has_vertex(x) {
@@ -181,6 +197,7 @@ where
         Ok(*x)
     }
 
+    #[inline(always)]
     fn del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // Remove vertex from map.
         match self.data.remove(x) {
@@ -191,6 +208,7 @@ where
         }
     }
 
+    #[inline(always)]
     fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>> {
         // Get vertex adjacency list.
         match self.data.get(&e.0) {
@@ -206,6 +224,7 @@ where
         }
     }
 
+    #[inline(always)]
     fn add_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
@@ -230,6 +249,7 @@ where
         }
     }
 
+    #[inline(always)]
     fn del_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),

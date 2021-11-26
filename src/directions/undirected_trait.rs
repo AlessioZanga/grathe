@@ -39,6 +39,7 @@ pub trait UndirectedTrait: StorageTrait {
     /// At least one of the vertex identifiers already exists in the graph,
     /// or the edge identifier already exists in the graph.
     ///
+    #[inline(always)]
     fn reserve_undirected_edge(
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
@@ -57,6 +58,7 @@ pub trait UndirectedTrait: StorageTrait {
     /// At least one of the vertex identifiers do not exist in the graph,
     /// or the edge label already exists in the graph.
     ///
+    #[inline(always)]
     fn add_undirected_edge_label(
         &mut self,
         x: &(Self::Vertex, Self::Vertex),
@@ -76,6 +78,7 @@ pub trait UndirectedTrait: StorageTrait {
     /// At least one of the vertex identifiers already exists in the graph,
     /// or the edge identifier or label already exists in the graph.
     ///
+    #[inline(always)]
     fn reserve_undirected_edge_label(
         &mut self,
         x: &(Self::Vertex, Self::Vertex),
