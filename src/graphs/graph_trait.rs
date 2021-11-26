@@ -1,7 +1,7 @@
 use crate::errors::*;
 use crate::io::*;
 use crate::types::*;
-use crate::{E, V};
+use crate::{Adj, E, V};
 use nasparse::CooMatrix;
 use num_traits::FromPrimitive;
 use std::collections::HashMap;
@@ -624,6 +624,42 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn is_supergraph(&self, other: &Self) -> bool {
         self >= other
+    }
+
+    /// Degree of vertex.
+    ///
+    /// Degree of given vertex identifier $X$ as $|Adj(G, X)|$.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exists in the graph.
+    ///
+    fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
+        Ok(Adj!(self, x)?.count())
+    }
+
+    /// Is isolated vertex.
+    ///
+    /// Checks whether the vertex is not adjacent to any other vertex in the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exists in the graph.
+    ///
+    fn is_isolated_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
+        Ok(self.degree_of(x)? == 0)
+    }
+
+    /// Is pendant vertex.
+    ///
+    /// Checks whether the vertex is adjacent to only one vertex in the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exists in the graph.
+    ///
+    fn is_pendant_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
+        Ok(self.degree_of(x)? == 1)
     }
 }
 

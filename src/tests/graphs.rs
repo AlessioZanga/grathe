@@ -1038,6 +1038,30 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<u32>>
+    where
+        T: GraphTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test for missing vertex
+        assert_true!(g.degree_of(&0).is_err());
+
+        // Test for isolated vertex
+        let i = g.add_vertex()?;
+        assert_eq!(g.degree_of(&i)?, 0);
+        assert_true!(g.is_isolated_vertex(&i)?);
+
+        // Test for pedant vertex
+        let j = g.add_vertex()?;
+        g.add_edge(&(i, j))?;
+        assert_eq!(g.degree_of(&i)?, 1);
+        assert_true!(g.is_pendant_vertex(&i)?);
+
+        Ok(())
+    }
+
     #[instantiate_tests(<AdjacencyListGraph<u32>>)]
     mod adjacency_list_graph {}
 }
