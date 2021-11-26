@@ -161,7 +161,7 @@ where
         self.data.contains_key(x)
     }
 
-    fn reserve_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>> {
+    fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // Increase last key or get default.
         let i = self
             .data
@@ -170,10 +170,10 @@ where
             .next()
             .map(|x| *x.0 + Self::Vertex::one())
             .unwrap_or(Self::Vertex::zero());
-        self.add_vertex(&i)
+        self.reserve_vertex(&i)
     }
 
-    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
+    fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>> {
         // TODO: Update using insert once stable.
         if self.has_vertex(x) {
             return Err(Error::VertexAlreadyDefined(*x));

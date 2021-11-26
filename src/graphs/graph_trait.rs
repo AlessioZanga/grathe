@@ -52,7 +52,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     {
         let mut g = Self::new();
         for x in vertices {
-            g.add_vertex(&x).unwrap();
+            g.reserve_vertex(&x).unwrap();
         }
         g
     }
@@ -71,8 +71,8 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     {
         let mut g = Self::new();
         for (x, y) in edges {
-            g.add_vertex(&x).ok();
-            g.add_vertex(&y).ok();
+            g.reserve_vertex(&x).ok();
+            g.reserve_vertex(&y).ok();
             g.add_edge(&(x, y)).unwrap();
         }
         g
@@ -298,7 +298,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier already exists in the graph.
     ///
-    fn reserve_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
+    fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
 
     /// Adds vertex to the graph
     ///
@@ -308,7 +308,7 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier already exists in the graph.
     ///
-    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
+    fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
 
     /// Deletes vertex from the graph
     ///
@@ -374,9 +374,9 @@ pub trait GraphTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex label already exists in the graph.
     ///
-    fn add_vertex_label(&mut self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        let i = self.reserve_vertex()?;
-        self.set_vertex_label(&i, x)
+    fn add_vertex_label(&mut self, y: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
+        let x = self.add_vertex()?;
+        self.set_vertex_label(&x, y)
     }
 
     /// Vertex identifier from label.

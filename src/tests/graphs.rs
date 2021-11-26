@@ -46,16 +46,17 @@ mod tests {
         assert_eq!(g, h); // G = (), H = ()
 
         // Two graphs are equals if the have the same vertex set and the same edge set.
-        g.add_vertex(&0)?;
+        let i = g.add_vertex()?;
+        assert_eq!(i, 0);
         assert_ne!(g, h); // G = (0), H = ()
 
-        h.add_vertex(&0)?;
+        h.add_vertex()?;
         assert_eq!(g, h); // G = (0), H = (0)
 
-        g.add_edge(&(0, 0))?;
+        g.add_edge(&(i, i))?;
         assert_ne!(g, h); // G = (0, (0, 0)), H = (0)
 
-        h.add_vertex(&1)?;
+        h.add_vertex()?;
         assert_ne!(g, h); // G = (0, (0, 0)), H = (0, 1)
 
         Ok(())
@@ -76,7 +77,7 @@ mod tests {
         assert_true!(g >= h);
 
         // The null graph is subgraph of every graph.
-        g.add_vertex(&0)?;
+        g.add_vertex()?;
         assert_false!(g < h);
         assert_false!(g <= h);
         assert_true!(g > h);
@@ -461,11 +462,11 @@ mod tests {
         assert_eq!(g.order(), 0);
 
         // Test increasing graph order.
-        g.add_vertex(&0)?;
+        let i = g.add_vertex()?;
         assert_eq!(g.order(), 1);
 
         // Test decreasing graph order.
-        g.del_vertex(&0)?;
+        g.del_vertex(&i)?;
         assert_eq!(g.order(), 0);
 
         // Test high graph order.
@@ -486,9 +487,9 @@ mod tests {
         assert_eq!(g.size(), 0);
 
         // Test increasing size graph.
-        g.add_vertex(&0)?;
-        g.add_vertex(&1)?;
-        g.add_edge(&(0, 1))?;
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
+        g.add_edge(&(i, j))?;
         assert_eq!(g.size(), 1);
 
         // Test decreasing size graph.
@@ -515,12 +516,12 @@ mod tests {
         assert_false!(g.has_vertex(&0));
 
         // Test add first vertex.
-        g.add_vertex(&0)?;
-        assert_true!(g.has_vertex(&0));
+        let i = g.add_vertex()?;
+        assert_true!(g.has_vertex(&i));
 
         // Test del first vertex.
-        g.del_vertex(&0)?;
-        assert_false!(g.has_vertex(&0));
+        g.del_vertex(&i)?;
+        assert_false!(g.has_vertex(&i));
 
         // Test sequence of vertices.
         g = T::from_order(N as usize);
@@ -536,11 +537,11 @@ mod tests {
     {
         // Add min Vertex.
         let mut g = T::default();
-        assert_eq!(g.reserve_vertex().unwrap() as usize, 0);
+        assert_eq!(g.add_vertex().unwrap() as usize, 0);
 
         // Add contiguous Vertex.
         g = T::from_order(N as usize);
-        assert_eq!(g.reserve_vertex().unwrap() as usize, N as usize);
+        assert_eq!(g.add_vertex().unwrap() as usize, N as usize);
 
         Ok(())
     }
@@ -553,8 +554,8 @@ mod tests {
     {
         // Panics on overflow.
         let mut g = T::default();
-        g.add_vertex(&T::Vertex::MAX).unwrap();
-        assert_true!(g.reserve_vertex().is_err());
+        g.reserve_vertex(&T::Vertex::MAX).unwrap();
+        assert_true!(g.add_vertex().is_err());
     }
 
     #[test]
@@ -565,22 +566,22 @@ mod tests {
         let mut g = T::default();
 
         // Add min Vertex.
-        g.add_vertex(&T::Vertex::MIN)?;
+        g.reserve_vertex(&T::Vertex::MIN)?;
         assert_true!(g.has_vertex(&T::Vertex::MIN));
 
         // Test double addition.
-        assert_true!(g.add_vertex(&T::Vertex::MIN).is_err());
+        assert_true!(g.reserve_vertex(&T::Vertex::MIN).is_err());
 
         // Add contiguous Vertex.
-        g.add_vertex(&1)?;
+        g.reserve_vertex(&1)?;
         assert_true!(g.has_vertex(&1));
 
         // Add non contiguous Vertex.
-        g.add_vertex(&N)?;
+        g.reserve_vertex(&N)?;
         assert_true!(g.has_vertex(&N));
 
         // Add max Vertex.
-        g.add_vertex(&T::Vertex::MAX)?;
+        g.reserve_vertex(&T::Vertex::MAX)?;
         assert_true!(g.has_vertex(&T::Vertex::MAX));
 
         Ok(())
@@ -594,7 +595,7 @@ mod tests {
         let mut g = T::default();
 
         // Del min Vertex.
-        g.add_vertex(&T::Vertex::MIN)?;
+        g.reserve_vertex(&T::Vertex::MIN)?;
         g.del_vertex(&T::Vertex::MIN)?;
         assert_false!(g.has_vertex(&T::Vertex::MIN));
 
@@ -602,22 +603,22 @@ mod tests {
         assert_true!(g.del_vertex(&T::Vertex::MIN).is_err());
 
         // Del contiguous Vertex.
-        g.add_vertex(&1)?;
+        g.reserve_vertex(&1)?;
         g.del_vertex(&1)?;
         assert_false!(g.has_vertex(&1));
 
         // Del non contiguous Vertex.
-        g.add_vertex(&N)?;
+        g.reserve_vertex(&N)?;
         g.del_vertex(&N)?;
         assert_false!(g.has_vertex(&N));
 
         // Del max Vertex.
-        g.add_vertex(&T::Vertex::MAX)?;
+        g.reserve_vertex(&T::Vertex::MAX)?;
         g.del_vertex(&T::Vertex::MAX)?;
         assert_false!(g.has_vertex(&T::Vertex::MAX));
 
         // Del vertex and associated edges.
-        g.add_vertex(&N)?;
+        g.reserve_vertex(&N)?;
         g.add_edge(&(N, N))?;
         g.del_vertex(&N)?;
         assert_true!(g.has_edge(&(N, N)).is_err());
@@ -636,7 +637,7 @@ mod tests {
         assert_true!(g.has_edge(&(0, 0)).is_err());
 
         // Test add first edge.
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex()?;
         let e = g.add_edge(&(i, i))?;
         assert_true!(g.has_edge(&e)?);
 
@@ -665,10 +666,10 @@ mod tests {
         let mut e = (0, 0);
         assert_true!(g.add_edge(&e).is_err());
 
-        g.add_vertex(&T::Vertex::MIN)?;
-        g.add_vertex(&(T::Vertex::MIN + 1))?;
-        g.add_vertex(&N)?;
-        g.add_vertex(&T::Vertex::MAX)?;
+        g.reserve_vertex(&T::Vertex::MIN)?;
+        g.reserve_vertex(&(T::Vertex::MIN + 1))?;
+        g.reserve_vertex(&N)?;
+        g.reserve_vertex(&T::Vertex::MAX)?;
 
         // Add min Edge.
         e = (T::Vertex::MIN, T::Vertex::MIN);
@@ -707,10 +708,10 @@ mod tests {
         let mut e = (0, 0);
         assert_true!(g.del_edge(&e).is_err());
 
-        g.add_vertex(&T::Vertex::MIN)?;
-        g.add_vertex(&(T::Vertex::MIN + 1))?;
-        g.add_vertex(&N)?;
-        g.add_vertex(&T::Vertex::MAX)?;
+        g.reserve_vertex(&T::Vertex::MIN)?;
+        g.reserve_vertex(&(T::Vertex::MIN + 1))?;
+        g.reserve_vertex(&N)?;
+        g.reserve_vertex(&T::Vertex::MAX)?;
 
         // Del min Edge.
         e = (T::Vertex::MIN, T::Vertex::MIN);
@@ -752,7 +753,7 @@ mod tests {
         assert_true!(g.get_vertex_id("0").is_err());
 
         // Test for existing vertex label.
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex()?;
         assert_eq!(g.set_vertex_label(&i, "0")?, i);
         assert_eq!(g.get_vertex_id("0")?, i);
 
@@ -769,7 +770,7 @@ mod tests {
         assert_true!(g.get_vertex_label(&0).is_err());
 
         // Test for existing vertex identifier.
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex()?;
         assert_eq!(g.set_vertex_label(&i, "0")?, i);
         assert_eq!(g.get_vertex_label(&i)?, "0");
 
@@ -786,7 +787,7 @@ mod tests {
         assert_true!(g.set_vertex_label(&0, "0").is_err());
 
         // Test for existing vertex label.
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex()?;
         assert_false!(g.set_vertex_label(&i, "0").is_err());
         assert_eq!(g.get_vertex_label(&i)?, "0");
 
@@ -795,7 +796,7 @@ mod tests {
         assert_eq!(g.get_vertex_label(&i)?, "1");
 
         // Test for vertex label duplicated label.
-        let j = g.add_vertex(&1)?;
+        let j = g.add_vertex()?;
         assert_true!(g.set_vertex_label(&j, "1").is_err());
         assert_true!(g.get_vertex_label(&j).is_err());
 
@@ -812,7 +813,7 @@ mod tests {
         assert_true!(g.unset_vertex_label(&0).is_err());
 
         // Test for existing vertex label.
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex()?;
         assert_false!(g.set_vertex_label(&i, "0").is_err());
         assert_false!(g.unset_vertex_label(&i).is_err());
 
@@ -833,8 +834,8 @@ mod tests {
         assert_true!(g.get_edge_id("(0, 1)").is_err());
 
         // Test for existing edge label.
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
         let e = g.add_edge(&(i, j))?;
         assert_eq!(g.set_edge_label(&e, "(0, 1)")?, e);
         assert_eq!(g.get_edge_id("(0, 1)")?, e);
@@ -852,8 +853,8 @@ mod tests {
         assert_true!(g.get_edge_label(&(0, 1)).is_err());
 
         // Test for existing edge identifier.
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
         let e = g.add_edge(&(i, j))?;
         assert_eq!(g.set_edge_label(&e, "(0, 1)")?, e);
         assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
@@ -882,8 +883,8 @@ mod tests {
     {
         // Test for missing edge identifier.
         let mut g = T::default();
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
         assert_true!(g.set_edge_label(&(i, j), "(0, 1)").is_err());
 
         // Test for existing edge label.
@@ -896,7 +897,7 @@ mod tests {
         assert_eq!(g.get_edge_label(&e)?, "(1, 1)");
 
         // Test for edge label duplicated label.
-        let k = g.add_vertex(&2)?;
+        let k = g.add_vertex()?;
         let f = g.add_edge(&(i, k))?;
         assert_true!(g.set_edge_label(&f, "(1, 1)").is_err());
         assert_true!(g.get_edge_label(&f).is_err());
@@ -911,8 +912,8 @@ mod tests {
     {
         // Test for missing edge identifier.
         let mut g = T::default();
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
         assert_true!(g.unset_edge_label(&(i, j)).is_err());
 
         // Test for existing edge label.

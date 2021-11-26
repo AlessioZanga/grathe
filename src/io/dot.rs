@@ -202,7 +202,7 @@ where
                     Rule::quoted_text => graph.add_vertex_label(k.trim_matches('"')),
                     // Match number type
                     // FIXME: Can Rule::number be a float? Use it as string?
-                    Rule::number => graph.add_vertex(&k.parse::<T::Vertex>().ok().unwrap()),
+                    Rule::number => graph.reserve_vertex(&k.parse::<T::Vertex>().ok().unwrap()),
                     // Match everything else
                     _ => unreachable!(),
                 };
