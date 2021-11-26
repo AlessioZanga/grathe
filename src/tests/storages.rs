@@ -403,17 +403,6 @@ mod tests {
     }
 
     #[test]
-    fn as_data<T>() -> Result<(), Error<u32>>
-    where
-        T: StorageTrait<Vertex = u32>,
-    {
-        let g = T::from_edges(E);
-        g.as_data();
-
-        Ok(())
-    }
-
-    #[test]
     fn as_vertices_labels<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,

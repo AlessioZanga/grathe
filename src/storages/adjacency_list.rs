@@ -95,11 +95,10 @@ where
     T: VertexTrait,
 {
     type Vertex = T;
-    type Storage = AdjacencyList<T>;
 
     fn new() -> Self {
         AdjacencyListStorage {
-            data: Self::Storage::new(),
+            data: AdjacencyList::<T>::new(),
             v_labels: LabelMap::new(),
             e_labels: LabelMap::new(),
         }
@@ -125,10 +124,6 @@ where
             Some(i) => Ok(Box::new(i.iter().copied())),
             None => Err(Error::VertexNotDefined(*x)),
         }
-    }
-
-    fn as_data(&self) -> &Self::Storage {
-        &self.data
     }
 
     fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex> {

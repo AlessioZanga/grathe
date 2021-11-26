@@ -20,9 +20,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     // Edge identifier type.
     // type Edge = (Self::Vertex, Self::Vertex);
 
-    /// Storage type.
-    type Storage;
-
     /// Base constructor.
     ///
     /// Returns a null graph.
@@ -236,12 +233,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         &'a self,
         x: &Self::Vertex,
     ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>>;
-
-    /// Data storage.
-    ///
-    /// Return immutable reference to internal data storage.
-    ///
-    fn as_data(&self) -> &Self::Storage;
 
     /// Vertices labels.
     ///
