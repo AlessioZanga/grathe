@@ -1,3 +1,4 @@
+/// Apply method delegation of storage trait.
 #[macro_export]
 macro_rules! delegate_storage {
     ($graph:ident) => {

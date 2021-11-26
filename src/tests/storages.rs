@@ -2,6 +2,7 @@
 #[generic_tests::define]
 mod tests {
     use crate::errors::*;
+    use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::storages::{AdjacencyListStorage, StorageTrait};
     use crate::types::*;
     use crate::{Adj, E, V};
@@ -1052,5 +1053,8 @@ mod tests {
     }
 
     #[instantiate_tests(<AdjacencyListStorage<u32>>)]
-    mod adjacency_list_graph {}
+    mod adjacency_list_storage {}
+
+    #[instantiate_tests(<UndirectedAdjacencyListGraph<u32>>)]
+    mod undirected_adjacency_list_graph {}
 }
