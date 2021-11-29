@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::errors::*;
+    use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::storages::StorageTrait;
     use std::path::PathBuf;

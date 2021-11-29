@@ -1,4 +1,4 @@
-use crate::errors::*;
+use crate::errors::Error;
 use crate::storages::StorageTrait;
 use crate::types::*;
 use std::cmp::Ordering;

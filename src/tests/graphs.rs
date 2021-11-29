@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::errors::*;
+    use crate::errors::Error;
     use crate::graphs::{GraphTrait, UndirectedAdjacencyListGraph};
     use std::path::Path;
     use tempfile::NamedTempFile;

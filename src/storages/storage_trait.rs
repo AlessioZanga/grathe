@@ -1,4 +1,4 @@
-use crate::errors::*;
+use crate::errors::Error;
 use crate::types::*;
 use crate::{Adj, E, V};
 use nasparse::CooMatrix;

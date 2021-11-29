@@ -1,4 +1,4 @@
-use crate::errors::*;
+use crate::errors::Error;
 use crate::graphs::GraphTrait;
 use crate::{E, V};
 use itertools::Itertools;
@@ -254,9 +254,25 @@ where
 {
     // Initialize empty string
     let mut dot = String::new();
+    // Set the graph_type
+    let mut graph_type = "graph";
+    if graph.is_directed() {
+        graph_type = "digraph";
+    }
+    // Set the edge_type
+    let mut edge_type = "--";
+    if graph.is_directed() {
+        edge_type = "->";
+    }
+    // De-symmetrize edge set for undirected graphs
+    // TODO: Avoid 'collect' workaround to deal with
+    //       different iterator resulting types
+    let mut edges = E!(graph).collect::<Vec<_>>();
+    if !graph.is_directed() {
+        edges = E!(graph).filter(|(x, y)| x <= y).collect();
+    }
     // Open DOT string by escaping "{"
-    // FIXME: Handle directionality
-    writeln!(dot, "graph {{")?;
+    writeln!(dot, "{} {{", graph_type)?;
     // Write vertices with label
     for x in V!(graph) {
         match graph.get_vertex_label(&x) {
@@ -265,10 +281,10 @@ where
         }?
     }
     // Write edges with label
-    for (x, y) in E!(graph) {
+    for (x, y) in edges {
         match graph.get_edge_label(&(x, y)) {
-            Err(_) => writeln!(dot, "\t{:?} -- {:?};", x, y),
-            Ok(z) => writeln!(dot, "\t{:?} -- {:?} [label=\"{}\"];", x, y, z),
+            Err(_) => writeln!(dot, "\t{:?} {} {:?};", x, edge_type, y),
+            Ok(z) => writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z),
         }?
     }
     // Close DOT string by escaping "}"

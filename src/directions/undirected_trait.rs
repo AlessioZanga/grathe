@@ -1,4 +1,4 @@
-use crate::errors::*;
+use crate::errors::Error;
 use crate::storages::StorageTrait;
 
 /// Undirected graph trait.

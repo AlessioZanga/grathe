@@ -1,5 +1,5 @@
 use crate::directions::DirectionalTrait;
-use crate::errors::*;
+use crate::errors::Error;
 use crate::io::*;
 use crate::storages::StorageTrait;
 use std::path::Path;
