@@ -24,7 +24,7 @@ mod tests {
         let i = g.add_vertex_label("A")?;
         let j = g.add_vertex_label("B")?;
         g.add_edge_label(&(i, j), "A -- B")?;
-        let h = crate::io::from_dot::<UndirectedAdjacencyListGraph<u32>>(&DOT)
+        let h = crate::io::from_dot::<UndirectedAdjacencyListGraph<u32>>(DOT)
             .unwrap()
             .pop()
             .unwrap();
@@ -43,7 +43,7 @@ mod tests {
     #[test]
     fn write_dot() {
         // Load graph from DOT string
-        let g = crate::io::from_dot::<UndirectedAdjacencyListGraph<u32>>(&DOT)
+        let g = crate::io::from_dot::<UndirectedAdjacencyListGraph<u32>>(DOT)
             .unwrap()
             .pop()
             .unwrap();

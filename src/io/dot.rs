@@ -112,7 +112,7 @@ where
                                 // FIXME: How to handle duplicated labels? Now it is first come, first served.
                                 let e = x.get(0).unwrap();
                                 // FIXME: How to handle shared label across edges of path? Now it is first come, first served.
-                                graph.set_edge_label(&e, to_label(value)).ok();
+                                graph.set_edge_label(e, to_label(value)).ok();
                             } else {
                                 // TODO: Add path attributes
                                 warn!(
@@ -302,7 +302,7 @@ where
     T: GraphTrait,
 {
     // Read DOT file
-    let string = read_to_string(path).expect(&format!("Failed to read file \"{:?}\"", &path));
+    let string = read_to_string(path).unwrap_or_else(|_| panic!("Failed to read file \"{:?}\"", &path));
     // Parse dot string.
     from_dot(&string)
 }
@@ -318,7 +318,7 @@ where
     // Export a sequence of graph into DOT string.
     let dot = to_dot(graph)?;
     // Write string to file
-    write(path, dot).expect(&format!("Failed to write file \"{:?}\"", &path));
+    write(path, dot).unwrap_or_else(|_| panic!("Failed to write file \"{:?}\"", &path));
 
     Ok(())
 }

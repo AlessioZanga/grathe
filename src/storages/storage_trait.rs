@@ -351,7 +351,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         y: &str,
     ) -> Result<Self::Vertex, Error<Self::Vertex>> {
         self.reserve_vertex(x)?;
-        self.set_vertex_label(&x, y)
+        self.set_vertex_label(x, y)
     }
 
     /// Vertex identifier from label.
@@ -367,7 +367,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.as_vertices_labels()
             .get_by_right(x)
             .copied()
-            .ok_or(Error::VertexLabelNotDefined(String::from(x)))
+            .ok_or_else(|| Error::VertexLabelNotDefined(String::from(x)))
     }
 
     /// Vertex label from identifier.
@@ -456,7 +456,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         y: &str,
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         self.add_edge(x)?;
-        self.set_edge_label(&x, y)
+        self.set_edge_label(x, y)
     }
 
     /// Adds edge label to the graph.
@@ -475,7 +475,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         y: &str,
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         self.reserve_edge(x)?;
-        self.set_edge_label(&x, y)
+        self.set_edge_label(x, y)
     }
 
     /// Edge identifier from label.
@@ -491,7 +491,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.as_edges_labels()
             .get_by_right(x)
             .copied()
-            .ok_or(Error::EdgeLabelNotDefined(String::from(x)))
+            .ok_or_else(|| Error::EdgeLabelNotDefined(String::from(x)))
     }
 
     /// Edge label from identifier.

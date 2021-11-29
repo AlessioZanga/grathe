@@ -49,9 +49,9 @@ mod tests {
         // Read DOT file to string
         let dot = Path::new("src/tests/data/14.dot");
         // Load graph using io function
-        let g = crate::io::read_dot::<T>(&dot).unwrap().pop().unwrap();
+        let g = crate::io::read_dot::<T>(dot).unwrap().pop().unwrap();
         // Test from DOT string constructor
-        assert_eq!(T::read_dot(&dot)?, g);
+        assert_eq!(T::read_dot(dot)?, g);
 
         Ok(())
     }

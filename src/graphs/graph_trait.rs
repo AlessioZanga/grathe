@@ -29,7 +29,7 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     /// Return a DOT string representation of the graph.
     ///
     fn to_dot(&self) -> Result<String, Error<Self::Vertex>> {
-        to_dot::<Self>(&self).map_err(|x| Error::ParseFailed(x.to_string()))
+        to_dot::<Self>(self).map_err(|x| Error::ParseFailed(x.to_string()))
     }
 
     /// Read DOT file constructor.
@@ -55,6 +55,6 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     /// Write the graph to a given DOT file.
     ///
     fn write_dot(&self, path: &Path) -> Result<(), Error<Self::Vertex>> {
-        write_dot::<Self>(path, &self).map_err(|x| Error::ParseFailed(x.to_string()))
+        write_dot::<Self>(path, self).map_err(|x| Error::ParseFailed(x.to_string()))
     }
 }

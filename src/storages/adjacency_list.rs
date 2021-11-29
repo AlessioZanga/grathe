@@ -182,7 +182,7 @@ where
             .rev()
             .next()
             .map(|x| *x.0 + Self::Vertex::one())
-            .unwrap_or(Self::Vertex::zero());
+            .unwrap_or_else(Self::Vertex::zero);
         // Reserve new identifier
         self.reserve_vertex(&x)
     }

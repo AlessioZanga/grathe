@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests_undirected {
-    use crate::directions::UndirectedTrait;
+    use crate::directions::{DirectionalTrait, UndirectedTrait};
     use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::Ne;
@@ -24,6 +24,24 @@ mod tests_undirected {
                 })
                 .all(|b| b),
         }
+    }
+
+    #[test]
+    fn is_directed<T>()
+    where
+        T: UndirectedTrait<Vertex = u32>,
+    {
+        let g = T::default();
+        assert_false!(g.is_directed());
+    }
+
+    #[test]
+    fn is_partially_directed<T>()
+    where
+        T: UndirectedTrait<Vertex = u32>,
+    {
+        let g = T::default();
+        assert_false!(g.is_partially_directed());
     }
 
     #[test]
@@ -95,6 +113,92 @@ mod tests_undirected {
             Ne!(g, &i)?.all(|x| g.has_edge(&(i, x)).unwrap() && g.has_edge(&(x, i)).unwrap())
         );
         assert_true!(is_sorted(Ne!(g, &i)?));
+
+        Ok(())
+    }
+
+    #[test]
+    fn add_undirected_edge<T>() -> Result<(), Error<u32>>
+    where
+        T: UndirectedTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test for undirected edges
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
+        let e = g.add_undirected_edge(&(i, j))?;
+        assert_true!(g.has_edge(&(i, j))?);
+        assert_true!(g.has_edge(&(j, i))?);
+
+        // Test for repeated undirected edges addition
+        assert_true!(g.add_undirected_edge(&e).is_err());
+
+        Ok(())
+    }
+
+    #[test]
+    fn reserve_undirected_edge<T>() -> Result<(), Error<u32>>
+    where
+        T: UndirectedTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test for undirected edges
+        let i = 0;
+        let j = 1;
+        let e = g.reserve_undirected_edge(&(i, j))?;
+        assert_true!(g.has_edge(&(i, j))?);
+        assert_true!(g.has_edge(&(j, i))?);
+
+        // Test for repeated undirected edges addition
+        assert_true!(g.reserve_undirected_edge(&e).is_err());
+
+        Ok(())
+    }
+
+    #[test]
+    fn add_undirected_edge_label<T>() -> Result<(), Error<u32>>
+    where
+        T: UndirectedTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test for undirected edges
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
+        let e = g.add_undirected_edge_label(&(i, j), "(0, 1)")?;
+        assert_true!(g.has_edge(&(i, j))?);
+        assert_true!(g.has_edge(&(j, i))?);
+        assert_true!(g.has_edge_label("(0, 1)"));
+        assert_eq!(g.get_edge_id("(0, 1)")?, e);
+        assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
+
+        // Test for repeated undirected edges addition
+        assert_true!(g.add_undirected_edge(&e).is_err());
+
+        Ok(())
+    }
+
+    #[test]
+    fn reserve_undirected_edge_label<T>() -> Result<(), Error<u32>>
+    where
+        T: UndirectedTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test for undirected edges
+        let i = 0;
+        let j = 1;
+        let e = g.reserve_undirected_edge_label(&(i, j), "(0, 1)")?;
+        assert_true!(g.has_edge(&(i, j))?);
+        assert_true!(g.has_edge(&(j, i))?);
+        assert_true!(g.has_edge_label("(0, 1)"));
+        assert_eq!(g.get_edge_id("(0, 1)")?, e);
+        assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
+
+        // Test for repeated undirected edges addition
+        assert_true!(g.reserve_undirected_edge(&e).is_err());
 
         Ok(())
     }

@@ -19,12 +19,18 @@ where
     T: VertexTrait,
 {
     #[inline(always)]
-    fn neighbors_iter<'a>(&'a self, x: &T) -> Result<Box<dyn Iterator<Item = T> + 'a>, Error<T>> {
-        self.adjacents_iter(&x)
+    fn neighbors_iter<'a>(
+        &'a self,
+        x: &Self::Vertex,
+    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>> {
+        self.adjacents_iter(x)
     }
 
     #[inline(always)]
-    fn add_undirected_edge(&mut self, e: &(T, T)) -> Result<(T, T), Error<T>> {
-        self.add_edge(&e)
+    fn add_undirected_edge(
+        &mut self,
+        e: &(Self::Vertex, Self::Vertex),
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
+        self.add_edge(e)
     }
 }

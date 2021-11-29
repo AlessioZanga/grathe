@@ -896,10 +896,10 @@ mod tests {
         assert_eq!(g.get_edge_label(&e)?, "(1, 1)");
 
         // Test for edge label duplicated label.
-        let k = g.add_vertex()?;
-        let f = g.add_edge(&(i, k))?;
-        assert_true!(g.set_edge_label(&f, "(1, 1)").is_err());
-        assert_true!(g.get_edge_label(&f).is_err());
+        let j = g.add_vertex()?;
+        let e = g.add_edge(&(i, j))?;
+        assert_true!(g.set_edge_label(&e, "(1, 1)").is_err());
+        assert_true!(g.get_edge_label(&e).is_err());
 
         Ok(())
     }

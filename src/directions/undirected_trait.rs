@@ -65,7 +65,7 @@ pub trait UndirectedTrait: StorageTrait {
         y: &str,
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         self.add_undirected_edge(x)?;
-        self.set_edge_label(&x, y)
+        self.set_edge_label(x, y)
     }
 
     /// Adds undirected edge label to the graph.
@@ -85,7 +85,7 @@ pub trait UndirectedTrait: StorageTrait {
         y: &str,
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
         self.reserve_undirected_edge(x)?;
-        self.set_edge_label(&x, y)
+        self.set_edge_label(x, y)
     }
 }
 
