@@ -36,9 +36,35 @@ mod tests_undirected {
         // Test for undirected edges
         let i = g.add_vertex()?;
         let j = g.add_vertex()?;
-        g.add_edge(&(i, j))?;
+        let e = g.add_edge(&(i, j))?;
         assert_true!(g.has_edge(&(i, j))?);
         assert_true!(g.has_edge(&(j, i))?);
+
+        // Test for repeated undirected edges addition
+        assert_true!(g.add_edge(&e).is_err());
+
+        Ok(())
+    }
+
+    #[test]
+    fn del_edge<T>() -> Result<(), Error<u32>>
+    where
+        T: UndirectedTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test for undirected edges
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
+        let e = g.add_edge(&(i, j))?;
+        assert_true!(g.has_edge(&(i, j))?);
+        assert_true!(g.has_edge(&(j, i))?);
+        assert_false!(g.del_edge(&e).is_err());
+
+        // Test for repeated undirected edges deletion
+        assert_true!(g.del_edge(&e).is_err());
+        assert_false!(g.has_edge(&(i, j))?);
+        assert_false!(g.has_edge(&(j, i))?);
 
         Ok(())
     }
