@@ -20,13 +20,47 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Base constructor.
     ///
-    /// Returns a null graph.
+    /// Let be $\mathcal{G}$ a graph type. The base constructor of $\mathcal{G}$
+    /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use grathe::graphs::Graph;
+    /// use grathe::storages::StorageTrait;
+    /// 
+    /// // Build a null graph.
+    /// let g = Graph::new();
+    /// 
+    /// // The vertex set is empty.
+    /// assert_eq!(g.order(), 0);
+    /// 
+    /// // The edge set is also empty.
+    /// assert_eq!(g.size(), 0);
+    /// ```
     ///
     fn new() -> Self;
 
     /// From order constructor.
     ///
     /// Construct a graph of a given order.
+    ///
+    /// # Examples
+    /// 
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::graphs::Graph;
+    /// use grathe::storages::StorageTrait;
+    /// 
+    /// // Build a 3-order graph.
+    /// let g = Graph::from_order(3);
+    /// 
+    /// assert_eq!(g.order(), 3);
+    /// assert_eq!(g.size(), 0);
+    /// 
+    /// // Vertex identifiers are added incrementally starting from zero.
+    /// assert_true!(g.has_vertex(&2));
+    /// ```
     ///
     fn from_order(order: usize) -> Self {
         Self::from_vertices((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()))

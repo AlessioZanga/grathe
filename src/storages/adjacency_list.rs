@@ -19,27 +19,6 @@ impl<T> PartialEq for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
-    /// Equality operator.
-    ///
-    /// Let $G$ and $H$ be two graphs, then $G$ is equal to $H$ if and only if
-    /// they have the same vertex set $V$ and the same edge set $E$:
-    /// $$G = H \iff V(G) = V(H) \wedge E(G) = E(H)$$
-    ///
-    /// # Complexity
-    ///
-    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    ///     use grathe::storages::{StorageTrait, AdjacencyListStorage};
-    ///
-    ///     let g = AdjacencyListStorage::<u32>::new();
-    ///     let h = AdjacencyListStorage::<u32>::new();
-    ///
-    ///     assert_eq!(g, h);
-    /// ```
-    ///
     #[inline(always)]
     fn eq(&self, other: &Self) -> bool {
         // Compare maps.
@@ -53,29 +32,6 @@ impl<T> PartialOrd for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
-    /// Equality operator.
-    ///
-    /// Let $G$ and $H$ be two graphs, then $G$ is partially comparable to $H$
-    /// if and only if they have the partially comparable vertex set $V$ and
-    /// partially comparable edge set $E$:
-    /// $$G \leq H \iff V(G) \leq V(H) \wedge E(G) \leq E(H)$$
-    ///
-    /// # Complexity
-    ///
-    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    ///     use all_asserts::*;
-    ///     use grathe::storages::{StorageTrait, AdjacencyListStorage};
-    ///
-    ///     let g = AdjacencyListStorage::<u32>::new();
-    ///     let h = AdjacencyListStorage::<u32>::new();
-    ///
-    ///     assert_le!(g, h);
-    /// ```
-    ///
     #[inline(always)]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.

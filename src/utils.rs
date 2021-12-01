@@ -12,6 +12,29 @@ macro_rules! impl_ungraph_trait {
         where
             T: VertexTrait,
         {
+            /// Equality operator.
+            ///
+            /// Let $G$ and $H$ be two graphs, then $G$ is equal to $H$ if and only if
+            /// they have the same vertex set $V$ and the same edge set $E$:
+            ///
+            /// $$G = H \iff V(G) = V(H) \wedge E(G) = E(H)$$
+            ///
+            /// # Complexity
+            ///
+            /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+            ///
+            /// # Examples
+            ///
+            /// ```
+            /// use grathe::graphs::Graph;
+            /// use grathe::storages::StorageTrait;
+            ///
+            /// let g = Graph::new();
+            /// let h = Graph::new();
+            ///
+            /// assert_eq!(g, h);
+            /// ```
+            ///
             fn eq(&self, other: &Self) -> bool {
                 self.0.eq(&other.0)
             }
@@ -23,6 +46,31 @@ macro_rules! impl_ungraph_trait {
         where
             T: VertexTrait,
         {
+            /// Comparable operator.
+            ///
+            /// Let $G$ and $H$ be two graphs, then $G$ is partially comparable to $H$
+            /// if and only if they have the partially comparable vertex set $V$ and
+            /// partially comparable edge set $E$:
+            ///
+            /// $$G \leq H \iff V(G) \leq V(H) \wedge E(G) \leq E(H)$$
+            ///
+            /// # Complexity
+            ///
+            /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+            ///
+            /// # Examples
+            ///
+            /// ```
+            /// use all_asserts::*;
+            /// use grathe::graphs::Graph;
+            /// use grathe::storages::StorageTrait;
+            ///
+            /// let g = Graph::new();
+            /// let h = Graph::new();
+            ///
+            /// assert_le!(g, h);
+            /// ```
+            ///
             fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 self.0.partial_cmp(&other.0)
             }
@@ -32,6 +80,27 @@ macro_rules! impl_ungraph_trait {
         where
             T: VertexTrait,
         {
+            /// Default constructor.
+            /// 
+            /// Let be $\mathcal{G}$ a graph type. The default constructor of $\mathcal{G}$
+            /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
+            /// 
+            /// # Examples
+            /// 
+            /// ```
+            /// use grathe::graphs::Graph;
+            /// use grathe::storages::StorageTrait;
+            /// 
+            /// // Build a null graph.
+            /// let g = Graph::default();
+            /// 
+            /// // The vertex set is empty.
+            /// assert_eq!(g.order(), 0);
+            /// 
+            /// // The edge set is also empty.
+            /// assert_eq!(g.size(), 0);
+            /// ```
+            ///
             fn default() -> Self {
                 Self::new()
             }
