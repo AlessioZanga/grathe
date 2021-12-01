@@ -541,10 +541,25 @@ mod tests {
         assert_false!(g.has_vertex(&T::Vertex::MAX));
 
         // Del vertex and associated edges.
-        g.reserve_vertex(&N)?;
-        g.add_edge(&(N, N))?;
-        g.del_vertex(&N)?;
-        assert_true!(g.has_edge(&(N, N)).is_err());
+        let i = g.add_vertex()?;
+        let j = g.add_vertex()?;
+        g.add_edge(&(i, j))?;
+        g.add_edge(&(j, i))?;
+        g.del_vertex(&i)?;
+        assert_true!(g.has_edge(&(i, j)).is_err());
+        assert_true!(g.has_edge(&(j, i)).is_err());
+        assert_true!(Adj!(g, &i).is_err());
+        assert_true!(Adj!(g, &j)?.find(|x| *x == i).is_none());
+
+        // Del vertex and associated label.
+        let l = "0";
+        let i = g.add_vertex_label(l)?;
+        g.del_vertex(&i)?;
+        assert_true!(g
+            .as_vertices_labels()
+            .iter()
+            .find(|(_, y)| *y == l)
+            .is_none());
 
         Ok(())
     }
@@ -683,6 +698,16 @@ mod tests {
         g.add_edge(&e)?;
         g.del_edge(&e)?;
         assert_false!(g.has_edge(&e)?);
+
+        // Del edge and associated label.
+        let l = "(0, 1)";
+        let e = g.add_edge_label(&(0, 1), l)?;
+        g.del_edge(&e)?;
+        assert_true!(g
+            .as_edges_labels()
+            .iter()
+            .find(|(_, y)| *y == l)
+            .is_none());
 
         Ok(())
     }

@@ -203,8 +203,17 @@ where
         match self.data.remove(x) {
             // If no vertex found return error.
             None => Err(Error::VertexNotDefined(*x)),
-            // Otherwise return successful.
-            Some(_) => Ok(*x),
+            // Otherwise
+            Some(_) => {
+                // Remove remaining identifiers if any
+                for (_, y) in self.data.iter_mut() {
+                    y.remove(x);
+                }
+                // Remove associated label if any
+                self.as_mut_vertices_labels().remove_by_left(x);
+                // Return success
+                Ok(*x)
+            }
         }
     }
 
@@ -266,8 +275,13 @@ where
                 Some(adj) => match adj.remove(&e.1) {
                     // If no edge defined return error.
                     false => Err(Error::EdgeNotDefined(*e)),
-                    // Otherwise return successful.
-                    true => Ok(*e),
+                    // Otherwise
+                    true => {
+                        // Remove associated label if any
+                        self.as_mut_edges_labels().remove_by_left(e);
+                        // Return success
+                        Ok(*e)
+                    }
                 },
             },
         }

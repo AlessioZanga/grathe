@@ -61,6 +61,13 @@ mod tests_undirected {
         // Test for repeated undirected edges addition
         assert_true!(g.add_edge(&e).is_err());
 
+        // Del vertex and associated edges.
+        g.del_vertex(&i)?;
+        assert_true!(g.has_edge(&(i, j)).is_err());
+        assert_true!(g.has_edge(&(j, i)).is_err());
+        assert_true!(Ne!(g, &i).is_err());
+        assert_true!(Ne!(g, &j)?.find(|x| *x == i).is_none());
+
         Ok(())
     }
 
