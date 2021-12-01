@@ -68,6 +68,7 @@ macro_rules! impl_ungraph_trait {
                     fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
                     fn del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
                     fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>>;
+                    fn clear(&mut self);
                 }
             }
 
@@ -177,6 +178,7 @@ macro_rules! impl_digraph_trait {
                         &mut self,
                         e: &(Self::Vertex, Self::Vertex),
                     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>;
+                    fn clear(&mut self);
                 }
             }
         }

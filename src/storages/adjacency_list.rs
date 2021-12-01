@@ -286,4 +286,12 @@ where
             },
         }
     }
+
+    fn clear(&mut self) {
+        // Clear the data structures
+        self.data.clear();
+        // Clear the vertices/edges labels
+        self.v_labels.clear();
+        self.e_labels.clear();
+    }
 }

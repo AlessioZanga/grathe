@@ -42,7 +42,6 @@ mod tests {
 
         // Two graphs are equals if the have the same vertex set and the same edge set.
         let i = g.add_vertex()?;
-        assert_eq!(i, 0);
         assert_ne!(g, h); // G = (0), H = ()
 
         h.add_vertex()?;
@@ -703,11 +702,7 @@ mod tests {
         let l = "(0, 1)";
         let e = g.add_edge_label(&(0, 1), l)?;
         g.del_edge(&e)?;
-        assert_true!(g
-            .as_edges_labels()
-            .iter()
-            .find(|(_, y)| *y == l)
-            .is_none());
+        assert_true!(g.as_edges_labels().iter().find(|(_, y)| *y == l).is_none());
 
         Ok(())
     }
@@ -948,6 +943,33 @@ mod tests {
         // Test for edge label overdeleting (identifier).
         assert_true!(g.unset_edge_label(&e).is_err());
         assert_true!(g.get_edge_label(&e).is_err());
+
+        Ok(())
+    }
+
+    #[test]
+    fn clear<T>() -> Result<(), Error<u32>>
+    where
+        T: StorageTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test empty graph
+        g.clear();
+        assert_eq!(g.order(), 0);
+        assert_eq!(g.size(), 0);
+        assert_true!(g.as_vertices_labels().is_empty());
+        assert_true!(g.as_edges_labels().is_empty());
+
+        // Test proper graph
+        let i = g.add_vertex_label("0")?;
+        let j = g.add_vertex_label("1")?;
+        g.add_edge_label(&(i, j), "(0, 1)")?;
+        g.clear();
+        assert_eq!(g.order(), 0);
+        assert_eq!(g.size(), 0);
+        assert_true!(g.as_vertices_labels().is_empty());
+        assert_true!(g.as_edges_labels().is_empty());
 
         Ok(())
     }

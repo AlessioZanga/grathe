@@ -576,6 +576,12 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self >= other
     }
 
+    /// Clears the graph.
+    /// 
+    /// Deletes the vertices and edges with the associated attributes.
+    /// 
+    fn clear(&mut self);
+
     /// Degree of vertex.
     ///
     /// Degree of given vertex identifier $X$ as $|Adj(G, X)|$.
