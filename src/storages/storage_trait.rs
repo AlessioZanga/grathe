@@ -26,8 +26,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Examples
     ///
     /// ```
-    /// use grathe::graphs::Graph;
-    /// use grathe::storages::StorageTrait;
+    /// use grathe::prelude::*;
     ///
     /// // Build a null graph.
     /// let g = Graph::new();
@@ -49,8 +48,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// ```
     /// use all_asserts::*;
-    /// use grathe::graphs::Graph;
-    /// use grathe::storages::StorageTrait;
+    /// use grathe::prelude::*;
     ///
     /// // Build a 3-order graph.
     /// let g = Graph::from_order(3);
@@ -78,8 +76,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// ```
     /// use all_asserts::*;
-    /// use grathe::graphs::Graph;
-    /// use grathe::storages::StorageTrait;
+    /// use grathe::prelude::*;
     ///
     /// // A sequence of unique vertices
     /// let sequence = vec![0, 3, 1, 2];
@@ -96,8 +93,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// This will panic due to duplicated vertices:
     /// ```should_panic
-    /// use grathe::graphs::Graph;
-    /// use grathe::storages::StorageTrait;
+    /// use grathe::prelude::*;
     ///
     /// // A sequence with repeated vertices.
     /// let sequence = vec![0, 3, 1, 2, 2];
@@ -125,12 +121,11 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Panics if the edge identifiers are not unique.
     ///
-        /// # Examples
+    /// # Examples
     ///
     /// ```
     /// use all_asserts::*;
-    /// use grathe::graphs::Graph;
-    /// use grathe::storages::StorageTrait;
+    /// use grathe::prelude::*;
     ///
     /// // A sequence of unique edges
     /// let sequence = vec![(0, 1), (2, 3), (1, 2)];
@@ -147,8 +142,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// This will panic due to duplicated vertices:
     /// ```should_panic
-    /// use grathe::graphs::Graph;
-    /// use grathe::storages::StorageTrait;
+    /// use grathe::prelude::*;
     ///
     /// // A sequence with repeated edges.
     /// let sequence = vec![(0, 1), (2, 3), (1, 2), (1, 2)];
@@ -261,9 +255,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// 
     /// ```
     /// use all_asserts::*;
-    /// use grathe::V;
-    /// use grathe::graphs::Graph;
-    /// use grathe::storages::StorageTrait;
+    /// use grathe::prelude::*;
     /// 
     /// // Build a 3-order graph
     /// let g = Graph::from_order(3);

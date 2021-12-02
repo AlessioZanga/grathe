@@ -15,7 +15,7 @@ pub mod graphs;
 /// I/O operations.
 pub mod io;
 
-// Frequently used items.
+/// Frequently used items.
 pub mod prelude;
 
 /// Backend graph storage implementations.

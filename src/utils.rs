@@ -62,8 +62,7 @@ macro_rules! impl_ungraph_trait {
             ///
             /// ```
             /// use all_asserts::*;
-            /// use grathe::graphs::Graph;
-            /// use grathe::storages::StorageTrait;
+            /// use grathe::prelude::*;
             ///
             /// let g = Graph::new();
             /// let h = Graph::new();
@@ -88,8 +87,7 @@ macro_rules! impl_ungraph_trait {
             /// # Examples
             /// 
             /// ```
-            /// use grathe::graphs::Graph;
-            /// use grathe::storages::StorageTrait;
+            /// use grathe::prelude::*;
             /// 
             /// // Build a null graph.
             /// let g = Graph::default();
