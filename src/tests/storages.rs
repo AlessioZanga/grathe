@@ -282,7 +282,7 @@ mod tests {
     }
 
     #[test]
-    fn adjacents_iter<T>() -> Result<(), Error<u32>>
+    fn adjacent_iter<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
@@ -298,7 +298,7 @@ mod tests {
         g.add_edge(&(0, 0))?;
         assert_eq!(Adj!(g, &0)?.count(), 2);
 
-        assert_true!(Adj!(g, &0)?.eq(g.adjacents_iter(&0)?));
+        assert_true!(Adj!(g, &0)?.eq(g.adjacent_iter(&0)?));
         assert_true!(Adj!(g, &0)?.all(|x| g.has_edge(&(0, x)).unwrap()));
         assert_true!(is_sorted(Adj!(g, &0)?));
 

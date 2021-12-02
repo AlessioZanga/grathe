@@ -79,7 +79,7 @@ where
     }
 
     #[inline(always)]
-    fn adjacents_iter<'a>(
+    fn adjacent_iter<'a>(
         &'a self,
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>> {

@@ -80,21 +80,21 @@ macro_rules! impl_ungraph_trait {
             T: VertexTrait,
         {
             /// Default constructor.
-            /// 
+            ///
             /// Let be $\mathcal{G}$ a graph type. The default constructor of $\mathcal{G}$
             /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
-            /// 
+            ///
             /// # Examples
-            /// 
+            ///
             /// ```
             /// use grathe::prelude::*;
-            /// 
+            ///
             /// // Build a null graph.
             /// let g = Graph::default();
-            /// 
+            ///
             /// // The vertex set is empty.
             /// assert_eq!(g.order(), 0);
-            /// 
+            ///
             /// // The edge set is also empty.
             /// assert_eq!(g.size(), 0);
             /// ```
@@ -120,7 +120,7 @@ macro_rules! impl_ungraph_trait {
                 to self.0 {
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
-                    fn adjacents_iter<'a>(
+                    fn adjacent_iter<'a>(
                         &'a self,
                         x: &Self::Vertex,
                     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
@@ -129,7 +129,6 @@ macro_rules! impl_ungraph_trait {
                     fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)>;
                     fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)>;
                     fn order(&self) -> usize;
-                    fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
                     fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
                     fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
@@ -140,18 +139,20 @@ macro_rules! impl_ungraph_trait {
             }
 
             #[inline(always)]
+            fn size(&self) -> usize {
+                // De-symmetrize edge set for correct size computation
+                self.edges_iter().filter(|(x, y)| x <= y).count()
+            }
+
+            #[inline(always)]
             fn add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
                 // Add edge (y, x)
                 self.0.add_edge(&(e.1, e.0))?;
                 // Add edge (x, y)
-                // TODO: We should clear up this part...
-                if let Err(Error::EdgeAlreadyDefined((x, y))) = self.0.add_edge(&e) {
-                    if (x != y) {
-                        unreachable!()
-                    }
+                match e.0 == e.1 {
+                    false => self.0.add_edge(&e),
+                    true => Ok(*e)
                 }
-
-                Ok(*e)
             }
 
             #[inline(always)]
@@ -159,7 +160,10 @@ macro_rules! impl_ungraph_trait {
                 // Del edge (y, x)
                 self.0.del_edge(&(e.1, e.0))?;
                 // Del edge (x, y)
-                self.0.del_edge(&e)
+                match e.0 == e.1 {
+                    false => self.0.del_edge(&e),
+                    true => Ok(*e)
+                }
             }
         }
 
@@ -222,7 +226,7 @@ macro_rules! impl_digraph_trait {
                 to self.0 {
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
-                    fn adjacents_iter<'a>(
+                    fn adjacent_iter<'a>(
                         &'a self,
                         x: &Self::Vertex,
                     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;

@@ -12,7 +12,7 @@ pub trait UndirectedTrait: StorageTrait {
     ///
     /// Panics if the vertex identifier does not exists in the graph.
     ///
-    fn neighbors_iter<'a>(
+    fn neighbor_iter<'a>(
         &'a self,
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
@@ -97,6 +97,6 @@ pub trait UndirectedTrait: StorageTrait {
 #[macro_export]
 macro_rules! Ne {
     ($g:expr, $x:expr) => {
-        $g.neighbors_iter($x)
+        $g.neighbor_iter($x)
     };
 }

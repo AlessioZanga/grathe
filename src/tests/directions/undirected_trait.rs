@@ -61,6 +61,11 @@ mod tests_undirected {
         // Test for repeated undirected edges addition
         assert_true!(g.add_edge(&e).is_err());
 
+        // Test for loops
+        let e = g.add_edge(&(i ,i))?;
+        assert_true!(g.has_edge(&(i, i))?);
+        g.del_edge(&e)?;
+
         // Del vertex and associated edges.
         g.del_vertex(&i)?;
         assert_true!(g.has_edge(&(i, j)).is_err());
@@ -115,7 +120,7 @@ mod tests_undirected {
         g.add_edge(&(j, j))?;
         assert_eq!(Ne!(g, &i)?.count(), 2);
 
-        assert_true!(Ne!(g, &i)?.eq(g.neighbors_iter(&i)?));
+        assert_true!(Ne!(g, &i)?.eq(g.neighbor_iter(&i)?));
         assert_true!(
             Ne!(g, &i)?.all(|x| g.has_edge(&(i, x)).unwrap() && g.has_edge(&(x, i)).unwrap())
         );

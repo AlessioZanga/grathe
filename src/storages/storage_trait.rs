@@ -24,7 +24,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
     ///
     /// # Examples
-    ///
     /// ```
     /// use grathe::prelude::*;
     ///
@@ -45,12 +44,11 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph of a given order.
     ///
     /// # Examples
-    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// // Build a 3-order graph.
+    /// // Build a 3rd order graph.
     /// let g = Graph::from_order(3);
     ///
     /// assert_eq!(g.order(), 3);
@@ -69,7 +67,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph from a given sequence of vertices, ignoring repeated ones.
     ///
     /// # Examples
-    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -79,7 +76,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Build a graph by consuming a vector of vertices
     /// let g = Graph::from_vertices(sequence);
-    /// 
+    ///
     /// // Build a graph by consuming any `IntoIterator`
     /// let h = Graph::from_vertices((0..4));
     ///
@@ -103,7 +100,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph from a given sequence of edges, ignoring repeated ones.
     ///
     /// # Examples
-    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -113,7 +109,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Build a graph by consuming a vector of edges
     /// let g = Graph::from_edges(sequence);
-    /// 
+    ///
     /// // Build a graph by consuming any `IntoIterator`
     /// let h = Graph::from_edges((0..4).zip((1..4)));
     ///
@@ -141,19 +137,18 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Complexity
     ///
     /// $O(|E| \cdot \log |E|)$ - Log-linear in the size of the graph.
-    /// 
-    /// # Examples
     ///
+    /// # Examples
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
-    /// 
+    ///
     /// // A sequence of uniques edges
     /// let E = EdgeList::from([(0, 1), (2, 3), (3, 1)]);
-    /// 
+    ///
     /// // Build a graph from a sequence of edges
     /// let g = Graph::from_edges(E.clone());
-    /// 
+    ///
     /// // Return an edge list (a.k.a. a *set* of edges) from the graph
     /// // FIXME: Use a DiGraph
     /// // assert_eq!(g.to_edge_list(), E);
@@ -237,23 +232,22 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Vertex iterator.
     ///
     /// Iterates over the vertex set $V$ ordered by identifier value.
-    /// 
+    ///
     /// # Examples
-    /// 
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
-    /// 
-    /// // Build a 3-order graph
+    ///
+    /// // Build a 3rd order graph
     /// let g = Graph::from_order(3);
-    /// 
+    ///
     /// // Use the vertex set iterator
     /// let V: Vec<_> = g.vertices_iter().collect();
     /// assert_eq!(V, [0, 1, 2]);
-    /// 
+    ///
     /// // Use the associated macro 'V!'
     /// assert_true!(g.vertices_iter().eq(V!(g)));
-    /// 
+    ///
     /// // Iterate over the vertex set
     /// for x in V!(g) {
     ///     assert_true!(g.has_vertex(&x));
@@ -267,22 +261,21 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Iterates over the edge set $E$ order by identifier values.
     ///
     /// # Examples
-    /// 
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
-    /// 
+    ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a 3-order graph
+    /// // Build a 3rd order graph
     /// let g = Graph::from_edges([(0, 1), (1, 0)]);
-    /// 
+    ///
     /// // Use the vertex set iterator
     /// let E: Vec<_> = g.edges_iter().collect();
     /// assert_eq!(E, [(0, 1), (1, 0)]);
-    /// 
+    ///
     /// // Use the associated macro 'E!'
     /// assert_true!(g.edges_iter().eq(E!(g)));
-    /// 
+    ///
     /// // Iterate over the vertex set
     /// for x in E!(g) {
     ///     assert_true!(g.has_edge(&x)?);
@@ -297,11 +290,39 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Iterates over the adjacent vertices set $Adj(G, X)$ of a given vertex $X$.
     ///
-    /// # Panics
+    /// # Errors
     ///
-    /// Panics if the vertex identifier does not exists in the graph.
+    /// The vertex identifier does not exists in the graph.
     ///
-    fn adjacents_iter<'a>(
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>>
+    /// # {
+    /// // Build a graph from edges
+    /// let g = Graph::from_edges([(0, 1), (2, 0), (0, 0)]);
+    ///
+    /// // Use the adjacent iterator.
+    /// let A: Vec<_> = g.adjacent_iter(&0)?.collect();
+    /// assert_eq!(A, [0, 1, 2]);
+    ///
+    /// // Use the associated macro 'Adj!'
+    /// assert_true!(g.adjacent_iter(&0)?.eq(Adj!(g, &0)?));
+    ///
+    /// // Iterate over the adjacent set
+    /// for x in Adj!(g, &0)? {
+    ///     assert_true!(g.has_edge(&(0, x))?);
+    /// }
+    ///
+    /// // Iterating over non-existing vertex yields an error
+    /// assert_true!(Adj!(g, &3).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    fn adjacent_iter<'a>(
         &'a self,
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
@@ -338,11 +359,35 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// $O(1)$ - Constant.
     ///
+    /// # Examples
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a 5th order graph
+    /// let g = Graph::from_order(5);
+    /// assert_eq!(g.order(), 5);
+    /// ```
+    ///
     fn order(&self) -> usize;
 
     /// Size of the graph.
     ///
     /// Return the graph size (aka. $|E|$).
+    ///
+    /// # Complexity
+    ///
+    /// $O(|E|)$ - Liner in the size of graph.
+    ///
+    /// # Examples
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a 5th size graph
+    /// let g = Graph::from_edges([
+    ///     (0, 1), (2, 0), (3, 2), (1, 2), (1, 1)
+    /// ]);
+    /// assert_eq!(g.size(), 5);
+    /// ```
     ///
     fn size(&self) -> usize;
 
@@ -350,6 +395,21 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Checks whether the graph has a given vertex or not.
     ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a 2nd order graph
+    /// let g = Graph::from_order(2);
+    ///
+    /// // Check vertex
+    /// assert_true!(g.has_vertex(&0));
+    /// assert_false!(g.has_vertex(&2));
+    /// # Ok(())
+    /// # }
+    /// ```
     fn has_vertex(&self, x: &Self::Vertex) -> bool;
 
     /// Adds vertex to the graph.
@@ -360,6 +420,22 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier already exists in the graph.
     ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    /// 
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a null graph
+    /// let mut g = Graph::default();
+    /// 
+    /// // Add a new vertex
+    /// let i = g.add_vertex()?;
+    /// assert_true!(g.has_vertex(&i));
+    /// # Ok(())
+    /// # }
+    /// ```
+    /// 
     fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
 
     /// Adds vertex to the graph.
@@ -777,6 +853,6 @@ macro_rules! E {
 #[macro_export]
 macro_rules! Adj {
     ($g:expr, $x:expr) => {
-        $g.adjacents_iter($x)
+        $g.adjacent_iter($x)
     };
 }
