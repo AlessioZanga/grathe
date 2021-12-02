@@ -22,19 +22,19 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Let be $\mathcal{G}$ a graph type. The base constructor of $\mathcal{G}$
     /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use grathe::graphs::Graph;
     /// use grathe::storages::StorageTrait;
-    /// 
+    ///
     /// // Build a null graph.
     /// let g = Graph::new();
-    /// 
+    ///
     /// // The vertex set is empty.
     /// assert_eq!(g.order(), 0);
-    /// 
+    ///
     /// // The edge set is also empty.
     /// assert_eq!(g.size(), 0);
     /// ```
@@ -46,18 +46,18 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph of a given order.
     ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::graphs::Graph;
     /// use grathe::storages::StorageTrait;
-    /// 
+    ///
     /// // Build a 3-order graph.
     /// let g = Graph::from_order(3);
-    /// 
+    ///
     /// assert_eq!(g.order(), 3);
     /// assert_eq!(g.size(), 0);
-    /// 
+    ///
     /// // Vertex identifiers are added incrementally starting from zero.
     /// assert_true!(g.has_vertex(&2));
     /// ```
@@ -73,6 +73,38 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Panics
     ///
     /// Panics if the vertex identifiers are not unique.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::graphs::Graph;
+    /// use grathe::storages::StorageTrait;
+    ///
+    /// // A sequence of unique vertices
+    /// let sequence = vec![0, 3, 1, 2];
+    ///
+    /// // Build a graph by consuming a vector of vertices
+    /// let g = Graph::from_vertices(sequence);
+    /// 
+    /// // Build a graph by consuming any `IntoIterator`
+    /// let h = Graph::from_vertices((0..4));
+    ///
+    /// assert_eq!(g, h);
+    ///
+    /// ```
+    ///
+    /// This will panic due to duplicated vertices:
+    /// ```should_panic
+    /// use grathe::graphs::Graph;
+    /// use grathe::storages::StorageTrait;
+    ///
+    /// // A sequence with repeated vertices.
+    /// let sequence = vec![0, 3, 1, 2, 2];
+    ///
+    /// // This panics!
+    /// let g = Graph::from_vertices(sequence);
+    /// ```
     ///
     fn from_vertices<Iter>(vertices: Iter) -> Self
     where
@@ -92,6 +124,38 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Panics
     ///
     /// Panics if the edge identifiers are not unique.
+    ///
+        /// # Examples
+    ///
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::graphs::Graph;
+    /// use grathe::storages::StorageTrait;
+    ///
+    /// // A sequence of unique edges
+    /// let sequence = vec![(0, 1), (2, 3), (1, 2)];
+    ///
+    /// // Build a graph by consuming a vector of edges
+    /// let g = Graph::from_edges(sequence);
+    /// 
+    /// // Build a graph by consuming any `IntoIterator`
+    /// let h = Graph::from_edges((0..4).zip((1..4)));
+    ///
+    /// assert_eq!(g, h);
+    ///
+    /// ```
+    ///
+    /// This will panic due to duplicated vertices:
+    /// ```should_panic
+    /// use grathe::graphs::Graph;
+    /// use grathe::storages::StorageTrait;
+    ///
+    /// // A sequence with repeated edges.
+    /// let sequence = vec![(0, 1), (2, 3), (1, 2), (1, 2)];
+    ///
+    /// // This panics!
+    /// let g = Graph::from_edges(sequence);
+    /// ```
     ///
     fn from_edges<Iter>(edges: Iter) -> Self
     where
@@ -192,6 +256,31 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Vertex iterator.
     ///
     /// Iterates over the vertex set $V$ ordered by identifier value.
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::V;
+    /// use grathe::graphs::Graph;
+    /// use grathe::storages::StorageTrait;
+    /// 
+    /// // Build a 3-order graph
+    /// let g = Graph::from_order(3);
+    /// 
+    /// // Use the vertex set iterator
+    /// let V: Vec<_> = g.vertices_iter().collect();
+    /// assert_eq!(V, [0, 1, 2]);
+    /// 
+    /// // Use the associated macro 'V!'
+    /// let W: Vec<_> = V!(g).collect();
+    /// assert_eq!(V, W);
+    /// 
+    /// // Iterate over the vertex set
+    /// for x in V!(g) {
+    ///     assert_true!(g.has_vertex(&x));
+    /// }
+    /// ```
     ///
     fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
 
@@ -611,9 +700,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     }
 
     /// Clears the graph.
-    /// 
+    ///
     /// Deletes the vertices and edges with the associated attributes.
-    /// 
+    ///
     fn clear(&mut self);
 
     /// Degree of vertex.
