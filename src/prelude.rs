@@ -9,3 +9,6 @@ pub use crate::graphs::{Graph, GraphTrait};
 
 // Re-export storages
 pub use crate::storages::StorageTrait;
+
+// Re-export types
+pub use crate::types::*;

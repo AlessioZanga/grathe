@@ -118,12 +118,12 @@ macro_rules! impl_ungraph_trait {
 
             delegate! {
                 to self.0 {
-                    fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
-                    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a>;
+                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
+                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
                     fn adjacents_iter<'a>(
                         &'a self,
                         x: &Self::Vertex,
-                    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex>;
                     fn as_mut_vertices_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
                     fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)>;
@@ -220,12 +220,12 @@ macro_rules! impl_digraph_trait {
 
             delegate! {
                 to self.0 {
-                    fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
-                    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a>;
+                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
+                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
                     fn adjacents_iter<'a>(
                         &'a self,
                         x: &Self::Vertex,
-                    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex>;
                     fn as_mut_vertices_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
                     fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)>;

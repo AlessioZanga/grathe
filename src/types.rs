@@ -16,6 +16,15 @@ impl<T> VertexTrait for T where T: PrimInt + FromPrimitive + FromStr + Debug + H
 // TODO: Where clauses are not enforced in type aliases,
 // once done we should add "where T: VertexTrait" down here.
 
+/// Vertex iterator trait (a.k.a Iterator<Item = Vertex> + Debug)
+pub trait VertexIterator<T>: Iterator<Item = T> + Debug {}
+impl<T, U> VertexIterator<U> for T where T: Iterator<Item = U> + Debug {}
+
+/// Edge iterator trait (a.k.a Iterator<Item = Edge> + Debug)
+pub trait EdgeIterator<T>: Iterator<Item = (T, T)> + Debug {}
+impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = (U, U)> + Debug {}
+
+
 /// Label bidirectional map type.
 pub type LabelMap<T> = BiHashMap<T, String>;
 

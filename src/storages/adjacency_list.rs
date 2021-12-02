@@ -65,12 +65,12 @@ where
     }
 
     #[inline(always)]
-    fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a> {
+    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a> {
         Box::new(self.data.iter().map(|x| x.0).copied())
     }
 
     #[inline(always)]
-    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a> {
+    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a> {
         Box::new(
             self.data
                 .iter()
@@ -82,7 +82,7 @@ where
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>> {
+    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>> {
         match self.data.get(x) {
             Some(i) => Ok(Box::new(i.iter().copied())),
             None => Err(Error::VertexNotDefined(*x)),

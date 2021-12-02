@@ -1,5 +1,6 @@
 use crate::errors::Error;
 use crate::storages::StorageTrait;
+use crate::types::*;
 
 /// Undirected graph trait.
 pub trait UndirectedTrait: StorageTrait {
@@ -14,7 +15,7 @@ pub trait UndirectedTrait: StorageTrait {
     fn neighbors_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Adds undirected edge to the graph.
     ///

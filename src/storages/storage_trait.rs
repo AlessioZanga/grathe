@@ -66,11 +66,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// From vertices constructor.
     ///
-    /// Construct a graph from a given sequence of vertices.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the vertex identifiers are not unique.
+    /// Construct a graph from a given sequence of vertices, ignoring repeated ones.
     ///
     /// # Examples
     ///
@@ -91,35 +87,20 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// ```
     ///
-    /// This will panic due to duplicated vertices:
-    /// ```should_panic
-    /// use grathe::prelude::*;
-    ///
-    /// // A sequence with repeated vertices.
-    /// let sequence = vec![0, 3, 1, 2, 2];
-    ///
-    /// // This panics!
-    /// let g = Graph::from_vertices(sequence);
-    /// ```
-    ///
     fn from_vertices<Iter>(vertices: Iter) -> Self
     where
         Iter: IntoIterator<Item = Self::Vertex>,
     {
         let mut g = Self::new();
         for x in vertices {
-            g.reserve_vertex(&x).unwrap();
+            g.reserve_vertex(&x).ok();
         }
         g
     }
 
     /// From edges constructor.
     ///
-    /// Construct a graph from a given sequence of edges.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the edge identifiers are not unique.
+    /// Construct a graph from a given sequence of edges, ignoring repeated ones.
     ///
     /// # Examples
     ///
@@ -140,17 +121,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// ```
     ///
-    /// This will panic due to duplicated vertices:
-    /// ```should_panic
-    /// use grathe::prelude::*;
-    ///
-    /// // A sequence with repeated edges.
-    /// let sequence = vec![(0, 1), (2, 3), (1, 2), (1, 2)];
-    ///
-    /// // This panics!
-    /// let g = Graph::from_edges(sequence);
-    /// ```
-    ///
     fn from_edges<Iter>(edges: Iter) -> Self
     where
         Iter: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
@@ -159,7 +129,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         for (x, y) in edges {
             g.reserve_vertex(&x).ok();
             g.reserve_vertex(&y).ok();
-            g.add_edge(&(x, y)).unwrap();
+            g.add_edge(&(x, y)).ok();
         }
         g
     }
@@ -171,6 +141,23 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Complexity
     ///
     /// $O(|E| \cdot \log |E|)$ - Log-linear in the size of the graph.
+    /// 
+    /// # Examples
+    ///
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    /// 
+    /// // A sequence of uniques edges
+    /// let E = EdgeList::from([(0, 1), (2, 3), (3, 1)]);
+    /// 
+    /// // Build a graph from a sequence of edges
+    /// let g = Graph::from_edges(E.clone());
+    /// 
+    /// // Return an edge list (a.k.a. a *set* of edges) from the graph
+    /// // FIXME: Use a DiGraph
+    /// // assert_eq!(g.to_edge_list(), E);
+    /// ```
     ///
     fn to_edge_list(&self) -> EdgeList<Self::Vertex> {
         let mut out = EdgeList::new();
@@ -265,8 +252,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_eq!(V, [0, 1, 2]);
     /// 
     /// // Use the associated macro 'V!'
-    /// let W: Vec<_> = V!(g).collect();
-    /// assert_eq!(V, W);
+    /// assert_true!(g.vertices_iter().eq(V!(g)));
     /// 
     /// // Iterate over the vertex set
     /// for x in V!(g) {
@@ -274,13 +260,38 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// }
     /// ```
     ///
-    fn vertices_iter<'a>(&'a self) -> Box<dyn Iterator<Item = Self::Vertex> + 'a>;
+    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
 
     /// Edge iterator.
     ///
     /// Iterates over the edge set $E$ order by identifier values.
     ///
-    fn edges_iter<'a>(&'a self) -> Box<dyn Iterator<Item = (Self::Vertex, Self::Vertex)> + 'a>;
+    /// # Examples
+    /// 
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    /// 
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a 3-order graph
+    /// let g = Graph::from_edges([(0, 1), (1, 0)]);
+    /// 
+    /// // Use the vertex set iterator
+    /// let E: Vec<_> = g.edges_iter().collect();
+    /// assert_eq!(E, [(0, 1), (1, 0)]);
+    /// 
+    /// // Use the associated macro 'E!'
+    /// assert_true!(g.edges_iter().eq(E!(g)));
+    /// 
+    /// // Iterate over the vertex set
+    /// for x in E!(g) {
+    ///     assert_true!(g.has_edge(&x)?);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
 
     /// Adjacent iterator.
     ///
@@ -293,7 +304,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Result<Box<dyn Iterator<Item = Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Vertices labels.
     ///

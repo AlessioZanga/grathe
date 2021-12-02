@@ -147,18 +147,11 @@ mod tests {
         g = T::from_vertices(0..N);
         assert_eq!(g.order(), N as usize);
 
-        Ok(())
-    }
-
-    #[test]
-    #[should_panic]
-    fn from_vertices_panics<T>()
-    where
-        T: StorageTrait<Vertex = u32>,
-    {
         // Test next graph duplicated vertex set.
         let g = T::from_vertices([0, 4, 2, 3, 1, 4, 3]);
         assert_eq!(g.order(), 5);
+
+        Ok(())
     }
 
     #[test]
@@ -183,18 +176,11 @@ mod tests {
         g = T::from_edges((0..N).zip(0..N));
         assert_eq!(g.size(), N as usize);
 
-        Ok(())
-    }
-
-    #[test]
-    #[should_panic]
-    fn from_edges_panics<T>()
-    where
-        T: StorageTrait<Vertex = u32>,
-    {
         // Test next graph duplicated vertex set.
         let g = T::from_edges(E);
-        assert_eq!(g.order(), 5);
+        assert_eq!(g.size(), 5);
+
+        Ok(())
     }
 
     #[test]
