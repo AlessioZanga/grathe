@@ -1217,6 +1217,22 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Checks if this graph is subgraph of given graph.
     ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// // Build two graphs.
+    /// let g = Graph::default();
+    /// let h = Graph::from_order(2);
+    ///
+    /// // The null graph is always subgraph of an other graph.
+    /// assert_true!(g.is_subgraph(&h));
+    ///
+    /// // Use the associated `<=` operator.
+    /// assert_true!(g <= h);
+    /// ```
+    ///
     #[inline(always)]
     fn is_subgraph(&self, other: &Self) -> bool {
         self <= other
@@ -1225,6 +1241,22 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Is supergraph of another graph.
     ///
     /// Checks if this graph is supergraph of given graph.
+    ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// // Build two graphs.
+    /// let g = Graph::default();
+    /// let h = Graph::from_order(2);
+    ///
+    /// // Any graph is supergraph of the null graph.
+    /// assert_true!(h.is_supergraph(&g));
+    ///
+    /// // Use the associated `>=` operator.
+    /// assert_true!(h >= g);
+    /// ```
     ///
     #[inline(always)]
     fn is_supergraph(&self, other: &Self) -> bool {
@@ -1235,6 +1267,26 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Deletes the vertices and edges with the associated attributes.
     ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a new graph.
+    /// let mut g = Graph::from_edges([(0, 1), (2, 3)]);
+    ///
+    /// // The graph *is not* null.
+    /// assert_ne!(g.order(), 0);
+    /// assert_ne!(g.size(), 0);
+    ///
+    /// // Clear the graph.
+    /// g.clear();
+    ///
+    /// // The graph *is* null.
+    /// assert_eq!(g.order(), 0);
+    /// assert_eq!(g.size(), 0);
+    /// ```
+    ///
     fn clear(&mut self);
 
     /// Degree of vertex.
@@ -1244,6 +1296,27 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Errors
     ///
     /// The vertex identifier does not exists in the graph.
+    ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a graph.
+    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    ///
+    /// // Get the degree of `1`.
+    /// assert_true!(
+    ///     g.degree_of(&1)? == 3 &&
+    ///     g.degree_of(&1)? == Adj!(g, &1)?.count()
+    /// );
+    ///
+    /// // Getting the degree of a non-existing vertex yields an error.
+    /// assert_true!(g.degree_of(&4).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
     ///
     #[inline(always)]
     fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
@@ -1258,6 +1331,24 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// The vertex identifier does not exists in the graph.
     ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a graph.
+    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    ///
+    /// // Check if `0` is isolated (a.k.a not connected).
+    /// assert_false!(g.is_isolated_vertex(&0)?);
+    ///
+    /// // Checking a non-existing vertex yields an error.
+    /// assert_true!(g.is_isolated_vertex(&4).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
     #[inline(always)]
     fn is_isolated_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         Ok(self.degree_of(x)? == 0)
@@ -1270,6 +1361,24 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Errors
     ///
     /// The vertex identifier does not exists in the graph.
+    ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a graph.
+    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    ///
+    /// // Check if `0` is pendant (a.k.a is connected to just one vertex).
+    /// assert_true!(g.is_pendant_vertex(&0)?);
+    ///
+    /// // Checking a non-existing vertex yields an error.
+    /// assert_true!(g.is_pendant_vertex(&4).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
     ///
     #[inline(always)]
     fn is_pendant_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
