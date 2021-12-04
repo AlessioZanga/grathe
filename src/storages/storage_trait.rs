@@ -227,9 +227,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// ```
     ///
-    fn from_vertex<Iter>(vertex: Iter) -> Self
+    fn from_vertex<I>(vertex: I) -> Self
     where
-        Iter: IntoIterator<Item = Self::Vertex>,
+        I: IntoIterator<Item = Self::Vertex>,
     {
         // Get vertex iterator.
         let vertex = vertex.into_iter();
@@ -267,9 +267,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// ```
     ///
-    fn from_edges<Iter>(edges: Iter) -> Self
+    fn from_edges<I>(edges: I) -> Self
     where
-        Iter: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
+        I: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Get edges iterator.
         let edges = edges.into_iter();
