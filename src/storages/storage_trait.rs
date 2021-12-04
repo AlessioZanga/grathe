@@ -52,7 +52,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // Build a new graph.
-    /// let mut g = Graph::from_edges([(0, 1), (2, 3)]);
+    /// let mut g = Graph::from_edge([(0, 1), (2, 3)]);
     ///
     /// // The graph *is not* null.
     /// assert_ne!(g.order(), 0);
@@ -291,15 +291,15 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let sequence = vec![(0, 1), (2, 3), (1, 2)];
     ///
     /// // Build a graph by consuming a vector of edges.
-    /// let g = Graph::from_edges(sequence);
+    /// let g = Graph::from_edge(sequence);
     ///
     /// // Build a graph by consuming any `IntoIterator`.
-    /// let h = Graph::from_edges((0..4).zip((1..4)));
+    /// let h = Graph::from_edge((0..4).zip((1..4)));
     ///
     /// assert_eq!(g, h);
     /// ```
     ///
-    fn from_edges<I>(edges: I) -> Self
+    fn from_edge<I>(edges: I) -> Self
     where
         I: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
@@ -314,6 +314,49 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         for (x, y) in edges {
             g.reserve_vertex(&x).ok();
             g.reserve_vertex(&y).ok();
+            g.add_edge(&(x, y)).ok();
+        }
+
+        g
+    }
+
+    /// From edges constructor.
+    ///
+    /// Construct a graph from a given sequence of edges, ignoring repeated ones.
+    ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// // A sequence of unique vertex labels pairs.
+    /// let sequence = vec![("0", "1"), ("2", "3"), ("1", "2")];
+    ///
+    /// // Build a graph by consuming a vector of vertex labels pairs.
+    /// let g = Graph::from_edge_labels(sequence);
+    /// ```
+    ///
+    fn from_edge_labels<'a, I>(edges: I) -> Self
+    where
+        I: IntoIterator<Item = (&'a str, &'a str)>,
+    {
+        // Get edges iterator.
+        let edges = edges.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = edges.size_hint();
+        // Build graph with initial capacity,
+        // assuming average frequency of new vertex.
+        let mut g = Self::with_capacity(lower);
+        // Add edges to the graph.
+        for (x, y) in edges {
+            let x = match g.add_vertex_label(x) {
+                Err(_) => g.get_vertex_id(x).unwrap(),
+                Ok(x) => x,
+            };
+            let y = match g.add_vertex_label(y) {
+                Err(_) => g.get_vertex_id(y).unwrap(),
+                Ok(y) => y,
+            };
             g.add_edge(&(x, y)).ok();
         }
 
@@ -337,7 +380,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let E = EdgeList::from([(0, 1), (1, 0)]);
     ///
     /// // Build a graph from a sequence of edges.
-    /// let g = Graph::from_edges(E.clone());
+    /// let g = Graph::from_edge(E.clone());
     ///
     /// // Return an edge list (a.k.a. a *set* of edges) from the graph.
     /// assert_eq!(g.to_edge_list(), E);
@@ -456,7 +499,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a 3rd order graph.
-    /// let g = Graph::from_edges([(0, 1), (1, 0)]);
+    /// let g = Graph::from_edge([(0, 1), (1, 0)]);
     ///
     /// // Use the vertex set iterator.
     /// let E: Vec<_> = g.edges_iter().collect();
@@ -491,7 +534,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # fn main() -> Result<(), grathe::errors::Error<u32>>
     /// # {
     /// // Build a graph from edges.
-    /// let g = Graph::from_edges([(0, 1), (2, 0), (0, 0)]);
+    /// let g = Graph::from_edge([(0, 1), (2, 0), (0, 0)]);
     ///
     /// // Use the adjacent iterator.
     /// let A: Vec<_> = g.adjacent_iter(&0)?.collect();
@@ -572,7 +615,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // Build a 5th size graph.
-    /// let g = Graph::from_edges([
+    /// let g = Graph::from_edge([
     ///     (0, 1), (2, 0), (3, 2), (1, 2), (1, 1)
     /// ]);
     /// assert_eq!(g.size(), 5);
@@ -707,7 +750,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (3, 2)]);
+    /// let g = Graph::from_edge([(0, 1), (3, 2)]);
     ///
     /// // Check edge.
     /// assert_true!(g.has_edge(&(0, 1))?);
@@ -1465,7 +1508,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edge([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Get the degree of `1`.
     /// assert_true!(
@@ -1499,7 +1542,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edge([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is isolated (a.k.a not connected).
     /// assert_false!(g.is_isolated_vertex(&0)?);
@@ -1530,7 +1573,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edge([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is pendant (a.k.a is connected to just one vertex).
     /// assert_true!(g.is_pendant_vertex(&0)?);

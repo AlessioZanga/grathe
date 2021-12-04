@@ -26,7 +26,7 @@ use grathe::prelude::*; // Frequently used items.
 
 fn main() -> Result<()> {
     // Define an (undirected) graph given its edges.
-    let mut G = Graph::from_edges([
+    let mut G = Graph::from_edge([
         (0, 1), (1, 2), (3, 4)
     ]);
     
