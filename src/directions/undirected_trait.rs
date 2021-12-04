@@ -6,7 +6,7 @@ use crate::types::*;
 pub trait UndirectedTrait: StorageTrait {
     /// Neighbor iterator.
     ///
-    /// Iterates over the neighbors vertices set $Ne(G, X)$ of a given vertex $X$.
+    /// Iterates over the neighbors vertex set $Ne(G, X)$ of a given vertex $X$.
     ///
     /// # Panics
     ///
@@ -71,7 +71,7 @@ pub trait UndirectedTrait: StorageTrait {
 
     /// Adds undirected edge label to the graph.
     ///
-    /// Insert given vertices identifiers, undirected edge identifier and
+    /// Insert given vertex identifiers, undirected edge identifier and
     /// undirected edge label into the graph.
     ///
     /// # Errors
@@ -92,7 +92,7 @@ pub trait UndirectedTrait: StorageTrait {
 
 /// Neighborhood iterator.
 ///
-/// Return the vertices iterator representing $Ne(G, X)$.
+/// Return the vertex iterator representing $Ne(G, X)$.
 ///
 #[macro_export]
 macro_rules! Ne {

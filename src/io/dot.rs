@@ -131,11 +131,11 @@ where
                     .into_inner()
                     // Discard direction placeholder
                     .step_by(2)
-                    // Group by tuples of vertices
+                    // Group by tuples of vertex
                     .tuple_windows()
                     // Map tuples to path
                     .map(|(x, y)| {
-                        // Insert vertices if missing
+                        // Insert vertex if missing
                         let e = (
                             match_rules(graph, x).unwrap(),
                             match_rules(graph, y).unwrap(),
@@ -273,7 +273,7 @@ where
     }
     // Open DOT string by escaping "{"
     writeln!(dot, "{} {{", graph_type)?;
-    // Write vertices with label
+    // Write vertex with label
     for x in V!(graph) {
         match graph.get_vertex_label(&x) {
             Err(_) => writeln!(dot, "\t{:?};", x),

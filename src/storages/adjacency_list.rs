@@ -104,7 +104,7 @@ where
     }
 
     #[inline(always)]
-    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a> {
+    fn vertex_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a> {
         Box::new(self.data.iter().map(|x| x.0).copied())
     }
 
@@ -129,12 +129,12 @@ where
     }
 
     #[inline(always)]
-    fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex> {
+    fn as_vertex_labels(&self) -> &LabelMap<Self::Vertex> {
         &self.v_labels
     }
 
     #[inline(always)]
-    fn as_mut_vertices_labels(&mut self) -> &mut LabelMap<Self::Vertex> {
+    fn as_mut_vertex_labels(&mut self) -> &mut LabelMap<Self::Vertex> {
         &mut self.v_labels
     }
 
@@ -205,7 +205,7 @@ where
                     y.remove(x);
                 }
                 // Remove associated label if any
-                self.as_mut_vertices_labels().remove_by_left(x);
+                self.as_mut_vertex_labels().remove_by_left(x);
                 // Return success
                 Ok(*x)
             }
@@ -285,7 +285,7 @@ where
     fn clear(&mut self) {
         // Clear the data structures
         self.data.clear();
-        // Clear the vertices/edges labels
+        // Clear the vertex/edges labels
         self.v_labels.clear();
         self.e_labels.clear();
     }

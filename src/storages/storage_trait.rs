@@ -44,7 +44,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Clears the graph.
     ///
-    /// Clears the graph, removing both vertices and edges.
+    /// Clears the graph, removing both vertex and edges.
     ///
     /// # Examples
     /// ```
@@ -70,7 +70,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Returns the capacity.
     ///
-    /// Returns the number of vertices the graph can hold.
+    /// Returns the number of vertex the graph can hold.
     /// Depending on the underlying storage, this could avoid reallocations.
     ///
     /// # Examples
@@ -114,7 +114,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Reserves additional capacity.
     ///
-    /// Reserves capacity for at least `additional` vertices to be inserted in the graph.
+    /// Reserves capacity for at least `additional` vertex to be inserted in the graph.
     /// Depending on the underlying storage, this could avoid reallocations.
     ///
     /// # Panics
@@ -191,7 +191,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// // Build a 3rd order graph.
     /// let g = Graph::from_order(3);
     ///
-    /// // There are three vertices...
+    /// // There are three vertex...
     /// assert_eq!(g.order(), 3);
     ///
     /// // ... but no edges.
@@ -202,43 +202,43 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn from_order(order: usize) -> Self {
-        Self::from_vertices((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()))
+        Self::from_vertex((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()))
     }
 
-    /// From vertices constructor.
+    /// From vertex constructor.
     ///
-    /// Construct a graph from a given sequence of vertices, ignoring repeated ones.
+    /// Construct a graph from a given sequence of vertex, ignoring repeated ones.
     ///
     /// # Examples
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// // A sequence of unique vertices.
+    /// // A sequence of unique vertex.
     /// let sequence = vec![0, 3, 1, 2];
     ///
-    /// // Build a graph by consuming a vector of vertices.
-    /// let g = Graph::from_vertices(sequence);
+    /// // Build a graph by consuming a vector of vertex.
+    /// let g = Graph::from_vertex(sequence);
     ///
     /// // Build a graph by consuming any `IntoIterator`.
-    /// let h = Graph::from_vertices((0..4));
+    /// let h = Graph::from_vertex((0..4));
     ///
     /// assert_eq!(g, h);
     ///
     /// ```
     ///
-    fn from_vertices<Iter>(vertices: Iter) -> Self
+    fn from_vertex<Iter>(vertex: Iter) -> Self
     where
         Iter: IntoIterator<Item = Self::Vertex>,
     {
-        // Get vertices iterator.
-        let vertices = vertices.into_iter();
+        // Get vertex iterator.
+        let vertex = vertex.into_iter();
         // Get lower bound size hint.
-        let (lower, _) = vertices.size_hint();
+        let (lower, _) = vertex.size_hint();
         // Build graph with initial capacity.
         let mut g = Self::with_capacity(lower);
-        // Add vertices to the graph.
-        for x in vertices {
+        // Add vertex to the graph.
+        for x in vertex {
             g.reserve_vertex(&x).ok();
         }
 
@@ -276,7 +276,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         // Get lower bound size hint.
         let (lower, _) = edges.size_hint();
         // Build graph with initial capacity,
-        // assuming average frequency of new vertices.
+        // assuming average frequency of new vertex.
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
         for (x, y) in edges {
@@ -399,11 +399,11 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_order(3);
     ///
     /// // Use the vertex set iterator.
-    /// let V: Vec<_> = g.vertices_iter().collect();
+    /// let V: Vec<_> = g.vertex_iter().collect();
     /// assert_eq!(V, [0, 1, 2]);
     ///
     /// // Use the associated macro 'V!'.
-    /// assert_true!(g.vertices_iter().eq(V!(g)));
+    /// assert_true!(g.vertex_iter().eq(V!(g)));
     ///
     /// // Iterate over the vertex set.
     /// for x in V!(g) {
@@ -411,7 +411,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// }
     /// ```
     ///
-    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
+    fn vertex_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
 
     /// Edge iterator.
     ///
@@ -445,7 +445,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Adjacent iterator.
     ///
-    /// Iterates over the adjacent vertices set $Adj(G, X)$ of a given vertex $X$.
+    /// Iterates over the adjacent vertex set $Adj(G, X)$ of a given vertex $X$.
     ///
     /// # Errors
     ///
@@ -484,17 +484,17 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
-    /// Vertices labels.
+    /// vertex labels.
     ///
-    /// Return immutable reference to internal vertices labels.
+    /// Return immutable reference to internal vertex labels.
     ///
-    fn as_vertices_labels(&self) -> &LabelMap<Self::Vertex>;
+    fn as_vertex_labels(&self) -> &LabelMap<Self::Vertex>;
 
-    /// Mutable vertices labels.
+    /// Mutable vertex labels.
     ///
-    /// Return mutable reference to internal vertices labels.
+    /// Return mutable reference to internal vertex labels.
     ///
-    fn as_mut_vertices_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
+    fn as_mut_vertex_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
 
     /// Edges labels.
     ///
@@ -706,7 +706,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// // Build a 2nd order graph.
     /// let mut g = Graph::from_order(2);
     ///
-    /// // Add a new edge from vertices.
+    /// // Add a new edge from vertex.
     /// let e = g.add_edge(&(0, 1))?;
     /// assert_true!(g.has_edge(&e)?);
     ///
@@ -841,7 +841,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     #[inline(always)]
     fn has_vertex_label(&self, x: &str) -> bool {
-        self.as_vertices_labels().contains_right(x)
+        self.as_vertex_labels().contains_right(x)
     }
 
     /// Adds vertex label to the graph.
@@ -949,7 +949,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     #[inline(always)]
     fn get_vertex_id(&self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        self.as_vertices_labels()
+        self.as_vertex_labels()
             .get_by_right(x)
             .copied()
             .ok_or_else(|| Error::VertexLabelNotDefined(String::from(x)))
@@ -987,7 +987,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     #[inline(always)]
     fn get_vertex_label(&self, x: &Self::Vertex) -> Result<&str, Error<Self::Vertex>> {
-        self.as_vertices_labels()
+        self.as_vertex_labels()
             .get_by_left(x)
             .map(|x| x.as_str())
             .ok_or(Error::VertexNotDefined(*x))
@@ -1029,10 +1029,10 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ) -> Result<Self::Vertex, Error<Self::Vertex>> {
         match self.has_vertex(x) {
             false => Err(Error::VertexNotDefined(*x)),
-            true => match self.as_vertices_labels().contains_right(y) {
+            true => match self.as_vertex_labels().contains_right(y) {
                 false => {
                     // Overwrite previous label if present
-                    self.as_mut_vertices_labels().insert(*x, String::from(y));
+                    self.as_mut_vertex_labels().insert(*x, String::from(y));
                     Ok(*x)
                 }
                 true => Err(Error::VertexLabelAlreadyDefined(String::from(y))),
@@ -1080,7 +1080,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         &mut self,
         x: &Self::Vertex,
     ) -> Result<(Self::Vertex, String), Error<Self::Vertex>> {
-        self.as_mut_vertices_labels()
+        self.as_mut_vertex_labels()
             .remove_by_left(x)
             .ok_or(Error::VertexNotDefined(*x))
     }
@@ -1157,7 +1157,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Adds edge label to the graph.
     ///
-    /// Insert given vertices identifiers, edge identifier and edge label into the graph.
+    /// Insert given vertex identifiers, edge identifier and edge label into the graph.
     ///
     /// # Errors
     ///
@@ -1517,12 +1517,12 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
 /// Vertex iterator.
 ///
-/// Return the vertices iterator representing $V(G)$.
+/// Return the vertex iterator representing $V(G)$.
 ///
 #[macro_export]
 macro_rules! V {
     ($g:expr) => {
-        $g.vertices_iter()
+        $g.vertex_iter()
     };
 }
 
@@ -1539,7 +1539,7 @@ macro_rules! E {
 
 /// Adjacency iterator.
 ///
-/// Return the vertices iterator representing $Adj(G, X)$.
+/// Return the vertex iterator representing $Adj(G, X)$.
 ///
 #[macro_export]
 macro_rules! Adj {

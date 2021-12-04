@@ -115,7 +115,7 @@ mod tests {
         g.clear();
         assert_eq!(g.order(), 0);
         assert_eq!(g.size(), 0);
-        assert_true!(g.as_vertices_labels().is_empty());
+        assert_true!(g.as_vertex_labels().is_empty());
         assert_true!(g.as_edges_labels().is_empty());
 
         // Test proper graph
@@ -125,7 +125,7 @@ mod tests {
         g.clear();
         assert_eq!(g.order(), 0);
         assert_eq!(g.size(), 0);
-        assert_true!(g.as_vertices_labels().is_empty());
+        assert_true!(g.as_vertex_labels().is_empty());
         assert_true!(g.as_edges_labels().is_empty());
 
         Ok(())
@@ -185,29 +185,29 @@ mod tests {
     }
 
     #[test]
-    fn from_vertices<T>() -> Result<(), Error<u32>>
+    fn from_vertex<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let mut g = T::from_vertices([]);
+        let mut g = T::from_vertex([]);
 
         // Test min graph vertex set.
         assert_eq!(g.order(), 0);
 
         // Test next graph vertex set.
-        g = T::from_vertices([0]);
+        g = T::from_vertex([0]);
         assert_eq!(g.order(), 1);
 
         // Test next graph unordered vertex set.
-        g = T::from_vertices([0, 4, 2, 3, 1]);
+        g = T::from_vertex([0, 4, 2, 3, 1]);
         assert_eq!(g.order(), 5);
 
         // Test high graph vertex set.
-        g = T::from_vertices(0..N);
+        g = T::from_vertex(0..N);
         assert_eq!(g.order(), N as usize);
 
         // Test next graph duplicated vertex set.
-        let g = T::from_vertices([0, 4, 2, 3, 1, 4, 3]);
+        let g = T::from_vertex([0, 4, 2, 3, 1, 4, 3]);
         assert_eq!(g.order(), 5);
 
         Ok(())
@@ -302,7 +302,7 @@ mod tests {
     }
 
     #[test]
-    fn vertices_iter<T>() -> Result<(), Error<u32>>
+    fn vertex_iter<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait,
     {
@@ -312,7 +312,7 @@ mod tests {
         g = T::from_order(N as usize);
         assert_eq!(V!(g).count(), N as usize);
 
-        assert_true!(V!(g).eq(g.vertices_iter()));
+        assert_true!(V!(g).eq(g.vertex_iter()));
         assert_true!(V!(g).all(|x| g.has_vertex(&x)));
         assert_true!(is_sorted(V!(g)));
 
@@ -384,23 +384,23 @@ mod tests {
     }
 
     #[test]
-    fn as_vertices_labels<T>() -> Result<(), Error<u32>>
+    fn as_vertex_labels<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
         let g = T::default();
-        g.as_vertices_labels();
+        g.as_vertex_labels();
 
         Ok(())
     }
 
     #[test]
-    fn as_mut_vertices_labels<T>() -> Result<(), Error<u32>>
+    fn as_mut_vertex_labels<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
         let mut g = T::default();
-        g.as_mut_vertices_labels();
+        g.as_mut_vertex_labels();
 
         Ok(())
     }
@@ -499,7 +499,7 @@ mod tests {
         g.del_vertex(&i)?;
         assert_false!(g.has_vertex(&i));
 
-        // Test sequence of vertices.
+        // Test sequence of vertex.
         g = T::from_order(N as usize);
         assert_true!((0..N).all(|i| g.has_vertex(&i)));
 
@@ -608,7 +608,7 @@ mod tests {
         let l = "0";
         let i = g.add_vertex_label(l)?;
         g.del_vertex(&i)?;
-        assert_true!(!g.as_vertices_labels().iter().any(|(_, y)| *y == l));
+        assert_true!(!g.as_vertex_labels().iter().any(|(_, y)| *y == l));
 
         Ok(())
     }
@@ -691,7 +691,7 @@ mod tests {
     {
         let mut g = T::default();
 
-        // Test missing edge and vertices.
+        // Test missing edge and vertex.
         let e = g.reserve_edge(&(0, 1))?;
         assert_true!(g.has_vertex(&e.0));
         assert_true!(g.has_vertex(&e.1));
