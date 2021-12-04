@@ -42,9 +42,35 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn new() -> Self;
 
-    /// With capacity constructor.
+    /// Clears the graph.
     ///
-    /// Construct a graph of a given capacity (a.k.a. reserve an order).
+    /// Clears the graph, removing both vertices and edges.
+    ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a new graph.
+    /// let mut g = Graph::from_edges([(0, 1), (2, 3)]);
+    ///
+    /// // The graph *is not* null.
+    /// assert_ne!(g.order(), 0);
+    /// assert_ne!(g.size(), 0);
+    ///
+    /// // Clear the graph.
+    /// g.clear();
+    ///
+    /// // The graph *is* null.
+    /// assert_eq!(g.order(), 0);
+    /// assert_eq!(g.size(), 0);
+    /// ```
+    ///
+    fn clear(&mut self);
+
+    /// Returns the capacity.
+    ///
+    /// Returns the number of vertices the graph can hold.
     /// Depending on the underlying storage, this could avoid reallocations.
     ///
     /// # Examples
@@ -53,6 +79,29 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Build a graph with a specific capacity.
     /// let g = Graph::with_capacity(3);
+    /// assert_eq!(g.capacity(), 3);
+    ///
+    /// // The order is still zero.
+    /// assert_eq!(g.order(), 0);
+    ///
+    /// // The size is still zero.
+    /// assert_eq!(g.size(), 0);
+    /// ```
+    ///
+    fn capacity(&self) -> usize;
+
+    /// With capacity constructor.
+    ///
+    /// Construct a graph of a given capacity (a.k.a. order).
+    /// Depending on the underlying storage, this could avoid reallocations.
+    ///
+    /// # Examples
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a graph with a specific capacity.
+    /// let g = Graph::with_capacity(3);
+    /// assert_eq!(g.capacity(), 3);
     ///
     /// // The order is still zero.
     /// assert_eq!(g.order(), 0);
@@ -65,7 +114,8 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Reserves additional capacity.
     ///
-    /// Reserves capacity for at least `additional` more vertices to be inserted in the graph.
+    /// Reserves capacity for at least `additional` vertices to be inserted in the graph.
+    /// Depending on the underlying storage, this could avoid reallocations.
     ///
     /// # Panics
     ///
@@ -80,6 +130,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Reserve additional capacity.
     /// g.reserve(3);
+    /// // FIXME: assert_eq!(g.capacity(), 3);
     ///
     /// // The order is still zero.
     /// assert_eq!(g.order(), 0);
@@ -89,6 +140,44 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn reserve(&mut self, additional: usize);
+
+    /// Shrinks the capacity with a lower limit.
+    ///
+    /// Shrinks the capacity of the graph with a lower limit.
+    ///
+    /// # Examples
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build graph with given capacity.
+    /// let mut g = Graph::with_capacity(100);
+    /// // FIXME: assert_eq!(g.capacity(), 100);
+    ///
+    /// // Shrink capacity to given minimum.
+    /// g.shrink_to(50);
+    /// // FIXME: assert_eq!(g.capacity(), 50);
+    /// ```
+    ///
+    fn shrink_to(&mut self, min_capacity: usize);
+
+    /// Shrinks the capacity.
+    ///
+    /// Shrinks the capacity of the graph as much as possible.
+    ///
+    /// # Examples
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build graph with given capacity.
+    /// let mut g = Graph::with_capacity(100);
+    /// // FIXME: assert_eq!(g.capacity(), 100);
+    ///
+    /// // Shrink capacity as much as possible.
+    /// g.shrink_to_fit();
+    /// // FIXME: assert_eq!(g.capacity(), 0);
+    /// ```
+    ///
+    fn shrink_to_fit(&mut self);
 
     /// From order constructor.
     ///
@@ -188,7 +277,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         let (lower, _) = edges.size_hint();
         // Build graph with initial capacity,
         // assuming average frequency of new vertices.
-        let mut g = Self::with_capacity(lower / 2);
+        let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
         for (x, y) in edges {
             g.reserve_vertex(&x).ok();
@@ -1328,32 +1417,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     fn is_supergraph(&self, other: &Self) -> bool {
         self >= other
     }
-
-    /// Clears the graph.
-    ///
-    /// Deletes the vertices and edges with the associated attributes.
-    ///
-    /// # Examples
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build a new graph.
-    /// let mut g = Graph::from_edges([(0, 1), (2, 3)]);
-    ///
-    /// // The graph *is not* null.
-    /// assert_ne!(g.order(), 0);
-    /// assert_ne!(g.size(), 0);
-    ///
-    /// // Clear the graph.
-    /// g.clear();
-    ///
-    /// // The graph *is* null.
-    /// assert_eq!(g.order(), 0);
-    /// assert_eq!(g.size(), 0);
-    /// ```
-    ///
-    fn clear(&mut self);
 
     /// Degree of vertex.
     ///

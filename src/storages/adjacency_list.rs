@@ -59,7 +59,7 @@ where
 
     #[inline(always)]
     fn new() -> Self {
-        AdjacencyListStorage {
+        Self {
             data: AdjacencyList::<T>::new(),
             v_labels: LabelMap::new(),
             e_labels: LabelMap::new(),
@@ -67,14 +67,40 @@ where
     }
 
     #[inline(always)]
-    fn with_capacity(_capacity: usize) -> Self {
+    fn capacity(&self) -> usize {
         // INFO: BTreeMap as no `capacity` concept.
-        Self::new()
+        std::cmp::max(self.order(), self.v_labels.capacity())
     }
 
     #[inline(always)]
-    fn reserve(&mut self, _additional: usize) {
+    fn with_capacity(capacity: usize) -> Self {
+        Self {
+            // INFO: BTreeMap as no `capacity` concept.
+            data: AdjacencyList::<T>::new(),
+            v_labels: LabelMap::with_capacity(capacity),
+            e_labels: LabelMap::with_capacity(capacity),
+        }
+    }
+
+    #[inline(always)]
+    fn reserve(&mut self, additional: usize) {
         // INFO: BTreeMap as no `capacity` concept.
+        // FIXME: self.v_labels.reserve(additional)
+        // FIXME: self.e_labels.reserve(additional)
+    }
+
+    #[inline(always)]
+    fn shrink_to(&mut self, min_capacity: usize) {
+        // INFO: BTreeMap as no `capacity` concept.
+        // FIXME: self.v_labels.shrink_to(min_capacity)
+        // FIXME: self.e_labels.shrink_to(min_capacity)
+    }
+
+    #[inline(always)]
+    fn shrink_to_fit(&mut self) {
+        // INFO: BTreeMap as no `capacity` concept.
+        // FIXME: self.v_labels.shrink_to_fit()
+        // FIXME: self.e_labels.shrink_to_fit()
     }
 
     #[inline(always)]

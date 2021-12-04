@@ -105,11 +105,39 @@ mod tests {
     }
 
     #[test]
+    fn clear<T>() -> Result<(), Error<u32>>
+    where
+        T: StorageTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Test empty graph
+        g.clear();
+        assert_eq!(g.order(), 0);
+        assert_eq!(g.size(), 0);
+        assert_true!(g.as_vertices_labels().is_empty());
+        assert_true!(g.as_edges_labels().is_empty());
+
+        // Test proper graph
+        let i = g.add_vertex_label("0")?;
+        let j = g.add_vertex_label("1")?;
+        g.add_edge_label(&(i, j), "(0, 1)")?;
+        g.clear();
+        assert_eq!(g.order(), 0);
+        assert_eq!(g.size(), 0);
+        assert_true!(g.as_vertices_labels().is_empty());
+        assert_true!(g.as_edges_labels().is_empty());
+
+        Ok(())
+    }
+
+    #[test]
     fn with_capacity<T>()
     where
         T: StorageTrait,
     {
         let g = T::with_capacity(3);
+        assert_eq!(g.capacity(), 3);
 
         // The order is still zero.
         assert_eq!(g.order(), 0);
@@ -965,33 +993,6 @@ mod tests {
         // Test for edge label overdeleting (identifier).
         assert_true!(g.unset_edge_label(&e).is_err());
         assert_true!(g.get_edge_label(&e).is_err());
-
-        Ok(())
-    }
-
-    #[test]
-    fn clear<T>() -> Result<(), Error<u32>>
-    where
-        T: StorageTrait<Vertex = u32>,
-    {
-        let mut g = T::default();
-
-        // Test empty graph
-        g.clear();
-        assert_eq!(g.order(), 0);
-        assert_eq!(g.size(), 0);
-        assert_true!(g.as_vertices_labels().is_empty());
-        assert_true!(g.as_edges_labels().is_empty());
-
-        // Test proper graph
-        let i = g.add_vertex_label("0")?;
-        let j = g.add_vertex_label("1")?;
-        g.add_edge_label(&(i, j), "(0, 1)")?;
-        g.clear();
-        assert_eq!(g.order(), 0);
-        assert_eq!(g.size(), 0);
-        assert_true!(g.as_vertices_labels().is_empty());
-        assert_true!(g.as_edges_labels().is_empty());
 
         Ok(())
     }
