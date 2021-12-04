@@ -214,6 +214,22 @@ mod tests {
     }
 
     #[test]
+    fn from_vertex_labels<T>() -> Result<(), Error<u32>>
+    where
+        T: StorageTrait<Vertex = u32>,
+    {
+        let sequence = vec!["0", "3", "1", "2"];
+        // Build a graph by consuming a vector of vertex labels.
+        let g = T::from_vertex_labels(sequence);
+
+        for (x, y) in V!(g).zip(["0", "3", "1", "2"]) {
+            assert_eq!(g.get_vertex_label(&x)?, y);
+        }
+
+        Ok(())
+    }
+
+    #[test]
     fn from_edges<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,

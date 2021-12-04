@@ -224,7 +224,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let h = Graph::from_vertex((0..4));
     ///
     /// assert_eq!(g, h);
-    ///
     /// ```
     ///
     fn from_vertex<I>(vertex: I) -> Self
@@ -240,6 +239,40 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         // Add vertex to the graph.
         for x in vertex {
             g.reserve_vertex(&x).ok();
+        }
+
+        g
+    }
+
+    /// From vertex labels constructor.
+    ///
+    /// Construct a graph from a given sequence of vertex labels, ignoring repeated ones.
+    ///
+    /// # Examples
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// // A sequence of unique vertex.
+    /// let sequence = vec!["0", "3", "1", "2"];
+    ///
+    /// // Build a graph by consuming a vector of vertex labels.
+    /// let g = Graph::from_vertex_labels(sequence);
+    /// ```
+    ///
+    fn from_vertex_labels<'a, I>(vertex: I) -> Self
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
+        // Get vertex iterator.
+        let vertex = vertex.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = vertex.size_hint();
+        // Build graph with initial capacity.
+        let mut g = Self::with_capacity(lower);
+        // Add vertex to the graph.
+        for x in vertex {
+            g.add_vertex_label(x).ok();
         }
 
         g
@@ -264,7 +297,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let h = Graph::from_edges((0..4).zip((1..4)));
     ///
     /// assert_eq!(g, h);
-    ///
     /// ```
     ///
     fn from_edges<I>(edges: I) -> Self
