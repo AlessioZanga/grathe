@@ -16,21 +16,23 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 # https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-all_asserts = ">=2.0.0"
-anyhow = ">=1.0.0"
-bimap = ">=0.6.0"
-delegate = ">=0.6.0"
-doc-comment = ">=0.3.0"
-generic-tests = ">=0.1.0"
-itertools = ">=0.10.0"
-log = {version = ">=0.4.0", features = ["max_level_debug", "release_max_level_warn"]}
-nalgebra = ">=0.29.0"
-nalgebra-sparse = ">=0.5.0"
-num-traits = ">=0.2.0"
-pest = ">=2.0.0"
-pest_derive = ">=2.0.0"
-tempfile = ">=3.0.0"
-thiserror = ">=1.0.0"
+bimap = "^0.6.1"
+delegate = "^0.6.1"
+itertools = "^0.10.1"
+log = {version = "^0.4.14", features = ["max_level_debug", "release_max_level_warn"]}
+nalgebra = "^0.29.0"
+nalgebra-sparse = "^0.5.0"
+num-traits = "^0.2.14"
+pest = "^2.1.3"
+pest_derive = "^2.1.0"
+thiserror = "^1.0.30"
+
+[dev-dependencies]
+all_asserts = "^2.3.0"
+anyhow = "^1.0.51"
+doc-comment = "^0.3.3"
+generic-tests = "^0.1.2"
+tempfile = "^3.2.0"
 
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "./src/docs-header.html" ]
