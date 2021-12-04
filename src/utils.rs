@@ -35,6 +35,7 @@ macro_rules! impl_ungraph_trait {
             /// assert_eq!(g, h);
             /// ```
             ///
+            #[inline(always)]
             fn eq(&self, other: &Self) -> bool {
                 self.0.eq(&other.0)
             }
@@ -70,6 +71,7 @@ macro_rules! impl_ungraph_trait {
             /// assert_le!(g, h);
             /// ```
             ///
+            #[inline(always)]
             fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 self.0.partial_cmp(&other.0)
             }
@@ -99,6 +101,7 @@ macro_rules! impl_ungraph_trait {
             /// assert_eq!(g.size(), 0);
             /// ```
             ///
+            #[inline(always)]
             fn default() -> Self {
                 Self::new()
             }
@@ -112,12 +115,14 @@ macro_rules! impl_ungraph_trait {
 
             type Storage = $storage<T>;
 
+            #[inline(always)]
             fn new() -> Self {
                 Self {
                     0: Default::default()
                 }
             }
 
+            #[inline(always)]
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     0: Self::Storage::with_capacity(capacity)
@@ -193,6 +198,7 @@ macro_rules! impl_digraph_trait {
         where
             T: VertexTrait,
         {
+            #[inline(always)]
             fn eq(&self, other: &Self) -> bool {
                 self.0.eq(&other.0)
             }
@@ -204,6 +210,7 @@ macro_rules! impl_digraph_trait {
         where
             T: VertexTrait,
         {
+            #[inline(always)]
             fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 self.0.partial_cmp(&other.0)
             }
@@ -213,6 +220,7 @@ macro_rules! impl_digraph_trait {
         where
             T: VertexTrait,
         {
+            #[inline(always)]
             fn default() -> Self {
                 Self::new()
             }
@@ -226,6 +234,7 @@ macro_rules! impl_digraph_trait {
 
             type Storage = $storage<T>;
 
+            #[inline(always)]
             fn new() -> Self {
                 Self {
                     0: Default::default()
