@@ -131,6 +131,7 @@ macro_rules! impl_ungraph_trait {
 
             delegate! {
                 to self.0 {
+                    fn reserve(&mut self, additional: usize);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
                     fn adjacent_iter<'a>(
@@ -241,8 +242,16 @@ macro_rules! impl_digraph_trait {
                 }
             }
 
+            #[inline(always)]
+            fn with_capacity(capacity: usize) -> Self {
+                Self {
+                    0: Self::Storage::with_capacity(capacity)
+                }
+            }
+
             delegate! {
                 to self.0 {
+                    fn reserve(&mut self, additional: usize);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
                     fn adjacent_iter<'a>(

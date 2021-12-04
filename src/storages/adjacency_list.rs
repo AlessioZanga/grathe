@@ -68,8 +68,13 @@ where
 
     #[inline(always)]
     fn with_capacity(_capacity: usize) -> Self {
-        // BTreeMap as no `capacity` concept.
+        // INFO: BTreeMap as no `capacity` concept.
         Self::new()
+    }
+
+    #[inline(always)]
+    fn reserve(&mut self, _additional: usize) {
+        // INFO: BTreeMap as no `capacity` concept.
     }
 
     #[inline(always)]

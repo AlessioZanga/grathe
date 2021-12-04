@@ -63,6 +63,33 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn with_capacity(capacity: usize) -> Self;
 
+    /// Reserves additional capacity.
+    ///
+    /// Reserves capacity for at least `additional` more vertices to be inserted in the graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the additional capacity overflows `usize`.
+    ///
+    /// # Examples
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a null graph.
+    /// let mut g = Graph::default();
+    ///
+    /// // Reserve additional capacity.
+    /// g.reserve(3);
+    ///
+    /// // The order is still zero.
+    /// assert_eq!(g.order(), 0);
+    ///
+    /// // The size is still zero.
+    /// assert_eq!(g.size(), 0);
+    /// ```
+    ///
+    fn reserve(&mut self, additional: usize);
+
     /// From order constructor.
     ///
     /// Construct a graph of a given order.

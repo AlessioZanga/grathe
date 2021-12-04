@@ -119,6 +119,23 @@ mod tests {
     }
 
     #[test]
+    fn reserve<T>()
+    where
+        T: StorageTrait,
+    {
+        let mut g = T::default();
+
+        // Reserve additional capacity.
+        g.reserve(3);
+
+        // The order is still zero.
+        assert_eq!(g.order(), 0);
+
+        // The size is still zero.
+        assert_eq!(g.size(), 0);
+    }
+
+    #[test]
     fn from_order<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
