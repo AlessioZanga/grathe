@@ -55,6 +55,8 @@ where
 {
     type Vertex = T;
 
+    type Storage = AdjacencyList<T>;
+
     #[inline(always)]
     fn new() -> Self {
         AdjacencyListStorage {
@@ -62,6 +64,12 @@ where
             v_labels: LabelMap::new(),
             e_labels: LabelMap::new(),
         }
+    }
+
+    #[inline(always)]
+    fn with_capacity(_capacity: usize) -> Self {
+        // BTreeMap as no `capacity` concept.
+        Self::new()
     }
 
     #[inline(always)]

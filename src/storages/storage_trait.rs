@@ -18,6 +18,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     // Edge identifier type.
     // type Edge = (Self::Vertex, Self::Vertex);
 
+    /// Underlying storage type.
+    type Storage;
+
     /// Base constructor.
     ///
     /// Let be $\mathcal{G}$ a graph type. The base constructor of $\mathcal{G}$
@@ -38,6 +41,27 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn new() -> Self;
+
+    /// With capacity constructor.
+    ///
+    /// Construct a graph of a given capacity (a.k.a. reserve an order).
+    /// Depending on the underlying storage, this could avoid reallocations.
+    ///
+    /// # Examples
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a graph with a specific capacity.
+    /// let g = Graph::with_capacity(3);
+    ///
+    /// // The order is still zero.
+    /// assert_eq!(g.order(), 0);
+    ///
+    /// // The size is still zero.
+    /// assert_eq!(g.size(), 0);
+    /// ```
+    ///
+    fn with_capacity(capacity: usize) -> Self;
 
     /// From order constructor.
     ///

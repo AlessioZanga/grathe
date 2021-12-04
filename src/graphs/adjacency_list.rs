@@ -10,7 +10,7 @@ where
     T: VertexTrait;
 
 // Storage delegation and graph trait implementation.
-impl_ungraph_trait!(UndirectedAdjacencyListGraph);
+impl_ungraph_trait!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
 
 impl<T> UndirectedAdjacencyListGraph<T> where T: VertexTrait {}
 

@@ -1,7 +1,7 @@
 /// Storage delegation and graph trait implementation for undirected graphs.
 #[macro_export]
 macro_rules! impl_ungraph_trait {
-    ($graph:ident) => {
+    ($graph:ident, $storage:ident) => {
         use crate::errors::Error;
         use crate::storages::StorageTrait;
         use crate::graphs::GraphTrait;
@@ -110,9 +110,17 @@ macro_rules! impl_ungraph_trait {
         {
             type Vertex = T;
 
+            type Storage = $storage<T>;
+
             fn new() -> Self {
                 Self {
                     0: Default::default()
+                }
+            }
+
+            fn with_capacity(capacity: usize) -> Self {
+                Self {
+                    0: Self::Storage::with_capacity(capacity)
                 }
             }
 
@@ -174,7 +182,7 @@ macro_rules! impl_ungraph_trait {
 /// Storage delegation and graph trait implementation for directed/partially-directed graphs.
 #[macro_export]
 macro_rules! impl_digraph_trait {
-    ($graph:ident) => {
+    ($graph:ident, $storage:ident) => {
         use crate::errors::Error;
         use crate::storages::StorageTrait;
         use crate::graphs::GraphTrait;
@@ -215,6 +223,8 @@ macro_rules! impl_digraph_trait {
             T: VertexTrait,
         {
             type Vertex = T;
+
+            type Storage = $storage<T>;
 
             fn new() -> Self {
                 Self {

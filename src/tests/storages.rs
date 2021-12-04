@@ -105,6 +105,20 @@ mod tests {
     }
 
     #[test]
+    fn with_capacity<T>()
+    where
+        T: StorageTrait,
+    {
+        let g = T::with_capacity(3);
+
+        // The order is still zero.
+        assert_eq!(g.order(), 0);
+
+        // The size is still zero.
+        assert_eq!(g.size(), 0);
+    }
+
+    #[test]
     fn from_order<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
