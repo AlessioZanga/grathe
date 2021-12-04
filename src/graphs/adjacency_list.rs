@@ -4,7 +4,7 @@ use crate::storages::AdjacencyListStorage;
 use crate::types::*;
 
 /// Undirected graph based on adjacency list storage.
-#[derive(Debug)]
+#[derive(Default, Debug)]
 pub struct UndirectedAdjacencyListGraph<T>(AdjacencyListStorage<T>)
 where
     T: VertexTrait;

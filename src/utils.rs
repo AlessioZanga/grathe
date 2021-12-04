@@ -77,36 +77,6 @@ macro_rules! impl_ungraph_trait {
             }
         }
 
-        impl<T> Default for $graph<T>
-        where
-            T: VertexTrait,
-        {
-            /// Default constructor.
-            ///
-            /// Let be $\mathcal{G}$ a graph type. The default constructor of $\mathcal{G}$
-            /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
-            ///
-            /// # Examples
-            ///
-            /// ```
-            /// use grathe::prelude::*;
-            ///
-            /// // Build a null graph.
-            /// let g = Graph::default();
-            ///
-            /// // The vertex set is empty.
-            /// assert_eq!(g.order(), 0);
-            ///
-            /// // The edge set is also empty.
-            /// assert_eq!(g.size(), 0);
-            /// ```
-            ///
-            #[inline(always)]
-            fn default() -> Self {
-                Self::new()
-            }
-        }
-
         impl<T> StorageTrait for $graph<T>
         where
             T: VertexTrait,
@@ -217,16 +187,6 @@ macro_rules! impl_digraph_trait {
             #[inline(always)]
             fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 self.0.partial_cmp(&other.0)
-            }
-        }
-
-        impl<T> Default for $graph<T>
-        where
-            T: VertexTrait,
-        {
-            #[inline(always)]
-            fn default() -> Self {
-                Self::new()
             }
         }
 

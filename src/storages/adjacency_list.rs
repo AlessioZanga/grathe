@@ -5,7 +5,7 @@ use std::cmp::Ordering;
 use std::collections::BTreeSet;
 
 /// Graph structure based on adjacency list storage.
-#[derive(Debug)]
+#[derive(Default, Debug)]
 pub struct AdjacencyListStorage<T>
 where
     T: VertexTrait,
@@ -36,16 +36,6 @@ where
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // Compare maps.
         self.data.partial_cmp(&other.data)
-    }
-}
-
-impl<T> Default for AdjacencyListStorage<T>
-where
-    T: VertexTrait,
-{
-    #[inline(always)]
-    fn default() -> Self {
-        Self::new()
     }
 }
 
