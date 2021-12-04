@@ -62,7 +62,7 @@ mod tests_undirected {
         assert_true!(g.add_edge(&e).is_err());
 
         // Test for loops
-        let e = g.add_edge(&(i ,i))?;
+        let e = g.add_edge(&(i, i))?;
         assert_true!(g.has_edge(&(i, i))?);
         g.del_edge(&e)?;
 
@@ -71,7 +71,7 @@ mod tests_undirected {
         assert_true!(g.has_edge(&(i, j)).is_err());
         assert_true!(g.has_edge(&(j, i)).is_err());
         assert_true!(Ne!(g, &i).is_err());
-        assert_true!(Ne!(g, &j)?.find(|x| *x == i).is_none());
+        assert_true!(!Ne!(g, &j)?.any(|x| x == i));
 
         Ok(())
     }

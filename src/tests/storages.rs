@@ -271,6 +271,11 @@ mod tests {
         assert_true!(V!(g).all(|x| g.has_vertex(&x)));
         assert_true!(is_sorted(V!(g)));
 
+        // Check iterator size hint.
+        let (lower, upper) = V!(g).size_hint();
+        assert_eq!(lower, N as usize);
+        assert_eq!(upper.unwrap(), N as usize);
+
         Ok(())
     }
 
@@ -291,6 +296,10 @@ mod tests {
         assert_true!(E!(g).eq(g.edges_iter()));
         assert_true!(E!(g).all(|x| g.has_edge(&x).unwrap()));
         assert_true!(is_sorted(E!(g)));
+
+        // Check iterator size hint (optional for edges).
+        let (lower, _) = E!(g).size_hint();
+        assert_le!(lower, 3);
 
         Ok(())
     }
@@ -548,17 +557,13 @@ mod tests {
         assert_true!(g.has_edge(&(i, j)).is_err());
         assert_true!(g.has_edge(&(j, i)).is_err());
         assert_true!(Adj!(g, &i).is_err());
-        assert_true!(Adj!(g, &j)?.find(|x| *x == i).is_none());
+        assert_true!(!Adj!(g, &j)?.any(|x| x == i));
 
         // Del vertex and associated label.
         let l = "0";
         let i = g.add_vertex_label(l)?;
         g.del_vertex(&i)?;
-        assert_true!(g
-            .as_vertices_labels()
-            .iter()
-            .find(|(_, y)| *y == l)
-            .is_none());
+        assert_true!(!g.as_vertices_labels().iter().any(|(_, y)| *y == l));
 
         Ok(())
     }
@@ -702,7 +707,7 @@ mod tests {
         let l = "(0, 1)";
         let e = g.add_edge_label(&(0, 1), l)?;
         g.del_edge(&e)?;
-        assert_true!(g.as_edges_labels().iter().find(|(_, y)| *y == l).is_none());
+        assert_true!(!g.as_edges_labels().iter().any(|(_, y)| *y == l));
 
         Ok(())
     }

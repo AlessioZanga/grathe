@@ -82,7 +82,7 @@ where
         Box::new(
             self.data
                 .iter()
-                .flat_map(|(x, ys)| std::iter::repeat(x).copied().zip(ys.iter().copied())),
+                .flat_map(|(x, ys)| ys.iter().map(|y| (*x, *y))),
         )
     }
 

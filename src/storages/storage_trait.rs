@@ -115,10 +115,17 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     where
         Iter: IntoIterator<Item = Self::Vertex>,
     {
-        let mut g = Self::new();
+        // Get vertices iterator.
+        let vertices = vertices.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = vertices.size_hint();
+        // Build graph with initial capacity.
+        let mut g = Self::with_capacity(lower);
+        // Add vertices to the graph.
         for x in vertices {
             g.reserve_vertex(&x).ok();
         }
+
         g
     }
 
@@ -148,12 +155,20 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     where
         Iter: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
-        let mut g = Self::new();
+        // Get edges iterator.
+        let edges = edges.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = edges.size_hint();
+        // Build graph with initial capacity,
+        // assuming average frequency of new vertices.
+        let mut g = Self::with_capacity(lower / 2);
+        // Add edges to the graph.
         for (x, y) in edges {
             g.reserve_vertex(&x).ok();
             g.reserve_vertex(&y).ok();
             g.add_edge(&(x, y)).ok();
         }
+
         g
     }
 
