@@ -19,11 +19,11 @@ where
     T: VertexTrait,
 {
     #[inline(always)]
-    fn neighbor_iter<'a>(
+    fn neighbors_iter<'a>(
         &'a self,
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>> {
-        self.adjacent_iter(x)
+        self.adjacents_iter(x)
     }
 
     #[inline(always)]

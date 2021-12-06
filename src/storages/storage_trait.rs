@@ -52,7 +52,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // Build a new graph.
-    /// let mut g = Graph::from_edge([(0, 1), (2, 3)]);
+    /// let mut g = Graph::from_edges([(0, 1), (2, 3)]);
     ///
     /// // The graph *is not* null.
     /// assert_ne!(g.order(), 0);
@@ -202,7 +202,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn from_order(order: usize) -> Self {
-        Self::from_vertex((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()))
+        Self::from_vertices((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()))
     }
 
     /// From vertex constructor.
@@ -218,26 +218,26 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let sequence = vec![0, 3, 1, 2];
     ///
     /// // Build a graph by consuming a vector of vertex.
-    /// let g = Graph::from_vertex(sequence);
+    /// let g = Graph::from_vertices(sequence);
     ///
     /// // Build a graph by consuming any `IntoIterator`.
-    /// let h = Graph::from_vertex((0..4));
+    /// let h = Graph::from_vertices((0..4));
     ///
     /// assert_eq!(g, h);
     /// ```
     ///
-    fn from_vertex<I>(vertex: I) -> Self
+    fn from_vertices<I>(iter: I) -> Self
     where
         I: IntoIterator<Item = Self::Vertex>,
     {
         // Get vertex iterator.
-        let vertex = vertex.into_iter();
+        let iter = iter.into_iter();
         // Get lower bound size hint.
-        let (lower, _) = vertex.size_hint();
+        let (lower, _) = iter.size_hint();
         // Build graph with initial capacity.
         let mut g = Self::with_capacity(lower);
         // Add vertex to the graph.
-        for x in vertex {
+        for x in iter {
             g.reserve_vertex(&x).ok();
         }
 
@@ -257,21 +257,21 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let sequence = vec!["0", "3", "1", "2"];
     ///
     /// // Build a graph by consuming a vector of vertex labels.
-    /// let g = Graph::from_vertex_labels(sequence);
+    /// let g = Graph::from_vertices_labels(sequence);
     /// ```
     ///
-    fn from_vertex_labels<'a, I>(vertex: I) -> Self
+    fn from_vertices_labels<'a, I>(iter: I) -> Self
     where
         I: IntoIterator<Item = &'a str>,
     {
         // Get vertex iterator.
-        let vertex = vertex.into_iter();
+        let iter = iter.into_iter();
         // Get lower bound size hint.
-        let (lower, _) = vertex.size_hint();
+        let (lower, _) = iter.size_hint();
         // Build graph with initial capacity.
         let mut g = Self::with_capacity(lower);
         // Add vertex to the graph.
-        for x in vertex {
+        for x in iter {
             g.add_vertex_label(x).ok();
         }
 
@@ -291,27 +291,27 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let sequence = vec![(0, 1), (2, 3), (1, 2)];
     ///
     /// // Build a graph by consuming a vector of edges.
-    /// let g = Graph::from_edge(sequence);
+    /// let g = Graph::from_edges(sequence);
     ///
     /// // Build a graph by consuming any `IntoIterator`.
-    /// let h = Graph::from_edge((0..4).zip((1..4)));
+    /// let h = Graph::from_edges((0..4).zip((1..4)));
     ///
     /// assert_eq!(g, h);
     /// ```
     ///
-    fn from_edge<I>(edges: I) -> Self
+    fn from_edges<I>(iter: I) -> Self
     where
         I: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Get edges iterator.
-        let edges = edges.into_iter();
+        let iter = iter.into_iter();
         // Get lower bound size hint.
-        let (lower, _) = edges.size_hint();
+        let (lower, _) = iter.size_hint();
         // Build graph with initial capacity,
         // assuming average frequency of new vertex.
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
-        for (x, y) in edges {
+        for (x, y) in iter {
             g.reserve_vertex(&x).ok();
             g.reserve_vertex(&y).ok();
             g.add_edge(&(x, y)).ok();
@@ -333,22 +333,22 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let sequence = vec![("0", "1"), ("2", "3"), ("1", "2")];
     ///
     /// // Build a graph by consuming a vector of vertex labels pairs.
-    /// let g = Graph::from_edge_labels(sequence);
+    /// let g = Graph::from_edges_labels(sequence);
     /// ```
     ///
-    fn from_edge_labels<'a, I>(edges: I) -> Self
+    fn from_edges_labels<'a, I>(iter: I) -> Self
     where
         I: IntoIterator<Item = (&'a str, &'a str)>,
     {
         // Get edges iterator.
-        let edges = edges.into_iter();
+        let iter = iter.into_iter();
         // Get lower bound size hint.
-        let (lower, _) = edges.size_hint();
+        let (lower, _) = iter.size_hint();
         // Build graph with initial capacity,
         // assuming average frequency of new vertex.
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
-        for (x, y) in edges {
+        for (x, y) in iter {
             let x = match g.add_vertex_label(x) {
                 Err(_) => g.get_vertex_id(x).unwrap(),
                 Ok(x) => x,
@@ -380,7 +380,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let E = EdgeList::from([(0, 1), (1, 0)]);
     ///
     /// // Build a graph from a sequence of edges.
-    /// let g = Graph::from_edge(E.clone());
+    /// let g = Graph::from_edges(E.clone());
     ///
     /// // Return an edge list (a.k.a. a *set* of edges) from the graph.
     /// assert_eq!(g.to_edge_list(), E);
@@ -474,11 +474,11 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_order(3);
     ///
     /// // Use the vertex set iterator.
-    /// let V: Vec<_> = g.vertex_iter().collect();
+    /// let V: Vec<_> = g.vertices_iter().collect();
     /// assert_eq!(V, [0, 1, 2]);
     ///
     /// // Use the associated macro 'V!'.
-    /// assert_true!(g.vertex_iter().eq(V!(g)));
+    /// assert_true!(g.vertices_iter().eq(V!(g)));
     ///
     /// // Iterate over the vertex set.
     /// for x in V!(g) {
@@ -486,7 +486,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// }
     /// ```
     ///
-    fn vertex_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
+    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
 
     /// Edge iterator.
     ///
@@ -499,7 +499,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a 3rd order graph.
-    /// let g = Graph::from_edge([(0, 1), (1, 0)]);
+    /// let g = Graph::from_edges([(0, 1), (1, 0)]);
     ///
     /// // Use the vertex set iterator.
     /// let E: Vec<_> = g.edges_iter().collect();
@@ -534,14 +534,14 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # fn main() -> Result<(), grathe::errors::Error<u32>>
     /// # {
     /// // Build a graph from edges.
-    /// let g = Graph::from_edge([(0, 1), (2, 0), (0, 0)]);
+    /// let g = Graph::from_edges([(0, 1), (2, 0), (0, 0)]);
     ///
     /// // Use the adjacent iterator.
-    /// let A: Vec<_> = g.adjacent_iter(&0)?.collect();
+    /// let A: Vec<_> = g.adjacents_iter(&0)?.collect();
     /// assert_eq!(A, [0, 1, 2]);
     ///
     /// // Use the associated macro 'Adj!'.
-    /// assert_true!(g.adjacent_iter(&0)?.eq(Adj!(g, &0)?));
+    /// assert_true!(g.adjacents_iter(&0)?.eq(Adj!(g, &0)?));
     ///
     /// // Iterate over the adjacent set.
     /// for x in Adj!(g, &0)? {
@@ -554,7 +554,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn adjacent_iter<'a>(
+    fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
@@ -615,7 +615,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // Build a 5th size graph.
-    /// let g = Graph::from_edge([
+    /// let g = Graph::from_edges([
     ///     (0, 1), (2, 0), (3, 2), (1, 2), (1, 1)
     /// ]);
     /// assert_eq!(g.size(), 5);
@@ -750,7 +750,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edge([(0, 1), (3, 2)]);
+    /// let g = Graph::from_edges([(0, 1), (3, 2)]);
     ///
     /// // Check edge.
     /// assert_true!(g.has_edge(&(0, 1))?);
@@ -1508,7 +1508,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edge([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Get the degree of `1`.
     /// assert_true!(
@@ -1542,7 +1542,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edge([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is isolated (a.k.a not connected).
     /// assert_false!(g.is_isolated_vertex(&0)?);
@@ -1573,7 +1573,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a graph.
-    /// let g = Graph::from_edge([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is pendant (a.k.a is connected to just one vertex).
     /// assert_true!(g.is_pendant_vertex(&0)?);
@@ -1597,7 +1597,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 #[macro_export]
 macro_rules! V {
     ($g:expr) => {
-        $g.vertex_iter()
+        $g.vertices_iter()
     };
 }
 
@@ -1619,6 +1619,6 @@ macro_rules! E {
 #[macro_export]
 macro_rules! Adj {
     ($g:expr, $x:expr) => {
-        $g.adjacent_iter($x)
+        $g.adjacents_iter($x)
     };
 }

@@ -29,5 +29,5 @@ pub enum Error<T> {
     EdgeLabelAlreadyDefined(String),
     /// Parsing error type.
     #[error("failed to parse graph")]
-    ParseFailed(String)
+    ParseFailed(String),
 }

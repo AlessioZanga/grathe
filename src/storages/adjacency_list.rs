@@ -94,7 +94,7 @@ where
     }
 
     #[inline(always)]
-    fn vertex_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a> {
+    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a> {
         Box::new(self.data.iter().map(|x| x.0).copied())
     }
 
@@ -108,7 +108,7 @@ where
     }
 
     #[inline(always)]
-    fn adjacent_iter<'a>(
+    fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>> {

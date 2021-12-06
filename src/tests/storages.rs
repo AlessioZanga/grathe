@@ -185,42 +185,42 @@ mod tests {
     }
 
     #[test]
-    fn from_vertex<T>() -> Result<(), Error<u32>>
+    fn from_vertices<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let mut g = T::from_vertex([]);
+        let mut g = T::from_vertices([]);
 
         // Test min graph vertex set.
         assert_eq!(g.order(), 0);
 
         // Test next graph vertex set.
-        g = T::from_vertex([0]);
+        g = T::from_vertices([0]);
         assert_eq!(g.order(), 1);
 
         // Test next graph unordered vertex set.
-        g = T::from_vertex([0, 4, 2, 3, 1]);
+        g = T::from_vertices([0, 4, 2, 3, 1]);
         assert_eq!(g.order(), 5);
 
         // Test high graph vertex set.
-        g = T::from_vertex(0..N);
+        g = T::from_vertices(0..N);
         assert_eq!(g.order(), N as usize);
 
         // Test next graph duplicated vertex set.
-        let g = T::from_vertex([0, 4, 2, 3, 1, 4, 3]);
+        let g = T::from_vertices([0, 4, 2, 3, 1, 4, 3]);
         assert_eq!(g.order(), 5);
 
         Ok(())
     }
 
     #[test]
-    fn from_vertex_labels<T>() -> Result<(), Error<u32>>
+    fn from_vertices_labels<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
         let sequence = vec!["0", "3", "1", "2"];
 
-        let g = T::from_vertex_labels(sequence);
+        let g = T::from_vertices_labels(sequence);
 
         for (x, y) in V!(g).zip(["0", "3", "1", "2"]) {
             assert_eq!(g.get_vertex_label(&x)?, y);
@@ -230,42 +230,42 @@ mod tests {
     }
 
     #[test]
-    fn from_edge<T>() -> Result<(), Error<u32>>
+    fn from_edges<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let mut g = T::from_edge([]);
+        let mut g = T::from_edges([]);
 
         // Test min graph vertex set.
         assert_eq!(g.size(), 0);
 
         // Test next graph vertex set.
-        g = T::from_edge([(0, 0)]);
+        g = T::from_edges([(0, 0)]);
         assert_eq!(g.size(), 1);
 
         // Test next graph unordered vertex set.
-        g = T::from_edge(E);
+        g = T::from_edges(E);
         assert_eq!(g.size(), 5);
 
         // Test high graph vertex set.
-        g = T::from_edge((0..N).zip(0..N));
+        g = T::from_edges((0..N).zip(0..N));
         assert_eq!(g.size(), N as usize);
 
         // Test next graph duplicated vertex set.
-        let g = T::from_edge(E);
+        let g = T::from_edges(E);
         assert_eq!(g.size(), 5);
 
         Ok(())
     }
 
     #[test]
-    fn from_edge_labels<T>() -> Result<(), Error<u32>>
+    fn from_edges_labels<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
         let sequence = vec![("0", "3"), ("1", "2")];
 
-        let g = T::from_edge_labels(sequence);
+        let g = T::from_edges_labels(sequence);
 
         for x in ["0", "1", "2", "3"] {
             assert_true!(g.has_vertex_label(&x));
@@ -279,7 +279,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let g = T::from_edge(E);
+        let g = T::from_edges(E);
         assert_eq!(g.to_edge_list(), EdgeList::from(E));
 
         Ok(())
@@ -290,7 +290,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let g = T::from_edge(E);
+        let g = T::from_edges(E);
         let mut a = AdjacencyList::default();
         for (x, y) in E {
             a.entry(x).or_default().insert(y);
@@ -305,7 +305,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let g = T::from_edge(E);
+        let g = T::from_edges(E);
         let mut a = DenseAdjacencyMatrix::zeros(8, 8);
         for (x, y) in E {
             a[(x as usize, y as usize)] = 1;
@@ -320,7 +320,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let g = T::from_edge(E);
+        let g = T::from_edges(E);
         let mut a = DenseAdjacencyMatrix::zeros(8, 8);
         for (x, y) in E {
             a[(x as usize, y as usize)] = 1;
@@ -334,7 +334,7 @@ mod tests {
     }
 
     #[test]
-    fn vertex_iter<T>() -> Result<(), Error<u32>>
+    fn vertices_iter<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait,
     {
@@ -344,7 +344,7 @@ mod tests {
         g = T::from_order(N as usize);
         assert_eq!(V!(g).count(), N as usize);
 
-        assert_true!(V!(g).eq(g.vertex_iter()));
+        assert_true!(V!(g).eq(g.vertices_iter()));
         assert_true!(V!(g).all(|x| g.has_vertex(&x)));
         assert_true!(is_sorted(V!(g)));
 
@@ -382,7 +382,7 @@ mod tests {
     }
 
     #[test]
-    fn adjacent_iter<T>() -> Result<(), Error<u32>>
+    fn adjacents_iter<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
     {
@@ -398,7 +398,7 @@ mod tests {
         g.add_edge(&(0, 0))?;
         assert_eq!(Adj!(g, &0)?.count(), 2);
 
-        assert_true!(Adj!(g, &0)?.eq(g.adjacent_iter(&0)?));
+        assert_true!(Adj!(g, &0)?.eq(g.adjacents_iter(&0)?));
         assert_true!(Adj!(g, &0)?.all(|x| g.has_edge(&(0, x)).unwrap()));
         assert_true!(is_sorted(Adj!(g, &0)?));
 
@@ -1034,8 +1034,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let g = T::from_edge([(0, 1)]);
-        let h = T::from_edge([(0, 1), (0, 2)]);
+        let g = T::from_edges([(0, 1)]);
+        let h = T::from_edges([(0, 1), (0, 2)]);
 
         assert_le!(g, h);
         assert_eq!((g <= h), g.is_subgraph(&h));
@@ -1048,8 +1048,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let g = T::from_edge([(0, 1), (0, 2)]);
-        let h = T::from_edge([(0, 1)]);
+        let g = T::from_edges([(0, 1), (0, 2)]);
+        let h = T::from_edges([(0, 1)]);
 
         assert_ge!(g, h);
         assert_eq!((g >= h), g.is_supergraph(&h));

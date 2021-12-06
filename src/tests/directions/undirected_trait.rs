@@ -120,7 +120,7 @@ mod tests_undirected {
         g.add_edge(&(j, j))?;
         assert_eq!(Ne!(g, &i)?.count(), 2);
 
-        assert_true!(Ne!(g, &i)?.eq(g.neighbor_iter(&i)?));
+        assert_true!(Ne!(g, &i)?.eq(g.neighbors_iter(&i)?));
         assert_true!(
             Ne!(g, &i)?.all(|x| g.has_edge(&(i, x)).unwrap() && g.has_edge(&(x, i)).unwrap())
         );

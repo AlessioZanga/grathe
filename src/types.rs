@@ -24,7 +24,6 @@ impl<T, U> VertexIterator<U> for T where T: Iterator<Item = U> + Debug {}
 pub trait EdgeIterator<T>: Iterator<Item = (T, T)> + Debug {}
 impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = (U, U)> + Debug {}
 
-
 /// Label bidirectional map type.
 pub type LabelMap<T> = BiHashMap<T, String>;
 

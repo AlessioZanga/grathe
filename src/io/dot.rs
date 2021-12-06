@@ -302,7 +302,8 @@ where
     T: GraphTrait,
 {
     // Read DOT file
-    let string = read_to_string(path).unwrap_or_else(|_| panic!("Failed to read file \"{:?}\"", &path));
+    let string =
+        read_to_string(path).unwrap_or_else(|_| panic!("Failed to read file \"{:?}\"", &path));
     // Parse dot string.
     from_dot(&string)
 }
