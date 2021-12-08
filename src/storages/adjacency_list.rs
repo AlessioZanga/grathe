@@ -75,22 +75,22 @@ where
     #[inline(always)]
     fn reserve(&mut self, additional: usize) {
         // INFO: BTreeMap as no `capacity` concept.
-        // FIXME: self.v_labels.reserve(additional)
-        // FIXME: self.e_labels.reserve(additional)
+        self.v_labels.reserve(additional);
+        self.e_labels.reserve(additional);
     }
 
     #[inline(always)]
     fn shrink_to(&mut self, min_capacity: usize) {
         // INFO: BTreeMap as no `capacity` concept.
-        // FIXME: self.v_labels.shrink_to(min_capacity)
-        // FIXME: self.e_labels.shrink_to(min_capacity)
+        self.v_labels.shrink_to(min_capacity);
+        self.e_labels.shrink_to(min_capacity);
     }
 
     #[inline(always)]
     fn shrink_to_fit(&mut self) {
         // INFO: BTreeMap as no `capacity` concept.
-        // FIXME: self.v_labels.shrink_to_fit()
-        // FIXME: self.e_labels.shrink_to_fit()
+        self.v_labels.shrink_to_fit();
+        self.e_labels.shrink_to_fit();
     }
 
     #[inline(always)]

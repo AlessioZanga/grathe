@@ -16,7 +16,7 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 # https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bimap = "^0.6.1"
+bimap = {git = "https://github.com/billyrieger/bimap-rs", rev = "dc7d6ad"}  # FIXME: Replace with bimap > 0.6.1
 delegate = "^0.6.1"
 itertools = "^0.10.1"
 log = {version = "^0.4.14", features = ["max_level_debug", "release_max_level_warn"]}

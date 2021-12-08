@@ -123,6 +123,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Examples
     /// ```
+    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // Build a null graph.
@@ -130,7 +131,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Reserve additional capacity.
     /// g.reserve(3);
-    /// // FIXME: assert_eq!(g.capacity(), 3);
+    /// assert_ge!(g.capacity(), 3);
     ///
     /// // The order is still zero.
     /// assert_eq!(g.order(), 0);
@@ -147,15 +148,16 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Examples
     /// ```
+    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
-    /// // FIXME: assert_eq!(g.capacity(), 100);
+    /// assert_ge!(g.capacity(), 100);
     ///
     /// // Shrink capacity to given minimum.
     /// g.shrink_to(50);
-    /// // FIXME: assert_eq!(g.capacity(), 50);
+    /// assert_ge!(g.capacity(), 50);
     /// ```
     ///
     fn shrink_to(&mut self, min_capacity: usize);
@@ -166,15 +168,16 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Examples
     /// ```
+    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
-    /// // FIXME: assert_eq!(g.capacity(), 100);
+    /// assert_ge!(g.capacity(), 100);
     ///
     /// // Shrink capacity as much as possible.
     /// g.shrink_to_fit();
-    /// // FIXME: assert_eq!(g.capacity(), 0);
+    /// assert_eq!(g.capacity(), 0);
     /// ```
     ///
     fn shrink_to_fit(&mut self);
