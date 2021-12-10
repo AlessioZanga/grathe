@@ -27,6 +27,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
     ///
     /// # Examples
+    ///
     /// ```
     /// use grathe::prelude::*;
     ///
@@ -47,6 +48,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Clears the graph, removing both vertex and edges.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -74,6 +76,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Depending on the underlying storage, this could avoid reallocations.
     ///
     /// # Examples
+    ///
     /// ```
     /// use grathe::prelude::*;
     ///
@@ -96,6 +99,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Depending on the underlying storage, this could avoid reallocations.
     ///
     /// # Examples
+    ///
     /// ```
     /// use grathe::prelude::*;
     ///
@@ -122,6 +126,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Panics if the additional capacity overflows `usize`.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -147,6 +152,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Shrinks the capacity of the graph with a lower limit.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -167,6 +173,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Shrinks the capacity of the graph as much as possible.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -187,6 +194,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph of a given order.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -213,6 +221,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph from a given sequence of vertex, ignoring repeated ones.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -252,6 +261,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph from a given sequence of vertex labels, ignoring repeated ones.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -286,6 +296,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph from a given sequence of edges, ignoring repeated ones.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -328,6 +339,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Construct a graph from a given sequence of edges, ignoring repeated ones.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -375,6 +387,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// $O(|E|)$ - Linear in the size of the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -469,6 +482,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Iterates over the vertex set $V$ ordered by identifier value.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -496,6 +510,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Iterates over the edge set $E$ order by identifier values.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -530,6 +545,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -595,6 +611,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// $O(1)$ - Constant.
     ///
     /// # Examples
+    ///
     /// ```
     /// use grathe::prelude::*;
     ///
@@ -614,6 +631,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// $O(|E|)$ - Liner in the size of graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use grathe::prelude::*;
     ///
@@ -631,6 +649,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Checks whether the graph has a given vertex or not.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -645,6 +664,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Ok(())
     /// # }
     /// ```
+    ///
     fn has_vertex(&self, x: &Self::Vertex) -> bool;
 
     /// Adds vertex to the graph.
@@ -656,6 +676,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -682,6 +703,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -702,6 +724,50 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
 
+    /// Extends graph with given vertices.
+    ///
+    /// Extends graph with given sequence of vertex identifiers.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a null graph.
+    /// let mut g = Graph::default();
+    ///
+    /// // Extend graph with vertices.
+    /// g.extend_vertices([0, 3, 1, 2])?;
+    /// assert_eq!(g.order(), 4);
+    /// assert_eq!(g.size(), 0);
+    ///
+    /// // Extending with existing vertices yields an error.
+    /// assert_true!(g.extend_vertices([0]).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    #[inline(always)]
+    fn extend_vertices<I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    where
+        I: IntoIterator<Item = Self::Vertex>,
+    {
+        // Get vertex iterator.
+        let iter = iter.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = iter.size_hint();
+        // Reserve additional capacity.
+        self.reserve(lower);
+        // Add vertex to the graph.
+        for x in iter {
+            self.reserve_vertex(&x)?;
+        }
+
+        Ok(())
+    }
+
     /// Deletes vertex from the graph.
     ///
     /// Remove given vertex identifier from the graph.
@@ -711,6 +777,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -747,6 +814,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// At least one of the vertex identifiers do not exist in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -776,6 +844,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the edge identifier already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -809,6 +878,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the edge identifier already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -849,6 +919,51 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.add_edge(e)
     }
 
+    /// Extends graph with given edges.
+    ///
+    /// Extends graph with given sequence of edges identifiers.
+    /// Non-existing vertices will be added as well.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a null graph.
+    /// let mut g = Graph::default();
+    ///
+    /// // Extend graph with edges.
+    /// g.extend_edges([(0, 3), (1, 2)])?;
+    /// assert_eq!(g.order(), 4);
+    /// assert_eq!(g.size(), 2);
+    ///
+    /// // Extending with existing edges yields an error.
+    /// assert_true!(g.extend_edges([(0, 3)]).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    #[inline(always)]
+    fn extend_edges<I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    where
+        I: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
+    {
+        // Get edge iterator.
+        let iter = iter.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = iter.size_hint();
+        // Reserve additional capacity.
+        self.reserve(lower);
+        // Add edge to the graph.
+        for x in iter {
+            self.reserve_edge(&x)?;
+        }
+
+        Ok(())
+    }
+
     /// Deletes edge from the graph.
     ///
     /// Remove given edge identifier from the graph.
@@ -859,6 +974,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the edge identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -894,6 +1010,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Checks whether the graph has a given vertex label or not.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -931,6 +1048,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex label already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -963,6 +1081,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier or label already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -995,6 +1114,50 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.set_vertex_label(x, y)
     }
 
+    /// Extends graph with given vertices.
+    ///
+    /// Extends graph with given sequence of vertex labels.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a null graph.
+    /// let mut g = Graph::default();
+    ///
+    /// // Extend graph with vertices.
+    /// g.extend_vertices_labels(["0", "3", "1", "2"])?;
+    /// assert_eq!(g.order(), 4);
+    /// assert_eq!(g.size(), 0);
+    ///
+    /// // Extending with existing vertices yields an error.
+    /// assert_true!(g.extend_vertices_labels(["0"]).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    #[inline(always)]
+    fn extend_vertices_labels<'a, I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    where
+        I: IntoIterator<Item = &'a str>,
+    {
+        // Get vertex iterator.
+        let iter = iter.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = iter.size_hint();
+        // Reserve additional capacity.
+        self.reserve(lower);
+        // Add vertex to the graph.
+        for x in iter {
+            self.add_vertex_label(&x)?;
+        }
+
+        Ok(())
+    }
+
     /// Vertex identifier from label.
     ///
     /// Return vertex identifier given its label.
@@ -1004,6 +1167,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex label does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1042,6 +1206,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1081,6 +1246,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the vertex label is already defined.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1128,6 +1294,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the vertex label is not defined.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1168,6 +1335,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Checks whether the graph has a given edge label or not.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1206,6 +1374,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the edge label already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1243,6 +1412,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the edge identifier or label already exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1275,6 +1445,53 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.set_edge_label(x, y)
     }
 
+    /// Extends graph with given edges.
+    ///
+    /// Extends graph with given sequence of edges labels.
+    /// Non-existing vertices will be added as well.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use all_asserts::*;
+    /// use grathe::prelude::*;
+    ///
+    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
+    /// // Build a null graph.
+    /// let mut g = Graph::default();
+    ///
+    /// // Extend graph with edges.
+    /// g.extend_edge_labels([("0", "3"), ("1", "2")])?;
+    /// assert_eq!(g.order(), 4);
+    /// assert_eq!(g.size(), 2);
+    ///
+    /// // Extending with existing edges yields an error.
+    /// assert_true!(g.extend_edge_labels([("0", "3")]).is_err());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    #[inline(always)]
+    fn extend_edge_labels<'a, I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    where
+        I: IntoIterator<Item = (&'a str, &'a str)>,
+    {
+        // Get edge iterator.
+        let iter = iter.into_iter();
+        // Get lower bound size hint.
+        let (lower, _) = iter.size_hint();
+        // Reserve additional capacity.
+        self.reserve(lower);
+        // Add edge to the graph.
+        for (x, y) in iter {
+            let x = self.add_vertex_label(x)?;
+            let y = self.add_vertex_label(y)?;
+            self.add_edge(&(x, y))?;
+        }
+
+        Ok(())
+    }
+
     /// Edge identifier from label.
     ///
     /// Return edge identifier given its label.
@@ -1284,6 +1501,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The edge label does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1322,6 +1540,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The edge identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1364,6 +1583,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the edge label is already defined.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1411,6 +1631,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// or the edge label is not defined.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1451,6 +1672,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Checks if this graph is subgraph of given graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1476,6 +1698,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// Checks if this graph is supergraph of given graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1505,6 +1728,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1539,6 +1763,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;
@@ -1570,6 +1795,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// The vertex identifier does not exists in the graph.
     ///
     /// # Examples
+    ///
     /// ```
     /// use all_asserts::*;
     /// use grathe::prelude::*;

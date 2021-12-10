@@ -596,6 +596,22 @@ mod tests {
     }
 
     #[test]
+    fn extend_vertices<T>() -> Result<(), Error<u32>>
+    where
+        T: StorageTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Extend graph with vertices.
+        g.extend_vertices([0, 3, 1, 2])?;
+        assert_eq!(g.order(), 4);
+        assert_eq!(g.size(), 0);
+        // Extending with existing vertices yields an error.
+        assert_true!(g.extend_vertices([0]).is_err());
+        Ok(())
+    }
+
+    #[test]
     fn del_vertex<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
@@ -738,6 +754,23 @@ mod tests {
     }
 
     #[test]
+    fn extend_edges<T>() -> Result<(), Error<u32>>
+    where
+        T: StorageTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Extend graph with edges.
+        g.extend_edges([(0, 3), (1, 2)])?;
+        assert_eq!(g.order(), 4);
+        assert_eq!(g.size(), 2);
+
+        // Extending with existing edges yields an error.
+        assert_true!(g.extend_edges([(0, 3)]).is_err());
+        Ok(())
+    }
+
+    #[test]
     fn del_edge<T>() -> Result<(), Error<u32>>
     where
         T: StorageTrait<Vertex = u32>,
@@ -851,6 +884,23 @@ mod tests {
         assert_eq!(g.get_vertex_id("0")?, i);
         assert_eq!(g.get_vertex_label(&i)?, "0");
 
+        Ok(())
+    }
+
+    #[test]
+    fn extend_vertices_labels<T>() -> Result<(), Error<u32>>
+    where
+        T: StorageTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Extend graph with vertices.
+        g.extend_vertices_labels(["0", "3", "1", "2"])?;
+        assert_eq!(g.order(), 4);
+        assert_eq!(g.size(), 0);
+
+        // Extending with existing vertices yields an error.
+        assert_true!(g.extend_vertices_labels(["0"]).is_err());
         Ok(())
     }
 
@@ -973,6 +1023,24 @@ mod tests {
         assert_true!(g.has_edge_label("(0, 1)"));
         assert_eq!(g.get_edge_id("(0, 1)")?, e);
         assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
+
+        Ok(())
+    }
+
+    #[test]
+    fn extend_edges_labels<T>() -> Result<(), Error<u32>>
+    where
+        T: StorageTrait<Vertex = u32>,
+    {
+        let mut g = T::default();
+
+        // Extend graph with edges.
+        g.extend_edge_labels([("0", "3"), ("1", "2")])?;
+        assert_eq!(g.order(), 4);
+        assert_eq!(g.size(), 2);
+
+        // Extending with existing edges yields an error.
+        assert_true!(g.extend_edge_labels([("0", "3")]).is_err());
 
         Ok(())
     }
