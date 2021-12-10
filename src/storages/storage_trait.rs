@@ -345,15 +345,16 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // A sequence of unique vertex labels pairs.
-    /// let sequence = vec![("0", "1"), ("2", "3"), ("1", "2")];
+    /// let sequence = vec![((0, 1), "(0, 1)"), ((2, 3), "(2, 3)"), ((1, 2), "(1, 2)")];
     ///
     /// // Build a graph by consuming a vector of vertex labels pairs.
     /// let g = Graph::from_edges_labels(sequence);
+    /// assert_eq!(E!(g).collect::<Vec<_>>(), [(0, 1), (1, 2), (2, 3)]);
     /// ```
     ///
     fn from_edges_labels<'a, I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = (&'a str, &'a str)>,
+        I: IntoIterator<Item = ((Self::Vertex, Self::Vertex), &'a str)>,
     {
         // Get edges iterator.
         let iter = iter.into_iter();
@@ -363,16 +364,11 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         // assuming average frequency of new vertex.
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
-        for (x, y) in iter {
-            let x = match g.add_vertex_label(x) {
-                Err(_) => g.get_vertex_id(x).unwrap(),
-                Ok(x) => x,
-            };
-            let y = match g.add_vertex_label(y) {
-                Err(_) => g.get_vertex_id(y).unwrap(),
-                Ok(y) => y,
-            };
+        for ((x, y), e) in iter {
+            g.reserve_vertex(&x).ok();
+            g.reserve_vertex(&y).ok();
             g.add_edge(&(x, y)).ok();
+            g.set_edge_label(&(x, y), e).ok();
         }
 
         g
@@ -1461,12 +1457,12 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let mut g = Graph::default();
     ///
     /// // Extend graph with edges.
-    /// g.extend_edge_labels([("0", "3"), ("1", "2")])?;
+    /// g.extend_edge_labels([((0, 3), "(0, 3)"), ((1, 2), "(1, 2)")])?;
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 2);
     ///
     /// // Extending with existing edges yields an error.
-    /// assert_true!(g.extend_edge_labels([("0", "3")]).is_err());
+    /// assert_true!(g.extend_edge_labels([((0, 3), "(0, 3)")]).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -1474,7 +1470,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     #[inline(always)]
     fn extend_edge_labels<'a, I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
     where
-        I: IntoIterator<Item = (&'a str, &'a str)>,
+        I: IntoIterator<Item = ((Self::Vertex, Self::Vertex), &'a str)>,
     {
         // Get edge iterator.
         let iter = iter.into_iter();
@@ -1484,9 +1480,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.reserve(lower);
         // Add edge to the graph.
         for (x, y) in iter {
-            let x = self.add_vertex_label(x)?;
-            let y = self.add_vertex_label(y)?;
-            self.add_edge(&(x, y))?;
+            self.reserve_edge_label(&x, y)?;
         }
 
         Ok(())

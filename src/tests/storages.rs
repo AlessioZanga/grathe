@@ -263,13 +263,10 @@ mod tests {
     where
         T: StorageTrait<Vertex = u32>,
     {
-        let sequence = vec![("0", "3"), ("1", "2")];
+        let sequence = vec![((0, 1), "(0, 1)"), ((2, 3), "(2, 3)"), ((1, 2), "(1, 2)")];
 
         let g = T::from_edges_labels(sequence);
-
-        for x in ["0", "1", "2", "3"] {
-            assert_true!(g.has_vertex_label(&x));
-        }
+        assert_eq!(E!(g).collect::<Vec<_>>(), [(0, 1), (1, 2), (2, 3)]);
 
         Ok(())
     }
@@ -1035,12 +1032,12 @@ mod tests {
         let mut g = T::default();
 
         // Extend graph with edges.
-        g.extend_edge_labels([("0", "3"), ("1", "2")])?;
+        g.extend_edge_labels([((0, 3), "(0, 3)"), ((1, 2), "(1, 2)")])?;
         assert_eq!(g.order(), 4);
         assert_eq!(g.size(), 2);
 
         // Extending with existing edges yields an error.
-        assert_true!(g.extend_edge_labels([("0", "3")]).is_err());
+        assert_true!(g.extend_edge_labels([((0, 3), "(0, 3)")]).is_err());
 
         Ok(())
     }
