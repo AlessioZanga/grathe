@@ -112,14 +112,9 @@ macro_rules! impl_ungraph_trait {
                         &'a self,
                         x: &Self::Vertex,
                     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
-                    fn as_vertex_labels(&self) -> &LabelMap<Self::Vertex>;
-                    fn as_mut_vertex_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
-                    fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)>;
-                    fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)>;
                     fn order(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
-                    fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
+                    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
                     fn del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
                     fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>>;
                 }
@@ -225,15 +220,10 @@ macro_rules! impl_digraph_trait {
                         &'a self,
                         x: &Self::Vertex,
                     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
-                    fn as_vertex_labels(&self) -> &LabelMap<Self::Vertex>;
-                    fn as_mut_vertex_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
-                    fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)>;
-                    fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)>;
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
-                    fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
+                    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
                     fn del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
                     fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>>;
                     fn add_edge(

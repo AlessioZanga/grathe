@@ -112,7 +112,7 @@ where
                                 // FIXME: How to handle duplicated labels? Now it is first come, first served.
                                 let e = x.get(0).unwrap();
                                 // FIXME: How to handle shared label across edges of path? Now it is first come, first served.
-                                graph.set_edge_label(e, to_label(value)).ok();
+                                // FIXME: graph.set_edge_label(e, to_label(value)).ok();
                             } else {
                                 // TODO: Add path attributes
                                 warn!(
@@ -174,7 +174,7 @@ where
                             // Handle special key
                             if key.as_str() == "label" {
                                 // FIXME: How to handle duplicated labels? Here is first come, first served.
-                                graph.set_vertex_label(&x, to_label(value)).ok();
+                                // FIXME: graph.set_vertex_label(&x, to_label(value)).ok();
                             } else {
                                 // TODO: Add vertex attributes
                                 warn!(
@@ -197,19 +197,17 @@ where
                 // Match identifier type
                 let x = match j.as_rule() {
                     // Match text type
-                    Rule::text => graph.add_vertex_label(k),
+                    Rule::text => graph.add_vertex(k),
                     // Match quoted text type by removing quoting
-                    Rule::quoted_text => graph.add_vertex_label(k.trim_matches('"')),
+                    Rule::quoted_text => graph.add_vertex(k.trim_matches('"')),
                     // Match number type
                     // FIXME: Can Rule::number be a float? Use it as string?
-                    Rule::number => graph.reserve_vertex(&k.parse::<T::Vertex>().ok().unwrap()),
+                    Rule::number => graph.add_vertex(&k.parse::<T::Vertex>().ok().unwrap()),
                     // Match everything else
                     _ => unreachable!(),
                 };
                 // Handle errors
                 let x = match x {
-                    // Match vertex label already defined error
-                    Err(Error::VertexLabelAlreadyDefined(x)) => graph.get_vertex_id(&x).unwrap(),
                     // Match vertex identifier already defined error
                     Err(Error::VertexAlreadyDefined(x)) => x,
                     // Give up on other errors
@@ -275,17 +273,13 @@ where
     writeln!(dot, "{} {{", graph_type)?;
     // Write vertex with label
     for x in V!(graph) {
-        match graph.get_vertex_label(&x) {
-            Err(_) => writeln!(dot, "\t{:?};", x),
-            Ok(y) => writeln!(dot, "\t{:?} [label=\"{}\"];", x, y),
-        }?
+        writeln!(dot, "\t{:?};", x);
+        // FIXME: writeln!(dot, "\t{:?} [label=\"{:?}\"];", x, y);
     }
     // Write edges with label
     for (x, y) in edges {
-        match graph.get_edge_label(&(x, y)) {
-            Err(_) => writeln!(dot, "\t{:?} {} {:?};", x, edge_type, y),
-            Ok(z) => writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z),
-        }?
+        writeln!(dot, "\t{:?} {} {:?};", x, edge_type, y);
+        // FIXME: writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z);
     }
     // Close DOT string by escaping "}"
     writeln!(dot, "}}")?;

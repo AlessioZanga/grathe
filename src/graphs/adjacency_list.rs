@@ -1,16 +1,16 @@
 use crate::directions::UndirectedTrait;
 use crate::impl_ungraph_trait;
-use crate::storages::AdjacencyListStorage;
+use crate::storages::AdjacencyList;
 use crate::types::*;
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
-pub struct UndirectedAdjacencyListGraph<T>(AdjacencyListStorage<T>)
+pub struct UndirectedAdjacencyListGraph<T>(AdjacencyList<T>)
 where
     T: VertexTrait;
 
 // Storage delegation and graph trait implementation.
-impl_ungraph_trait!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
+impl_ungraph_trait!(UndirectedAdjacencyListGraph, AdjacencyList);
 
 impl<T> UndirectedAdjacencyListGraph<T> where T: VertexTrait {}
 

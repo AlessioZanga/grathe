@@ -2,7 +2,6 @@ use crate::errors::Error;
 use crate::types::*;
 use crate::{Adj, E, V};
 use nasparse::CooMatrix;
-use num_traits::FromPrimitive;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
@@ -16,7 +15,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     // TODO: Uncomment once associated type defaults are stable.
     // Edge identifier type.
-    // type Edge = (Self::Vertex, Self::Vertex);
+    // type Edge = &(Self::Vertex, Self::Vertex);
 
     /// Underlying storage type.
     type Storage;
@@ -213,7 +212,12 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn from_order(order: usize) -> Self {
-        Self::from_vertices((0..order).map(|x| Self::Vertex::from_usize(x).unwrap()))
+        let mut g = Self::with_capacity(order);
+        for x in (0..order).map(|x| Self::Vertex::try_from(x).ok().unwrap()) {
+            g.add_vertex(&x).ok();
+        }
+
+        g
     }
 
     /// From vertex constructor.
@@ -236,46 +240,18 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let h = Graph::from_vertices((0..4));
     ///
     /// assert_eq!(g, h);
-    /// ```
-    ///
-    fn from_vertices<I>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = Self::Vertex>,
-    {
-        // Get vertex iterator.
-        let iter = iter.into_iter();
-        // Get lower bound size hint.
-        let (lower, _) = iter.size_hint();
-        // Build graph with initial capacity.
-        let mut g = Self::with_capacity(lower);
-        // Add vertex to the graph.
-        for x in iter {
-            g.reserve_vertex(&x).ok();
-        }
-
-        g
-    }
-
-    /// From vertex labels constructor.
-    ///
-    /// Construct a graph from a given sequence of vertex labels, ignoring repeated ones.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
     ///
     /// // A sequence of unique vertex.
     /// let sequence = vec!["0", "3", "1", "2"];
     ///
     /// // Build a graph by consuming a vector of vertex labels.
-    /// let g = Graph::from_vertices_labels(sequence);
+    /// let g = GraphWithLabels::from_vertices(sequence);
     /// ```
     ///
-    fn from_vertices_labels<'a, I>(iter: I) -> Self
+    fn from_vertices<'a, I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = &'a str>,
+        Self: 'a,
+        I: IntoIterator<Item = &'a Self::Vertex>,
     {
         // Get vertex iterator.
         let iter = iter.into_iter();
@@ -285,7 +261,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         let mut g = Self::with_capacity(lower);
         // Add vertex to the graph.
         for x in iter {
-            g.add_vertex_label(x).ok();
+            g.add_vertex(x).ok();
         }
 
         g
@@ -311,6 +287,13 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let h = Graph::from_edges((0..4).zip((1..4)));
     ///
     /// assert_eq!(g, h);
+    ///
+    /// // A sequence of unique vertex labels pairs.
+    /// let sequence = vec![("0", "1"), ("2", "3"), ("1", "2")];
+    ///
+    /// // Build a graph by consuming a vector of vertex labels pairs.
+    /// let g = GraphWithLabels::from_edges(sequence);
+    /// assert_eq!(E!(g).collect::<Vec<_>>(), [("0", "1"), ("1", "2"), ("2", "3")]);
     /// ```
     ///
     fn from_edges<I>(iter: I) -> Self
@@ -326,49 +309,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
         for (x, y) in iter {
-            g.reserve_vertex(&x).ok();
-            g.reserve_vertex(&y).ok();
+            g.add_vertex(&x).ok();
+            g.add_vertex(&y).ok();
             g.add_edge(&(x, y)).ok();
-        }
-
-        g
-    }
-
-    /// From edges constructor.
-    ///
-    /// Construct a graph from a given sequence of edges, ignoring repeated ones.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // A sequence of unique vertex labels pairs.
-    /// let sequence = vec![((0, 1), "(0, 1)"), ((2, 3), "(2, 3)"), ((1, 2), "(1, 2)")];
-    ///
-    /// // Build a graph by consuming a vector of vertex labels pairs.
-    /// let g = Graph::from_edges_labels(sequence);
-    /// assert_eq!(E!(g).collect::<Vec<_>>(), [(0, 1), (1, 2), (2, 3)]);
-    /// ```
-    ///
-    fn from_edges_labels<'a, I>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = ((Self::Vertex, Self::Vertex), &'a str)>,
-    {
-        // Get edges iterator.
-        let iter = iter.into_iter();
-        // Get lower bound size hint.
-        let (lower, _) = iter.size_hint();
-        // Build graph with initial capacity,
-        // assuming average frequency of new vertex.
-        let mut g = Self::with_capacity(lower);
-        // Add edges to the graph.
-        for ((x, y), e) in iter {
-            g.reserve_vertex(&x).ok();
-            g.reserve_vertex(&y).ok();
-            g.add_edge(&(x, y)).ok();
-            g.set_edge_label(&(x, y), e).ok();
         }
 
         g
@@ -400,6 +343,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn to_edge_list(&self) -> EdgeList<Self::Vertex> {
         let mut out = EdgeList::new();
+        // FIXME:
         out.extend(E!(self));
         out
     }
@@ -574,30 +518,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         x: &Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
-    /// vertex labels.
-    ///
-    /// Return immutable reference to internal vertex labels.
-    ///
-    fn as_vertex_labels(&self) -> &LabelMap<Self::Vertex>;
-
-    /// Mutable vertex labels.
-    ///
-    /// Return mutable reference to internal vertex labels.
-    ///
-    fn as_mut_vertex_labels(&mut self) -> &mut LabelMap<Self::Vertex>;
-
-    /// Edges labels.
-    ///
-    /// Return immutable reference to internal edges labels.
-    ///
-    fn as_edges_labels(&self) -> &LabelMap<(Self::Vertex, Self::Vertex)>;
-
-    /// Mutable edges labels.
-    ///
-    /// Return mutable reference to internal edges labels.
-    ///
-    fn as_mut_edges_labels(&mut self) -> &mut LabelMap<(Self::Vertex, Self::Vertex)>;
-
     /// Order of the graph.
     ///
     /// Return the graph order (aka. $|V|$).
@@ -657,6 +577,15 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// // Check vertex.
     /// assert_true!(g.has_vertex(&0));
     /// assert_false!(g.has_vertex(&2));
+    ///
+    /// // Build a null graph.
+    /// let mut g = GraphWithLabels::default();
+    ///
+    /// // Add a vertex given its label.
+    /// let i = g.add_vertex("0")?;
+    ///
+    /// // Check that the newly added label is indeed in the graph.
+    /// assert_true!(g.has_vertex("0"));
     /// # Ok(())
     /// # }
     /// ```
@@ -682,43 +611,22 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let mut g = Graph::default();
     ///
     /// // Add a new vertex.
-    /// let i = g.add_vertex()?;
+    /// let i = g.add_vertex(&0)?;
     /// assert_true!(g.has_vertex(&i));
-    /// # Ok(())
-    /// # }
-    /// ```
     ///
-    fn add_vertex(&mut self) -> Result<Self::Vertex, Error<Self::Vertex>>;
-
-    /// Adds vertex to the graph.
-    ///
-    /// Insert given vertex identifier into the graph.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier already exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
     /// // Build a null graph.
-    /// let mut g = Graph::default();
+    /// let mut g = GraphWithLabels::default();
     ///
-    /// // Add a new vertex with a specific identifier.
-    /// let i = g.reserve_vertex(&42)?;
-    /// assert_true!(g.has_vertex(&i) && i == 42);
+    /// // Add a vertex given its label.
+    /// let i = g.add_vertex("0")?;
     ///
-    /// // Adding an existing vertex yields an error.
-    /// assert_true!(g.reserve_vertex(&42).is_err());
+    /// // Adding an existing vertex label yields an error.
+    /// assert_true!(g.add_vertex("0").is_err());
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn reserve_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
+    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
 
     /// Extends graph with given vertices.
     ///
@@ -741,6 +649,17 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Extending with existing vertices yields an error.
     /// assert_true!(g.extend_vertices([0]).is_err());
+    ///
+    /// // Build a null graph.
+    /// let mut g = GraphWithLabels::default();
+    ///
+    /// // Extend graph with vertices.
+    /// g.extend_vertices(["0", "3", "1", "2"])?;
+    /// assert_eq!(g.order(), 4);
+    /// assert_eq!(g.size(), 0);
+    ///
+    /// // Extending with existing vertices yields an error.
+    /// assert_true!(g.extend_vertices(["0"]).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -758,7 +677,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.reserve(lower);
         // Add vertex to the graph.
         for x in iter {
-            self.reserve_vertex(&x)?;
+            self.add_vertex(&x)?;
         }
 
         Ok(())
@@ -824,6 +743,15 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Checking an edge with non-existing vertex yields an error.
     /// assert_true!(g.has_edge(&(0, 42)).is_err());
+    ///
+    /// // Build a null graph.
+    /// let mut g = GraphWithLabels::default();
+    ///
+    /// // Add a edge given its label.
+    /// let e = g.reserve_edge(("0", "1"))?;
+    ///
+    /// // Check that the newly added label is indeed in the graph.
+    /// assert_true!(g.has_edge(("0", "1"));
     /// # Ok(())
     /// # }
     /// ```
@@ -855,6 +783,15 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Adding an existing edge yields an error.
     /// assert_true!(g.add_edge(&e).is_err());
+    ///
+    /// // Build a 3rd order graph.
+    /// let mut g = GraphWithLabels::from_order(3);
+    ///
+    /// // Add a edge given its label.
+    /// let e = g.add_edge(("0", "1"))?;
+    ///
+    /// // Adding an existing edge label yields an error.
+    /// assert_true!(g.add_edge(("0", "1")).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -899,8 +836,18 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_true!(g.reserve_edge(&(0, 2)).is_err());
     ///
     /// // ..but adding them is fine.
-    /// g.reserve_vertex(&2)?;
+    /// g.add_vertex(&2)?;
     /// assert_false!(g.add_edge(&(0, 2)).is_err());
+    ///
+    /// // Build a null graph.
+    /// let mut g = GraphWithLabels::default();
+    ///
+    /// // Reserve a edge given its identifier and label.
+    /// let e = g.reserve_edge(("0", "1"))?;
+    /// assert_true!(g.has_edge(&e)?);
+    ///
+    /// // Reserving an existing edge identifier or label yields an error.
+    /// assert_true!(g.reserve_edge(("0", "1")).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -910,8 +857,8 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
-        self.reserve_vertex(&e.0)?;
-        self.reserve_vertex(&e.1)?;
+        self.add_vertex(&e.0)?;
+        self.add_vertex(&e.1)?;
         self.add_edge(e)
     }
 
@@ -992,6 +939,17 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Deleting a non-existing edge yields an error.
     /// assert_true!(g.del_edge(&e).is_err());
+    ///
+    /// // Build a null graph.
+    /// let mut g = GraphWithLabels::default();
+    ///
+    /// // Extend graph with edges.
+    /// g.extend_edge([("0", "3"), ("1", "2")])?;
+    /// assert_eq!(g.order(), 4);
+    /// assert_eq!(g.size(), 2);
+    ///
+    /// // Extending with existing edges yields an error.
+    /// assert_true!(g.extend_edge([("0", "3")]).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -1000,666 +958,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         &mut self,
         e: &(Self::Vertex, Self::Vertex),
     ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>;
-
-    /// Checks vertex label.
-    ///
-    /// Checks whether the graph has a given vertex label or not.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a vertex given its label.
-    /// let i = g.add_vertex_label("0")?;
-    ///
-    /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_vertex_label("0"));
-    ///
-    /// // Check whether an identifier is associated to a specific label (stable).
-    /// assert_true!(matches!(g.get_vertex_label(&i), Ok("0")));
-    ///
-    /// // TODO: Check whether an identifier is associated to a specific label (nightly).
-    /// // assert_true!(g.get_vertex_label(&i).contains("0"));
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn has_vertex_label(&self, x: &str) -> bool {
-        self.as_vertex_labels().contains_right(x)
-    }
-
-    /// Adds vertex label to the graph.
-    ///
-    /// Insert given vertex label into the graph.
-    ///
-    /// # Errors
-    ///
-    /// The vertex label already exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a vertex given its label.
-    /// let i = g.add_vertex_label("0")?;
-    ///
-    /// // Adding an existing vertex label yields an error.
-    /// assert_true!(g.add_vertex_label("0").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn add_vertex_label(&mut self, y: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        let x = self.add_vertex()?;
-        self.set_vertex_label(&x, y)
-    }
-
-    /// Adds vertex label to the graph.
-    ///
-    /// Insert given vertex identifier and label into the graph.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier or label already exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Reserve a vertex given its identifier and label.
-    /// let i = g.reserve_vertex_label(&0, "0")?;
-    /// assert_true!(
-    ///     g.has_vertex(&i) &&                         // 0 in G
-    ///     g.has_vertex_label("0") &&                  // "0" in G
-    ///     matches!(g.get_vertex_label(&i), Ok("0"))   // (0, "0") in G
-    /// );
-    ///
-    /// // Reserving an existing vertex identifier or label yields an error.
-    /// assert_true!(g.reserve_vertex_label(&i, "0").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn reserve_vertex_label(
-        &mut self,
-        x: &Self::Vertex,
-        y: &str,
-    ) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        self.reserve_vertex(x)?;
-        self.set_vertex_label(x, y)
-    }
-
-    /// Extends graph with given vertices.
-    ///
-    /// Extends graph with given sequence of vertex labels.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Extend graph with vertices.
-    /// g.extend_vertices_labels(["0", "3", "1", "2"])?;
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 0);
-    ///
-    /// // Extending with existing vertices yields an error.
-    /// assert_true!(g.extend_vertices_labels(["0"]).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn extend_vertices_labels<'a, I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
-    where
-        I: IntoIterator<Item = &'a str>,
-    {
-        // Get vertex iterator.
-        let iter = iter.into_iter();
-        // Get lower bound size hint.
-        let (lower, _) = iter.size_hint();
-        // Reserve additional capacity.
-        self.reserve(lower);
-        // Add vertex to the graph.
-        for x in iter {
-            self.add_vertex_label(&x)?;
-        }
-
-        Ok(())
-    }
-
-    /// Vertex identifier from label.
-    ///
-    /// Return vertex identifier given its label.
-    ///
-    /// # Errors
-    ///
-    /// The vertex label does not exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a vertex given its label.
-    /// let i = g.add_vertex_label("0")?;
-    ///
-    /// // Get vertex by label.
-    /// let j = g.get_vertex_id("0")?;
-    /// assert_eq!(i, j);
-    ///
-    /// // Getting non-existing vertex label yields an error.
-    /// assert_true!(g.get_vertex_id("1").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn get_vertex_id(&self, x: &str) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        self.as_vertex_labels()
-            .get_by_right(x)
-            .copied()
-            .ok_or_else(|| Error::VertexLabelNotDefined(String::from(x)))
-    }
-
-    /// Vertex label from identifier.
-    ///
-    /// Return vertex label given its identifier.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a vertex given its label.
-    /// let i = g.add_vertex_label("0")?;
-    ///
-    /// // Get vertex by label.
-    /// let j = g.get_vertex_label(&i)?;
-    /// assert_eq!("0", j);
-    ///
-    /// // Getting non-existing vertex label yields an error.
-    /// assert_true!(g.get_vertex_label(&1).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn get_vertex_label(&self, x: &Self::Vertex) -> Result<&str, Error<Self::Vertex>> {
-        self.as_vertex_labels()
-            .get_by_left(x)
-            .map(|x| x.as_str())
-            .ok_or(Error::VertexNotDefined(*x))
-    }
-
-    /// Set vertex label.
-    ///
-    /// Sets vertex label given identifier.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exists in the graph,
-    /// or the vertex label is already defined.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a vertex and set label.
-    /// let i = g.add_vertex()?;
-    /// g.set_vertex_label(&i, "0")?;
-    /// assert_eq!(g.get_vertex_label(&i)?, "0");
-    ///
-    /// // Setting non-existing vertex label yields an error.
-    /// assert_true!(g.set_vertex_label(&1, "1").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn set_vertex_label(
-        &mut self,
-        x: &Self::Vertex,
-        y: &str,
-    ) -> Result<Self::Vertex, Error<Self::Vertex>> {
-        match self.has_vertex(x) {
-            false => Err(Error::VertexNotDefined(*x)),
-            true => match self.as_vertex_labels().contains_right(y) {
-                false => {
-                    // Overwrite previous label if present
-                    self.as_mut_vertex_labels().insert(*x, String::from(y));
-                    Ok(*x)
-                }
-                true => Err(Error::VertexLabelAlreadyDefined(String::from(y))),
-            },
-        }
-    }
-
-    /// Unset vertex label.
-    ///
-    /// Un-sets vertex label given identifier.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exists in the graph,
-    /// or the vertex label is not defined.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a vertex and set label.
-    /// let i = g.add_vertex_label("0")?;
-    /// assert_eq!(g.get_vertex_label(&i)?, "0");
-    ///
-    /// // Un-setting vertex label returns identifier-label pair.
-    /// let (j, k) = g.unset_vertex_label(&i)?;
-    /// assert_true!(
-    ///     i == j &&
-    ///     k == "0" &&
-    ///     !g.has_vertex_label("0")
-    /// );
-    ///
-    /// // Un-setting non-existing vertex label yields an error.
-    /// assert_true!(g.unset_vertex_label(&1).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn unset_vertex_label(
-        &mut self,
-        x: &Self::Vertex,
-    ) -> Result<(Self::Vertex, String), Error<Self::Vertex>> {
-        self.as_mut_vertex_labels()
-            .remove_by_left(x)
-            .ok_or(Error::VertexNotDefined(*x))
-    }
-
-    /// Checks edge label.
-    ///
-    /// Checks whether the graph has a given edge label or not.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a edge given its label.
-    /// let e = g.reserve_edge_label(&(0, 1), "(0, 1)")?;
-    ///
-    /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_edge_label("(0, 1)"));
-    ///
-    /// // Check whether an identifier is associated to a specific label (stable).
-    /// assert_true!(matches!(g.get_edge_label(&e), Ok("(0, 1)")));
-    ///
-    /// // TODO: Check whether an identifier is associated to a specific label (nightly).
-    /// // assert_true!(g.get_edge_label(&e).contains("(0, 1)"));
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn has_edge_label(&self, x: &str) -> bool {
-        self.as_edges_labels().contains_right(x)
-    }
-
-    /// Adds edge label to the graph.
-    ///
-    /// Insert given edge label into the graph.
-    ///
-    /// # Errors
-    ///
-    /// At least one of the vertex identifiers do not exist in the graph,
-    /// or the edge label already exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a 3rd order graph.
-    /// let mut g = Graph::from_order(3);
-    ///
-    /// // Add a edge given its label.
-    /// let e = g.add_edge_label(&(0, 1), "(0, 1)")?;
-    ///
-    /// // Adding an existing edge label yields an error.
-    /// assert_true!(g.add_edge_label(&(0, 2), "(0, 1)").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn add_edge_label(
-        &mut self,
-        x: &(Self::Vertex, Self::Vertex),
-        y: &str,
-    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
-        self.add_edge(x)?;
-        self.set_edge_label(x, y)
-    }
-
-    /// Adds edge label to the graph.
-    ///
-    /// Insert given vertex identifiers, edge identifier and edge label into the graph.
-    ///
-    /// # Errors
-    ///
-    /// At least one of the vertex identifiers already exists in the graph,
-    /// or the edge identifier or label already exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Reserve a edge given its identifier and label.
-    /// let e = g.reserve_edge_label(&(0, 1), "(0, 1)")?;
-    /// assert_true!(
-    ///     g.has_edge(&e)? &&                              // (0, 1) in G
-    ///     g.has_edge_label("(0, 1)") &&                   // "(0, 1)" in G
-    ///     matches!(g.get_edge_label(&e), Ok("(0, 1)"))    // ((0, 1), "(0, 1)") in G
-    /// );
-    ///
-    /// // Reserving an existing edge identifier or label yields an error.
-    /// assert_true!(g.reserve_edge_label(&e, "(0, 1)").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn reserve_edge_label(
-        &mut self,
-        x: &(Self::Vertex, Self::Vertex),
-        y: &str,
-    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
-        self.reserve_edge(x)?;
-        self.set_edge_label(x, y)
-    }
-
-    /// Extends graph with given edges.
-    ///
-    /// Extends graph with given sequence of edges labels.
-    /// Non-existing vertices will be added as well.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Extend graph with edges.
-    /// g.extend_edge_labels([((0, 3), "(0, 3)"), ((1, 2), "(1, 2)")])?;
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 2);
-    ///
-    /// // Extending with existing edges yields an error.
-    /// assert_true!(g.extend_edge_labels([((0, 3), "(0, 3)")]).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn extend_edge_labels<'a, I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
-    where
-        I: IntoIterator<Item = ((Self::Vertex, Self::Vertex), &'a str)>,
-    {
-        // Get edge iterator.
-        let iter = iter.into_iter();
-        // Get lower bound size hint.
-        let (lower, _) = iter.size_hint();
-        // Reserve additional capacity.
-        self.reserve(lower);
-        // Add edge to the graph.
-        for (x, y) in iter {
-            self.reserve_edge_label(&x, y)?;
-        }
-
-        Ok(())
-    }
-
-    /// Edge identifier from label.
-    ///
-    /// Return edge identifier given its label.
-    ///
-    /// # Errors
-    ///
-    /// The edge label does not exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a edge given its label.
-    /// let e = g.reserve_edge_label(&(0, 1), "(0, 1)")?;
-    ///
-    /// // Get edge by label.
-    /// let f = g.get_edge_id("(0, 1)")?;
-    /// assert_eq!(e, f);
-    ///
-    /// // Getting non-existing edge label yields an error.
-    /// assert_true!(g.get_edge_id("(1, 2)").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn get_edge_id(&self, x: &str) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
-        self.as_edges_labels()
-            .get_by_right(x)
-            .copied()
-            .ok_or_else(|| Error::EdgeLabelNotDefined(String::from(x)))
-    }
-
-    /// Edge label from identifier.
-    ///
-    /// Return edge label given its identifier.
-    ///
-    /// # Errors
-    ///
-    /// The edge identifier does not exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a edge given its label.
-    /// let e = g.reserve_edge_label(&(0, 1), "(0, 1)")?;
-    ///
-    /// // Get edge by label.
-    /// let f = g.get_edge_label(&e)?;
-    /// assert_eq!("(0, 1)", f);
-    ///
-    /// // Getting non-existing edge label yields an error.
-    /// assert_true!(g.get_edge_label(&(1, 2)).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    #[inline(always)]
-    fn get_edge_label(
-        &self,
-        x: &(Self::Vertex, Self::Vertex),
-    ) -> Result<&str, Error<Self::Vertex>> {
-        self.as_edges_labels()
-            .get_by_left(x)
-            .map(|x| x.as_str())
-            .ok_or(Error::EdgeNotDefined(*x))
-    }
-
-    /// Set edge label.
-    ///
-    /// Sets edge label given identifier.
-    ///
-    /// # Errors
-    ///
-    /// The edge identifier does not exists in the graph,
-    /// or the edge label is already defined.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a edge and set label.
-    /// let e = g.reserve_edge(&(0, 1))?;
-    /// g.set_edge_label(&e, "(0, 1)")?;
-    /// assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
-    ///
-    /// // Setting non-existing edge label yields an error.
-    /// assert_true!(g.set_edge_label(&(1, 2), "(1, 2)").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn set_edge_label(
-        &mut self,
-        x: &(Self::Vertex, Self::Vertex),
-        y: &str,
-    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
-        match self.has_edge(x)? {
-            false => Err(Error::EdgeNotDefined(*x)),
-            true => match self.as_edges_labels().contains_right(y) {
-                false => {
-                    // Overwrite previous label if present
-                    self.as_mut_edges_labels().insert(*x, String::from(y));
-                    Ok(*x)
-                }
-                true => Err(Error::EdgeLabelAlreadyDefined(String::from(y))),
-            },
-        }
-    }
-
-    /// Unset edge label.
-    ///
-    /// Un-sets edge label given identifier.
-    ///
-    /// # Errors
-    ///
-    /// The edge identifier does not exists in the graph,
-    /// or the edge label is not defined.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), grathe::errors::Error<u32>> {
-    /// // Build a null graph.
-    /// let mut g = Graph::default();
-    ///
-    /// // Add a edge and set label.
-    /// let e = g.reserve_edge_label(&(0, 1), "(0, 1)")?;
-    /// assert_eq!(g.get_edge_label(&e)?, "(0, 1)");
-    ///
-    /// // Un-setting edge label returns identifier-label pair.
-    /// let (f, d) = g.unset_edge_label(&e)?;
-    /// assert_true!(
-    ///     e == f &&
-    ///     d == "(0, 1)" &&
-    ///     !g.has_edge_label("(0, 1)")
-    /// );
-    ///
-    /// // Un-setting non-existing edge label yields an error.
-    /// assert_true!(g.unset_edge_label(&(1, 2)).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn unset_edge_label(
-        &mut self,
-        x: &(Self::Vertex, Self::Vertex),
-    ) -> Result<((Self::Vertex, Self::Vertex), String), Error<Self::Vertex>> {
-        self.as_mut_edges_labels()
-            .remove_by_left(x)
-            .ok_or(Error::EdgeNotDefined(*x))
-    }
 
     /// Is subgraph of another graph.
     ///
