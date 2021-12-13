@@ -54,7 +54,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // Build a new graph.
-    /// let mut g = Graph::from_edges([(0, 1), (2, 3)]);
+    /// let mut g = Graph::from_edges([(&0, &1), (&2, &3)]);
     ///
     /// // The graph *is not* null.
     /// assert_ne!(g.order(), 0);
@@ -78,11 +78,14 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Examples
     ///
     /// ```
+    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // Build a graph with a specific capacity.
     /// let g = Graph::with_capacity(3);
-    /// assert_eq!(g.capacity(), 3);
+    ///
+    /// // Capacity constraints is soft-enforced.
+    /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
     /// assert_eq!(g.order(), 0);
@@ -101,11 +104,14 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # Examples
     ///
     /// ```
+    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // Build a graph with a specific capacity.
     /// let g = Graph::with_capacity(3);
-    /// assert_eq!(g.capacity(), 3);
+    ///
+    /// // Capacity constraints is soft-enforced.
+    /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
     /// assert_eq!(g.order(), 0);
@@ -136,7 +142,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Reserve additional capacity.
     /// g.reserve(3);
-    /// assert_ge!(g.capacity(), 3);
+    ///
+    /// // Capacity constraints is soft-enforced.
+    /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
     /// assert_eq!(g.order(), 0);
@@ -159,11 +167,14 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
-    /// assert_ge!(g.capacity(), 100);
+    ///
+    /// // Capacity constraints is soft-enforced.
+    /// assert_le!(g.capacity(), 100);
     ///
     /// // Shrink capacity to given minimum.
     /// g.shrink_to(50);
-    /// assert_ge!(g.capacity(), 50);
+    ///
+    /// assert_le!(g.capacity(), 50);
     /// ```
     ///
     fn shrink_to(&mut self, min_capacity: usize);
@@ -180,11 +191,14 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
-    /// assert_ge!(g.capacity(), 100);
+    ///
+    /// // Capacity constraints is soft-enforced.
+    /// assert_le!(g.capacity(), 100);
     ///
     /// // Shrink capacity as much as possible.
     /// g.shrink_to_fit();
-    /// assert_eq!(g.capacity(), 0);
+    ///
+    /// assert_le!(g.capacity(), 0);
     /// ```
     ///
     fn shrink_to_fit(&mut self);
@@ -214,6 +228,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn from_order(order: usize) -> Self {
         let mut g = Self::with_capacity(order);
+        // FIXME: That's really bad for performance...
         for x in (0..order).map(|x| Self::Vertex::from_str(&x.to_string()).ok().unwrap()) {
             g.add_vertex(&x).ok();
         }
@@ -235,7 +250,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let sequence = vec![0, 3, 1, 2];
     ///
     /// // Build a graph by consuming a vector of vertex.
-    /// let g = Graph::from_vertices(sequence);
+    /// let g = Graph::from_vertices(&sequence);
     ///
     /// // Build a graph by consuming any `IntoIterator`.
     /// let h = Graph::from_vertices((0..4));
@@ -246,13 +261,13 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let sequence = vec!["0", "3", "1", "2"];
     ///
     /// // Build a graph by consuming a vector of vertex labels.
-    /// let g = GraphWithLabels::from_vertices(sequence);
+    /// let g = GraphLabels::from_vertices(&sequence);
     /// ```
     ///
-    fn from_vertices<'a, I>(iter: I) -> Self
+    fn from_vertices<'a, I, U>(iter: I) -> Self
     where
-        Self: 'a,
-        I: IntoIterator<Item = &'a Self::Vertex>,
+        I: IntoIterator<Item = &'a U>,
+        U: 'a + Eq + Clone + Into<Self::Vertex>,
     {
         // Get vertex iterator.
         let iter = iter.into_iter();
@@ -279,7 +294,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // A sequence of unique edges.
-    /// let sequence = vec![(0, 1), (2, 3), (1, 2)];
+    /// let sequence = vec![(&0, &1), (&2, &3), (&1, &2)];
     ///
     /// // Build a graph by consuming a vector of edges.
     /// let g = Graph::from_edges(sequence);
@@ -290,17 +305,17 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_eq!(g, h);
     ///
     /// // A sequence of unique vertex labels pairs.
-    /// let sequence = vec![("0", "1"), ("2", "3"), ("1", "2")];
+    /// let sequence = vec![(&"0", &"1"), (&"2", &"3"), (&"1", &"2")];
     ///
     /// // Build a graph by consuming a vector of vertex labels pairs.
-    /// let g = GraphWithLabels::from_edges(sequence);
-    /// assert_eq!(E!(g).collect::<Vec<_>>(), [("0", "1"), ("1", "2"), ("2", "3")]);
+    /// let g = GraphLabels::from_edges(sequence);
+    /// assert_eq!(E!(g).collect::<Vec<_>>(), [(&"0", &"1"), (&"1", &"2"), (&"2", &"3")]);
     /// ```
     ///
-    fn from_edges<'a, I>(iter: I) -> Self
+    fn from_edges<'a, I, U>(iter: I) -> Self
     where
-        Self: 'a,
-        I: IntoIterator<Item = (&'a Self::Vertex, &'a Self::Vertex)>,
+        I: IntoIterator<Item = (&'a U, &'a U)>,
+        U: 'a + Eq + Clone + Into<Self::Vertex>,
     {
         // Get edges iterator.
         let iter = iter.into_iter();
@@ -334,13 +349,13 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use grathe::prelude::*;
     ///
     /// // A sequence of uniques edges.
-    /// let x = EdgeList::from([(0, 1), (1, 0)]);
+    /// let sequence = [(&0, &1), (&1, &0)];
     ///
     /// // Build a graph from a sequence of edges.
-    /// let g = Graph::from_edges(x.clone());
+    /// let g = Graph::from_edges(sequence);
     ///
     /// // Return an edge list (a.k.a. a *set* of edges) from the graph.
-    /// assert_eq!(g.to_edge_list(), x);
+    /// assert_eq!(g.to_edge_list(), EdgeList::from(sequence.map(|(x, y)| (x.clone(), y.clone()))));
     /// ```
     ///
     fn to_edge_list(&self) -> EdgeList<Self::Vertex> {
@@ -434,7 +449,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_order(3);
     ///
     /// // Use the vertex set iterator.
-    /// let V: Vec<_> = g.vertices_iter().collect();
+    /// let V: Vec<_> = g.vertices_iter().cloned().collect();
     /// assert_eq!(V, [0, 1, 2]);
     ///
     /// // Use the associated macro 'V!'.
@@ -442,7 +457,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Iterate over the vertex set.
     /// for x in V!(g) {
-    ///     assert_true!(g.has_vertex(&x));
+    ///     assert_true!(g.has_vertex(x));
     /// }
     /// ```
     ///
@@ -458,20 +473,20 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a 3rd order graph.
-    /// let g = Graph::from_edges([(0, 1), (1, 0)]);
+    /// let g = Graph::from_edges([(&0, &1), (&1, &0)]);
     ///
     /// // Use the vertex set iterator.
     /// let x: Vec<_> = g.edges_iter().collect();
-    /// assert_eq!(x, [(0, 1), (1, 0)]);
+    /// assert_eq!(x, [(&0, &1), (&1, &0)]);
     ///
     /// // Use the associated macro 'E!'.
     /// assert_true!(g.edges_iter().eq(E!(g)));
     ///
     /// // Iterate over the vertex set.
     /// for x in E!(g) {
-    ///     assert_true!(g.has_edge(&x)?);
+    ///     assert_true!(g.has_edge(x)?);
     /// }
     /// # Ok(())
     /// # }
@@ -494,13 +509,13 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>>
+    /// # fn main() -> Result<(), anyhow::Error>
     /// # {
     /// // Build a graph from edges.
-    /// let g = Graph::from_edges([(0, 1), (2, 0), (0, 0)]);
+    /// let g = Graph::from_edges([(&0, &1), (&2, &0), (&0, &0)]);
     ///
     /// // Use the adjacent iterator.
-    /// let A: Vec<_> = g.adjacents_iter(&0)?.collect();
+    /// let A: Vec<_> = g.adjacents_iter(&0)?.cloned().collect();
     /// assert_eq!(A, [0, 1, 2]);
     ///
     /// // Use the associated macro 'Adj!'.
@@ -508,7 +523,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Iterate over the adjacent set.
     /// for x in Adj!(g, &0)? {
-    ///     assert_true!(g.has_edge(&(0, x))?);
+    ///     assert_true!(g.has_edge((&0, x))?);
     /// }
     ///
     /// // Iterating over non-existing vertex yields an error.
@@ -559,7 +574,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Build a 5th size graph.
     /// let g = Graph::from_edges([
-    ///     (0, 1), (2, 0), (3, 2), (1, 2), (1, 1)
+    ///     (&0, &1), (&2, &0), (&3, &2), (&1, &2), (&1, &1)
     /// ]);
     /// assert_eq!(g.size(), 5);
     /// ```
@@ -576,7 +591,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a 2nd order graph.
     /// let g = Graph::from_order(2);
     ///
@@ -585,13 +600,13 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_false!(g.has_vertex(&2));
     ///
     /// // Build a null graph.
-    /// let mut g = GraphWithLabels::default();
+    /// let mut g = GraphLabels::default();
     ///
     /// // Add a vertex given its label.
-    /// let i = g.add_vertex("0")?;
+    /// let i = g.add_vertex(&"0")?;
     ///
     /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_vertex("0"));
+    /// assert_true!(g.has_vertex(&"0"));
     /// # Ok(())
     /// # }
     /// ```
@@ -614,22 +629,22 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::default();
     ///
     /// // Add a new vertex.
     /// let i = g.add_vertex(&0)?;
-    /// assert_true!(g.has_vertex(&i));
+    /// assert_true!(g.has_vertex(i));
     ///
     /// // Build a null graph.
-    /// let mut g = GraphWithLabels::default();
+    /// let mut g = GraphLabels::default();
     ///
     /// // Add a vertex given its label.
-    /// let i = g.add_vertex("0")?;
+    /// let i = g.add_vertex(&"0")?;
     ///
     /// // Adding an existing vertex label yields an error.
-    /// assert_true!(g.add_vertex("0").is_err());
+    /// assert_true!(g.add_vertex(&"0").is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -648,28 +663,28 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::default();
     ///
     /// // Extend graph with vertices.
-    /// g.extend_vertices([0, 3, 1, 2])?;
+    /// g.extend_vertices(&[0, 3, 1, 2])?;
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 0);
     ///
     /// // Extending with existing vertices yields an error.
-    /// assert_true!(g.extend_vertices([0]).is_err());
+    /// assert_true!(g.extend_vertices(&[0]).is_err());
     ///
     /// // Build a null graph.
-    /// let mut g = GraphWithLabels::default();
+    /// let mut g = GraphLabels::default();
     ///
     /// // Extend graph with vertices.
-    /// g.extend_vertices(["0", "3", "1", "2"])?;
+    /// g.extend_vertices(&["0", "3", "1", "2"])?;
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 0);
     ///
     /// // Extending with existing vertices yields an error.
-    /// assert_true!(g.extend_vertices(["0"]).is_err());
+    /// assert_true!(g.extend_vertices(&["0"]).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -708,23 +723,23 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::default();
     ///
     /// // Add a new vertex.
-    /// let i = g.add_vertex()?;
-    /// assert_true!(g.has_vertex(&i));
+    /// let i = g.add_vertex(&0)?;
+    /// assert_true!(g.has_vertex(i));
     ///
     /// // Delete the newly added vertex.
-    /// let j = g.del_vertex(&i)?;
-    /// assert_false!(g.has_vertex(&i));
+    /// let j = g.del_vertex(i)?;
+    /// assert_false!(g.has_vertex(i));
     ///
     /// // Deleting a vertex returns its identifier.
     /// assert_eq!(i, j);
     ///
     /// // Deleting a non-existing vertex yields an error.
-    /// assert_true!(g.del_vertex(&i).is_err());
+    /// assert_true!(g.del_vertex(i).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -747,24 +762,24 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (3, 2)]);
+    /// let g = Graph::from_edges([(&0, &1), (&3, &2)]);
     ///
     /// // Check edge.
-    /// assert_true!(g.has_edge(&(0, 1))?);
+    /// assert_true!(g.has_edge((&0, &1))?);
     ///
     /// // Checking an edge with non-existing vertex yields an error.
-    /// assert_true!(g.has_edge(&(0, 42)).is_err());
+    /// assert_true!(g.has_edge((&0, &42)).is_err());
     ///
     /// // Build a null graph.
-    /// let mut g = GraphWithLabels::default();
+    /// let mut g = GraphLabels::default();
     ///
     /// // Add a edge given its label.
-    /// let x = g.reserve_edge(("0", "1"))?;
+    /// let x = g.reserve_edge((&"0", &"1"))?;
     ///
     /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_edge(("0", "1"));
+    /// assert_true!(g.has_edge((&"0", &"1"))?);
     /// # Ok(())
     /// # }
     /// ```
@@ -788,25 +803,25 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a 2nd order graph.
     /// let mut g = Graph::from_order(2);
     ///
     /// // Add a new edge from vertex.
-    /// let x = g.add_edge(&(0, 1))?;
-    /// assert_true!(g.has_edge(&x)?);
+    /// let x = g.add_edge((&0, &1))?;
+    /// assert_true!(g.has_edge(x)?);
     ///
     /// // Adding an existing edge yields an error.
-    /// assert_true!(g.add_edge(&x).is_err());
+    /// assert_true!(g.add_edge(x).is_err());
     ///
     /// // Build a 3rd order graph.
-    /// let mut g = GraphWithLabels::from_order(3);
+    /// let mut g = GraphLabels::from_order(3);
     ///
     /// // Add a edge given its label.
-    /// let x = g.add_edge(("0", "1"))?;
+    /// let x = g.add_edge((&"0", &"1"))?;
     ///
     /// // Adding an existing edge label yields an error.
-    /// assert_true!(g.add_edge(("0", "1")).is_err());
+    /// assert_true!(g.add_edge((&"0", &"1")).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -830,38 +845,38 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::default();
     ///
     /// // Add a new edge with specific identifiers.
-    /// let x = g.reserve_edge(&(0, 1))?;
+    /// let x = g.reserve_edge((&0, &1))?;
     /// assert_true!(
     ///     g.has_vertex(&0) &&
     ///     g.has_vertex(&1) &&
-    ///     g.has_edge(&x)?
+    ///     g.has_edge(x)?
     /// );
     ///
     /// // Reserving an existing edge yields an error.
-    /// assert_true!(g.reserve_edge(&x).is_err());
+    /// assert_true!(g.reserve_edge(x).is_err());
     ///
     /// // Also, reserving a non-existing edge with.
     /// // at least one existing vertex yields an error...
-    /// assert_true!(g.reserve_edge(&(0, 2)).is_err());
+    /// assert_true!(g.reserve_edge((&0, &2)).is_err());
     ///
     /// // ..but adding them is fine.
     /// g.add_vertex(&2)?;
-    /// assert_false!(g.add_edge(&(0, 2)).is_err());
+    /// assert_false!(g.add_edge((&0, &2)).is_err());
     ///
     /// // Build a null graph.
-    /// let mut g = GraphWithLabels::default();
+    /// let mut g = GraphLabels::default();
     ///
     /// // Reserve a edge given its identifier and label.
-    /// let x = g.reserve_edge(("0", "1"))?;
-    /// assert_true!(g.has_edge(&x)?);
+    /// let x = g.reserve_edge((&"0", &"1"))?;
+    /// assert_true!(g.has_edge(x)?);
     ///
     /// // Reserving an existing edge identifier or label yields an error.
-    /// assert_true!(g.reserve_edge(("0", "1")).is_err());
+    /// assert_true!(g.reserve_edge((&"0", &"1")).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -890,17 +905,17 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::default();
     ///
     /// // Extend graph with edges.
-    /// g.extend_edges([(0, 3), (1, 2)])?;
+    /// g.extend_edges([(&0, &3), (&1, &2)])?;
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 2);
     ///
     /// // Extending with existing edges yields an error.
-    /// assert_true!(g.extend_edges([(0, 3)]).is_err());
+    /// assert_true!(g.extend_edges([(&0, &3)]).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -940,34 +955,34 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::default();
     ///
     /// // Add a new edge.
-    /// let x = g.reserve_edge(&(0, 1))?;
-    /// assert_true!(g.has_edge(&x)?);
+    /// let x = g.reserve_edge((&0, &1))?;
+    /// assert_true!(g.has_edge(x)?);
     ///
     /// // Delete the newly added edge.
-    /// let f = g.del_edge(&x)?;
-    /// assert_false!(g.has_edge(&x)?);
+    /// let f = g.del_edge(x)?;
+    /// assert_false!(g.has_edge(x)?);
     ///
     /// // Deleting a edge returns its identifier.
     /// assert_eq!(x, f);
     ///
     /// // Deleting a non-existing edge yields an error.
-    /// assert_true!(g.del_edge(&x).is_err());
+    /// assert_true!(g.del_edge(x).is_err());
     ///
     /// // Build a null graph.
-    /// let mut g = GraphWithLabels::default();
+    /// let mut g = GraphLabels::default();
     ///
     /// // Extend graph with edges.
-    /// g.extend_edge([("0", "3"), ("1", "2")])?;
+    /// g.extend_edges([(&"0", &"3"), (&"1", &"2")])?;
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 2);
     ///
     /// // Extending with existing edges yields an error.
-    /// assert_true!(g.extend_edge([("0", "3")]).is_err());
+    /// assert_true!(g.extend_edges([(&"0", &"3")]).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -1042,9 +1057,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edges([(&0, &1), (&2, &1), (&3, &1)]);
     ///
     /// // Get the degree of `1`.
     /// assert_true!(
@@ -1080,9 +1095,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edges([(&0, &1), (&2, &1), (&3, &1)]);
     ///
     /// // Check if `0` is isolated (a.k.a not connected).
     /// assert_false!(g.is_isolated_vertex(&0)?);
@@ -1115,9 +1130,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), grathe::errors::Error<i32>> {
+    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
-    /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
+    /// let g = Graph::from_edges([(&0, &1), (&2, &1), (&3, &1)]);
     ///
     /// // Check if `0` is pendant (a.k.a is connected to just one vertex).
     /// assert_true!(g.is_pendant_vertex(&0)?);

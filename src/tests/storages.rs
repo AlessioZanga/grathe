@@ -134,7 +134,7 @@ mod tests {
     {
         let g = T::with_capacity(3);
         // FIXME: capacity constraints is soft-enforced.
-        // assert_eq!(g.capacity(), 3);
+        assert_le!(g.capacity(), 3);
 
         // The order is still zero.
         assert_eq!(g.order(), 0);
@@ -186,7 +186,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::from_vertices([]);
+        let mut g = T::from_vertices::<_, i32>([]);
 
         // Test min graph vertex set.
         assert_eq!(g.order(), 0);
@@ -215,7 +215,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::from_edges([]);
+        let mut g = T::from_edges::<_, i32>([]);
 
         // Test min graph vertex set.
         assert_eq!(g.size(), 0);
