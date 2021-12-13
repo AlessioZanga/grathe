@@ -7,10 +7,10 @@ use std::hash::Hash;
 use std::str::FromStr;
 
 /// The base vertex trait.
-pub trait VertexTrait: PartialEq + Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
+pub trait VertexTrait: Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
 
 // Blanket implementation of vertex trait.
-impl<T> VertexTrait for T where T: PartialEq + Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
+impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
 
 // TODO: Where clauses are not enforced in type aliases,
 // once done we should add "where T: VertexTrait" down here.

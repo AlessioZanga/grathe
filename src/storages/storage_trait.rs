@@ -517,10 +517,12 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn adjacents_iter<'a>(
+    fn adjacents_iter<'a, U>(
         &'a self,
-        x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
+        x: &U,
+    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>;
 
     /// Order of the graph.
     ///
@@ -594,7 +596,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn has_vertex(&self, x: &Self::Vertex) -> bool;
+    fn has_vertex<U>(&self, x: &U) -> bool
+    where
+        U: Eq + Clone + Into<Self::Vertex>;
 
     /// Adds vertex to the graph.
     ///
@@ -630,10 +634,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn add_vertex<'a>(
-        &mut self,
-        x: &'a Self::Vertex,
-    ) -> Result<&'a Self::Vertex, Error<Self::Vertex>>;
+    fn add_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>;
 
     /// Extends graph with given vertices.
     ///
@@ -672,10 +675,10 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn extend_vertices<'a, I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    fn extend_vertices<'a, I, U>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
     where
-        Self: 'a,
-        I: IntoIterator<Item = &'a Self::Vertex>,
+        I: IntoIterator<Item = &'a U>,
+        U: 'a + Eq + Clone + Into<Self::Vertex>,
     {
         // Get vertex iterator.
         let iter = iter.into_iter();
@@ -726,10 +729,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn del_vertex<'a>(
-        &mut self,
-        x: &'a Self::Vertex,
-    ) -> Result<&'a Self::Vertex, Error<Self::Vertex>>;
+    fn del_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>;
 
     /// Checks edge in the graph.
     ///
@@ -767,10 +769,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn has_edge<'a>(
-        &self,
-        x: (&'a Self::Vertex, &'a Self::Vertex),
-    ) -> Result<bool, Error<Self::Vertex>>;
+    fn has_edge<'a, U>(&self, x: (&'a U, &'a U)) -> Result<bool, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>;
 
     /// Adds edge to the graph.
     ///
@@ -810,10 +811,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn add_edge<'a>(
-        &mut self,
-        x: (&'a Self::Vertex, &'a Self::Vertex),
-    ) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>>;
+    fn add_edge<'a, U>(&mut self, x: (&'a U, &'a U)) -> Result<(&'a U, &'a U), Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>;
 
     /// Adds edge to the graph.
     ///
@@ -867,12 +867,15 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn reserve_edge<'a>(
+    fn reserve_edge<'a, U>(
         &mut self,
-        x: (&'a Self::Vertex, &'a Self::Vertex),
-    ) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>> {
-        self.add_vertex(&x.0)?;
-        self.add_vertex(&x.1)?;
+        x: (&'a U, &'a U),
+    ) -> Result<(&'a U, &'a U), Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        self.add_vertex(x.0)?;
+        self.add_vertex(x.1)?;
         self.add_edge(x)
     }
 
@@ -903,10 +906,10 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn extend_edges<'a, I>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    fn extend_edges<'a, I, U>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
     where
-        Self: 'a,
-        I: IntoIterator<Item = (&'a Self::Vertex, &'a Self::Vertex)>,
+        I: IntoIterator<Item = (&'a U, &'a U)>,
+        U: 'a + Eq + Clone + Into<Self::Vertex>,
     {
         // Get edge iterator.
         let iter = iter.into_iter();
@@ -969,10 +972,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn del_edge<'a>(
-        &mut self,
-        x: (&'a Self::Vertex, &'a Self::Vertex),
-    ) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>>;
+    fn del_edge<'a, U>(&mut self, x: (&'a U, &'a U)) -> Result<(&'a U, &'a U), Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>;
 
     /// Is subgraph of another graph.
     ///
@@ -1057,7 +1059,10 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn degree_of<'a>(&self, x: &'a Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
+    fn degree_of<U>(&self, x: &U) -> Result<usize, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
         Ok(Adj!(self, x)?.count())
     }
 
@@ -1089,7 +1094,10 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn is_isolated_vertex<'a>(&self, x: &'a Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
+    fn is_isolated_vertex<U>(&self, x: &U) -> Result<bool, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
         Ok(self.degree_of(x)? == 0)
     }
 
@@ -1121,7 +1129,10 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn is_pendant_vertex<'a>(&self, x: &'a Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
+    fn is_pendant_vertex<U>(&self, x: &U) -> Result<bool, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
         Ok(self.degree_of(x)? == 1)
     }
 }

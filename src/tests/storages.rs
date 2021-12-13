@@ -94,7 +94,7 @@ mod tests {
     #[test]
     fn default<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait,
+        T: StorageTrait<Vertex = i32>,
     {
         // Test default call.
         let g = T::default();
@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn with_capacity<T>()
     where
-        T: StorageTrait,
+        T: StorageTrait<Vertex = i32>,
     {
         let g = T::with_capacity(3);
         // FIXME: capacity constraints is soft-enforced.
@@ -146,7 +146,7 @@ mod tests {
     #[test]
     fn reserve<T>()
     where
-        T: StorageTrait,
+        T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::default();
 
@@ -301,7 +301,7 @@ mod tests {
     #[test]
     fn vertices_iter<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait,
+        T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::from_order(0);
         assert_eq!(V!(g).count(), 0);
@@ -310,7 +310,7 @@ mod tests {
         assert_eq!(V!(g).count(), N as usize);
 
         assert_true!(V!(g).eq(g.vertices_iter()));
-        assert_true!(V!(g).all(|x| g.has_vertex(&x)));
+        assert_true!(V!(g).all(|x| g.has_vertex(x)));
         assert_true!(is_sorted(V!(g)));
 
         // Check iterator size hint.
@@ -395,7 +395,7 @@ mod tests {
         assert_eq!(g.order(), 1);
 
         // Test decreasing graph order.
-        g.del_vertex(&i)?;
+        g.del_vertex(i)?;
         assert_eq!(g.order(), 0);
 
         // Test high graph order.
@@ -446,11 +446,11 @@ mod tests {
 
         // Test add first vertex.
         let i = g.add_vertex(&0)?;
-        assert_true!(g.has_vertex(&i));
+        assert_true!(g.has_vertex(i));
 
         // Test del first vertex.
-        g.del_vertex(&i)?;
-        assert_false!(g.has_vertex(&i));
+        g.del_vertex(i)?;
+        assert_false!(g.has_vertex(i));
 
         // Test sequence of vertex.
         g = T::from_order(N as usize);
@@ -544,11 +544,11 @@ mod tests {
         let j = g.add_vertex(&1)?;
         g.add_edge((i, j))?;
         g.add_edge((j, i))?;
-        g.del_vertex(&i)?;
+        g.del_vertex(i)?;
         assert_true!(g.has_edge((i, j)).is_err());
         assert_true!(g.has_edge((j, i)).is_err());
-        assert_true!(Adj!(g, &i).is_err());
-        assert_true!(!Adj!(g, &j)?.any(|x| x == i));
+        assert_true!(Adj!(g, i).is_err());
+        assert_true!(!Adj!(g, j)?.any(|x| x == i));
 
         Ok(())
     }

@@ -63,13 +63,19 @@ where
     }
 
     #[inline(always)]
-    fn adjacents_iter<'a>(
+    fn adjacents_iter<'a, U>(
         &'a self,
-        x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>> {
-        match self.get(&x) {
+        x: &U,
+    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        // Get vertex identifier.
+        let i = x.clone().into();
+        // Get iterator over adjacent vertices.
+        match self.get(&i) {
             Some(i) => Ok(Box::new(i.iter())),
-            None => Err(Error::VertexNotDefined(x.clone())),
+            None => Err(Error::VertexNotDefined(i)),
         }
     }
 
@@ -87,38 +93,47 @@ where
     }
 
     #[inline(always)]
-    fn has_vertex(&self, x: &Self::Vertex) -> bool {
+    fn has_vertex<U>(&self, x: &U) -> bool
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        // Get vertex identifier.
+        let i = x.clone().into();
         // Check if map contains key.
-        self.contains_key(&x)
+        self.contains_key(&i)
     }
 
     #[inline(always)]
-    fn add_vertex<'a>(
-        &mut self,
-        x: &'a Self::Vertex,
-    ) -> Result<&'a Self::Vertex, Error<Self::Vertex>> {
+    fn add_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        // Get vertex identifier.
+        let i = x.clone().into();
         // TODO: Update using insert once stable.
         if self.has_vertex(x) {
-            return Err(Error::VertexAlreadyDefined(x.clone()));
+            return Err(Error::VertexAlreadyDefined(i));
         }
-        self.insert(x.clone(), BTreeSet::new());
+        self.insert(i, BTreeSet::new());
         Ok(x)
     }
 
     #[inline(always)]
-    fn del_vertex<'a>(
-        &mut self,
-        x: &'a Self::Vertex,
-    ) -> Result<&'a Self::Vertex, Error<Self::Vertex>> {
+    fn del_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        // Get vertex identifier.
+        let i = x.clone().into();
         // Remove vertex from map.
-        match self.remove(&x) {
+        match self.remove(&i) {
             // If no vertex found return error.
-            None => Err(Error::VertexNotDefined(x.clone())),
+            None => Err(Error::VertexNotDefined(i)),
             // Otherwise
             Some(_) => {
                 // Remove remaining identifiers if any
                 for (_, y) in self.iter_mut() {
-                    y.remove(&x);
+                    y.remove(&i);
                 }
                 // Return success
                 Ok(x)
@@ -127,42 +142,49 @@ where
     }
 
     #[inline(always)]
-    fn has_edge<'a>(
-        &self,
-        (x, y): (&'a Self::Vertex, &'a Self::Vertex),
-    ) -> Result<bool, Error<Self::Vertex>> {
+    fn has_edge<'a, U>(&self, (x, y): (&'a U, &'a U)) -> Result<bool, Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        // Get vertex identifier.
+        let (i, j) = (x.clone().into(), y.clone().into());
         // Get vertex adjacency list.
-        match self.get(x) {
+        match self.get(&i) {
             // If no vertex found return error.
-            None => Err(Error::VertexNotDefined(x.clone())),
+            None => Err(Error::VertexNotDefined(i)),
             // Otherwise check second vertex.
-            Some(adj) => match self.contains_key(y) {
+            Some(adj) => match self.contains_key(&j) {
                 // If no vertex found return error.
-                false => Err(Error::VertexNotDefined(y.clone())),
+                false => Err(Error::VertexNotDefined(j)),
                 // Otherwise check if it is in the adjacency list.
-                true => Ok(adj.contains(y)),
+                true => Ok(adj.contains(&j)),
             },
         }
     }
 
     #[inline(always)]
-    fn add_edge<'a>(
+    fn add_edge<'a, U>(
         &mut self,
-        (x, y): (&'a Self::Vertex, &'a Self::Vertex),
-    ) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>> {
+        (x, y): (&'a U, &'a U),
+    ) -> Result<(&'a U, &'a U), Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        // Get vertex identifier.
+        let (i, j) = (x.clone().into(), y.clone().into());
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
-        match self.contains_key(x) {
+        match self.contains_key(&j) {
             // If no vertex found return error.
-            false => Err(Error::VertexNotDefined(y.clone())),
+            false => Err(Error::VertexNotDefined(j)),
             // Otherwise get mutable vertex adjacency list.
-            true => match self.get_mut(x) {
+            true => match self.get_mut(&i) {
                 // If no vertex exists return error.
-                None => Err(Error::VertexNotDefined(x.clone())),
+                None => Err(Error::VertexNotDefined(i)),
                 // Otherwise try to insert vertex into adjacency list.
-                Some(adj) => match adj.insert(y.clone()) {
+                Some(adj) => match adj.insert(j.clone()) {
                     // If edge already defined return error.
-                    false => Err(Error::EdgeAlreadyDefined((x.clone(), y.clone()))),
+                    false => Err(Error::EdgeAlreadyDefined((i, j))),
                     // Otherwise return successful.
                     true => Ok((x, y)),
                 },
@@ -171,22 +193,27 @@ where
     }
 
     #[inline(always)]
-    fn del_edge<'a>(
+    fn del_edge<'a, U>(
         &mut self,
-        (x, y): (&'a Self::Vertex, &'a Self::Vertex),
-    ) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>> {
+        (x, y): (&'a U, &'a U),
+    ) -> Result<(&'a U, &'a U), Error<Self::Vertex>>
+    where
+        U: Eq + Clone + Into<Self::Vertex>,
+    {
+        // Get vertex identifier.
+        let (i, j) = (x.clone().into(), y.clone().into());
         // Check if second vertex exists.
-        match self.contains_key(y) {
+        match self.contains_key(&j) {
             // If no vertex found return error.
-            false => Err(Error::VertexNotDefined(y.clone())),
+            false => Err(Error::VertexNotDefined(j)),
             // Otherwise get mutable vertex adjacency list.
-            true => match self.get_mut(x) {
+            true => match self.get_mut(&i) {
                 // If no vertex exists return error.
-                None => Err(Error::VertexNotDefined(x.clone())),
+                None => Err(Error::VertexNotDefined(i)),
                 // Otherwise try to remove vertex from adjacency list.
-                Some(adj) => match adj.remove(y) {
+                Some(adj) => match adj.remove(&j) {
                     // If no edge defined return error.
-                    false => Err(Error::EdgeNotDefined((x.clone(), y.clone()))),
+                    false => Err(Error::EdgeNotDefined((i, j))),
                     // Otherwise
                     true => {
                         // Return success

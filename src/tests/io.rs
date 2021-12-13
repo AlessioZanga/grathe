@@ -7,8 +7,7 @@ mod tests {
     use tempfile::NamedTempFile;
 
     // Set DOT string
-    const DOT: &str =
-        "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n\t0 -- 1 [label=\"A -- B\"];\n}\n";
+    const DOT: &str = "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n";
 
     fn load_test_data() -> Vec<PathBuf> {
         std::fs::read_dir("src/tests/data")
@@ -21,24 +20,23 @@ mod tests {
     #[test]
     fn from_dot() -> Result<(), Error<String>> {
         let mut g = UndirectedAdjacencyListGraph::<String>::default();
-    fn from_dot() -> Result<(), Error<u32>> {
-        let mut g = UndirectedAdjacencyListGraph::<u32>::default();
-        let i = g.add_vertex_label("A")?;
-        let j = g.add_vertex_label("B")?;
-        g.add_edge_label(&(i, j), "A -- B")?;
-        let h = crate::io::from_dot::<UndirectedAdjacencyListGraph<u32>>(DOT)
+        let i = g.add_vertex(&"A")?;
+        let j = g.add_vertex(&"B")?;
+        g.add_edge((i, j))?;
         let h = crate::io::from_dot::<UndirectedAdjacencyListGraph<String>>(DOT)
             .unwrap()
             .pop()
             .unwrap();
         assert_eq!(g, h);
+
         Ok(())
     }
 
     #[test]
     fn read_dot() {
         for path in load_test_data() {
-            let parsed = crate::io::read_dot::<UndirectedAdjacencyListGraph<String>>(&path).unwrap();
+            let parsed =
+                crate::io::read_dot::<UndirectedAdjacencyListGraph<String>>(&path).unwrap();
             println!("{:?}", parsed);
         }
     }

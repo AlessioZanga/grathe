@@ -7,8 +7,7 @@ mod tests {
     use tempfile::NamedTempFile;
 
     // Set DOT string
-    const DOT: &str =
-        "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n\t0 -- 1 [label=\"A -- B\"];\n}\n";
+    const DOT: &str = "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n";
 
     #[test]
     fn from_dot<T>() -> Result<(), Error<String>>
@@ -32,9 +31,9 @@ mod tests {
     {
         // Init graph
         let mut g = T::default();
-        let i = g.add_vertex_label("A")?;
-        let j = g.add_vertex_label("B")?;
-        g.add_edge_label(&(i, j), "A -- B")?;
+        let i = g.add_vertex(&"A")?;
+        let j = g.add_vertex(&"B")?;
+        g.add_edge((i, j))?;
         // Test
         assert_eq!(g.to_dot()?, DOT);
 
@@ -63,9 +62,9 @@ mod tests {
     {
         // Init graph
         let mut g = T::default();
-        let i = g.add_vertex_label("A")?;
-        let j = g.add_vertex_label("B")?;
-        g.add_edge_label(&(i, j), "A -- B")?;
+        let i = g.add_vertex(&"A")?;
+        let j = g.add_vertex(&"B")?;
+        g.add_edge((i, j))?;
         // Get temporary file path
         let path = NamedTempFile::new().unwrap().into_temp_path();
         // Write to DOT file
