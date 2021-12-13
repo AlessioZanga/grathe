@@ -21,16 +21,16 @@ where
     #[inline(always)]
     fn neighbors_iter<'a>(
         &'a self,
-        x: &Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>> {
+        x: &'a Self::Vertex,
+    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>> {
         self.adjacents_iter(x)
     }
 
     #[inline(always)]
-    fn add_undirected_edge(
+    fn add_undirected_edge<'a>(
         &mut self,
-        e: &(Self::Vertex, Self::Vertex),
-    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
-        self.add_edge(e)
+        x: (&'a Self::Vertex, &'a Self::Vertex),
+    ) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>> {
+        self.add_edge(x)
     }
 }

@@ -4,27 +4,28 @@ use nasparse::CsrMatrix;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
+use std::str::FromStr;
 
 /// The base vertex trait.
-pub trait VertexTrait: PartialEq + Eq + Ord + Copy + Default + Debug + Hash + TryFrom<usize> { }
+pub trait VertexTrait: PartialEq + Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
 
 // Blanket implementation of vertex trait.
-impl<T> VertexTrait for T where T: PartialEq + Eq + Ord + Copy + Default + Debug + Hash + TryFrom<usize> { }
+impl<T> VertexTrait for T where T: PartialEq + Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
 
 // TODO: Where clauses are not enforced in type aliases,
 // once done we should add "where T: VertexTrait" down here.
 
 /// Vertex iterator trait (a.k.a Iterator<Item = Vertex> + Debug)
-pub trait VertexIterator<T>: Iterator<Item = T> + Debug where T: VertexTrait {}
+pub trait VertexIterator<T>: Iterator<Item = T> + Debug {}
 
 // Blanket implementation of vertex iterator trait.
-impl<T, U> VertexIterator<U> for T where T: Iterator<Item = U> + Debug, U: VertexTrait {}
+impl<T, U> VertexIterator<U> for T where T: Iterator<Item = U> + Debug {}
 
 /// Edge iterator trait (a.k.a Iterator<Item = Edge> + Debug)
-pub trait EdgeIterator<T>: Iterator<Item = (T, T)> + Debug where T: VertexTrait {}
+pub trait EdgeIterator<T>: Iterator<Item = T> + Debug {}
 
 // Blanket implementation of edge iterator trait.
-impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = (U, U)> + Debug, U: VertexTrait {}
+impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = U> + Debug {}
 
 /// Label bidirectional map type.
 pub type LabelMap<T> = BiHashMap<T, String>;

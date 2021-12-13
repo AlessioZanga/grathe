@@ -10,10 +10,10 @@ pub mod directions;
 pub mod errors;
 
 /// Graphs types, traits and structs.
-// pub mod graphs;
+pub mod graphs;
 
 /// I/O operations.
-// pub mod io;
+pub mod io;
 
 /// Frequently used items.
 pub mod prelude;

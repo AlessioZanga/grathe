@@ -8,6 +8,7 @@ use pest::Parser;
 use std::fmt::Write;
 use std::fs::{read_to_string, write};
 use std::path::Path;
+use std::str::FromStr;
 
 // Workaround to print warning messages during tests
 #[cfg(not(test))]
@@ -142,15 +143,20 @@ where
                         );
                         // Insert path
                         let e = match e {
-                            (DOTValue::Vertex(x), DOTValue::Vertex(y)) => graph.add_edge(&(x, y)),
+                            (DOTValue::Vertex(x), DOTValue::Vertex(y)) => {
+                                match graph.add_edge((&x, &y)) {
+                                    Err(e) => Err(e),
+                                    Ok(_) => Ok((x, y)),
+                                }
+                            }
                             // FIXME: Handling subgraphs
                             _ => unreachable!(),
                         };
                         // Return path
                         match e {
-                            Err(Error::EdgeAlreadyDefined(x)) => x,
+                            Err(Error::EdgeAlreadyDefined(e)) => e,
                             Err(_) => unreachable!(),
-                            Ok(x) => x,
+                            Ok(e) => e,
                         }
                     })
                     // Collect sequence of edges into path
@@ -193,34 +199,26 @@ where
                 // Get vertex identifier
                 let j = i.next().unwrap();
                 // Get underlying text representation
-                let k = j.as_str();
-                // Match identifier type
-                let x = match j.as_rule() {
-                    // Match text type
-                    Rule::text => graph.add_vertex(k),
-                    // Match quoted text type by removing quoting
-                    Rule::quoted_text => graph.add_vertex(k.trim_matches('"')),
-                    // Match number type
-                    // FIXME: Can Rule::number be a float? Use it as string?
-                    Rule::number => graph.add_vertex(&k.parse::<T::Vertex>().ok().unwrap()),
-                    // Match everything else
-                    _ => unreachable!(),
-                };
+                let k = to_label(j);
+                // Map text representation to vertex
+                let k = T::Vertex::from_str(k);
+                // Assert conversion succeeded
+                let k = k.ok().unwrap();
                 // Handle errors
-                let x = match x {
+                let k = match graph.add_vertex(&k) {
                     // Match vertex identifier already defined error
-                    Err(Error::VertexAlreadyDefined(x)) => x,
+                    Err(Error::VertexAlreadyDefined(k)) => k,
                     // Give up on other errors
                     Err(_) => unreachable!(),
                     // Match ok on success
-                    Ok(x) => x,
+                    Ok(_) => k,
                 };
                 // TODO: Add vertex port
-                if let Some(x) = i.next() {
-                    warn!("Vertex port '{}' ignored.", x.as_str());
+                if let Some(k) = i.next() {
+                    warn!("Vertex port '{}' ignored.", k.as_str());
                 }
                 // Return vertex identifier
-                return Ok(DOTValue::Vertex(x));
+                return Ok(DOTValue::Vertex(k));
             }
             _ => {
                 // TODO: Handle missing rules

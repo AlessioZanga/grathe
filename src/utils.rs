@@ -106,17 +106,17 @@ macro_rules! impl_ungraph_trait {
                     fn reserve(&mut self, additional: usize);
                     fn shrink_to(&mut self, min_capacity: usize);
                     fn shrink_to_fit(&mut self);
-                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
-                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
+                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a>;
+                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a>;
                     fn adjacents_iter<'a>(
                         &'a self,
-                        x: &Self::Vertex,
-                    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                        x: &'a Self::Vertex,
+                    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
-                    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
-                    fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>>;
+                    fn add_vertex<'a>(&mut self, x: &'a Self::Vertex) -> Result<&'a Self::Vertex, Error<Self::Vertex>>;
+                    fn del_vertex<'a>(&mut self, x: &'a Self::Vertex) -> Result<&'a Self::Vertex, Error<Self::Vertex>>;
+                    fn has_edge<'a>(&self, x: (&'a Self::Vertex, &'a Self::Vertex)) -> Result<bool, Error<Self::Vertex>>;
                 }
             }
 
@@ -127,24 +127,24 @@ macro_rules! impl_ungraph_trait {
             }
 
             #[inline(always)]
-            fn add_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
+            fn add_edge<'a>(&mut self, (x, y): (&'a Self::Vertex, &'a Self::Vertex)) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>> {
                 // Add edge (y, x)
-                self.0.add_edge(&(e.1, e.0))?;
+                self.0.add_edge((y, x))?;
                 // Add edge (x, y)
-                match e.0 == e.1 {
-                    false => self.0.add_edge(&e),
-                    true => Ok(*e)
+                match x == y {
+                    false => self.0.add_edge((x, y)),
+                    true => Ok((x, y))
                 }
             }
 
             #[inline(always)]
-            fn del_edge(&mut self, e: &(Self::Vertex, Self::Vertex)) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>> {
+            fn del_edge<'a>(&mut self, (x, y): (&'a Self::Vertex, &'a Self::Vertex)) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>> {
                 // Del edge (y, x)
-                self.0.del_edge(&(e.1, e.0))?;
+                self.0.del_edge((y, x))?;
                 // Del edge (x, y)
-                match e.0 == e.1 {
-                    false => self.0.del_edge(&e),
-                    true => Ok(*e)
+                match x == y {
+                    false => self.0.del_edge((x, y)),
+                    true => Ok((x, y))
                 }
             }
         }
@@ -214,26 +214,20 @@ macro_rules! impl_digraph_trait {
                     fn reserve(&mut self, additional: usize);
                     fn shrink_to(&mut self, min_capacity: usize);
                     fn shrink_to_fit(&mut self);
-                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<Self::Vertex> + 'a>;
-                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<Self::Vertex> + 'a>;
+                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a>;
+                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a>;
                     fn adjacents_iter<'a>(
                         &'a self,
-                        x: &Self::Vertex,
-                    ) -> Result<Box<dyn VertexIterator<Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                        x: &'a Self::Vertex,
+                    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn add_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
-                    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<Self::Vertex, Error<Self::Vertex>>;
-                    fn has_edge(&self, e: &(Self::Vertex, Self::Vertex)) -> Result<bool, Error<Self::Vertex>>;
-                    fn add_edge(
-                        &mut self,
-                        e: &(Self::Vertex, Self::Vertex),
-                    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>;
-                    fn del_edge(
-                        &mut self,
-                        e: &(Self::Vertex, Self::Vertex),
-                    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>;
+                    fn add_vertex<'a>(&mut self, x: &'a Self::Vertex) -> Result<&'a Self::Vertex, Error<Self::Vertex>>;
+                    fn del_vertex<'a>(&mut self, x: &'a Self::Vertex) -> Result<&'a Self::Vertex, Error<Self::Vertex>>;
+                    fn has_edge<'a>(&self, x: (&'a Self::Vertex, &'a Self::Vertex)) -> Result<bool, Error<Self::Vertex>>;
+                    fn add_edge<'a>(&mut self, (x, y): (&'a Self::Vertex, &'a Self::Vertex)) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>>;
+                    fn del_edge<'a>(&mut self, (x, y): (&'a Self::Vertex, &'a Self::Vertex)) -> Result<(&'a Self::Vertex, &'a Self::Vertex), Error<Self::Vertex>>;
                 }
             }
         }

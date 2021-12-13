@@ -11,9 +11,9 @@ mod tests {
         "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n\t0 -- 1 [label=\"A -- B\"];\n}\n";
 
     #[test]
-    fn from_dot<T>() -> Result<(), Error<u32>>
+    fn from_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: GraphTrait<Vertex = String>,
     {
         // Read DOT file to string
         let dot = std::fs::read_to_string("src/tests/data/14.dot").unwrap();
@@ -26,9 +26,9 @@ mod tests {
     }
 
     #[test]
-    fn to_dot<T>() -> Result<(), Error<u32>>
+    fn to_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: GraphTrait<Vertex = String>,
     {
         // Init graph
         let mut g = T::default();
@@ -42,9 +42,9 @@ mod tests {
     }
 
     #[test]
-    fn read_dot<T>() -> Result<(), Error<u32>>
+    fn read_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: GraphTrait<Vertex = String>,
     {
         // Read DOT file to string
         let dot = Path::new("src/tests/data/14.dot");
@@ -57,9 +57,9 @@ mod tests {
     }
 
     #[test]
-    fn write_dot<T>() -> Result<(), Error<u32>>
+    fn write_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = u32>,
+        T: GraphTrait<Vertex = String>,
     {
         // Init graph
         let mut g = T::default();
@@ -76,6 +76,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<UndirectedAdjacencyListGraph<u32>>)]
+    #[instantiate_tests(<UndirectedAdjacencyListGraph<String>>)]
     mod undirected_adjacency_list_graph {}
 }
