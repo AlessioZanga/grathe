@@ -31,7 +31,7 @@ mod tests_undirected {
     where
         T: UndirectedTrait<Vertex = i32>,
     {
-        let g = T::default();
+        let g = T::new();
         assert_false!(g.is_directed());
     }
 
@@ -40,7 +40,7 @@ mod tests_undirected {
     where
         T: UndirectedTrait<Vertex = i32>,
     {
-        let g = T::default();
+        let g = T::new();
         assert_false!(g.is_partially_directed());
     }
 
@@ -49,7 +49,7 @@ mod tests_undirected {
     where
         T: UndirectedTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test for undirected edges
         let i = g.add_vertex(&0)?;
@@ -81,7 +81,7 @@ mod tests_undirected {
     where
         T: UndirectedTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test for undirected edges
         let i = g.add_vertex(&0)?;
@@ -104,7 +104,7 @@ mod tests_undirected {
     where
         T: UndirectedTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test for empty graph
         assert_true!(Ne!(g, &0).is_err());
@@ -132,7 +132,7 @@ mod tests_undirected {
     where
         T: UndirectedTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test for undirected edges
         let i = g.add_vertex(&0)?;
@@ -152,7 +152,7 @@ mod tests_undirected {
     where
         T: UndirectedTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test for undirected edges
         let (i, j) = g.reserve_undirected_edge((&0, &1))?;

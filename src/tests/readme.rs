@@ -1,7 +1,11 @@
-#[cfg(tests)]
+#[cfg(doctest)]
 mod tests {
-    #[allow(unused_imports)]
-    use doc_comment::doctest;
-    #[cfg(doctest)]
-    doctest!("../../README.md"); // Test examples in README file.
+    macro_rules! external_doc_test {
+        ($x:expr) => {
+            #[doc = $x]
+            extern "C" {}
+        };
+    }
+
+    external_doc_test!(include_str!("../../README.md"));
 }

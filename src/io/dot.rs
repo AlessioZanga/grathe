@@ -230,7 +230,7 @@ where
     // Match each graph in dot file
     for pair in pairs {
         // Init an empty graph
-        let mut graph = T::default();
+        let mut graph = T::new();
         // Match rules for this graph
         match_rules(&mut graph, pair)?;
         // Push graph to result vector

@@ -19,7 +19,7 @@ mod tests {
 
     #[test]
     fn from_dot() -> Result<(), Error<String>> {
-        let mut g = UndirectedAdjacencyListGraph::<String>::default();
+        let mut g = UndirectedAdjacencyListGraph::<String>::new();
         let i = g.add_vertex(&"A")?;
         let j = g.add_vertex(&"B")?;
         g.add_edge((i, j))?;

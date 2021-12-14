@@ -8,4 +8,4 @@ pub use graph_trait::GraphTrait;
 pub type Graph = UndirectedAdjacencyListGraph<i32>;
 
 /// Default undirected graph with labels implementation based on adjacency list.
-pub type GraphLabels = UndirectedAdjacencyListGraph<String>;
+pub type Graphl = UndirectedAdjacencyListGraph<String>;

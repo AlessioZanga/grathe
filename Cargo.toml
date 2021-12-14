@@ -30,7 +30,6 @@ thiserror = "^1.0.30"
 [dev-dependencies]
 all_asserts = "^2.3.0"
 anyhow = "^1.0.51"
-doc-comment = "^0.3.3"
 generic-tests = "^0.1.2"
 tempfile = "^3.2.0"
 

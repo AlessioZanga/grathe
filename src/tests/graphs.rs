@@ -30,7 +30,7 @@ mod tests {
         T: GraphTrait<Vertex = String>,
     {
         // Init graph
-        let mut g = T::default();
+        let mut g = T::new();
         let i = g.add_vertex(&"A")?;
         let j = g.add_vertex(&"B")?;
         g.add_edge((i, j))?;
@@ -61,7 +61,7 @@ mod tests {
         T: GraphTrait<Vertex = String>,
     {
         // Init graph
-        let mut g = T::default();
+        let mut g = T::new();
         let i = g.add_vertex(&"A")?;
         let j = g.add_vertex(&"B")?;
         g.add_edge((i, j))?;

@@ -8,7 +8,7 @@ mod tests {
     use all_asserts::*;
 
     const N: i32 = 1e3 as i32;
-    const E: [(&i32, &i32); 5] = [(&4, &3), (&0, &1), (&2, &3), (&5, &6), (&7, &2)];
+    const E: [(i32, i32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
 
     // TODO: Replace with is_sorted method on iterators once stable.
     fn is_sorted<I>(data: I) -> bool
@@ -34,8 +34,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
-        let mut h = T::default();
+        let mut g = T::new();
+        let mut h = T::new();
 
         // Null graphs are equals by definition.
         assert_eq!(g, h); // G = (), H = ()
@@ -61,8 +61,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
-        let h = T::default();
+        let mut g = T::new();
+        let h = T::new();
 
         // Null graphs are equals by definition.
         assert_false!(g < h);
@@ -86,7 +86,7 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         // Test empty new call.
-        T::default();
+        T::new();
 
         Ok(())
     }
@@ -97,7 +97,7 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         // Test default call.
-        let g = T::default();
+        let g = T::new();
         assert_eq!(g.order(), 0_usize);
         assert_eq!(g.size(), 0_usize);
 
@@ -109,7 +109,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test empty graph
         g.clear();
@@ -148,7 +148,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Reserve additional capacity.
         g.reserve(3);
@@ -199,10 +199,6 @@ mod tests {
         g = T::from_vertices(&[0, 4, 2, 3, 1]);
         assert_eq!(g.order(), 5);
 
-        // Test high graph vertex set.
-        // FIXME: g = T::from_vertices(0..N);
-        // FIXME: assert_eq!(g.order(), &N);
-
         // Test next graph duplicated vertex set.
         let g = T::from_vertices(&[0, 4, 2, 3, 1, 4, 3]);
         assert_eq!(g.order(), 5);
@@ -221,19 +217,19 @@ mod tests {
         assert_eq!(g.size(), 0);
 
         // Test next graph vertex set.
-        g = T::from_edges([(&0, &0)]);
+        g = T::from_edges(&[(0, 0)]);
         assert_eq!(g.size(), 1);
 
         // Test next graph unordered vertex set.
-        g = T::from_edges(E);
+        g = T::from_edges(&E);
         assert_eq!(g.size(), 5);
 
         // Test high graph vertex set.
-        // FIXME: g = T::from_edges((0..N).zip(0..N));
-        // FIXME: assert_eq!(g.size(), &N);
+        // g = T::from_edges(&(0..N).zip(0..N));
+        // assert_eq!(g.size(), &N);
 
         // Test next graph duplicated vertex set.
-        let g = T::from_edges(E);
+        let g = T::from_edges(&E);
         assert_eq!(g.size(), 5);
 
         Ok(())
@@ -244,8 +240,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let g = T::from_edges(E);
-        assert_eq!(g.to_edge_list(), EdgeList::from(E.map(|(x, y)| (*x, *y))));
+        let g = T::from_edges(&E);
+        assert_eq!(g.to_edge_list(), EdgeList::from(E));
 
         Ok(())
     }
@@ -255,10 +251,10 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let g = T::from_edges(E);
-        let mut a = AdjacencyList::default();
+        let g = T::from_edges(&E);
+        let mut a = AdjacencyList::new();
         for (x, y) in E {
-            a.entry(*x).or_default().insert(*y);
+            a.entry(x).or_default().insert(y);
         }
         assert_eq!(g.to_adjacency_list(), a);
 
@@ -270,9 +266,9 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let g = T::from_edges(E);
+        let g = T::from_edges(&E);
         let mut a = DenseAdjacencyMatrix::zeros(8, 8);
-        for (&x, &y) in E {
+        for (x, y) in E {
             a[(x as usize, y as usize)] = 1;
         }
         assert_eq!(g.to_dense_adjacency_matrix(), a);
@@ -285,9 +281,9 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let g = T::from_edges(E);
+        let g = T::from_edges(&E);
         let mut a = DenseAdjacencyMatrix::zeros(8, 8);
-        for (&x, &y) in E {
+        for (x, y) in E {
             a[(x as usize, y as usize)] = 1;
         }
         assert_eq!(
@@ -385,7 +381,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test null graph order.
         assert_eq!(g.order(), 0);
@@ -410,7 +406,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test null graph has no size by definition.
         assert_eq!(g.size(), 0);
@@ -439,7 +435,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test null graph has no vertex by definition.
         assert_false!(g.has_vertex(&0));
@@ -465,7 +461,7 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         // Add min Vertex.
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Add min Vertex.
         g.add_vertex(&T::Vertex::MIN)?;
@@ -498,7 +494,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Extend graph with vertices.
         g.extend_vertices(&[0, 3, 1, 2])?;
@@ -514,7 +510,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Del min Vertex.
         g.add_vertex(&T::Vertex::MIN)?;
@@ -558,7 +554,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test null graph has no edge by definition.
         assert_true!(g.has_edge((&0, &0)).is_err());
@@ -587,7 +583,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test missing vertex.
         let e = (&0, &0);
@@ -629,7 +625,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test missing edge and vertex.
         let e = g.reserve_edge((&0, &1))?;
@@ -650,15 +646,15 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Extend graph with edges.
-        g.extend_edges([(&0, &3), (&1, &2)])?;
+        g.extend_edges(&[(0, 3), (1, 2)])?;
         assert_eq!(g.order(), 4);
         assert_eq!(g.size(), 2);
 
         // Extending with existing edges yields an error.
-        assert_true!(g.extend_edges([(&0, &3)]).is_err());
+        assert_true!(g.extend_edges(&[(0, 3)]).is_err());
         Ok(())
     }
 
@@ -667,7 +663,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test missing vertex.
         let mut e = (&0, &0);
@@ -713,8 +709,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let g = T::from_edges([(&0, &1)]);
-        let h = T::from_edges([(&0, &1), (&0, &2)]);
+        let g = T::from_edges(&[(0, 1)]);
+        let h = T::from_edges(&[(0, 1), (0, 2)]);
 
         assert_le!(g, h);
         assert_eq!((g <= h), g.is_subgraph(&h));
@@ -727,8 +723,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let g = T::from_edges([(&0, &1), (&0, &2)]);
-        let h = T::from_edges([(&0, &1)]);
+        let g = T::from_edges(&[(0, 1), (0, 2)]);
+        let h = T::from_edges(&[(0, 1)]);
 
         assert_ge!(g, h);
         assert_eq!((g >= h), g.is_supergraph(&h));
@@ -741,7 +737,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::default();
+        let mut g = T::new();
 
         // Test for missing vertex
         assert_true!(g.degree_of(&0).is_err());
