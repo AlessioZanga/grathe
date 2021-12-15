@@ -54,24 +54,24 @@ mod tests_undirected {
         // Test for undirected edges
         let i = g.add_vertex(&0)?;
         let j = g.add_vertex(&1)?;
-        let e = g.add_edge((i, j))?;
-        assert_true!(g.has_edge((i, j))?);
-        assert_true!(g.has_edge((j, i))?);
+        g.add_edge(&i, &j)?;
+        assert_true!(g.has_edge(&i, &j)?);
+        assert_true!(g.has_edge(&j, &i)?);
 
         // Test for repeated undirected edges addition
-        assert_true!(g.add_edge(e).is_err());
+        assert_true!(g.add_edge(&i, &j).is_err());
 
         // Test for loops
-        let e = g.add_edge((i, i))?;
-        assert_true!(g.has_edge((i, i))?);
-        g.del_edge(e)?;
+        g.add_edge(&i, &i)?;
+        assert_true!(g.has_edge(&i, &i)?);
+        g.del_edge(&i, &j)?;
 
         // Del vertex and associated edges.
-        g.del_vertex(i)?;
-        assert_true!(g.has_edge((i, j)).is_err());
-        assert_true!(g.has_edge((j, i)).is_err());
-        assert_true!(Ne!(g, i).is_err());
-        assert_true!(!Ne!(g, j)?.any(|x| x == i));
+        g.del_vertex(&i)?;
+        assert_true!(g.has_edge(&i, &j).is_err());
+        assert_true!(g.has_edge(&j, &i).is_err());
+        assert_true!(Ne!(g, &i).is_err());
+        assert_true!(!Ne!(g, &j)?.any(|&x| x == i));
 
         Ok(())
     }
@@ -86,15 +86,15 @@ mod tests_undirected {
         // Test for undirected edges
         let i = g.add_vertex(&0)?;
         let j = g.add_vertex(&1)?;
-        let e = g.add_edge((i, j))?;
-        assert_true!(g.has_edge((i, j))?);
-        assert_true!(g.has_edge((j, i))?);
-        assert_false!(g.del_edge(e).is_err());
+        g.add_edge(&i, &j)?;
+        assert_true!(g.has_edge(&i, &j)?);
+        assert_true!(g.has_edge(&j, &i)?);
+        assert_false!(g.del_edge(&i, &j).is_err());
 
         // Test for repeated undirected edges deletion
-        assert_true!(g.del_edge(e).is_err());
-        assert_false!(g.has_edge((i, j))?);
-        assert_false!(g.has_edge((j, i))?);
+        assert_true!(g.del_edge(&i, &j).is_err());
+        assert_false!(g.has_edge(&i, &j)?);
+        assert_false!(g.has_edge(&j, &i)?);
 
         Ok(())
     }
@@ -111,18 +111,20 @@ mod tests_undirected {
 
         // Test for existing vertex
         let i = g.add_vertex(&0)?;
-        assert_eq!(Ne!(g, i)?.count(), 0);
+        assert_eq!(Ne!(g, &i)?.count(), 0);
 
         // Test for existing neighbors
         let j = g.add_vertex(&1)?;
-        g.add_edge((i, i))?;
-        g.add_edge((i, j))?;
-        g.add_edge((j, j))?;
-        assert_eq!(Ne!(g, i)?.count(), 2);
+        g.add_edge(&i, &i)?;
+        g.add_edge(&i, &j)?;
+        g.add_edge(&j, &j)?;
+        assert_eq!(Ne!(g, &i)?.count(), 2);
 
-        assert_true!(Ne!(g, i)?.eq(g.neighbors_iter(i)?));
-        assert_true!(Ne!(g, i)?.all(|x| g.has_edge((i, x)).unwrap() && g.has_edge((x, i)).unwrap()));
-        assert_true!(is_sorted(Ne!(g, i)?));
+        assert_true!(Ne!(g, &i)?.eq(g.neighbors_iter(&i)?));
+        assert_true!(
+            Ne!(g, &i)?.all(|&x| g.has_edge(&i, &x).unwrap() && g.has_edge(&x, &i).unwrap())
+        );
+        assert_true!(is_sorted(Ne!(g, &i)?));
 
         Ok(())
     }
@@ -137,12 +139,12 @@ mod tests_undirected {
         // Test for undirected edges
         let i = g.add_vertex(&0)?;
         let j = g.add_vertex(&1)?;
-        let e = g.add_undirected_edge((i, j))?;
-        assert_true!(g.has_edge((i, j))?);
-        assert_true!(g.has_edge((j, i))?);
+        g.add_undirected_edge(&i, &j)?;
+        assert_true!(g.has_edge(&i, &j)?);
+        assert_true!(g.has_edge(&j, &i)?);
 
         // Test for repeated undirected edges addition
-        assert_true!(g.add_undirected_edge(e).is_err());
+        assert_true!(g.add_undirected_edge(&i, &j).is_err());
 
         Ok(())
     }
@@ -155,12 +157,12 @@ mod tests_undirected {
         let mut g = T::new();
 
         // Test for undirected edges
-        let (i, j) = g.reserve_undirected_edge((&0, &1))?;
-        assert_true!(g.has_edge((i, j))?);
-        assert_true!(g.has_edge((j, i))?);
+        let (i, j) = g.reserve_undirected_edge(&0, &1)?;
+        assert_true!(g.has_edge(&i, &j)?);
+        assert_true!(g.has_edge(&j, &i)?);
 
         // Test for repeated undirected edges addition
-        assert_true!(g.reserve_undirected_edge((i, j)).is_err());
+        assert_true!(g.reserve_undirected_edge(&i, &j).is_err());
 
         Ok(())
     }

@@ -31,22 +31,25 @@ fn main() -> Result<()> {
     ]);
     
     // Iterate over the vertex set.
-    for x in V!(G) {
-        assert_true!(G.has_vertex(x));
+    for &x in V!(G) {
+        assert_true!(G.has_vertex(&x));
     }
 
     // Iterate over the neighbors of `1`.
     for x in Ne!(G, &1)? {
-        assert_true!(G.has_edge((x, &1))?);
+        assert_true!(G.has_edge(x, &1)?);
     }
 
     // Define a graph with labels, equivalent to Graph::<String>.
-    let mut G = Graphl::from_vertices(&["A", "B", "C"]);
-    assert_true!(G.has_vertex(&"A"));
+    let mut G = Graphl::new();
+
+    // Add a vertex to the graph.
+    let x = G.add_vertex(&"A")?;
+    assert_true!(G.has_vertex(&x));
 
     // Handle errors in a Rust-compatible way.
     assert_true!(
-        match G.add_vertex(&"A") {
+        match G.add_vertex(&x) {
             Err(_) => true, // Error! Vertex already defined!
             Ok(_) => false, // Ok! Vertex added successfully!
         }

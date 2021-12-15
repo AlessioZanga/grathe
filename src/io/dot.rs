@@ -144,7 +144,7 @@ where
                         // Insert path
                         let e = match e {
                             (DOTValue::Vertex(x), DOTValue::Vertex(y)) => {
-                                match graph.add_edge((&x, &y)) {
+                                match graph.add_edge(&x, &y) {
                                     Err(e) => Err(e),
                                     Ok(_) => Ok((x, y)),
                                 }
@@ -154,9 +154,8 @@ where
                         };
                         // Return path
                         match e {
-                            Err(Error::EdgeAlreadyDefined(e)) => e,
+                            Err(Error::EdgeAlreadyDefined(e)) | Ok(e) => e,
                             Err(_) => unreachable!(),
-                            Ok(e) => e,
                         }
                     })
                     // Collect sequence of edges into path
@@ -207,11 +206,9 @@ where
                 // Handle errors
                 let k = match graph.add_vertex(&k) {
                     // Match vertex identifier already defined error
-                    Err(Error::VertexAlreadyDefined(k)) => k,
+                    Err(Error::VertexAlreadyDefined(k)) | Ok(k) => k,
                     // Give up on other errors
                     Err(_) => unreachable!(),
-                    // Match ok on success
-                    Ok(_) => k,
                 };
                 // TODO: Add vertex port
                 if let Some(k) = i.next() {

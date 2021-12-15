@@ -106,12 +106,12 @@ macro_rules! impl_ungraph_trait {
                     fn shrink_to_fit(&mut self);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a>;
-                    fn adjacents_iter<'a, U>(&'a self, x: &U) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
+                    fn adjacents_iter<'a>(&'a self, x: &Self::Vertex) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
-                    fn has_vertex<U>(&self, x: &U) -> bool where U: Eq + Clone + Into<Self::Vertex>;
-                    fn add_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn del_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn has_edge<'a, U>(&self, x: (&'a U, &'a U)) -> Result<bool, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
+                    fn has_vertex(&self, x: &Self::Vertex) -> bool;
+                    fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
+                    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+                    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>>;
                 }
             }
 
@@ -122,24 +122,24 @@ macro_rules! impl_ungraph_trait {
             }
 
             #[inline(always)]
-            fn add_edge<'a, U>(&mut self, (x, y): (&'a U, &'a U)) -> Result<(&'a U, &'a U), Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex> {
+            fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
                 // Add edge (y, x)
-                self.0.add_edge((y, x))?;
+                self.0.add_edge(y, x)?;
                 // Add edge (x, y)
                 match x == y {
-                    false => self.0.add_edge((x, y)),
-                    true => Ok((x, y))
+                    false => self.0.add_edge(x, y),
+                    true => Ok(())
                 }
             }
 
             #[inline(always)]
-            fn del_edge<'a, U>(&mut self, (x, y): (&'a U, &'a U)) -> Result<(&'a U, &'a U), Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex> {
+            fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
                 // Del edge (y, x)
-                self.0.del_edge((y, x))?;
+                self.0.del_edge(y, x)?;
                 // Del edge (x, y)
                 match x == y {
-                    false => self.0.del_edge((x, y)),
-                    true => Ok((x, y))
+                    false => self.0.del_edge(x, y),
+                    true => Ok(())
                 }
             }
         }
@@ -211,15 +211,15 @@ macro_rules! impl_digraph_trait {
                     fn shrink_to_fit(&mut self);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a>;
-                    fn adjacents_iter<'a, U>(&'a self, x: &U) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
+                    fn adjacents_iter<'a>(&'a self, x: &Self::Vertex) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
-                    fn has_vertex<U>(&self, x: &U) -> bool where U: Eq + Clone + Into<Self::Vertex>;
-                    fn add_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn del_vertex<'a, U>(&mut self, x: &'a U) -> Result<&'a U, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn has_edge<'a, U>(&self, x: (&'a U, &'a U)) -> Result<bool, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn add_edge<'a>(&mut self, (x, y): (&'a U, &'a U)) -> Result<(&'a U, &'a U), Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn del_edge<'a>(&mut self, (x, y): (&'a U, &'a U)) -> Result<(&'a U, &'a U), Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
+                    fn has_vertex(&self, x: &Self::Vertex) -> bool;
+                    fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
+                    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+                    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>>;
+                    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+                    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
                 }
             }
         }

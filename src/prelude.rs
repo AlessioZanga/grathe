@@ -5,7 +5,7 @@ pub use crate::{Adj, Ne, E, V};
 pub use crate::directions::{DirectionalTrait, UndirectedTrait};
 
 // Re-export graphs
-pub use crate::graphs::{Graph, Graphl, GraphTrait};
+pub use crate::graphs::{Graph, GraphTrait, Graphl};
 
 // Re-export storages
 pub use crate::storages::StorageTrait;

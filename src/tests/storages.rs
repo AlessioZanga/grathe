@@ -47,7 +47,7 @@ mod tests {
         h.add_vertex(&0)?;
         assert_eq!(g, h); // G = (0), H = (0)
 
-        g.add_edge((i, i))?;
+        g.add_edge(&i, &i)?;
         assert_ne!(g, h); // G = (0, (0, 0)), H = (0)
 
         h.add_vertex(&1)?;
@@ -119,7 +119,7 @@ mod tests {
         // Test proper graph
         let i = g.add_vertex(&0)?;
         let j = g.add_vertex(&1)?;
-        g.add_edge((i, j))?;
+        g.add_edge(&i, &j)?;
         g.clear();
         assert_eq!(g.order(), 0);
         assert_eq!(g.size(), 0);
@@ -326,13 +326,13 @@ mod tests {
         assert_eq!(E!(g).count(), 0);
 
         g = T::from_order(N as usize);
-        g.add_edge((&1, &1))?;
-        g.add_edge((&0, &1))?;
-        g.add_edge((&0, &0))?;
+        g.add_edge(&1, &1)?;
+        g.add_edge(&0, &1)?;
+        g.add_edge(&0, &0)?;
         assert_eq!(E!(g).count(), 3);
 
         assert_true!(E!(g).eq(g.edges_iter()));
-        assert_true!(E!(g).all(|x| g.has_edge(x).unwrap()));
+        assert_true!(E!(g).all(|(&x, &y)| g.has_edge(&x, &y).unwrap()));
         assert_true!(is_sorted(E!(g)));
 
         // Check iterator size hint (optional for edges).
@@ -354,13 +354,13 @@ mod tests {
         assert_true!(Adj!(g, &1).is_err());
 
         g = T::from_order(N as usize);
-        g.add_edge((&1, &1))?;
-        g.add_edge((&0, &1))?;
-        g.add_edge((&0, &0))?;
+        g.add_edge(&1, &1)?;
+        g.add_edge(&0, &1)?;
+        g.add_edge(&0, &0)?;
         assert_eq!(Adj!(g, &0)?.count(), 2);
 
         assert_true!(Adj!(g, &0)?.eq(g.adjacents_iter(&0)?));
-        assert_true!(Adj!(g, &0)?.all(|x| g.has_edge((&0, x)).unwrap()));
+        assert_true!(Adj!(g, &0)?.all(|&x| g.has_edge(&0, &x).unwrap()));
         assert_true!(is_sorted(Adj!(g, &0)?));
 
         Ok(())
@@ -391,7 +391,7 @@ mod tests {
         assert_eq!(g.order(), 1);
 
         // Test decreasing graph order.
-        g.del_vertex(i)?;
+        g.del_vertex(&i)?;
         assert_eq!(g.order(), 0);
 
         // Test high graph order.
@@ -414,17 +414,17 @@ mod tests {
         // Test increasing size graph.
         let i = g.add_vertex(&0)?;
         let j = g.add_vertex(&1)?;
-        let e = g.add_edge((i, j))?;
+        g.add_edge(&i, &j)?;
         assert_eq!(g.size(), 1);
 
         // Test decreasing size graph.
-        g.del_edge(e)?;
+        g.del_edge(&i, &j)?;
         assert_eq!(g.size(), 0);
 
         // Test sequence size graph.
         g = T::from_order(N as usize);
         for i in 0..N {
-            g.add_edge((&0, &i))?;
+            g.add_edge(&0, &i)?;
             assert_eq!(g.size(), (i + 1) as usize);
         }
         Ok(())
@@ -442,11 +442,11 @@ mod tests {
 
         // Test add first vertex.
         let i = g.add_vertex(&0)?;
-        assert_true!(g.has_vertex(i));
+        assert_true!(g.has_vertex(&i));
 
         // Test del first vertex.
-        g.del_vertex(i)?;
-        assert_false!(g.has_vertex(i));
+        g.del_vertex(&i)?;
+        assert_false!(g.has_vertex(&i));
 
         // Test sequence of vertex.
         g = T::from_order(N as usize);
@@ -464,27 +464,27 @@ mod tests {
         let mut g = T::new();
 
         // Add min Vertex.
-        g.add_vertex(&T::Vertex::MIN)?;
-        assert_true!(g.has_vertex(&T::Vertex::MIN));
+        let i = g.add_vertex(&T::Vertex::MIN)?;
+        assert_true!(g.has_vertex(&i));
 
         // Test double addition.
-        assert_true!(g.add_vertex(&T::Vertex::MIN).is_err());
+        assert_true!(g.add_vertex(&i).is_err());
 
         // Add contiguous Vertex.
-        g.add_vertex(&1)?;
-        assert_true!(g.has_vertex(&1));
+        let i = g.add_vertex(&1)?;
+        assert_true!(g.has_vertex(&i));
 
         // Add non contiguous Vertex.
-        g.add_vertex(&N)?;
-        assert_true!(g.has_vertex(&N));
+        let i = g.add_vertex(&N)?;
+        assert_true!(g.has_vertex(&i));
 
         // Add max Vertex.
-        g.add_vertex(&T::Vertex::MAX)?;
-        assert_true!(g.has_vertex(&T::Vertex::MAX));
+        let i = g.add_vertex(&T::Vertex::MAX)?;
+        assert_true!(g.has_vertex(&i));
 
         // Add contiguous Vertex.
         g = T::from_order(N as usize);
-        assert_eq!(g.add_vertex(&N).unwrap(), &N);
+        assert_eq!(g.add_vertex(&N)?, N);
 
         Ok(())
     }
@@ -513,38 +513,38 @@ mod tests {
         let mut g = T::new();
 
         // Del min Vertex.
-        g.add_vertex(&T::Vertex::MIN)?;
-        g.del_vertex(&T::Vertex::MIN)?;
-        assert_false!(g.has_vertex(&T::Vertex::MIN));
+        let i = g.add_vertex(&T::Vertex::MIN)?;
+        g.del_vertex(&i)?;
+        assert_false!(g.has_vertex(&i));
 
         // Test double deletion.
-        assert_true!(g.del_vertex(&T::Vertex::MIN).is_err());
+        assert_true!(g.del_vertex(&i).is_err());
 
         // Del contiguous Vertex.
-        g.add_vertex(&1)?;
-        g.del_vertex(&1)?;
-        assert_false!(g.has_vertex(&1));
+        let i = g.add_vertex(&1)?;
+        g.del_vertex(&i)?;
+        assert_false!(g.has_vertex(&i));
 
         // Del non contiguous Vertex.
-        g.add_vertex(&N)?;
-        g.del_vertex(&N)?;
-        assert_false!(g.has_vertex(&N));
+        let i = g.add_vertex(&N)?;
+        g.del_vertex(&i)?;
+        assert_false!(g.has_vertex(&i));
 
         // Del max Vertex.
-        g.add_vertex(&T::Vertex::MAX)?;
-        g.del_vertex(&T::Vertex::MAX)?;
-        assert_false!(g.has_vertex(&T::Vertex::MAX));
+        let i = g.add_vertex(&T::Vertex::MAX)?;
+        g.del_vertex(&i)?;
+        assert_false!(g.has_vertex(&i));
 
         // Del vertex and associated edges.
         let i = g.add_vertex(&0)?;
         let j = g.add_vertex(&1)?;
-        g.add_edge((i, j))?;
-        g.add_edge((j, i))?;
-        g.del_vertex(i)?;
-        assert_true!(g.has_edge((i, j)).is_err());
-        assert_true!(g.has_edge((j, i)).is_err());
-        assert_true!(Adj!(g, i).is_err());
-        assert_true!(!Adj!(g, j)?.any(|x| x == i));
+        g.add_edge(&i, &j)?;
+        g.add_edge(&j, &i)?;
+        g.del_vertex(&i)?;
+        assert_true!(g.has_edge(&i, &j).is_err());
+        assert_true!(g.has_edge(&j, &i).is_err());
+        assert_true!(Adj!(g, &i).is_err());
+        assert_true!(!Adj!(g, &j)?.any(|&x| x == i));
 
         Ok(())
     }
@@ -557,23 +557,23 @@ mod tests {
         let mut g = T::new();
 
         // Test null graph has no edge by definition.
-        assert_true!(g.has_edge((&0, &0)).is_err());
+        assert_true!(g.has_edge(&0, &0).is_err());
 
         // Test add first edge.
         let i = g.add_vertex(&0)?;
-        let e = g.add_edge((i, i))?;
-        assert_true!(g.has_edge(e)?);
+        g.add_edge(&i, &i)?;
+        assert_true!(g.has_edge(&i, &i)?);
 
         // Test del first edge.
-        let e = g.del_edge(e)?;
-        assert_false!(g.has_edge(e)?);
+        g.del_edge(&i, &i)?;
+        assert_false!(g.has_edge(&i, &i)?);
 
         // Test sequence of edges.
         g = T::from_order(N as usize);
         for i in 0..N {
-            g.add_edge((&0, &i))?;
+            g.add_edge(&0, &i)?;
         }
-        assert_true!((0..N).all(|i| g.has_edge((&0, &i)).unwrap()));
+        assert_true!((0..N).all(|i| g.has_edge(&0, &i).unwrap()));
 
         Ok(())
     }
@@ -586,8 +586,8 @@ mod tests {
         let mut g = T::new();
 
         // Test missing vertex.
-        let e = (&0, &0);
-        assert_true!(g.add_edge(e).is_err());
+        let (i, j) = (0, 0);
+        assert_true!(g.add_edge(&i, &j).is_err());
 
         g.add_vertex(&T::Vertex::MIN)?;
         g.add_vertex(&(T::Vertex::MIN + 1))?;
@@ -595,27 +595,27 @@ mod tests {
         g.add_vertex(&T::Vertex::MAX)?;
 
         // Add min Edge.
-        let e = (&T::Vertex::MIN, &T::Vertex::MIN);
-        g.add_edge(e)?;
-        assert_true!(g.has_edge(e)?);
+        let (i, j) = (T::Vertex::MIN, T::Vertex::MIN);
+        g.add_edge(&i, &j)?;
+        assert_true!(g.has_edge(&i, &j)?);
 
         // Test double addition.
-        assert_true!(g.add_edge(e).is_err());
+        assert_true!(g.add_edge(&i, &j).is_err());
 
         // Add contiguous Edge.
-        let e = (&T::Vertex::MIN, &(T::Vertex::MIN + 1));
-        g.add_edge(e)?;
-        assert_true!(g.has_edge(e)?);
+        let (i, j) = (T::Vertex::MIN, (T::Vertex::MIN + 1));
+        g.add_edge(&i, &j)?;
+        assert_true!(g.has_edge(&i, &j)?);
 
         // Add non contiguous Edge.
-        let e = (&N, &N);
-        g.add_edge(e)?;
-        assert_true!(g.has_edge(e)?);
+        let (i, j) = (N, N);
+        g.add_edge(&i, &j)?;
+        assert_true!(g.has_edge(&i, &j)?);
 
         // Add max Vertex.
-        let e = (&T::Vertex::MAX, &T::Vertex::MAX);
-        g.add_edge(e)?;
-        assert_true!(g.has_edge(e)?);
+        let (i, j) = (T::Vertex::MAX, T::Vertex::MAX);
+        g.add_edge(&i, &j)?;
+        assert_true!(g.has_edge(&i, &j)?);
 
         Ok(())
     }
@@ -628,15 +628,15 @@ mod tests {
         let mut g = T::new();
 
         // Test missing edge and vertex.
-        let e = g.reserve_edge((&0, &1))?;
-        assert_true!(g.has_vertex(e.0));
-        assert_true!(g.has_vertex(e.1));
-        assert_true!(g.has_edge(e).unwrap());
+        let (i, j) = g.reserve_edge(&0, &1)?;
+        assert_true!(g.has_vertex(&i));
+        assert_true!(g.has_vertex(&j));
+        assert_true!(g.has_edge(&i, &j)?);
 
         // Test already existing vertex
         let i = g.add_vertex(&2)?;
-        assert_true!(g.reserve_edge((i, &3)).is_err());
-        assert_true!(g.reserve_edge((&3, i)).is_err());
+        assert_true!(g.reserve_edge(&i, &3).is_err());
+        assert_true!(g.reserve_edge(&3, &i).is_err());
 
         Ok(())
     }
@@ -666,8 +666,8 @@ mod tests {
         let mut g = T::new();
 
         // Test missing vertex.
-        let mut e = (&0, &0);
-        assert_true!(g.del_edge(e).is_err());
+        let (i, j) = (0, 0);
+        assert_true!(g.del_edge(&i, &j).is_err());
 
         g.add_vertex(&T::Vertex::MIN)?;
         g.add_vertex(&(T::Vertex::MIN + 1))?;
@@ -675,31 +675,31 @@ mod tests {
         g.add_vertex(&T::Vertex::MAX)?;
 
         // Del min Edge.
-        e = (&T::Vertex::MIN, &T::Vertex::MIN);
-        g.add_edge(e)?;
-        g.del_edge(e)?;
-        assert_false!(g.has_edge(e)?);
+        let (i, j) = (T::Vertex::MIN, T::Vertex::MIN);
+        g.add_edge(&i, &j)?;
+        g.del_edge(&i, &j)?;
+        assert_false!(g.has_edge(&i, &j)?);
 
         // Test double deletion.
-        assert_true!(g.del_edge(e).is_err());
+        assert_true!(g.del_edge(&i, &j).is_err());
 
         // Del contiguous Edge.
-        e = (&T::Vertex::MIN, &(T::Vertex::MIN + 1));
-        g.add_edge(e)?;
-        g.del_edge(e)?;
-        assert_false!(g.has_edge(e)?);
+        let (i, j) = (T::Vertex::MIN, (T::Vertex::MIN + 1));
+        g.add_edge(&i, &j)?;
+        g.del_edge(&i, &j)?;
+        assert_false!(g.has_edge(&i, &j)?);
 
         // Del non contiguous Edge.
-        e = (&N, &N);
-        g.add_edge(e)?;
-        g.del_edge(e)?;
-        assert_false!(g.has_edge(e)?);
+        let (i, j) = (N, N);
+        g.add_edge(&i, &j)?;
+        g.del_edge(&i, &j)?;
+        assert_false!(g.has_edge(&i, &j)?);
 
         // Del max Vertex.
-        e = (&T::Vertex::MAX, &T::Vertex::MAX);
-        g.add_edge(e)?;
-        g.del_edge(e)?;
-        assert_false!(g.has_edge(e)?);
+        let (i, j) = (T::Vertex::MAX, T::Vertex::MAX);
+        g.add_edge(&i, &j)?;
+        g.del_edge(&i, &j)?;
+        assert_false!(g.has_edge(&i, &j)?);
 
         Ok(())
     }
@@ -744,14 +744,14 @@ mod tests {
 
         // Test for isolated vertex
         let i = g.add_vertex(&0)?;
-        assert_eq!(g.degree_of(i)?, 0);
-        assert_true!(g.is_isolated_vertex(i)?);
+        assert_eq!(g.degree_of(&i)?, 0);
+        assert_true!(g.is_isolated_vertex(&i)?);
 
         // Test for pendant vertex
         let j = g.add_vertex(&1)?;
-        g.add_edge((i, j))?;
-        assert_eq!(g.degree_of(i)?, 1);
-        assert_true!(g.is_pendant_vertex(i)?);
+        g.add_edge(&i, &j)?;
+        assert_eq!(g.degree_of(&i)?, 1);
+        assert_true!(g.is_pendant_vertex(&i)?);
 
         Ok(())
     }

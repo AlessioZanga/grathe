@@ -22,7 +22,7 @@ mod tests {
         let mut g = UndirectedAdjacencyListGraph::<String>::new();
         let i = g.add_vertex(&"A")?;
         let j = g.add_vertex(&"B")?;
-        g.add_edge((i, j))?;
+        g.add_edge(&i, &j)?;
         let h = crate::io::from_dot::<UndirectedAdjacencyListGraph<String>>(DOT)
             .unwrap()
             .pop()

@@ -33,7 +33,7 @@ mod tests {
         let mut g = T::new();
         let i = g.add_vertex(&"A")?;
         let j = g.add_vertex(&"B")?;
-        g.add_edge((i, j))?;
+        g.add_edge(&i, &j)?;
         // Test
         assert_eq!(g.to_dot()?, DOT);
 
@@ -64,7 +64,7 @@ mod tests {
         let mut g = T::new();
         let i = g.add_vertex(&"A")?;
         let j = g.add_vertex(&"B")?;
-        g.add_edge((i, j))?;
+        g.add_edge(&i, &j)?;
         // Get temporary file path
         let path = NamedTempFile::new().unwrap().into_temp_path();
         // Write to DOT file

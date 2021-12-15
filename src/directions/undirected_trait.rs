@@ -12,12 +12,10 @@ pub trait UndirectedTrait: StorageTrait {
     ///
     /// Panics if the vertex identifier does not exists in the graph.
     ///
-    fn neighbors_iter<'a, T>(
+    fn neighbors_iter<'a>(
         &'a self,
-        x: &'a T,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+        x: &Self::Vertex,
+    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Adds undirected edge to the graph.
     ///
@@ -28,12 +26,11 @@ pub trait UndirectedTrait: StorageTrait {
     /// At least one of the vertex identifiers do not exist in the graph,
     /// or the undirected edge identifier already exists in the graph.
     ///
-    fn add_undirected_edge<'a, T>(
+    fn add_undirected_edge(
         &mut self,
-        x: (&'a T, &'a T),
-    ) -> Result<(&'a T, &'a T), Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+        x: &Self::Vertex,
+        y: &Self::Vertex,
+    ) -> Result<(), Error<Self::Vertex>>;
 
     /// Adds undirected edge to the graph.
     ///
@@ -45,16 +42,18 @@ pub trait UndirectedTrait: StorageTrait {
     /// or the edge identifier already exists in the graph.
     ///
     #[inline(always)]
-    fn reserve_undirected_edge<'a, T>(
+    fn reserve_undirected_edge<T>(
         &mut self,
-        (x, y): (&'a T, &'a T),
-    ) -> Result<(&'a T, &'a T), Error<Self::Vertex>>
+        x: &T,
+        y: &T,
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>
     where
         T: Eq + Clone + Into<Self::Vertex>,
     {
-        self.add_vertex(x)?;
-        self.add_vertex(y)?;
-        self.add_undirected_edge((x, y))
+        let x = self.add_vertex(x)?;
+        let y = self.add_vertex(y)?;
+        self.add_undirected_edge(&x, &y)?;
+        Ok((x, y))
     }
 }
 

@@ -324,9 +324,15 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
         for (x, y) in iter {
-            g.add_vertex(x).ok();
-            g.add_vertex(y).ok();
-            g.add_edge((x, y)).ok();
+            let x = match g.add_vertex(x) {
+                Err(Error::VertexAlreadyDefined(x)) | Ok(x) => x,
+                Err(_) => unreachable!(),
+            };
+            let y = match g.add_vertex(y) {
+                Err(Error::VertexAlreadyDefined(y)) | Ok(y) => y,
+                Err(_) => unreachable!(),
+            };
+            g.add_edge(&x, &y).ok();
         }
 
         g
@@ -483,8 +489,8 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_true!(g.edges_iter().eq(E!(g)));
     ///
     /// // Iterate over the vertex set.
-    /// for x in E!(g) {
-    ///     assert_true!(g.has_edge(x)?);
+    /// for (x, y) in E!(g) {
+    ///     assert_true!(g.has_edge(&x, &y)?);
     /// }
     /// # Ok(())
     /// # }
@@ -520,8 +526,8 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_true!(g.adjacents_iter(&0)?.eq(Adj!(g, &0)?));
     ///
     /// // Iterate over the adjacent set.
-    /// for x in Adj!(g, &0)? {
-    ///     assert_true!(g.has_edge((&0, x))?);
+    /// for &x in Adj!(g, &0)? {
+    ///     assert_true!(g.has_edge(&0, &x)?);
     /// }
     ///
     /// // Iterating over non-existing vertex yields an error.
@@ -530,12 +536,10 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn adjacents_iter<'a, T>(
+    fn adjacents_iter<'a>(
         &'a self,
-        x: &T,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+        x: &Self::Vertex,
+    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Order of the graph.
     ///
@@ -604,14 +608,12 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let i = g.add_vertex(&"0")?;
     ///
     /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_vertex(&"0"));
+    /// assert_true!(g.has_vertex(&i));
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn has_vertex<T>(&self, x: &T) -> bool
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+    fn has_vertex(&self, x: &Self::Vertex) -> bool;
 
     /// Adds vertex to the graph.
     ///
@@ -633,7 +635,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Add a new vertex.
     /// let i = g.add_vertex(&0)?;
-    /// assert_true!(g.has_vertex(i));
+    /// assert_true!(g.has_vertex(&i));
     ///
     /// // Build a null graph.
     /// let mut g = Graphl::new();
@@ -647,7 +649,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn add_vertex<'a, T>(&mut self, x: &'a T) -> Result<&'a T, Error<Self::Vertex>>
+    fn add_vertex<'a, T>(&mut self, x: &'a T) -> Result<Self::Vertex, Error<Self::Vertex>>
     where
         T: Eq + Clone + Into<Self::Vertex>;
 
@@ -727,24 +729,19 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Add a new vertex.
     /// let i = g.add_vertex(&0)?;
-    /// assert_true!(g.has_vertex(i));
+    /// assert_true!(g.has_vertex(&i));
     ///
     /// // Delete the newly added vertex.
-    /// let j = g.del_vertex(i)?;
-    /// assert_false!(g.has_vertex(i));
-    ///
-    /// // Deleting a vertex returns its identifier.
-    /// assert_eq!(i, j);
+    /// g.del_vertex(&i)?;
+    /// assert_false!(g.has_vertex(&i));
     ///
     /// // Deleting a non-existing vertex yields an error.
-    /// assert_true!(g.del_vertex(i).is_err());
+    /// assert_true!(g.del_vertex(&i).is_err());
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn del_vertex<'a, T>(&mut self, x: &'a T) -> Result<&'a T, Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
 
     /// Checks edge in the graph.
     ///
@@ -765,26 +762,24 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_edges(&[(0, 1), (3, 2)]);
     ///
     /// // Check edge.
-    /// assert_true!(g.has_edge((&0, &1))?);
+    /// assert_true!(g.has_edge(&0, &1)?);
     ///
     /// // Checking an edge with non-existing vertex yields an error.
-    /// assert_true!(g.has_edge((&0, &42)).is_err());
+    /// assert_true!(g.has_edge(&0, &42).is_err());
     ///
     /// // Build a null graph.
     /// let mut g = Graphl::new();
     ///
     /// // Add a edge given its label.
-    /// let x = g.reserve_edge((&"0", &"1"))?;
+    /// let (x, y) = g.reserve_edge(&"0", &"1")?;
     ///
     /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_edge((&"0", &"1"))?);
+    /// assert_true!(g.has_edge(&x, &y)?);
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn has_edge<'a, T>(&self, x: (&'a T, &'a T)) -> Result<bool, Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>>;
 
     /// Adds edge to the graph.
     ///
@@ -805,28 +800,33 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// // Build a 2nd order graph.
     /// let mut g = Graph::from_order(2);
     ///
+    /// // Set vertices identifiers.
+    /// let (x, y) = (0, 1);
+    ///
     /// // Add a new edge from vertex.
-    /// let x = g.add_edge((&0, &1))?;
-    /// assert_true!(g.has_edge(x)?);
+    /// g.add_edge(&x, &y)?;
+    /// assert_true!(g.has_edge(&x, &y)?);
     ///
     /// // Adding an existing edge yields an error.
-    /// assert_true!(g.add_edge(x).is_err());
+    /// assert_true!(g.add_edge(&x, &y).is_err());
     ///
     /// // Build a 3rd order graph.
     /// let mut g = Graphl::from_order(3);
     ///
+    /// // Set vertices identifiers.
+    /// let x: String = "0".into();
+    /// let y: String = "1".into();
+    ///
     /// // Add a edge given its label.
-    /// let x = g.add_edge((&"0", &"1"))?;
+    /// g.add_edge(&x, &y)?;
     ///
     /// // Adding an existing edge label yields an error.
-    /// assert_true!(g.add_edge((&"0", &"1")).is_err());
+    /// assert_true!(g.add_edge(&x, &y).is_err());
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn add_edge<'a, T>(&mut self, x: (&'a T, &'a T)) -> Result<(&'a T, &'a T), Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
 
     /// Adds edge to the graph.
     ///
@@ -848,48 +848,50 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let mut g = Graph::new();
     ///
     /// // Add a new edge with specific identifiers.
-    /// let x = g.reserve_edge((&0, &1))?;
+    /// let (x, y) = g.reserve_edge(&0, &1)?;
     /// assert_true!(
-    ///     g.has_vertex(&0) &&
-    ///     g.has_vertex(&1) &&
-    ///     g.has_edge(x)?
+    ///     g.has_vertex(&x) &&
+    ///     g.has_vertex(&x) &&
+    ///     g.has_edge(&x, &y)?
     /// );
     ///
     /// // Reserving an existing edge yields an error.
-    /// assert_true!(g.reserve_edge(x).is_err());
+    /// assert_true!(g.reserve_edge(&x, &y).is_err());
     ///
     /// // Also, reserving a non-existing edge with.
     /// // at least one existing vertex yields an error...
-    /// assert_true!(g.reserve_edge((&0, &2)).is_err());
+    /// assert_true!(g.reserve_edge(&0, &2).is_err());
     ///
     /// // ..but adding them is fine.
     /// g.add_vertex(&2)?;
-    /// assert_false!(g.add_edge((&0, &2)).is_err());
+    /// assert_false!(g.add_edge(&0, &2).is_err());
     ///
     /// // Build a null graph.
     /// let mut g = Graphl::new();
     ///
     /// // Reserve a edge given its identifier and label.
-    /// let x = g.reserve_edge((&"0", &"1"))?;
-    /// assert_true!(g.has_edge(x)?);
+    /// let (x, y) = g.reserve_edge(&"0", &"1")?;
+    /// assert_true!(g.has_edge(&x, &y)?);
     ///
     /// // Reserving an existing edge identifier or label yields an error.
-    /// assert_true!(g.reserve_edge((&"0", &"1")).is_err());
+    /// assert_true!(g.reserve_edge(&"0", &"1").is_err());
     /// # Ok(())
     /// # }
     /// ```
     ///
     #[inline(always)]
-    fn reserve_edge<'a, T>(
+    fn reserve_edge<T>(
         &mut self,
-        x: (&'a T, &'a T),
-    ) -> Result<(&'a T, &'a T), Error<Self::Vertex>>
+        x: &T,
+        y: &T,
+    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>
     where
         T: Eq + Clone + Into<Self::Vertex>,
     {
-        self.add_vertex(x.0)?;
-        self.add_vertex(x.1)?;
-        self.add_edge(x)
+        let x = self.add_vertex(x)?;
+        let y = self.add_vertex(y)?;
+        self.add_edge(&x, &y)?;
+        Ok((x, y))
     }
 
     /// Extends graph with given edges.
@@ -914,6 +916,17 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// // Extending with existing edges yields an error.
     /// assert_true!(g.extend_edges(&[(0, 3)]).is_err());
+    ///
+    /// // Build a null graph.
+    /// let mut g = Graphl::new();
+    ///
+    /// // Extend graph with edges.
+    /// g.extend_edges(&[("0", "3"), ("1", "2")])?;
+    /// assert_eq!(g.order(), 4);
+    /// assert_eq!(g.size(), 2);
+    ///
+    /// // Extending with existing edges yields an error.
+    /// assert_true!(g.extend_edges(&[("0", "3")]).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -932,7 +945,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.reserve(lower);
         // Add edge to the graph.
         for (x, y) in iter {
-            self.reserve_edge((x, y))?;
+            self.reserve_edge(x, y)?;
         }
 
         Ok(())
@@ -958,36 +971,20 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let mut g = Graph::new();
     ///
     /// // Add a new edge.
-    /// let x = g.reserve_edge((&0, &1))?;
-    /// assert_true!(g.has_edge(x)?);
+    /// let (x, y) = g.reserve_edge(&0, &1)?;
+    /// assert_true!(g.has_edge(&x, &y)?);
     ///
     /// // Delete the newly added edge.
-    /// let f = g.del_edge(x)?;
-    /// assert_false!(g.has_edge(x)?);
-    ///
-    /// // Deleting a edge returns its identifier.
-    /// assert_eq!(x, f);
+    /// g.del_edge(&x, &y)?;
+    /// assert_false!(g.has_edge(&x, &y)?);
     ///
     /// // Deleting a non-existing edge yields an error.
-    /// assert_true!(g.del_edge(x).is_err());
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graphl::new();
-    ///
-    /// // Extend graph with edges.
-    /// g.extend_edges(&[("0", "3"), ("1", "2")])?;
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 2);
-    ///
-    /// // Extending with existing edges yields an error.
-    /// assert_true!(g.extend_edges(&[("0", "3")]).is_err());
+    /// assert_true!(g.del_edge(&x, &y).is_err());
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn del_edge<'a, T>(&mut self, x: (&'a T, &'a T)) -> Result<(&'a T, &'a T), Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>;
+    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
 
     /// Is subgraph of another graph.
     ///
@@ -1072,10 +1069,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn degree_of<T>(&self, x: &T) -> Result<usize, Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>,
-    {
+    fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
         Ok(Adj!(self, x)?.count())
     }
 
@@ -1107,10 +1101,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn is_isolated_vertex<T>(&self, x: &T) -> Result<bool, Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>,
-    {
+    fn is_isolated_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         Ok(self.degree_of(x)? == 0)
     }
 
@@ -1142,10 +1133,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     #[inline(always)]
-    fn is_pendant_vertex<T>(&self, x: &T) -> Result<bool, Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>,
-    {
+    fn is_pendant_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         Ok(self.degree_of(x)? == 1)
     }
 }
