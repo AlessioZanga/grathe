@@ -35,8 +35,7 @@ macro_rules! impl_ungraph_trait {
             /// assert_eq!(g, h);
             /// ```
             ///
-            #[inline(always)]
-            fn eq(&self, other: &Self) -> bool {
+                    fn eq(&self, other: &Self) -> bool {
                 self.0.eq(&other.0)
             }
         }
@@ -71,8 +70,7 @@ macro_rules! impl_ungraph_trait {
             /// assert_le!(g, h);
             /// ```
             ///
-            #[inline(always)]
-            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 self.0.partial_cmp(&other.0)
             }
         }
@@ -85,13 +83,11 @@ macro_rules! impl_ungraph_trait {
 
             type Storage = $storage<T>;
 
-            #[inline(always)]
-            fn new() -> Self {
+                    fn new() -> Self {
                 Default::default()
             }
 
-            #[inline(always)]
-            fn with_capacity(capacity: usize) -> Self {
+                    fn with_capacity(capacity: usize) -> Self {
                 Self {
                     0: Self::Storage::with_capacity(capacity)
                 }
@@ -115,14 +111,12 @@ macro_rules! impl_ungraph_trait {
                 }
             }
 
-            #[inline(always)]
-            fn size(&self) -> usize {
+                    fn size(&self) -> usize {
                 // De-symmetrize edge set for correct size computation
                 self.edges_iter().filter(|(x, y)| x <= y).count()
             }
 
-            #[inline(always)]
-            fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+                    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
                 // Add edge (y, x)
                 self.0.add_edge(y, x)?;
                 // Add edge (x, y)
@@ -132,8 +126,7 @@ macro_rules! impl_ungraph_trait {
                 }
             }
 
-            #[inline(always)]
-            fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+                    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
                 // Del edge (y, x)
                 self.0.del_edge(y, x)?;
                 // Del edge (x, y)
@@ -162,8 +155,7 @@ macro_rules! impl_digraph_trait {
         where
             T: VertexTrait,
         {
-            #[inline(always)]
-            fn eq(&self, other: &Self) -> bool {
+                    fn eq(&self, other: &Self) -> bool {
                 self.0.eq(&other.0)
             }
         }
@@ -174,8 +166,7 @@ macro_rules! impl_digraph_trait {
         where
             T: VertexTrait,
         {
-            #[inline(always)]
-            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 self.0.partial_cmp(&other.0)
             }
         }
@@ -188,15 +179,13 @@ macro_rules! impl_digraph_trait {
 
             type Storage = $storage<T>;
 
-            #[inline(always)]
-            fn new() -> Self {
+                    fn new() -> Self {
                 Self {
                     0: Default::new()
                 }
             }
 
-            #[inline(always)]
-            fn with_capacity(capacity: usize) -> Self {
+                    fn with_capacity(capacity: usize) -> Self {
                 Self {
                     0: Self::Storage::with_capacity(capacity)
                 }

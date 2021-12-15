@@ -13,12 +13,10 @@ impl<T> DirectionalTrait for T
 where
     T: UndirectedTrait,
 {
-    #[inline(always)]
     fn is_directed(&self) -> bool {
         false
     }
 
-    #[inline(always)]
     fn is_partially_directed(&self) -> bool {
         false
     }

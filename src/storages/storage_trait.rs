@@ -688,7 +688,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    #[inline(always)]
     fn extend_vertices<'a, I, T>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
     where
         I: IntoIterator<Item = &'a T>,
@@ -878,7 +877,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    #[inline(always)]
     fn reserve_edge<T>(
         &mut self,
         x: &T,
@@ -930,7 +928,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    #[inline(always)]
     fn extend_edges<'a, I, T>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
     where
         I: IntoIterator<Item = &'a (T, T)>,
@@ -1006,7 +1003,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_true!(g <= h);
     /// ```
     ///
-    #[inline(always)]
     fn is_subgraph(&self, other: &Self) -> bool {
         self <= other
     }
@@ -1032,7 +1028,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_true!(h >= g);
     /// ```
     ///
-    #[inline(always)]
     fn is_supergraph(&self, other: &Self) -> bool {
         self >= other
     }
@@ -1067,7 +1062,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    #[inline(always)]
     fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
         Ok(Adj!(self, x)?.len())
     }
@@ -1099,7 +1093,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    #[inline(always)]
     fn is_isolated_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         Ok(self.degree_of(x)? == 0)
     }
@@ -1131,7 +1124,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    #[inline(always)]
     fn is_pendant_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         Ok(self.degree_of(x)? == 1)
     }

@@ -41,7 +41,6 @@ pub trait UndirectedTrait: StorageTrait {
     /// At least one of the vertex identifiers already exists in the graph,
     /// or the edge identifier already exists in the graph.
     ///
-    #[inline(always)]
     fn reserve_undirected_edge<T>(
         &mut self,
         x: &T,

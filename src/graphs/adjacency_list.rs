@@ -18,7 +18,6 @@ impl<T> UndirectedTrait for UndirectedAdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
-    #[inline(always)]
     fn neighbors_iter<'a>(
         &'a self,
         x: &Self::Vertex,
@@ -26,7 +25,6 @@ where
         self.adjacents_iter(x)
     }
 
-    #[inline(always)]
     fn add_undirected_edge(
         &mut self,
         x: &Self::Vertex,

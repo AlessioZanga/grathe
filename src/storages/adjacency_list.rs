@@ -12,50 +12,41 @@ where
 
     type Storage = AdjacencyList<T>;
 
-    #[inline(always)]
     fn new() -> Self {
         Self::new()
     }
 
-    #[inline(always)]
     fn clear(&mut self) {
         // Clear the data structures
         self.clear();
     }
 
-    #[inline(always)]
     fn capacity(&self) -> usize {
         // INFO: BTreeMap as no `capacity` concept.
         0
     }
 
-    #[inline(always)]
     fn with_capacity(_capacity: usize) -> Self {
         // INFO: BTreeMap as no `capacity` concept.
         Self::new()
     }
 
-    #[inline(always)]
     fn reserve(&mut self, _additional: usize) {
         // INFO: BTreeMap as no `capacity` concept.
     }
 
-    #[inline(always)]
     fn shrink_to(&mut self, _min_capacity: usize) {
         // INFO: BTreeMap as no `capacity` concept.
     }
 
-    #[inline(always)]
     fn shrink_to_fit(&mut self) {
         // INFO: BTreeMap as no `capacity` concept.
     }
 
-    #[inline(always)]
     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         Box::new(self.iter().map(|x| x.0))
     }
 
-    #[inline(always)]
     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a> {
         Box::new(ExactSizeIter::new(
             self.iter().flat_map(|(x, ys)| std::iter::repeat(x).zip(ys)),
@@ -63,7 +54,6 @@ where
         ))
     }
 
-    #[inline(always)]
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
@@ -75,26 +65,22 @@ where
         }
     }
 
-    #[inline(always)]
     fn order(&self) -> usize {
         // Get map size.
         self.len()
     }
 
-    #[inline(always)]
     fn size(&self) -> usize {
         self.iter() // Iterate over the adjacency lists.
             .map(|(_, adj)| adj.len())
             .sum::<usize>() // Accumulate their sizes.
     }
 
-    #[inline(always)]
     fn has_vertex(&self, x: &Self::Vertex) -> bool {
         // Check if map contains key.
         self.contains_key(x)
     }
 
-    #[inline(always)]
     fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>>
     where
         U: Eq + Clone + Into<Self::Vertex>,
@@ -109,7 +95,6 @@ where
         Ok(x)
     }
 
-    #[inline(always)]
     fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
         // Remove vertex from map.
         match self.remove(x) {
@@ -127,7 +112,6 @@ where
         }
     }
 
-    #[inline(always)]
     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
         // Get vertex adjacency list.
         match self.get(x) {
@@ -143,7 +127,6 @@ where
         }
     }
 
-    #[inline(always)]
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
         // Check if second vertex exists. NOTE: Check second vertex before first
         // in order to avoid contemporaneous immutable and mutable refs to data.
@@ -165,7 +148,6 @@ where
         }
     }
 
-    #[inline(always)]
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
         // Check if second vertex exists.
         match self.contains_key(y) {

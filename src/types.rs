@@ -56,7 +56,6 @@ where
     type Item = I::Item;
 
     // Forward call to inner iterator.
-    #[inline(always)]
     fn next(&mut self) -> Option<Self::Item> {
         if self.size > 0 {
             self.size -= 1;
@@ -65,7 +64,6 @@ where
     }
 
     // Forward call to predefined size.
-    #[inline(always)]
     fn size_hint(&self) -> (usize, Option<usize>) {
         (self.size, Some(self.size))
     }
