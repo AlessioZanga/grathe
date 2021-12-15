@@ -94,7 +94,7 @@ where
     }
 
     #[inline(always)]
-    fn add_vertex<'a, U>(&mut self, x: &'a U) -> Result<Self::Vertex, Error<Self::Vertex>>
+    fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>>
     where
         U: Eq + Clone + Into<Self::Vertex>,
     {
@@ -156,7 +156,7 @@ where
                 // Otherwise try to insert vertex into adjacency list.
                 Some(adj) => match adj.insert(y.clone()) {
                     // If edge already defined return error.
-                    false => Err(Error::EdgeAlreadyDefined((x.clone(), y.clone()))),
+                    false => Err(Error::EdgeAlreadyDefined(x.clone(), y.clone())),
                     // Otherwise return successful.
                     true => Ok(()),
                 },
@@ -177,7 +177,7 @@ where
                 // Otherwise try to remove vertex from adjacency list.
                 Some(adj) => match adj.remove(y) {
                     // If no edge defined return error.
-                    false => Err(Error::EdgeNotDefined((x.clone(), y.clone()))),
+                    false => Err(Error::EdgeNotDefined(x.clone(), y.clone())),
                     // Otherwise return success
                     true => Ok(()),
                 },

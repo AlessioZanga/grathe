@@ -154,7 +154,7 @@ where
                         };
                         // Return path
                         match e {
-                            Err(Error::EdgeAlreadyDefined(e)) | Ok(e) => e,
+                            Err(Error::EdgeAlreadyDefined(x, y)) | Ok((x, y)) => (x, y),
                             Err(_) => unreachable!(),
                         }
                     })
@@ -268,13 +268,13 @@ where
     writeln!(dot, "{} {{", graph_type)?;
     // Write vertex with label
     for x in V!(graph) {
-        writeln!(dot, "\t{:?};", x);
-        // FIXME: writeln!(dot, "\t{:?} [label=\"{:?}\"];", x, y);
+        writeln!(dot, "\t{:?};", x)?;
+        // FIXME: writeln!(dot, "\t{:?} [label=\"{:?}\"];", x, y)?;
     }
     // Write edges with label
     for (x, y) in edges {
-        writeln!(dot, "\t{:?} {} {:?};", x, edge_type, y);
-        // FIXME: writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z);
+        writeln!(dot, "\t{:?} {} {:?};", x, edge_type, y)?;
+        // FIXME: writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z)?;
     }
     // Close DOT string by escaping "}"
     writeln!(dot, "}}")?;

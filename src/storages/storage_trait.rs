@@ -649,7 +649,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn add_vertex<'a, T>(&mut self, x: &'a T) -> Result<Self::Vertex, Error<Self::Vertex>>
+    fn add_vertex<T>(&mut self, x: &T) -> Result<Self::Vertex, Error<Self::Vertex>>
     where
         T: Eq + Clone + Into<Self::Vertex>;
 

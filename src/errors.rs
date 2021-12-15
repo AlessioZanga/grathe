@@ -11,10 +11,10 @@ pub enum Error<T> {
     VertexAlreadyDefined(T),
     /// Edge not defined error type.
     #[error("edge identifier `{0:?}` not defined")]
-    EdgeNotDefined((T, T)),
+    EdgeNotDefined(T, T),
     /// Edge already defined error type.
     #[error("edge identifier `{0:?}` already defined")]
-    EdgeAlreadyDefined((T, T)),
+    EdgeAlreadyDefined(T, T),
     /// Parsing error type.
     #[error("failed to parse graph")]
     ParseFailed(String),
