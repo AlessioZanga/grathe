@@ -465,7 +465,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// }
     /// ```
     ///
-    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a>;
+    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Edge iterator.
     ///
@@ -496,8 +496,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn edges_iter<'a>(&'a self)
-        -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a>;
+    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
 
     /// Adjacent iterator.
     ///
@@ -539,7 +538,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Order of the graph.
     ///

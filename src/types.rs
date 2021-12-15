@@ -16,16 +16,16 @@ impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + F
 // once done we should add "where T: VertexTrait" down here.
 
 /// Vertex iterator trait (a.k.a Iterator<Item = Vertex> + Debug)
-pub trait VertexIterator<T>: Iterator<Item = T> + ExactSizeIterator + Debug {}
+pub trait VertexIterator<'a, T: 'a>: Iterator<Item = &'a T> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of vertex iterator trait.
-impl<T, U> VertexIterator<U> for T where T: Iterator<Item = U> + ExactSizeIterator + Debug {}
+impl<'a, T, U> VertexIterator<'a, U> for T where T: Iterator<Item = &'a U> + ExactSizeIterator + Debug, U: 'a {}
 
 /// Edge iterator trait (a.k.a Iterator<Item = Edge> + Debug)
-pub trait EdgeIterator<T>: Iterator<Item = T> + ExactSizeIterator + Debug {}
+pub trait EdgeIterator<'a, T: 'a>: Iterator<Item = (&'a T, &'a T)> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of edge iterator trait.
-impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = U> + ExactSizeIterator + Debug {}
+impl<'a, T, U> EdgeIterator<'a, U> for T where T: Iterator<Item = (&'a U, &'a U)> + ExactSizeIterator + Debug, U: 'a {}
 
 /// Iterator over edges with exact size_hint
 #[derive(Debug)]

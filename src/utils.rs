@@ -104,9 +104,9 @@ macro_rules! impl_ungraph_trait {
                     fn reserve(&mut self, additional: usize);
                     fn shrink_to(&mut self, min_capacity: usize);
                     fn shrink_to_fit(&mut self);
-                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a>;
-                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a>;
-                    fn adjacents_iter<'a>(&'a self, x: &Self::Vertex) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
+                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
+                    fn adjacents_iter<'a>(&'a self, x: &Self::Vertex) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
                     fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
@@ -209,9 +209,9 @@ macro_rules! impl_digraph_trait {
                     fn reserve(&mut self, additional: usize);
                     fn shrink_to(&mut self, min_capacity: usize);
                     fn shrink_to_fit(&mut self);
-                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a>;
-                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a>;
-                    fn adjacents_iter<'a>(&'a self, x: &Self::Vertex) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
+                    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
+                    fn adjacents_iter<'a>(&'a self, x: &Self::Vertex) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;

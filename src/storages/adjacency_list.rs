@@ -51,14 +51,12 @@ where
     }
 
     #[inline(always)]
-    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<&'a Self::Vertex> + 'a> {
+    fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         Box::new(self.iter().map(|x| x.0))
     }
 
     #[inline(always)]
-    fn edges_iter<'a>(
-        &'a self,
-    ) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a> {
+    fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a> {
         Box::new(ExactSizeIter::new(
             self.iter().flat_map(|(x, ys)| std::iter::repeat(x).zip(ys)),
             self.size(),
@@ -69,7 +67,7 @@ where
     fn adjacents_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>> {
+    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
         // Get iterator over adjacent vertices.
         match self.get(x) {
             Some(x) => Ok(Box::new(x.iter())),

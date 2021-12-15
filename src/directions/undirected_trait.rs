@@ -15,7 +15,7 @@ pub trait UndirectedTrait: StorageTrait {
     fn neighbors_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Adds undirected edge to the graph.
     ///

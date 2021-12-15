@@ -22,7 +22,7 @@ where
     fn neighbors_iter<'a>(
         &'a self,
         x: &Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<&'a Self::Vertex> + 'a>, Error<Self::Vertex>> {
+    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
         self.adjacents_iter(x)
     }
 
