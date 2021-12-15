@@ -16,20 +16,20 @@ impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + F
 // once done we should add "where T: VertexTrait" down here.
 
 /// Vertex iterator trait (a.k.a Iterator<Item = Vertex> + Debug)
-pub trait VertexIterator<T>: Iterator<Item = T> + Debug {}
+pub trait VertexIterator<T>: Iterator<Item = T> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of vertex iterator trait.
-impl<T, U> VertexIterator<U> for T where T: Iterator<Item = U> + Debug {}
+impl<T, U> VertexIterator<U> for T where T: Iterator<Item = U> + ExactSizeIterator + Debug {}
 
 /// Edge iterator trait (a.k.a Iterator<Item = Edge> + Debug)
-pub trait EdgeIterator<T>: Iterator<Item = T> + Debug {}
+pub trait EdgeIterator<T>: Iterator<Item = T> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of edge iterator trait.
-impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = U> + Debug {}
+impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = U> + ExactSizeIterator + Debug {}
 
 /// Iterator over edges with exact size_hint
 #[derive(Debug)]
-pub struct SizedIter<I>
+pub struct ExactSizeIter<I>
 where
     I: Iterator,
 {
@@ -37,8 +37,8 @@ where
     size: usize,
 }
 
-// Implement base constructor.
-impl<I> SizedIter<I>
+// Implement base constructor for ExactSizeIter.
+impl<I> ExactSizeIter<I>
 where
     I: Iterator,
 {
@@ -48,8 +48,8 @@ where
     }
 }
 
-// Implement Iterator for SizedIter.
-impl<I> Iterator for SizedIter<I>
+// Implement Iterator for ExactSizeIter.
+impl<I> Iterator for ExactSizeIter<I>
 where
     I: Iterator,
 {
@@ -70,6 +70,9 @@ where
         (self.size, Some(self.size))
     }
 }
+
+// Implement ExactSizeIter for ExactSizeIterator.
+impl<I> ExactSizeIterator for ExactSizeIter<I> where I: Iterator {}
 
 /// Label bidirectional map type.
 pub type LabelMap<T> = BiHashMap<T, String>;
