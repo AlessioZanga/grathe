@@ -15,19 +15,19 @@ impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + F
 // TODO: Where clauses are not enforced in type aliases,
 // once done we should add "where T: VertexTrait" down here.
 
-/// Vertex iterator trait (a.k.a Iterator<Item = Vertex> + Debug)
+/// Vertex iterator trait.
 pub trait VertexIterator<'a, T: 'a>: Iterator<Item = &'a T> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of vertex iterator trait.
 impl<'a, T, U> VertexIterator<'a, U> for T where T: Iterator<Item = &'a U> + ExactSizeIterator + Debug, U: 'a {}
 
-/// Edge iterator trait (a.k.a Iterator<Item = Edge> + Debug)
+/// Edge iterator trait.
 pub trait EdgeIterator<'a, T: 'a>: Iterator<Item = (&'a T, &'a T)> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of edge iterator trait.
 impl<'a, T, U> EdgeIterator<'a, U> for T where T: Iterator<Item = (&'a U, &'a U)> + ExactSizeIterator + Debug, U: 'a {}
 
-/// Iterator over edges with exact size_hint
+/// Iterator with exact size.
 #[derive(Debug)]
 pub struct ExactSizeIter<I>
 where
