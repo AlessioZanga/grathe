@@ -111,14 +111,14 @@ mod tests_undirected {
 
         // Test for existing vertex
         let i = g.add_vertex(&0)?;
-        assert_eq!(Ne!(g, &i)?.count(), 0);
+        assert_eq!(Ne!(g, &i)?.len(), 0);
 
         // Test for existing neighbors
         let j = g.add_vertex(&1)?;
         g.add_edge(&i, &i)?;
         g.add_edge(&i, &j)?;
         g.add_edge(&j, &j)?;
-        assert_eq!(Ne!(g, &i)?.count(), 2);
+        assert_eq!(Ne!(g, &i)?.len(), 2);
 
         assert_true!(Ne!(g, &i)?.eq(g.neighbors_iter(&i)?));
         assert_true!(

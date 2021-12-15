@@ -1058,7 +1058,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// // Get the degree of `1`.
     /// assert_true!(
     ///     g.degree_of(&1)? == 3 &&
-    ///     g.degree_of(&1)? == Adj!(g, &1)?.count()
+    ///     g.degree_of(&1)? == Adj!(g, &1)?.len()
     /// );
     ///
     /// // Getting the degree of a non-existing vertex yields an error.
@@ -1069,7 +1069,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     #[inline(always)]
     fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
-        Ok(Adj!(self, x)?.count())
+        Ok(Adj!(self, x)?.len())
     }
 
     /// Is isolated vertex.
