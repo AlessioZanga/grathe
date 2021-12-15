@@ -335,9 +335,9 @@ mod tests {
         assert_true!(E!(g).all(|(&x, &y)| g.has_edge(&x, &y).unwrap()));
         assert_true!(is_sorted(E!(g)));
 
-        // Check iterator size hint (optional for edges).
+        // Check iterator size hint.
         let (lower, _) = E!(g).size_hint();
-        assert_le!(lower, 3);
+        assert_eq!(lower, 3);
 
         Ok(())
     }

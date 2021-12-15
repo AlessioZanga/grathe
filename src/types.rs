@@ -27,6 +27,50 @@ pub trait EdgeIterator<T>: Iterator<Item = T> + Debug {}
 // Blanket implementation of edge iterator trait.
 impl<T, U> EdgeIterator<U> for T where T: Iterator<Item = U> + Debug {}
 
+/// Iterator over edges with exact size_hint
+#[derive(Debug)]
+pub struct SizedIter<I>
+where
+    I: Iterator,
+{
+    iter: I,
+    size: usize,
+}
+
+// Implement base constructor.
+impl<I> SizedIter<I>
+where
+    I: Iterator,
+{
+    /// Constructor with given iterator and initial exact size.
+    pub fn new(iter: I, size: usize) -> Self {
+        Self { iter, size }
+    }
+}
+
+// Implement Iterator for SizedIter.
+impl<I> Iterator for SizedIter<I>
+where
+    I: Iterator,
+{
+    type Item = I::Item;
+
+    // Forward call to inner iterator.
+    #[inline(always)]
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.size > 0 {
+            self.size -= 1;
+        }
+        self.iter.next()
+    }
+
+    // Forward call to predefined size.
+    #[inline(always)]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        (self.size, Some(self.size))
+    }
+}
+
 /// Label bidirectional map type.
 pub type LabelMap<T> = BiHashMap<T, String>;
 

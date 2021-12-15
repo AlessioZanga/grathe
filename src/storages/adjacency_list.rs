@@ -59,7 +59,10 @@ where
     fn edges_iter<'a>(
         &'a self,
     ) -> Box<dyn EdgeIterator<(&'a Self::Vertex, &'a Self::Vertex)> + 'a> {
-        Box::new(self.iter().flat_map(|(x, ys)| std::iter::repeat(x).zip(ys)))
+        Box::new(SizedIter::new(
+            self.iter().flat_map(|(x, ys)| std::iter::repeat(x).zip(ys)),
+            self.size(),
+        ))
     }
 
     #[inline(always)]
