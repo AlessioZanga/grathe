@@ -16,15 +16,19 @@ impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + F
 // once done we should add "where T: VertexTrait" down here.
 
 /// Vertex iterator trait.
+#[rustfmt::skip]
 pub trait VertexIterator<'a, T: 'a>: Iterator<Item = &'a T> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of vertex iterator trait.
+#[rustfmt::skip]
 impl<'a, T, U> VertexIterator<'a, U> for T where T: Iterator<Item = &'a U> + ExactSizeIterator + Debug, U: 'a {}
 
 /// Edge iterator trait.
+#[rustfmt::skip]
 pub trait EdgeIterator<'a, T: 'a>: Iterator<Item = (&'a T, &'a T)> + ExactSizeIterator + Debug {}
 
 // Blanket implementation of edge iterator trait.
+#[rustfmt::skip]
 impl<'a, T, U> EdgeIterator<'a, U> for T where T: Iterator<Item = (&'a U, &'a U)> + ExactSizeIterator + Debug, U: 'a {}
 
 /// Iterator with exact size.
