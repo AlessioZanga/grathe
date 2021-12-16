@@ -301,7 +301,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 3);
     ///
-    /// // A sequence of unique vertex labels pairs.
+    /// // A sequence of unique edge labels pairs.
     /// let sequence = [("0", "1"), ("2", "3"), ("1", "2")];
     ///
     /// // Build a graph given a vector of vertex labels pairs.
@@ -769,7 +769,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let mut g = Graphl::new();
     ///
     /// // Add a edge given its label.
-    /// let (x, y) = g.reserve_edge(&"0", &"1")?;
+    /// let x = g.add_vertex(&"0")?;
+    /// let y = g.add_vertex(&"1")?;
+    /// g.add_edge(&x, &y)?;
     ///
     /// // Check that the newly added label is indeed in the graph.
     /// assert_true!(g.has_edge(&x, &y)?);
@@ -826,71 +828,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
 
-    /// Adds edge to the graph.
-    ///
-    /// Insert given vertex identifiers and edge identifier into the graph.
-    ///
-    /// # Errors
-    ///
-    /// At least one of the vertex identifiers already exists in the graph,
-    /// or the edge identifier already exists in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), anyhow::Error> {
-    /// // Build a null graph.
-    /// let mut g = Graph::new();
-    ///
-    /// // Add a new edge with specific identifiers.
-    /// let (x, y) = g.reserve_edge(&0, &1)?;
-    /// assert_true!(
-    ///     g.has_vertex(&x) &&
-    ///     g.has_vertex(&x) &&
-    ///     g.has_edge(&x, &y)?
-    /// );
-    ///
-    /// // Reserving an existing edge yields an error.
-    /// assert_true!(g.reserve_edge(&x, &y).is_err());
-    ///
-    /// // Also, reserving a non-existing edge with.
-    /// // at least one existing vertex yields an error...
-    /// assert_true!(g.reserve_edge(&0, &2).is_err());
-    ///
-    /// // ..but adding them is fine.
-    /// g.add_vertex(&2)?;
-    /// assert_false!(g.add_edge(&0, &2).is_err());
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graphl::new();
-    ///
-    /// // Reserve a edge given its identifier and label.
-    /// let (x, y) = g.reserve_edge(&"0", &"1")?;
-    /// assert_true!(g.has_edge(&x, &y)?);
-    ///
-    /// // Reserving an existing edge identifier or label yields an error.
-    /// assert_true!(g.reserve_edge(&"0", &"1").is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn reserve_edge<T>(
-        &mut self,
-        x: &T,
-        y: &T,
-    ) -> Result<(Self::Vertex, Self::Vertex), Error<Self::Vertex>>
-    where
-        T: Eq + Clone + Into<Self::Vertex>,
-    {
-        let x = self.add_vertex(x)?;
-        let y = self.add_vertex(y)?;
-        self.add_edge(&x, &y)?;
-        Ok((x, y))
-    }
-
     /// Extends graph with given edges.
     ///
     /// Extends graph with given sequence of edges identifiers.
@@ -941,7 +878,18 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         self.reserve(lower);
         // Add edge to the graph.
         for (x, y) in iter {
-            self.reserve_edge(x, y)?;
+            // Try to add vertex, ignore error if vertex already defined.
+            let x = match self.add_vertex(x) {
+                Err(Error::VertexAlreadyDefined(x)) | Ok(x) => x,
+                Err(_) => unreachable!(),
+            };
+            // Try to add vertex, ignore error if vertex already defined.
+            let y = match self.add_vertex(y) {
+                Err(Error::VertexAlreadyDefined(y)) | Ok(y) => y,
+                Err(_) => unreachable!(),
+            };
+            // Add vertex given new vertices.
+            self.add_edge(&x, &y)?;
         }
 
         Ok(())
@@ -967,7 +915,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let mut g = Graph::new();
     ///
     /// // Add a new edge.
-    /// let (x, y) = g.reserve_edge(&0, &1)?;
+    /// let x = g.add_vertex(&0)?;
+    /// let y = g.add_vertex(&1)?;
+    /// g.add_edge(&x, &y)?;
     /// assert_true!(g.has_edge(&x, &y)?);
     ///
     /// // Delete the newly added edge.

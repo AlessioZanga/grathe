@@ -621,27 +621,6 @@ mod tests {
     }
 
     #[test]
-    fn reserve_edge<T>() -> Result<(), Error<i32>>
-    where
-        T: StorageTrait<Vertex = i32>,
-    {
-        let mut g = T::new();
-
-        // Test missing edge and vertex.
-        let (i, j) = g.reserve_edge(&0, &1)?;
-        assert_true!(g.has_vertex(&i));
-        assert_true!(g.has_vertex(&j));
-        assert_true!(g.has_edge(&i, &j)?);
-
-        // Test already existing vertex
-        let i = g.add_vertex(&2)?;
-        assert_true!(g.reserve_edge(&i, &3).is_err());
-        assert_true!(g.reserve_edge(&3, &i).is_err());
-
-        Ok(())
-    }
-
-    #[test]
     fn extend_edges<T>() -> Result<(), Error<i32>>
     where
         T: StorageTrait<Vertex = i32>,
