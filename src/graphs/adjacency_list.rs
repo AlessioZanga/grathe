@@ -11,6 +11,7 @@ where
 {
     data: AdjacencyList<T>,
     vattrs: Attributes<T>,
+    eattrs: Attributes<(T, T)>,
 }
 
 // Storage delegation and graph trait implementation.

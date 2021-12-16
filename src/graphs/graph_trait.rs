@@ -54,6 +54,68 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     ///
     fn unset_vertex_attr(&mut self, x: &Self::Vertex, k: &str) -> Result<Box<dyn Any>, Error<Self::Vertex>>;
 
+    /// Reference to edge attributes.
+    ///
+    /// Returns the reference to the edge attributes map.
+    ///
+    fn as_edge_attrs(&self) -> &Attributes<(Self::Vertex, Self::Vertex)>;
+
+    /// Checks edge attribute.
+    ///
+    /// Checks whether a edge has an attribute with given key.
+    ///
+    /// # Errors
+    ///
+    /// The edge identifier does not exist in the graph.
+    ///
+    fn has_edge_attr(&self, x: &Self::Vertex, y: &Self::Vertex, k: &str) -> Result<bool, Error<Self::Vertex>>;
+
+    /// Gets edge attribute with given key.
+    ///
+    /// Returns a reference to an attribute with given key.
+    ///
+    /// # Errors
+    ///
+    /// The edge identifier (or its attribute key) does not exist in the graph.
+    ///
+    fn get_edge_attr<'a>(
+        &'a self,
+        x: &Self::Vertex,
+        y: &Self::Vertex,
+        k: &str,
+    ) -> Result<&'a dyn Any, Error<Self::Vertex>>;
+
+    /// Sets edge attribute with given key and value.
+    ///
+    /// Inserts the edge attribute into the graph, overwriting any previous assignment.
+    ///
+    /// # Errors
+    ///
+    /// The edge identifier does not exist in the graph.
+    ///
+    fn set_edge_attr<V: 'static>(
+        &mut self,
+        x: &Self::Vertex,
+        y: &Self::Vertex,
+        k: &str,
+        v: V,
+    ) -> Result<(), Error<Self::Vertex>>;
+
+    /// Un-sets edge attribute with given key and returns its value.
+    ///
+    /// Removes the edge attribute from the graph.
+    ///
+    /// # Errors
+    ///
+    /// The edge identifier (or its attribute key) does not exist in the graph.
+    ///
+    fn unset_edge_attr(
+        &mut self,
+        x: &Self::Vertex,
+        y: &Self::Vertex,
+        k: &str,
+    ) -> Result<Box<dyn Any>, Error<Self::Vertex>>;
+
     /// From DOT string constructor.
     ///
     /// Construct a graph from a given DOT string.

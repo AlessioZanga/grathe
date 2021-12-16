@@ -99,7 +99,7 @@ where
                 // Get iterator on parsed
                 let mut i = pair.into_inner();
                 // Parse path identifier
-                if let DOTValue::Path(x) = match_rules(graph, i.next().unwrap())? {
+                if let DOTValue::Path(p) = match_rules(graph, i.next().unwrap())? {
                     // Add path attributes
                     if let Some(attributes) = i.next() {
                         // Iterate over attributes
@@ -108,15 +108,10 @@ where
                             // Map attributes into (key, value) pairs
                             .map(|x| x.into_inner().tuple_windows().next().unwrap())
                         {
-                            // Handle special key
-                            if k.as_str() == "label" {
-                                // FIXME: How to handle duplicated labels? Now it is first come, first served.
-                                let e = x.get(0).unwrap();
-                                // FIXME: How to handle shared label across edges of path? Now it is first come, first served.
-                                // FIXME: graph.set_edge_label(e, to_label(value)).ok();
-                            } else {
-                                // TODO: Add path attributes
-                                warn!("path attribute '{}={}' ignored.", k.as_str(), v.as_str());
+                            // Iterate over each edge in the path.
+                            for (x, y) in &p {
+                                // Set the same attributes for each edge in the path.
+                                graph.set_edge_attr(&x, &y, k.as_str(), v.as_str().to_string()).unwrap();
                             }
                         }
                     }

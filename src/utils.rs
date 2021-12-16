@@ -91,7 +91,8 @@ macro_rules! impl_ungraph_trait {
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: Self::Storage::with_capacity(capacity),
-                    vattrs: Attributes::<T>::new(),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
                 }
             }
 
@@ -138,20 +139,26 @@ macro_rules! impl_ungraph_trait {
                 // Add edge (y, x)
                 self.data.add_edge(y, x)?;
                 // Add edge (x, y)
-                match x == y {
-                    false => self.data.add_edge(x, y),
-                    true => Ok(())
+                if x != y {
+                    self.data.add_edge(x, y)?;
                 }
+                // Add associated attribute map.
+                self.eattrs.insert((x.clone(), y.clone()), Default::default());
+                // Return successfully.
+                Ok(())
             }
 
             fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
                 // Del edge (y, x)
                 self.data.del_edge(y, x)?;
                 // Del edge (x, y)
-                match x == y {
-                    false => self.data.del_edge(x, y),
-                    true => Ok(())
+                if x != y {
+                    self.data.del_edge(x, y)?;
                 }
+                // Delete associated attribute map.
+                self.eattrs.remove(&(x.clone(), y.clone()));
+                // Return successfully.
+                Ok(())
             }
         }
 
@@ -176,7 +183,7 @@ macro_rules! impl_ungraph_trait {
                     // If vertex is not defined return error.
                     None => Err(Error::VertexNotDefined(x.clone())),
                     // Otherwise, check if vertex has an attribute with given key.
-                    Some(vattrs) => match vattrs.get(k) {
+                    Some(attrs) => match attrs.get(k) {
                         // If attribute key is not defined return error.
                         None => Err(Error::VertexAttributeNotDefined(x.clone(), k.to_string())),
                         // Otherwise, cast pointer to given type.
@@ -209,6 +216,81 @@ macro_rules! impl_ungraph_trait {
                     Some(attrs) => match attrs.remove(k) {
                         // There is no such attribute, return error.
                         None => Err(Error::VertexAttributeNotDefined(x.clone(), k.to_string())),
+                        // Return successfully.
+                        Some(v) => Ok(v),
+                    }
+                }
+            }
+
+            fn as_edge_attrs(&self) -> &Attributes<(Self::Vertex, Self::Vertex)> {
+                &self.eattrs
+            }
+
+            fn has_edge_attr(&self, x: &Self::Vertex, y: &Self::Vertex, k: &str) -> Result<bool, Error<Self::Vertex>> {
+                // Check if edge is valid.
+                match self.eattrs.get(&(x.clone(), y.clone())) {
+                    // If edge is not defined return error.
+                    None => Err(Error::EdgeNotDefined(x.clone(), y.clone())),
+                    // Otherwise, check if edge has any attribute or an attribute with given key.
+                    Some(attrs) => Ok(attrs.contains_key(k))
+                }
+            }
+
+            fn get_edge_attr<'a>(
+                &'a self,
+                x: &Self::Vertex,
+                y: &Self::Vertex,
+                k: &str,
+            ) -> Result<&'a dyn Any, Error<Self::Vertex>> {
+                // Check if edge is valid.
+                match self.eattrs.get(&(x.clone(), y.clone())) {
+                    // If edge is not defined return error.
+                    None => Err(Error::EdgeNotDefined(x.clone(), y.clone())),
+                    // Otherwise, check if edge has an attribute with given key.
+                    Some(vattrs) => match vattrs.get(k) {
+                        // If attribute key is not defined return error.
+                        None => Err(Error::EdgeAttributeNotDefined(x.clone(), y.clone(), k.to_string())),
+                        // Otherwise, cast pointer to given type.
+                        Some(v) => Ok(v)
+                    }
+                }
+            }
+
+            fn set_edge_attr<V: 'static>(
+                &mut self,
+                x: &Self::Vertex,
+                y: &Self::Vertex,
+                k: &str,
+                v: V,
+            ) -> Result<(), Error<Self::Vertex>> {
+                // Check if edge is valid.
+                match self.eattrs.get_mut(&(x.clone(), y.clone())) {
+                    // Edge is not defined, return error.
+                    None => Err(Error::EdgeNotDefined(x.clone(), y.clone())),
+                    // Otherwise, check if edge has any attribute or an attribute with given key.
+                    Some(attrs) => {
+                        // Insert attribute in map.
+                        attrs.insert(k.to_string(), Box::new(v));
+                        // Return successfully.
+                        Ok(())
+                    }
+                }
+            }
+
+            fn unset_edge_attr(
+                &mut self,
+                x: &Self::Vertex,
+                y: &Self::Vertex,
+                k: &str,
+            ) -> Result<Box<dyn Any>, Error<Self::Vertex>> {
+                // Check if edge is valid.
+                match self.vattrs.get_mut(x) {
+                    // If edge is not defined return error.
+                    None => Err(Error::EdgeNotDefined(x.clone(), y.clone())),
+                    // Otherwise, try to remove the attribute with given key.
+                    Some(attrs) => match attrs.remove(k) {
+                        // There is no such attribute, return error.
+                        None => Err(Error::EdgeAttributeNotDefined(x.clone(), y.clone(), k.to_string())),
                         // Return successfully.
                         Some(v) => Ok(v),
                     }
