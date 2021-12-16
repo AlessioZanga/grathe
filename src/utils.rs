@@ -7,6 +7,7 @@ macro_rules! impl_ungraph_trait {
         use crate::graphs::GraphTrait;
         use delegate::delegate;
         use std::cmp::Ordering;
+        use std::any::Any;
 
         impl<T> PartialEq for $graph<T>
         where
@@ -35,8 +36,8 @@ macro_rules! impl_ungraph_trait {
             /// assert_eq!(g, h);
             /// ```
             ///
-                    fn eq(&self, other: &Self) -> bool {
-                self.0.eq(&other.0)
+            fn eq(&self, other: &Self) -> bool {
+                self.data.eq(&other.data)
             }
         }
 
@@ -70,8 +71,8 @@ macro_rules! impl_ungraph_trait {
             /// assert_le!(g, h);
             /// ```
             ///
-                    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-                self.0.partial_cmp(&other.0)
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                self.data.partial_cmp(&other.data)
             }
         }
 
@@ -83,18 +84,19 @@ macro_rules! impl_ungraph_trait {
 
             type Storage = $storage<T>;
 
-                    fn new() -> Self {
+            fn new() -> Self {
                 Default::default()
             }
 
-                    fn with_capacity(capacity: usize) -> Self {
+            fn with_capacity(capacity: usize) -> Self {
                 Self {
-                    0: Self::Storage::with_capacity(capacity)
+                    data: Self::Storage::with_capacity(capacity),
+                    vattrs: Attributes::<T>::new(),
                 }
             }
 
             delegate! {
-                to self.0 {
+                to self.data {
                     fn clear(&mut self);
                     fn capacity(&self) -> usize;
                     fn reserve(&mut self, additional: usize);
@@ -105,39 +107,114 @@ macro_rules! impl_ungraph_trait {
                     fn adjacents_iter<'a>(&'a self, x: &Self::Vertex) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
                     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>>;
                 }
             }
 
-                    fn size(&self) -> usize {
+            fn size(&self) -> usize {
                 // De-symmetrize edge set for correct size computation
                 self.edges_iter().filter(|(x, y)| x <= y).count()
             }
 
-                    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+            fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex> {
+                // Add vertex into the graph.
+                let x = self.data.add_vertex(x)?;
+                // Add associated attribute map.
+                self.vattrs.insert(x.clone(), Default::default());
+                // Return successfully.
+                Ok((x))
+            }
+
+            fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+                // Delete vertex from the graph.
+                self.data.del_vertex(x)?;
+                // Delete associated attribute map.
+                self.vattrs.remove(x);
+                // Return successfully.
+                Ok(())
+            }
+
+            fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
                 // Add edge (y, x)
-                self.0.add_edge(y, x)?;
+                self.data.add_edge(y, x)?;
                 // Add edge (x, y)
                 match x == y {
-                    false => self.0.add_edge(x, y),
+                    false => self.data.add_edge(x, y),
                     true => Ok(())
                 }
             }
 
-                    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+            fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
                 // Del edge (y, x)
-                self.0.del_edge(y, x)?;
+                self.data.del_edge(y, x)?;
                 // Del edge (x, y)
                 match x == y {
-                    false => self.0.del_edge(x, y),
+                    false => self.data.del_edge(x, y),
                     true => Ok(())
                 }
             }
         }
 
-        impl<T> GraphTrait for $graph<T> where T: VertexTrait {}
+        impl<T> GraphTrait for $graph<T> where T: VertexTrait {
+            fn as_vertex_attrs(&self) -> &Attributes<Self::Vertex> {
+                &self.vattrs
+            }
+
+            fn has_vertex_attr(&self, x: &Self::Vertex, k: &str) -> Result<bool, Error<Self::Vertex>> {
+                // Check if vertex is valid.
+                match self.vattrs.get(x) {
+                    // If vertex is not defined return error.
+                    None => Err(Error::VertexNotDefined(x.clone())),
+                    // Otherwise, check if vertex has any attribute or an attribute with given key.
+                    Some(attrs) => Ok(attrs.contains_key(k))
+                }
+            }
+
+            fn get_vertex_attr<'a>(&'a self, x: &Self::Vertex, k: &str) -> Result<&'a dyn Any, Error<Self::Vertex>> {
+                // Check if vertex is valid.
+                match self.vattrs.get(x) {
+                    // If vertex is not defined return error.
+                    None => Err(Error::VertexNotDefined(x.clone())),
+                    // Otherwise, check if vertex has an attribute with given key.
+                    Some(vattrs) => match vattrs.get(k) {
+                        // If attribute key is not defined return error.
+                        None => Err(Error::VertexAttributeNotDefined(x.clone(), k.to_string())),
+                        // Otherwise, cast pointer to given type.
+                        Some(v) => Ok(v)
+                    }
+                }
+            }
+
+            fn set_vertex_attr<V: 'static>(&mut self, x: &Self::Vertex, k: &str, v: V) -> Result<(), Error<Self::Vertex>> {
+                // Check if vertex is valid.
+                match self.vattrs.get_mut(x) {
+                    // Vertex is not defined, return error.
+                    None => Err(Error::VertexNotDefined(x.clone())),
+                    // Otherwise, check if vertex has any attribute or an attribute with given key.
+                    Some(attrs) => {
+                        // Insert attribute in map.
+                        attrs.insert(k.to_string(), Box::new(v));
+                        // Return successfully.
+                        Ok(())
+                    }
+                }
+            }
+
+            fn unset_vertex_attr(&mut self, x: &Self::Vertex, k: &str) -> Result<Box<dyn Any>, Error<Self::Vertex>> {
+                // Check if vertex is valid.
+                match self.vattrs.get_mut(x) {
+                    // If vertex is not defined return error.
+                    None => Err(Error::VertexNotDefined(x.clone())),
+                    // Otherwise, try to remove the attribute with given key.
+                    Some(attrs) => match attrs.remove(k) {
+                        // There is no such attribute, return error.
+                        None => Err(Error::VertexAttributeNotDefined(x.clone(), k.to_string())),
+                        // Return successfully.
+                        Some(v) => Ok(v),
+                    }
+                }
+            }
+        }
     };
 }
 
@@ -155,8 +232,8 @@ macro_rules! impl_digraph_trait {
         where
             T: VertexTrait,
         {
-                    fn eq(&self, other: &Self) -> bool {
-                self.0.eq(&other.0)
+            fn eq(&self, other: &Self) -> bool {
+                self.data.eq(&other.data)
             }
         }
 
@@ -166,8 +243,8 @@ macro_rules! impl_digraph_trait {
         where
             T: VertexTrait,
         {
-                    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-                self.0.partial_cmp(&other.0)
+            fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+                self.data.partial_cmp(&other.data)
             }
         }
 
@@ -179,20 +256,20 @@ macro_rules! impl_digraph_trait {
 
             type Storage = $storage<T>;
 
-                    fn new() -> Self {
+            fn new() -> Self {
                 Self {
-                    0: Default::new()
+                    data: Default::new()
                 }
             }
 
-                    fn with_capacity(capacity: usize) -> Self {
+            fn with_capacity(capacity: usize) -> Self {
                 Self {
-                    0: Self::Storage::with_capacity(capacity)
+                    data: Self::Storage::with_capacity(capacity)
                 }
             }
 
             delegate! {
-                to self.0 {
+                to self.data {
                     fn clear(&mut self);
                     fn capacity(&self) -> usize;
                     fn reserve(&mut self, additional: usize);

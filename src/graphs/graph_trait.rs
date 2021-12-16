@@ -2,10 +2,58 @@ use crate::directions::DirectionalTrait;
 use crate::errors::Error;
 use crate::io::*;
 use crate::storages::StorageTrait;
+use crate::types::*;
+use std::any::Any;
 use std::path::Path;
 
 /// The base graph trait.
 pub trait GraphTrait: DirectionalTrait + StorageTrait {
+    /// Reference to vertex attributes.
+    ///
+    /// Returns the reference to the vertex attributes map.
+    ///
+    fn as_vertex_attrs(&self) -> &Attributes<Self::Vertex>;
+
+    /// Checks vertex attribute.
+    ///
+    /// Checks whether a vertex has an attribute with given key.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exist in the graph.
+    ///
+    fn has_vertex_attr(&self, x: &Self::Vertex, k: &str) -> Result<bool, Error<Self::Vertex>>;
+
+    /// Gets vertex attribute with given key.
+    ///
+    /// Returns a reference to an attribute with given key.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier (or its attribute key) does not exist in the graph.
+    ///
+    fn get_vertex_attr<'a>(&'a self, x: &Self::Vertex, k: &str) -> Result<&'a dyn Any, Error<Self::Vertex>>;
+
+    /// Sets vertex attribute with given key and value.
+    ///
+    /// Inserts the vertex attribute into the graph, overwriting any previous assignment.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier does not exist in the graph.
+    ///
+    fn set_vertex_attr<V: 'static>(&mut self, x: &Self::Vertex, k: &str, v: V) -> Result<(), Error<Self::Vertex>>;
+
+    /// Un-sets vertex attribute with given key and returns its value.
+    ///
+    /// Removes the vertex attribute from the graph.
+    ///
+    /// # Errors
+    ///
+    /// The vertex identifier (or its attribute key) does not exist in the graph.
+    ///
+    fn unset_vertex_attr(&mut self, x: &Self::Vertex, k: &str) -> Result<Box<dyn Any>, Error<Self::Vertex>>;
+
     /// From DOT string constructor.
     ///
     /// Construct a graph from a given DOT string.

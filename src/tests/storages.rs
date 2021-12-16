@@ -286,10 +286,7 @@ mod tests {
         for (x, y) in E {
             a[(x as usize, y as usize)] = 1;
         }
-        assert_eq!(
-            g.to_sparse_adjacency_matrix(),
-            SparseAdjacencyMatrix::from(&a)
-        );
+        assert_eq!(g.to_sparse_adjacency_matrix(), SparseAdjacencyMatrix::from(&a));
 
         Ok(())
     }

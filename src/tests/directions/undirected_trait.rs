@@ -121,9 +121,7 @@ mod tests_undirected {
         assert_eq!(Ne!(g, &i)?.len(), 2);
 
         assert_true!(Ne!(g, &i)?.eq(g.neighbors_iter(&i)?));
-        assert_true!(
-            Ne!(g, &i)?.all(|&x| g.has_edge(&i, &x).unwrap() && g.has_edge(&x, &i).unwrap())
-        );
+        assert_true!(Ne!(g, &i)?.all(|&x| g.has_edge(&i, &x).unwrap() && g.has_edge(&x, &i).unwrap()));
         assert_true!(is_sorted(Ne!(g, &i)?));
 
         Ok(())
@@ -145,24 +143,6 @@ mod tests_undirected {
 
         // Test for repeated undirected edges addition
         assert_true!(g.add_undirected_edge(&i, &j).is_err());
-
-        Ok(())
-    }
-
-    #[test]
-    fn reserve_undirected_edge<T>() -> Result<(), Error<i32>>
-    where
-        T: UndirectedTrait<Vertex = i32>,
-    {
-        let mut g = T::new();
-
-        // Test for undirected edges
-        let (i, j) = g.reserve_undirected_edge(&0, &1)?;
-        assert_true!(g.has_edge(&i, &j)?);
-        assert_true!(g.has_edge(&j, &i)?);
-
-        // Test for repeated undirected edges addition
-        assert_true!(g.reserve_undirected_edge(&i, &j).is_err());
 
         Ok(())
     }

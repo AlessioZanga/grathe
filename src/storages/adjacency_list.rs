@@ -1,7 +1,6 @@
 use crate::errors::Error;
 use crate::storages::StorageTrait;
 use crate::types::*;
-use std::collections::BTreeSet;
 
 /// Graph structure based on adjacency list storage.
 impl<T> StorageTrait for AdjacencyList<T>
@@ -91,7 +90,7 @@ where
         if self.has_vertex(&x) {
             return Err(Error::VertexAlreadyDefined(x));
         }
-        self.insert(x.clone(), BTreeSet::new());
+        self.insert(x.clone(), Default::default());
         Ok(x)
     }
 

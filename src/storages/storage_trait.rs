@@ -399,12 +399,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         let mut idx = HashMap::new();
         let mut out = DenseAdjacencyMatrix::zeros(n, n);
         // Build vid-to-index mapping.
-        idx.extend(
-            V!(self)
-                .into_iter()
-                .enumerate()
-                .map(|(index, vid)| (vid, index)),
-        );
+        idx.extend(V!(self).into_iter().enumerate().map(|(i, x)| (x, i)));
         // Populate the output value.
         for (x, y) in E!(self) {
             out[(idx[&x], idx[&y])] = 1;
@@ -425,12 +420,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
         let mut idx = HashMap::new();
         let mut out = CooMatrix::<i8>::zeros(n, n);
         // Build vid-to-index mapping.
-        idx.extend(
-            V!(self)
-                .into_iter()
-                .enumerate()
-                .map(|(index, vid)| (vid, index)),
-        );
+        idx.extend(V!(self).into_iter().enumerate().map(|(index, vid)| (vid, index)));
         // Populate the output value.
         out.reserve(self.size());
         for (x, y) in E!(self) {
@@ -504,7 +494,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// The vertex identifier does not exists in the graph.
+    /// The vertex identifier does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -713,7 +703,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// The vertex identifier does not exists in the graph.
+    /// The vertex identifier does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -747,7 +737,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// At least one of the vertex identifiers do not exist in the graph.
+    /// At least one of the vertex identifiers does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -787,7 +777,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// At least one of the vertex identifiers do not exist in the graph,
+    /// At least one of the vertex identifiers does not exist in the graph,
     /// or the edge identifier already exists in the graph.
     ///
     /// # Examples
@@ -901,8 +891,8 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// At least one of the vertex identifiers do not exist in the graph,
-    /// or the edge identifier does not exists in the graph.
+    /// At least one of the vertex identifiers does not exist in the graph,
+    /// or the edge identifier does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -988,7 +978,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// The vertex identifier does not exists in the graph.
+    /// The vertex identifier does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -1022,7 +1012,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// The vertex identifier does not exists in the graph.
+    /// The vertex identifier does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -1053,7 +1043,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// # Errors
     ///
-    /// The vertex identifier does not exists in the graph.
+    /// The vertex identifier does not exist in the graph.
     ///
     /// # Examples
     ///

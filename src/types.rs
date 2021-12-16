@@ -1,6 +1,7 @@
 use bimap::BiHashMap;
 use na::{Dynamic, OMatrix};
 use nasparse::CsrMatrix;
+use std::any::Any;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -78,6 +79,9 @@ impl<I> ExactSizeIterator for ExactSizeIter<I> where I: Iterator {}
 
 /// Label bidirectional map type.
 pub type LabelMap<T> = BiHashMap<T, String>;
+
+/// Attribute map type.
+pub type Attributes<T> = BTreeMap<T, BTreeMap<String, Box<dyn Any>>>;
 
 /// Edge list type.
 pub type EdgeList<T> = BTreeSet<(T, T)>;

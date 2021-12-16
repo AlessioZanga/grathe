@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use crate::errors::Error;
-    use crate::graphs::UndirectedAdjacencyListGraph;
+    use crate::graphs::{GraphTrait, UndirectedAdjacencyListGraph};
     use crate::storages::StorageTrait;
     use std::path::PathBuf;
     use tempfile::NamedTempFile;
@@ -33,10 +33,21 @@ mod tests {
     }
 
     #[test]
+    fn to_dot() -> Result<(), Error<i32>> {
+        let mut g = UndirectedAdjacencyListGraph::<i32>::new();
+        let i = g.add_vertex(&0)?;
+        let j = g.add_vertex(&1)?;
+        g.set_vertex_attr(&i, "label", "A")?;
+        g.set_vertex_attr(&j, "label", String::from("B"))?;
+        assert_eq!(g.to_dot()?.as_str(), "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n}\n");
+
+        Ok(())
+    }
+
+    #[test]
     fn read_dot() {
         for path in load_test_data() {
-            let parsed =
-                crate::io::read_dot::<UndirectedAdjacencyListGraph<String>>(&path).unwrap();
+            let parsed = crate::io::read_dot::<UndirectedAdjacencyListGraph<String>>(&path).unwrap();
             println!("{:?}", parsed);
         }
     }

@@ -103,24 +103,20 @@ where
                     // Add path attributes
                     if let Some(attributes) = i.next() {
                         // Iterate over attributes
-                        for (key, value) in attributes
+                        for (k, v) in attributes
                             .into_inner()
                             // Map attributes into (key, value) pairs
                             .map(|x| x.into_inner().tuple_windows().next().unwrap())
                         {
                             // Handle special key
-                            if key.as_str() == "label" {
+                            if k.as_str() == "label" {
                                 // FIXME: How to handle duplicated labels? Now it is first come, first served.
                                 let e = x.get(0).unwrap();
                                 // FIXME: How to handle shared label across edges of path? Now it is first come, first served.
                                 // FIXME: graph.set_edge_label(e, to_label(value)).ok();
                             } else {
                                 // TODO: Add path attributes
-                                warn!(
-                                    "path attribute '{}={}' ignored.",
-                                    key.as_str(),
-                                    value.as_str()
-                                );
+                                warn!("path attribute '{}={}' ignored.", k.as_str(), v.as_str());
                             }
                         }
                     }
@@ -137,18 +133,13 @@ where
                     // Map tuples to path
                     .map(|(x, y)| {
                         // Insert vertex if missing
-                        let e = (
-                            match_rules(graph, x).unwrap(),
-                            match_rules(graph, y).unwrap(),
-                        );
+                        let e = (match_rules(graph, x).unwrap(), match_rules(graph, y).unwrap());
                         // Insert path
                         let e = match e {
-                            (DOTValue::Vertex(x), DOTValue::Vertex(y)) => {
-                                match graph.add_edge(&x, &y) {
-                                    Err(e) => Err(e),
-                                    Ok(_) => Ok((x, y)),
-                                }
-                            }
+                            (DOTValue::Vertex(x), DOTValue::Vertex(y)) => match graph.add_edge(&x, &y) {
+                                Err(e) => Err(e),
+                                Ok(_) => Ok((x, y)),
+                            },
                             // FIXME: Handling subgraphs
                             _ => unreachable!(),
                         };
@@ -171,23 +162,12 @@ where
                     // Add vertex attributes
                     if let Some(attributes) = i.next() {
                         // Iterate over attributes
-                        for (key, value) in attributes
+                        for (k, v) in attributes
                             .into_inner()
                             // Map attributes into (key, value) pairs
                             .map(|x| x.into_inner().tuple_windows().next().unwrap())
                         {
-                            // Handle special key
-                            if key.as_str() == "label" {
-                                // FIXME: How to handle duplicated labels? Here is first come, first served.
-                                // FIXME: graph.set_vertex_label(&x, to_label(value)).ok();
-                            } else {
-                                // TODO: Add vertex attributes
-                                warn!(
-                                    "Vertex attribute '{}={}' ignored.",
-                                    key.as_str(),
-                                    value.as_str()
-                                );
-                            }
+                            graph.set_vertex_attr(&x, k.as_str(), v.as_str().to_string()).unwrap();
                         }
                     }
                 }
@@ -245,31 +225,53 @@ pub fn to_dot<T>(graph: &T) -> Result<String, std::fmt::Error>
 where
     T: GraphTrait,
 {
-    // Initialize empty string
+    // Initialize empty string.
     let mut dot = String::new();
-    // Set the graph_type
+    // Set the graph_type.
     let mut graph_type = "graph";
     if graph.is_directed() {
         graph_type = "digraph";
     }
-    // Set the edge_type
+    // Set the edge_type.
     let mut edge_type = "--";
     if graph.is_directed() {
         edge_type = "->";
     }
-    // De-symmetrize edge set for undirected graphs
+    // De-symmetrize edge set for undirected graphs.
     // TODO: Avoid 'collect' workaround to deal with
-    //       different iterator resulting types
+    //       different iterator resulting types.
     let mut edges = E!(graph).collect::<Vec<_>>();
     if !graph.is_directed() {
         edges = E!(graph).filter(|(x, y)| x <= y).collect();
     }
-    // Open DOT string by escaping "{"
+    // Get reference to vertices attributes.
+    let vattrs = graph.as_vertex_attrs();
+    // Open DOT string by escaping "{".
     writeln!(dot, "{} {{", graph_type)?;
-    // Write vertex with label
+    // Write vertex with its attributes.
     for x in V!(graph) {
-        writeln!(dot, "\t{:?};", x)?;
-        // FIXME: writeln!(dot, "\t{:?} [label=\"{:?}\"];", x, y)?;
+        // Write the vertex identifier.
+        write!(dot, "\t{:?}", x)?;
+        // Get vertex attributes.
+        let attrs = vattrs.get(x).unwrap();
+        // Write its attributes, if any.
+        if !attrs.is_empty() {
+            // Format key-value pairs.
+            let attrs = attrs.iter().map(|(k, v)| {
+                // Try to downcast the Any type to a printable one.
+                if let Some(v) = v.downcast_ref::<String>() {
+                    format!("{}={:?}", k, v)
+                } else if let Some(v) = v.downcast_ref::<&str>() {
+                    format!("{}={:?}", k, v)
+                } else {
+                    format!("{}=\"{:?}\"", k, v)
+                }
+            }).join(", ");
+            // Write key-value pair.
+            write!(dot, " [{}]", attrs)?;
+        }
+        // End vertex statement.
+        writeln!(dot, ";")?;
     }
     // Write edges with label
     for (x, y) in edges {
@@ -291,8 +293,7 @@ where
     T: GraphTrait,
 {
     // Read DOT file
-    let string =
-        read_to_string(path).unwrap_or_else(|_| panic!("Failed to read file \"{:?}\"", &path));
+    let string = read_to_string(path).unwrap_or_else(|_| panic!("Failed to read file \"{:?}\"", &path));
     // Parse dot string.
     from_dot(&string)
 }

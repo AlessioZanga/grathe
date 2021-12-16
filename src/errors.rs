@@ -15,6 +15,9 @@ pub enum Error<T> {
     /// Edge already defined error type.
     #[error("edge identifier `{0:?}` already defined")]
     EdgeAlreadyDefined(T, T),
+    /// Vertex attribute not defined error type.
+    #[error("vertex `{0:?}` has no attribute `{1:?}`")]
+    VertexAttributeNotDefined(T, String),
     /// Parsing error type.
     #[error("failed to parse graph")]
     ParseFailed(String),
