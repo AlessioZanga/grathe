@@ -1,5 +1,5 @@
-use na::{Dynamic, OMatrix};
-use nasparse::CsrMatrix;
+use ndarray::Array2;
+use sprs::TriMat;
 use std::any::Any;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
@@ -83,7 +83,7 @@ pub type EdgeList<T> = BTreeSet<(T, T)>;
 pub type AdjacencyList<T> = BTreeMap<T, BTreeSet<T>>;
 
 /// Dense adjacency matrix type.
-pub type DenseAdjacencyMatrix = OMatrix<i8, Dynamic, Dynamic>;
+pub type DenseAdjacencyMatrix = Array2<i8>;
 
 /// Sparse adjacency matrix type.
-pub type SparseAdjacencyMatrix = CsrMatrix<i8>;
+pub type SparseAdjacencyMatrix = TriMat<i8>;

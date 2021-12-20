@@ -29,8 +29,6 @@ pub mod utils;
 
 mod tests;
 
-extern crate nalgebra as na;
-extern crate nalgebra_sparse as nasparse;
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;

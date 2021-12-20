@@ -1,7 +1,6 @@
 use crate::errors::Error;
 use crate::types::*;
 use crate::{Adj, E, V};
-use nasparse::CooMatrix;
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -397,7 +396,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     fn to_dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
         let n = self.order();
         let mut idx = HashMap::new();
-        let mut out = DenseAdjacencyMatrix::zeros(n, n);
+        let mut out = DenseAdjacencyMatrix::zeros((n, n));
         // Build vid-to-index mapping.
         idx.extend(V!(self).into_iter().enumerate().map(|(i, x)| (x, i)));
         // Populate the output value.
@@ -418,15 +417,15 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     fn to_sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
         let n = self.order();
         let mut idx = HashMap::new();
-        let mut out = CooMatrix::<i8>::zeros(n, n);
+        let mut out = SparseAdjacencyMatrix::new((n, n));
         // Build vid-to-index mapping.
         idx.extend(V!(self).into_iter().enumerate().map(|(index, vid)| (vid, index)));
         // Populate the output value.
         out.reserve(self.size());
         for (x, y) in E!(self) {
-            out.push(idx[&x], idx[&y], 1);
+            out.add_triplet(idx[&x], idx[&y], 1);
         }
-        SparseAdjacencyMatrix::from(&out)
+        out
     }
 
     /// Vertex iterator.
