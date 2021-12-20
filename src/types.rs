@@ -1,4 +1,3 @@
-use bimap::BiHashMap;
 use na::{Dynamic, OMatrix};
 use nasparse::CsrMatrix;
 use std::any::Any;
@@ -12,9 +11,6 @@ pub trait VertexTrait: Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
 
 // Blanket implementation of vertex trait.
 impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
-
-// TODO: Where clauses are not enforced in type aliases,
-// once done we should add "where T: VertexTrait" down here.
 
 /// Vertex iterator trait.
 #[rustfmt::skip]
@@ -76,9 +72,6 @@ where
 
 // Implement ExactSizeIter for ExactSizeIterator.
 impl<I> ExactSizeIterator for ExactSizeIter<I> where I: Iterator {}
-
-/// Label bidirectional map type.
-pub type LabelMap<T> = BiHashMap<T, String>;
 
 /// Attribute map type.
 pub type Attributes<T> = BTreeMap<T, BTreeMap<String, Box<dyn Any>>>;

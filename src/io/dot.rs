@@ -107,11 +107,13 @@ where
                             .into_inner()
                             // Map attributes into (key, value) pairs
                             .map(|x| x.into_inner().tuple_windows().next().unwrap())
+                            // Get (key, value) pairs as string
+                            .map(|(k, v)| (k.as_str(), v.as_str()))
                         {
                             // Iterate over each edge in the path.
                             for (x, y) in &p {
                                 // Set the same attributes for each edge in the path.
-                                graph.set_edge_attr(&x, &y, k.as_str(), v.as_str().to_string()).unwrap();
+                                graph.set_edge_attr(x, y, k, v.to_string()).unwrap();
                             }
                         }
                     }
@@ -161,8 +163,10 @@ where
                             .into_inner()
                             // Map attributes into (key, value) pairs
                             .map(|x| x.into_inner().tuple_windows().next().unwrap())
+                            // Get (key, value) pairs as string
+                            .map(|(k, v)| (k.as_str(), v.as_str()))
                         {
-                            graph.set_vertex_attr(&x, k.as_str(), v.as_str().to_string()).unwrap();
+                            graph.set_vertex_attr(&x, k, v.to_string()).unwrap();
                         }
                     }
                 }
@@ -252,16 +256,19 @@ where
         // Write its attributes, if any.
         if !attrs.is_empty() {
             // Format key-value pairs.
-            let attrs = attrs.iter().map(|(k, v)| {
-                // Try to downcast the Any type to a printable one.
-                if let Some(v) = v.downcast_ref::<String>() {
-                    format!("{}={:?}", k, v)
-                } else if let Some(v) = v.downcast_ref::<&str>() {
-                    format!("{}={:?}", k, v)
-                } else {
-                    format!("{}=\"{:?}\"", k, v)
-                }
-            }).join(", ");
+            let attrs = attrs
+                .iter()
+                .map(|(k, v)| {
+                    // Try to downcast the Any type to a printable one.
+                    if let Some(v) = v.downcast_ref::<String>() {
+                        format!("{}={:?}", k, v)
+                    } else if let Some(v) = v.downcast_ref::<&str>() {
+                        format!("{}={:?}", k, v)
+                    } else {
+                        format!("{}=\"{:?}\"", k, v)
+                    }
+                })
+                .join(", ");
             // Write key-value pair.
             write!(dot, " [{}]", attrs)?;
         }

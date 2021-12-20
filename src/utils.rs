@@ -123,7 +123,7 @@ macro_rules! impl_ungraph_trait {
                 // Add associated attribute map.
                 self.vattrs.insert(x.clone(), Default::default());
                 // Return successfully.
-                Ok((x))
+                Ok(x)
             }
 
             fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {

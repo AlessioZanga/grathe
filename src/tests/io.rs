@@ -39,7 +39,10 @@ mod tests {
         let j = g.add_vertex(&1)?;
         g.set_vertex_attr(&i, "label", "A")?;
         g.set_vertex_attr(&j, "label", String::from("B"))?;
-        assert_eq!(g.to_dot()?.as_str(), "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n}\n");
+        assert_eq!(
+            g.to_dot()?.as_str(),
+            "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n}\n"
+        );
 
         Ok(())
     }

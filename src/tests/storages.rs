@@ -186,7 +186,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::from_vertices::<_, i32>([]);
+        let mut g = T::from_vertices::<_, i32>(&[]);
 
         // Test min graph vertex set.
         assert_eq!(g.order(), 0);
@@ -211,7 +211,7 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let mut g = T::from_edges::<_, i32>([]);
+        let mut g = T::from_edges::<_, i32>(&[]);
 
         // Test min graph vertex set.
         assert_eq!(g.size(), 0);
