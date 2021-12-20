@@ -304,10 +304,10 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::from_order(0);
-        assert_eq!(V!(g).len(), 0);
+        assert_eq!(V!(g).count(), 0);
 
         g = T::from_order(N as usize);
-        assert_eq!(V!(g).len(), N as usize);
+        assert_eq!(V!(g).count(), N as usize);
 
         assert_true!(V!(g).eq(g.vertices_iter()));
         assert_true!(V!(g).all(|x| g.has_vertex(x)));
@@ -327,13 +327,13 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::from_order(0);
-        assert_eq!(E!(g).len(), 0);
+        assert_eq!(E!(g).count(), 0);
 
         g = T::from_order(N as usize);
         g.add_edge(&1, &1)?;
         g.add_edge(&0, &1)?;
         g.add_edge(&0, &0)?;
-        assert_eq!(E!(g).len(), 3);
+        assert_eq!(E!(g).count(), 3);
 
         assert_true!(E!(g).eq(g.edges_iter()));
         assert_true!(E!(g).all(|(&x, &y)| g.has_edge(&x, &y).unwrap()));
@@ -352,7 +352,7 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::from_order(1);
-        assert_eq!(Adj!(g, &0)?.len(), 0);
+        assert_eq!(Adj!(g, &0)?.count(), 0);
 
         // Test missing vertex identifier
         assert_true!(Adj!(g, &1).is_err());
@@ -361,7 +361,7 @@ mod tests {
         g.add_edge(&1, &1)?;
         g.add_edge(&0, &1)?;
         g.add_edge(&0, &0)?;
-        assert_eq!(Adj!(g, &0)?.len(), 2);
+        assert_eq!(Adj!(g, &0)?.count(), 2);
 
         assert_true!(Adj!(g, &0)?.eq(g.adjacents_iter(&0)?));
         assert_true!(Adj!(g, &0)?.all(|&x| g.has_edge(&0, &x).unwrap()));
@@ -377,7 +377,7 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         let g = T::from_order(0);
-        assert_eq!(Adj!(g, &0).unwrap().len(), 0);
+        assert_eq!(Adj!(g, &0).unwrap().count(), 0);
     }
 
     #[test]

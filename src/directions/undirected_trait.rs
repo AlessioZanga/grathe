@@ -1,12 +1,13 @@
+use crate::directions::DirectionalTrait;
 use crate::errors::Error;
 use crate::storages::StorageTrait;
 use crate::types::*;
 
 /// Undirected graph trait.
-pub trait UndirectedTrait: StorageTrait {
+pub trait UndirectedTrait: DirectionalTrait + StorageTrait {
     /// Neighbor iterator.
     ///
-    /// Iterates over the neighbors vertex set $Ne(G, X)$ of a given vertex $X$.
+    /// Iterates over the vertex set $Ne(G, X)$ of a given vertex $X$.
     ///
     /// # Panics
     ///
@@ -14,7 +15,7 @@ pub trait UndirectedTrait: StorageTrait {
     ///
     fn neighbors_iter<'a>(
         &'a self,
-        x: &Self::Vertex,
+        x: &'a Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Adds undirected edge to the graph.

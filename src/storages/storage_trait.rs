@@ -489,7 +489,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
 
     /// Adjacent iterator.
     ///
-    /// Iterates over the adjacent vertex set $Adj(G, X)$ of a given vertex $X$.
+    /// Iterates over the vertex set $Adj(G, X)$ of a given vertex $X$.
     ///
     /// # Errors
     ///
@@ -526,7 +526,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn adjacents_iter<'a>(
         &'a self,
-        x: &Self::Vertex,
+        x: &'a Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
 
     /// Order of the graph.
@@ -992,7 +992,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// // Get the degree of `1`.
     /// assert_true!(
     ///     g.degree_of(&1)? == 3 &&
-    ///     g.degree_of(&1)? == Adj!(g, &1)?.len()
+    ///     g.degree_of(&1)? == Adj!(g, &1)?.count()
     /// );
     ///
     /// // Getting the degree of a non-existing vertex yields an error.
@@ -1002,7 +1002,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
-        Ok(Adj!(self, x)?.len())
+        Ok(Adj!(self, x)?.count())
     }
 
     /// Is isolated vertex.

@@ -32,7 +32,7 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     ///
     /// The vertex identifier (or its attribute key) does not exist in the graph.
     ///
-    fn get_vertex_attr<'a>(&'a self, x: &Self::Vertex, k: &str) -> Result<&'a dyn Any, Error<Self::Vertex>>;
+    fn get_vertex_attr<'a>(&'a self, x: &'a Self::Vertex, k: &str) -> Result<&'a dyn Any, Error<Self::Vertex>>;
 
     /// Sets vertex attribute with given key and value.
     ///
@@ -80,7 +80,7 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     ///
     fn get_edge_attr<'a>(
         &'a self,
-        x: &Self::Vertex,
+        x: &'a Self::Vertex,
         y: &Self::Vertex,
         k: &str,
     ) -> Result<&'a dyn Any, Error<Self::Vertex>>;

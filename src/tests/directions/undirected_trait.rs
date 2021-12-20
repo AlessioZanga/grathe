@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests_undirected {
-    use crate::directions::{DirectionalTrait, UndirectedTrait};
+    use crate::directions::UndirectedTrait;
     use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::Ne;
@@ -111,14 +111,14 @@ mod tests_undirected {
 
         // Test for existing vertex
         let i = g.add_vertex(&0)?;
-        assert_eq!(Ne!(g, &i)?.len(), 0);
+        assert_eq!(Ne!(g, &i)?.count(), 0);
 
         // Test for existing neighbors
         let j = g.add_vertex(&1)?;
         g.add_edge(&i, &i)?;
         g.add_edge(&i, &j)?;
         g.add_edge(&j, &j)?;
-        assert_eq!(Ne!(g, &i)?.len(), 2);
+        assert_eq!(Ne!(g, &i)?.count(), 2);
 
         assert_true!(Ne!(g, &i)?.eq(g.neighbors_iter(&i)?));
         assert_true!(Ne!(g, &i)?.all(|&x| g.has_edge(&i, &x).unwrap() && g.has_edge(&x, &i).unwrap()));

@@ -55,12 +55,12 @@ where
 
     fn adjacents_iter<'a>(
         &'a self,
-        x: &Self::Vertex,
+        x: &'a Self::Vertex,
     ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
         // Get iterator over adjacent vertices.
         match self.get(x) {
-            Some(x) => Ok(Box::new(x.iter())),
             None => Err(Error::VertexNotDefined(x.clone())),
+            Some(x) => Ok(Box::new(x.iter())),
         }
     }
 

@@ -14,11 +14,11 @@ impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + F
 
 /// Vertex iterator trait.
 #[rustfmt::skip]
-pub trait VertexIterator<'a, T: 'a>: Iterator<Item = &'a T> + ExactSizeIterator + Debug {}
+pub trait VertexIterator<'a, T: 'a>: Iterator<Item = &'a T> + Debug {}
 
 // Blanket implementation of vertex iterator trait.
 #[rustfmt::skip]
-impl<'a, T, U> VertexIterator<'a, U> for T where T: Iterator<Item = &'a U> + ExactSizeIterator + Debug, U: 'a {}
+impl<'a, T, U> VertexIterator<'a, U> for T where T: Iterator<Item = &'a U> + Debug, U: 'a {}
 
 /// Edge iterator trait.
 #[rustfmt::skip]
