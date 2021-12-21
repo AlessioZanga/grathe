@@ -1,6 +1,6 @@
 #[cfg(test)]
 #[generic_tests::define]
-mod tests_undirected {
+mod tests {
     use crate::directions::UndirectedTrait;
     use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
@@ -118,11 +118,11 @@ mod tests_undirected {
         g.add_edge(&i, &i)?;
         g.add_edge(&i, &j)?;
         g.add_edge(&j, &j)?;
-        assert_eq!(Ne!(g, &i)?.count(), 2);
+        assert_eq!(Ne!(g, &j)?.count(), 2);
 
-        assert_true!(Ne!(g, &i)?.eq(g.neighbors_iter(&i)?));
-        assert_true!(Ne!(g, &i)?.all(|&x| g.has_edge(&i, &x).unwrap() && g.has_edge(&x, &i).unwrap()));
-        assert_true!(is_sorted(Ne!(g, &i)?));
+        assert_true!(Ne!(g, &j)?.eq(g.neighbors_iter(&j)?));
+        assert_true!(Ne!(g, &j)?.all(|&x| g.has_edge(&x, &j).unwrap() && g.has_edge(&j, &x).unwrap()));
+        assert_true!(is_sorted(Ne!(g, &j)?));
 
         Ok(())
     }

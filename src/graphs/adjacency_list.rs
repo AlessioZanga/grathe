@@ -57,13 +57,6 @@ impl<T> DirectedTrait for DirectedAdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
-    fn ancestors_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
-        todo!()
-    }
-
     fn parents_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
@@ -85,13 +78,6 @@ where
             None => Err(Error::VertexNotDefined(x.clone())),
             Some(x) => Ok(Box::new(x.iter())),
         }
-    }
-
-    fn descendants_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
-        todo!()
     }
 
     fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {

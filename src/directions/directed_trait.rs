@@ -2,6 +2,7 @@ use crate::directions::DirectionalTrait;
 use crate::errors::Error;
 use crate::storages::StorageTrait;
 use crate::types::*;
+use std::collections::{BTreeSet, VecDeque};
 
 /// Directed graph trait.
 pub trait DirectedTrait: DirectionalTrait + StorageTrait {
@@ -16,7 +17,29 @@ pub trait DirectedTrait: DirectionalTrait + StorageTrait {
     fn ancestors_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+        // Initialize ancestors.
+        let mut ancestors = BTreeSet::new();
+        // Initialize visiting queue.
+        let mut visiting = VecDeque::from([x]);
+        // Loop until the visiting queue is empty.
+        loop {
+            // Pop a vertex from the to-be-visited queue.
+            match visiting.pop_front() {
+                // No remaining vertex to visit,
+                None => break,
+                // There is at least one vertex that has not been visited yet, therefore ...
+                Some(x) => visiting.extend(
+                    // ... insert any parent of this vertex ...
+                    self.parents_iter(x)?
+                        // ... that has not already been added to the ancestors set.
+                        .filter(|&x| ancestors.insert(x)),
+                ),
+            }
+        }
+        // Return ancestors set iterator.
+        Ok(Box::new(ancestors.into_iter()))
+    }
 
     /// Parents iterator.
     ///
@@ -55,7 +78,29 @@ pub trait DirectedTrait: DirectionalTrait + StorageTrait {
     fn descendants_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+        // Initialize descendants.
+        let mut descendants = BTreeSet::new();
+        // Initialize visiting queue.
+        let mut visiting = VecDeque::from([x]);
+        // Loop until the visiting queue is empty.
+        loop {
+            // Pop a vertex from the to-be-visited queue.
+            match visiting.pop_front() {
+                // No remaining vertex to visit,
+                None => break,
+                // There is at least one vertex that has not been visited yet, therefore ...
+                Some(x) => visiting.extend(
+                    // ... insert any child of this vertex ...
+                    self.children_iter(x)?
+                        // ... that has not already been added to the descendants set.
+                        .filter(|&x| descendants.insert(x)),
+                ),
+            }
+        }
+        // Return descendants set iterator.
+        Ok(Box::new(descendants.into_iter()))
+    }
 
     /// Adds directed edge to the graph.
     ///
