@@ -1,6 +1,6 @@
-use crate::directions::UndirectedTrait;
+use crate::directions::{DirectedTrait, UndirectedTrait};
 use crate::types::*;
-use crate::Ne;
+use crate::{Ch, Ne};
 use std::collections::{HashMap, VecDeque};
 use std::vec::Vec;
 
@@ -23,20 +23,9 @@ where
     pub predecessor: HashMap<&'a T, &'a T>,
 }
 
-impl<'a, T> DepthFirstSearch<'a, T>
-where
-    T: VertexTrait,
-{
-    /// Execute DFS *tree* for a given undirected graph.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the source vertex is not in the graph.
-    ///
-    pub fn from_undirected<U>(g: &'a U, x: &'a T) -> Self
-    where
-        U: UndirectedTrait<Vertex = T>,
-    {
+/// Reachable-agnostic implementation of DFS.
+macro_rules! dfs {
+    ($g:expr, $x:expr, $reachable:ident) => {{
         // Initialize the discovery-time map.
         let mut discovery_time: HashMap<_, _> = HashMap::new();
         // Initialize the finish-time map.
@@ -47,10 +36,10 @@ where
         // Initialize the global time counter.
         let mut time: usize = 0;
         // Initialize the visit stack.
-        let mut stack: Vec<_> = Vec::from([x]);
+        let mut stack: Vec<_> = Vec::from([$x]);
 
         // Assert that source vertex is in graph.
-        assert!(g.has_vertex(x));
+        assert!($g.has_vertex($x));
 
         // While there are still vertices to be visited.
         while let Some(&y) = stack.last() {
@@ -61,7 +50,7 @@ where
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for z in Ne!(g, y).unwrap() {
+                for z in $reachable!($g, y).unwrap() {
                     // Filter already visited vertices (as GRAY).
                     if !discovery_time.contains_key(z) {
                         // Set predecessor.
@@ -94,5 +83,36 @@ where
             finish_time,
             predecessor,
         }
+    }};
+}
+
+impl<'a, T> DepthFirstSearch<'a, T>
+where
+    T: VertexTrait,
+{
+    /// Execute DFS *tree* for a given directed graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    pub fn from_directed<U>(g: &'a U, x: &'a T) -> Self
+    where
+        U: DirectedTrait<Vertex = T>,
+    {
+        dfs!(g, x, Ch)
+    }
+
+    /// Execute DFS *tree* for a given undirected graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    pub fn from_undirected<U>(g: &'a U, x: &'a T) -> Self
+    where
+        U: UndirectedTrait<Vertex = T>,
+    {
+        dfs!(g, x, Ne)
     }
 }
