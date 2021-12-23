@@ -37,15 +37,22 @@ where
     where
         U: UndirectedTrait<Vertex = T>,
     {
+        // Initialize the discovery-time map.
         let mut discovery_time: HashMap<_, _> = HashMap::new();
+        // Initialize the finish-time map.
         let mut finish_time: HashMap<_, _> = HashMap::new();
+        // Initialize the predecessors map.
         let mut predecessor: HashMap<_, _> = HashMap::new();
 
+        // Initialize the global time counter.
         let mut time: usize = 0;
+        // Initialize the visit stack.
         let mut stack: Vec<_> = Vec::from([x]);
 
+        // Assert that source vertex is in graph.
         assert!(g.has_vertex(x));
 
+        // While there are still vertices to be visited.
         while let Some(&y) = stack.last() {
             // Check if vertex is WHITE (i.e. was not seen before).
             if !discovery_time.contains_key(y) {
@@ -68,6 +75,7 @@ where
                 stack.extend(queue.iter().rev());
                 // Increment time.
                 time += 1;
+            // If the vertex is NOT WHITE.
             } else {
                 // Remove it from stack.
                 stack.pop();
