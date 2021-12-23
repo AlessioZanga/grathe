@@ -43,36 +43,37 @@ where
 
         let mut time: usize = 0;
         let mut stack: Vec<_> = Vec::from([x]);
-        let mut color: HashMap<_, bool> = HashMap::new();
 
         assert!(g.has_vertex(x));
 
         while let Some(&y) = stack.last() {
             // Check if vertex is WHITE (i.e. was not seen before).
-            if !color.contains_key(y) {
-                // Set it as GRAY.
-                color.insert(y, false);
-                // Set its discover time.
+            if !discovery_time.contains_key(y) {
+                // Set its discover time (as GRAY).
                 discovery_time.insert(y, time);
-                // Get visitable vertices ...
-                let queue = VecDeque::from_iter(
-                    Ne!(g, &y)
-                        .unwrap()
-                        // ... filtering for already visited vertices.
-                        .filter(|&z| !color.contains_key(z)),
-                );
-                // Push vertices onto the stack in reverse order.
+                // Initialize visiting queue.
+                let mut queue = VecDeque::new();
+                // Iterate over reachable vertices.
+                for z in Ne!(g, y).unwrap() {
+                    // Filter already visited vertices (as GRAY).
+                    if !discovery_time.contains_key(z) {
+                        // Set predecessor.
+                        predecessor.insert(z, y);
+                        // Add to queue.
+                        queue.push_back(z);
+                    }
+                }
+                // Push vertices onto the stack in reverse order, this makes
+                // traversal order and neighborhood order the same.
                 stack.extend(queue.iter().rev());
                 // Increment time.
                 time += 1;
             } else {
                 // Remove it from stack.
                 stack.pop();
-                // Check if it is GRAY.
-                if let Some(false) = color.get(y) {
-                    // Set it as BLACK.
-                    color.insert(y, true);
-                    // Set its finish time.
+                // Check if it is GRAY (not BLACK).
+                if !finish_time.contains_key(y) {
+                    // Set its finish time (as BLACK).
                     finish_time.insert(y, time);
                     // Increment time.
                     time += 1;

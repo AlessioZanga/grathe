@@ -153,7 +153,7 @@ mod tests {
         // Check DFS coherence.
         assert_eq!(search.discovery_time.len(), 2);
         assert_eq!(search.finish_time.len(), 2);
-        // FIXME: assert_eq!(search.predecessor.len(), 1);
+        assert_eq!(search.predecessor.len(), 1);
 
         // Check distances.
         assert_eq!(search.discovery_time.get(&i), Some(&0));
@@ -162,8 +162,8 @@ mod tests {
         assert_eq!(search.finish_time.get(&i), Some(&3));
 
         // Check predecessors.
-        // FIXME: assert_eq!(search.predecessor.get(&i), None);
-        // FIXME: assert_eq!(search.predecessor.get(&j), Some(&&i));
+        assert_eq!(search.predecessor.get(&i), None);
+        assert_eq!(search.predecessor.get(&j), Some(&&i));
 
         // Add a disconnected vertex.
         let k = g.add_vertex(&2)?;
@@ -174,7 +174,7 @@ mod tests {
         // Check DFS coherence.
         assert_eq!(search.discovery_time.len(), 2);
         assert_eq!(search.finish_time.len(), 2);
-        // FIXME: assert_eq!(search.predecessor.len(), 1);
+        assert_eq!(search.predecessor.len(), 1);
 
         // Check distances.
         assert_eq!(search.discovery_time.get(&i), Some(&0));
@@ -186,9 +186,9 @@ mod tests {
         assert_eq!(search.finish_time.get(&k), None);
 
         // Check predecessors.
-        // FIXME: assert_eq!(search.predecessor.get(&i), None);
-        // FIXME: assert_eq!(search.predecessor.get(&j), Some(&&i));
-        // FIXME: assert_eq!(search.predecessor.get(&k), None);
+        assert_eq!(search.predecessor.get(&i), None);
+        assert_eq!(search.predecessor.get(&j), Some(&&i));
+        assert_eq!(search.predecessor.get(&k), None);
 
         // Build non-trivial graph.
         let g = T::from_edges(&[
@@ -219,7 +219,7 @@ mod tests {
         // Check DFS coherence.
         assert_eq!(search.discovery_time.len(), 8);
         assert_eq!(search.finish_time.len(), 8);
-        // FIXME: assert_eq!(search.predecessor.len(), 7);
+        assert_eq!(search.predecessor.len(), 7);
 
         // Check distances.
         assert_eq!(search.discovery_time.get(&0), Some(&0));
@@ -240,7 +240,7 @@ mod tests {
         assert_eq!(search.finish_time.get(&0), Some(&15));
 
         // Check predecessors.
-        /** FIXME: assert_eq!(search.predecessor.get(&0), None);
+        assert_eq!(search.predecessor.get(&0), None);
         assert_eq!(search.predecessor.get(&1), Some(&&0));
         assert_eq!(search.predecessor.get(&2), Some(&&1));
         assert_eq!(search.predecessor.get(&3), Some(&&0));
@@ -248,7 +248,6 @@ mod tests {
         assert_eq!(search.predecessor.get(&5), Some(&&4));
         assert_eq!(search.predecessor.get(&6), Some(&&5));
         assert_eq!(search.predecessor.get(&7), Some(&&6));
-        */
 
         Ok(())
     }
