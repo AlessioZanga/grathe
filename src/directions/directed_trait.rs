@@ -1,11 +1,10 @@
-use crate::directions::DirectionalTrait;
 use crate::errors::Error;
-use crate::storages::StorageTrait;
+use crate::graphs::GraphTrait;
 use crate::types::*;
 use std::collections::{BTreeSet, VecDeque};
 
 /// Directed graph trait.
-pub trait DirectedTrait: DirectionalTrait + StorageTrait {
+pub trait DirectedTrait: GraphTrait {
     /// Ancestors iterator.
     ///
     /// Iterates over the vertex set $An(G, X)$ of a given vertex $X$.
@@ -21,21 +20,16 @@ pub trait DirectedTrait: DirectionalTrait + StorageTrait {
         // Initialize ancestors.
         let mut ancestors = BTreeSet::new();
         // Initialize visiting queue.
-        let mut visiting = VecDeque::from([x]);
+        let mut queue = VecDeque::from([x]);
         // Loop until the visiting queue is empty.
-        loop {
-            // Pop a vertex from the to-be-visited queue.
-            match visiting.pop_front() {
-                // No remaining vertex to visit,
-                None => break,
-                // There is at least one vertex that has not been visited yet, therefore ...
-                Some(x) => visiting.extend(
-                    // ... insert any parent of this vertex ...
-                    self.parents_iter(x)?
-                        // ... that has not already been added to the ancestors set.
-                        .filter(|&x| ancestors.insert(x)),
-                ),
-            }
+        while let Some(x) = queue.pop_front() {
+            // There is at least one vertex that has not been visited yet, therefore ...
+            queue.extend(
+                // ... insert any parent of this vertex ...
+                self.parents_iter(x)?
+                    // ... that has not already been added to the ancestors set.
+                    .filter(|&x| ancestors.insert(x)),
+            )
         }
         // Return ancestors set iterator.
         Ok(Box::new(ancestors.into_iter()))
@@ -82,21 +76,16 @@ pub trait DirectedTrait: DirectionalTrait + StorageTrait {
         // Initialize descendants.
         let mut descendants = BTreeSet::new();
         // Initialize visiting queue.
-        let mut visiting = VecDeque::from([x]);
+        let mut queue = VecDeque::from([x]);
         // Loop until the visiting queue is empty.
-        loop {
-            // Pop a vertex from the to-be-visited queue.
-            match visiting.pop_front() {
-                // No remaining vertex to visit,
-                None => break,
-                // There is at least one vertex that has not been visited yet, therefore ...
-                Some(x) => visiting.extend(
-                    // ... insert any child of this vertex ...
-                    self.children_iter(x)?
-                        // ... that has not already been added to the descendants set.
-                        .filter(|&x| descendants.insert(x)),
-                ),
-            }
+        while let Some(x) = queue.pop_front() {
+            // There is at least one vertex that has not been visited yet, therefore ...
+            queue.extend(
+                // ... insert any child of this vertex ...
+                self.children_iter(x)?
+                    // ... that has not already been added to the descendants set.
+                    .filter(|&x| descendants.insert(x)),
+            )
         }
         // Return descendants set iterator.
         Ok(Box::new(descendants.into_iter()))
