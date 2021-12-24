@@ -132,6 +132,60 @@ macro_rules! criterion_storage_group_template {
                 }
             }
 
+            fn [< $T:lower _ $U:lower _ adjacents_iter >] (c: &mut Criterion) {
+                let gs: Vec<(usize, Vec<($U, $U)>)> = N
+                    .iter()
+                    .map(|&x| (x, std::iter::repeat(0).zip((0..x as $U).into_iter().rev()).collect()))
+                    .collect();
+                let gs: Vec<(usize, $T<$U>)> = gs.iter().map(|(x, y)| (*x, $T::from_edges(y))).collect();
+
+                let group = format_group_template!($T, $U, "adjacents_iter");
+                let mut group = c.benchmark_group(group);
+                for (n, i) in &gs {
+                    group.bench_with_input(BenchmarkId::from_parameter(n), &i, |b, &i| {
+                        b.iter(|| {
+                            black_box(i).adjacents_iter(&0).unwrap().count();
+                        })
+                    });
+                }
+            }
+
+            fn [< $T:lower _ $U:lower _ order >] (c: &mut Criterion) {
+                let gs: Vec<(usize, Vec<($U, $U)>)> = N
+                    .iter()
+                    .map(|&x| (x, (0..x as $U).zip((0..x as $U).into_iter().rev()).collect()))
+                    .collect();
+                let gs: Vec<(usize, $T<$U>)> = gs.iter().map(|(x, y)| (*x, $T::from_edges(y))).collect();
+
+                let group = format_group_template!($T, $U, "order");
+                let mut group = c.benchmark_group(group);
+                for (n, i) in &gs {
+                    group.bench_with_input(BenchmarkId::from_parameter(n), &i, |b, &i| {
+                        b.iter(|| {
+                            black_box(i).order();
+                        })
+                    });
+                }
+            }
+
+            fn [< $T:lower _ $U:lower _ size >] (c: &mut Criterion) {
+                let gs: Vec<(usize, Vec<($U, $U)>)> = N
+                    .iter()
+                    .map(|&x| (x, (0..x as $U).zip((0..x as $U).into_iter().rev()).collect()))
+                    .collect();
+                let gs: Vec<(usize, $T<$U>)> = gs.iter().map(|(x, y)| (*x, $T::from_edges(y))).collect();
+
+                let group = format_group_template!($T, $U, "size");
+                let mut group = c.benchmark_group(group);
+                for (n, i) in &gs {
+                    group.bench_with_input(BenchmarkId::from_parameter(n), &i, |b, &i| {
+                        b.iter(|| {
+                            black_box(i).size();
+                        })
+                    });
+                }
+            }
+
             criterion_group!(
                 [< $T:lower _ $U:lower _ storage >],
                 [< $T:lower _ $U:lower _ new >],
@@ -141,7 +195,10 @@ macro_rules! criterion_storage_group_template {
                 [< $T:lower _ $U:lower _ from_vertices >],
                 [< $T:lower _ $U:lower _ from_edges >],
                 [< $T:lower _ $U:lower _ vertices_iter >],
-                [< $T:lower _ $U:lower _ edges_iter >]
+                [< $T:lower _ $U:lower _ edges_iter >],
+                [< $T:lower _ $U:lower _ adjacents_iter >],
+                [< $T:lower _ $U:lower _ order >],
+                [< $T:lower _ $U:lower _ size >],
             );
         }
     };
