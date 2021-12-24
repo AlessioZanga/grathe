@@ -9,7 +9,11 @@ use std::collections::{HashMap, VecDeque};
 /// The underlying algorithm implements a breadth-first search *tree* procedure,
 /// where all-and-only the vertices reachable form a given source vertex are visited.
 ///
-#[derive(Debug)]
+/// TODO: Once `min_specialization` and `Fn*` traits will be stabilized,
+/// replace `from_*` using specialized `From` traits and
+/// replace `run_*` using specialized `FnMut` traits.
+///
+#[derive(Default, Debug)]
 pub struct BreadthFirstSearch<'a, T>
 where
     T: VertexTrait,
@@ -22,11 +26,9 @@ where
 
 /// Reachable-agnostic implementation of BFS.
 macro_rules! bfs {
-    ($g:expr, $x:expr, $reachable:ident) => {{
+    ($search:expr, $g:expr, $x:expr, $reachable:ident) => {{
         // Initialize the distance map.
-        let mut distance: HashMap<_, _> = HashMap::from([($x, 0)]);
-        // Initialize the predecessor map.
-        let mut predecessor: HashMap<_, _> = HashMap::new();
+        $search.distance.insert($x, 0);
 
         // Initialize the to-be-visited queue with the source vertex.
         let mut queue: VecDeque<_> = VecDeque::from([$x]);
@@ -39,18 +41,16 @@ macro_rules! bfs {
             // Iterate over the reachable vertices of the popped vertex.
             for z in $reachable!($g, y).unwrap() {
                 // If the vertex has never seen before.
-                if !distance.contains_key(z) {
+                if !$search.distance.contains_key(z) {
                     // Compute the distance from its predecessor.
-                    distance.insert(z, distance[y] + 1);
+                    $search.distance.insert(z, $search.distance[y] + 1);
                     // Set its predecessor.
-                    predecessor.insert(z, y);
+                    $search.predecessor.insert(z, y);
                     // Push it into the to-be-visited queue.
                     queue.push_back(z);
                 }
             }
         }
-
-        Self { distance, predecessor }
     }};
 }
 
@@ -58,7 +58,7 @@ impl<'a, T> BreadthFirstSearch<'a, T>
 where
     T: VertexTrait,
 {
-    /// Execute BFS *tree* for a given directed graph.
+    /// Run BFS *tree* for a given directed graph.
     ///
     /// # Panics
     ///
@@ -68,10 +68,26 @@ where
     where
         U: DirectedTrait<Vertex = T>,
     {
-        bfs!(g, x, Ch)
+        // Initialize the BFS object.
+        let mut search: Self = Default::default();
+        search.run_directed(g, x);
+        search
     }
 
-    /// Execute BFS *tree* for a given undirected graph.
+    /// Incrementally run BFS *tree* for a given directed graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    pub fn run_directed<U>(&mut self, g: &'a U, x: &'a T)
+    where
+        U: DirectedTrait<Vertex = T>,
+    {
+        bfs!(self, g, x, Ch);
+    }
+
+    /// Run BFS *tree* for a given undirected graph.
     ///
     /// # Panics
     ///
@@ -81,6 +97,22 @@ where
     where
         U: UndirectedTrait<Vertex = T>,
     {
-        bfs!(g, x, Ne)
+        // Initialize the BFS object.
+        let mut search: Self = Default::default();
+        search.run_undirected(g, x);
+        search
+    }
+
+    /// Incrementally run BFS *tree* for a given undirected graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    pub fn run_undirected<U>(&mut self, g: &'a U, x: &'a T)
+    where
+        U: UndirectedTrait<Vertex = T>,
+    {
+        bfs!(self, g, x, Ne);
     }
 }

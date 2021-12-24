@@ -10,11 +10,17 @@ use std::vec::Vec;
 /// The underlying algorithm implements a depth-first search *tree* procedure,
 /// where all-and-only the vertices reachable form a given source vertex are visited.
 ///
-#[derive(Debug)]
+/// TODO: Once `min_specialization` and `Fn*` traits will be stabilized,
+/// replace `from_*` using specialized `From` traits and
+/// replace `run_*` using specialized `FnMut` traits.
+///
+#[derive(Default, Debug)]
 pub struct DepthFirstSearch<'a, T>
 where
     T: VertexTrait,
 {
+    /// Global time counter.
+    pub time: usize,
     /// Discovery time of each discovered vertex.
     pub discovery_time: HashMap<&'a T, usize>,
     /// Finish time of each discovered vertex.
@@ -25,16 +31,7 @@ where
 
 /// Reachable-agnostic implementation of DFS.
 macro_rules! dfs {
-    ($g:expr, $x:expr, $reachable:ident) => {{
-        // Initialize the discovery-time map.
-        let mut discovery_time: HashMap<_, _> = HashMap::new();
-        // Initialize the finish-time map.
-        let mut finish_time: HashMap<_, _> = HashMap::new();
-        // Initialize the predecessors map.
-        let mut predecessor: HashMap<_, _> = HashMap::new();
-
-        // Initialize the global time counter.
-        let mut time: usize = 0;
+    ($search:expr, $g:expr, $x:expr, $reachable:ident) => {{
         // Initialize the visit stack.
         let mut stack: Vec<_> = Vec::from([$x]);
 
@@ -44,17 +41,17 @@ macro_rules! dfs {
         // While there are still vertices to be visited.
         while let Some(&y) = stack.last() {
             // Check if vertex is WHITE (i.e. was not seen before).
-            if !discovery_time.contains_key(y) {
+            if !$search.discovery_time.contains_key(y) {
                 // Set its discover time (as GRAY).
-                discovery_time.insert(y, time);
+                $search.discovery_time.insert(y, $search.time);
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
                 for z in $reachable!($g, y).unwrap() {
                     // Filter already visited vertices (as GRAY).
-                    if !discovery_time.contains_key(z) {
+                    if !$search.discovery_time.contains_key(z) {
                         // Set predecessor.
-                        predecessor.insert(z, y);
+                        $search.predecessor.insert(z, y);
                         // Add to queue.
                         queue.push_back(z);
                     }
@@ -63,25 +60,19 @@ macro_rules! dfs {
                 // traversal order and neighborhood order the same.
                 stack.extend(queue.iter().rev());
                 // Increment time.
-                time += 1;
+                $search.time += 1;
             // If the vertex is NOT WHITE.
             } else {
                 // Remove it from stack.
                 stack.pop();
                 // Check if it is GRAY (not BLACK).
-                if !finish_time.contains_key(y) {
+                if !$search.finish_time.contains_key(y) {
                     // Set its finish time (as BLACK).
-                    finish_time.insert(y, time);
+                    $search.finish_time.insert(y, $search.time);
                     // Increment time.
-                    time += 1;
+                    $search.time += 1;
                 }
             }
-        }
-
-        Self {
-            discovery_time,
-            finish_time,
-            predecessor,
         }
     }};
 }
@@ -90,7 +81,7 @@ impl<'a, T> DepthFirstSearch<'a, T>
 where
     T: VertexTrait,
 {
-    /// Execute DFS *tree* for a given directed graph.
+    /// Run DFS *tree* for a given directed graph.
     ///
     /// # Panics
     ///
@@ -100,10 +91,26 @@ where
     where
         U: DirectedTrait<Vertex = T>,
     {
-        dfs!(g, x, Ch)
+        // Initialize the DFS object.
+        let mut search: Self = Default::default();
+        search.run_directed(g, x);
+        search
     }
 
-    /// Execute DFS *tree* for a given undirected graph.
+    /// Incrementally run DFS *tree* for a given directed graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    pub fn run_directed<U>(&mut self, g: &'a U, x: &'a T)
+    where
+        U: DirectedTrait<Vertex = T>,
+    {
+        dfs!(self, g, x, Ch);
+    }
+
+    /// Run DFS *tree* for a given undirected graph.
     ///
     /// # Panics
     ///
@@ -113,6 +120,22 @@ where
     where
         U: UndirectedTrait<Vertex = T>,
     {
-        dfs!(g, x, Ne)
+        // Initialize the DFS object.
+        let mut search: Self = Default::default();
+        search.run_undirected(g, x);
+        search
+    }
+
+    /// Incrementally run DFS *tree* for a given undirected graph.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    pub fn run_undirected<U>(&mut self, g: &'a U, x: &'a T)
+    where
+        U: UndirectedTrait<Vertex = T>,
+    {
+        dfs!(self, g, x, Ne);
     }
 }
