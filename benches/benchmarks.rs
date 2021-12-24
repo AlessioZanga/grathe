@@ -35,7 +35,7 @@ macro_rules! criterion_storage_group_template {
                 for i in N {
                     group.bench_with_input(BenchmarkId::from_parameter(i), &i, |b, &i| {
                         b.iter(|| {
-                            black_box($T::<$U>::with_capacity(i));
+                            $T::<$U>::with_capacity(black_box(i));
                         })
                     });
                 }
@@ -50,7 +50,7 @@ macro_rules! criterion_storage_group_template {
                 for i in N {
                     group.bench_with_input(BenchmarkId::from_parameter(i), &i, |b, &i| {
                         b.iter(|| {
-                            black_box(g.reserve(i));
+                            g.reserve(black_box(i));
                         })
                     });
                 }
@@ -63,7 +63,7 @@ macro_rules! criterion_storage_group_template {
                 for i in N {
                     group.bench_with_input(BenchmarkId::from_parameter(i), &i, |b, &i| {
                         b.iter(|| {
-                            black_box($T::<$U>::from_order(i));
+                            $T::<$U>::from_order(black_box(i));
                         })
                     });
                 }
@@ -77,7 +77,7 @@ macro_rules! criterion_storage_group_template {
                 for (n, i) in &v {
                     group.bench_with_input(BenchmarkId::from_parameter(n), &i, |b, &i| {
                         b.iter(|| {
-                            black_box($T::<$U>::from_vertices(i));
+                            $T::<$U>::from_vertices(black_box(i));
                         })
                     });
                 }
@@ -94,7 +94,7 @@ macro_rules! criterion_storage_group_template {
                 for (n, i) in &e {
                     group.bench_with_input(BenchmarkId::from_parameter(n), &i, |b, &i| {
                         b.iter(|| {
-                            black_box($T::<$U>::from_edges(i));
+                            $T::<$U>::from_edges(black_box(i));
                         })
                     });
                 }
@@ -108,7 +108,7 @@ macro_rules! criterion_storage_group_template {
                 for (n, i) in &gs {
                     group.bench_with_input(BenchmarkId::from_parameter(n), &i, |b, &i| {
                         b.iter(|| {
-                            black_box(i.vertices_iter().count());
+                            black_box(i).vertices_iter().count();
                         })
                     });
                 }
@@ -126,7 +126,7 @@ macro_rules! criterion_storage_group_template {
                 for (n, i) in &gs {
                     group.bench_with_input(BenchmarkId::from_parameter(n), &i, |b, &i| {
                         b.iter(|| {
-                            black_box(i.edges_iter().count());
+                            black_box(i).edges_iter().count();
                         })
                     });
                 }
