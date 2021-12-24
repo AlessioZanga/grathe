@@ -740,5 +740,5 @@ mod tests {
     }
 
     #[instantiate_tests(<AdjacencyList<i32>>)]
-    mod adjacency_list_storage {}
+    mod adjacency_list {}
 }
