@@ -18,14 +18,13 @@ jobs:
           profile: minimal
           toolchain: stable
       - name: Benchmark
-        run: cargo bench --bench benchmarks -- --output-format bencher | tee output.txt
+        run: RUSTFLAGS="-C target-cpu=native" cargo bench --bench benchmarks -- --output-format bencher | tee output.txt
       - name: Cache
         uses: actions/cache@v2
         env:
           cache-name: cache-dependencies
         with:
           path: |
-            ./cache
             ~/.cargo
             target
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}
@@ -35,7 +34,6 @@ jobs:
           name: 'Benchmark'
           tool: 'cargo'
           output-file-path: output.txt
-          external-data-json-path: ./cache/benchmark-data.json
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           alert-threshold: '200%'
