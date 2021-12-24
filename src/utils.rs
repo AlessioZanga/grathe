@@ -383,7 +383,6 @@ macro_rules! impl_digraph_trait {
                     fn shrink_to_fit(&mut self);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
-                    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
@@ -393,6 +392,19 @@ macro_rules! impl_digraph_trait {
                     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
                     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
                 }
+            }
+
+            fn adjacents_iter<'a>(
+                &'a self,
+                x: &'a Self::Vertex,
+            ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+                // Initialize adjacents.
+                let mut adjacents = BTreeSet::new();
+                // Adjacents are parents plus children vertices.
+                adjacents.extend(self.parents_iter(x)?);
+                adjacents.extend(self.children_iter(x)?);
+                // Return adjacents set iterator.
+                Ok(Box::new(adjacents.into_iter()))
             }
         }
 

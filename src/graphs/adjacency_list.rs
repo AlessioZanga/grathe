@@ -8,6 +8,7 @@ use crate::{impl_digraph_trait, impl_graph_trait, impl_ungraph_trait};
 use delegate::delegate;
 use std::any::Any;
 use std::cmp::Ordering;
+use std::collections::BTreeSet;
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]

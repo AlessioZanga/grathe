@@ -4,7 +4,7 @@ mod tests {
     use crate::directions::DirectedTrait;
     use crate::errors::Error;
     use crate::graphs::DirectedAdjacencyListGraph;
-    use crate::{An, Ch, De, Pa};
+    use crate::{Adj, An, Ch, De, Pa};
     use all_asserts::*;
 
     // TODO: Replace with is_sorted method on iterators once stable.
@@ -42,6 +42,37 @@ mod tests {
     {
         let g = T::new();
         assert_false!(g.is_partially_directed());
+    }
+
+    #[test]
+    fn adjacents_iter<T>() -> Result<(), Error<i32>>
+    where
+        T: DirectedTrait<Vertex = i32>,
+    {
+        let mut g = T::new();
+
+        // Test for empty graph
+        assert_true!(Adj!(g, &0).is_err());
+
+        // Test for existing vertex
+        let i = g.add_vertex(&0)?;
+        assert_eq!(Adj!(g, &i)?.count(), 0);
+
+        // Test for existing ancestors
+        let j = g.add_vertex(&1)?;
+        let k = g.add_vertex(&2)?;
+        let l = g.add_vertex(&3)?;
+        g.add_edge(&i, &j)?;
+        g.add_edge(&k, &j)?;
+        g.add_edge(&l, &k)?;
+        assert_eq!(Adj!(g, &i)?.count(), 1);
+        assert_eq!(Adj!(g, &j)?.count(), 2);
+        assert_eq!(Adj!(g, &j)?.collect::<Vec<_>>(), [&i, &k]);
+
+        assert_true!(Adj!(g, &j)?.eq(g.adjacents_iter(&j)?));
+        assert_true!(is_sorted(Adj!(g, &j)?));
+
+        Ok(())
     }
 
     #[test]
