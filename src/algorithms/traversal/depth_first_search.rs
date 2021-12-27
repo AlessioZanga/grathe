@@ -47,7 +47,7 @@ macro_rules! dfs {
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for z in $reachable!($g, y).unwrap() {
+                for z in $reachable!($g, y) {
                     // Filter already visited vertices (as GRAY).
                     if !$search.discovery_time.contains_key(z) {
                         // Set predecessor.

@@ -14,19 +14,16 @@ mod tests {
     {
         let mut g = T::new();
 
-        // Test for missing vertex
-        assert_true!(g.degree_of(&"0".into()).is_err());
-
         // Test for isolated vertex
         let i = g.add_vertex(&"0")?;
-        assert_eq!(g.degree_of(&i)?, 0);
-        assert_true!(g.is_isolated_vertex(&i)?);
+        assert_eq!(g.degree_of(&i), 0);
+        assert_true!(g.is_isolated_vertex(&i));
 
         // Test for pendant vertex
         let j = g.add_vertex(&"1")?;
         g.add_edge(&i, &j)?;
-        assert_eq!(g.degree_of(&i)?, 1);
-        assert_true!(g.is_pendant_vertex(&i)?);
+        assert_eq!(g.degree_of(&i), 1);
+        assert_true!(g.is_pendant_vertex(&i));
 
         Ok(())
     }

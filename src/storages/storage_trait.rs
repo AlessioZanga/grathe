@@ -491,9 +491,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Iterates over the vertex set $Adj(G, X)$ of a given vertex $X$.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// The vertex identifier does not exist in the graph.
+    /// Panics if the vertex identifier does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -507,19 +507,16 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_edges(&[(0, 1), (2, 0), (0, 0)]);
     ///
     /// // Use the adjacent iterator.
-    /// let A: Vec<_> = g.adjacents_iter(&0)?.cloned().collect();
+    /// let A: Vec<_> = g.adjacents_iter(&0).cloned().collect();
     /// assert_eq!(A, [0, 1, 2]);
     ///
     /// // Use the associated macro 'Adj!'.
-    /// assert_true!(g.adjacents_iter(&0)?.eq(Adj!(g, &0)?));
+    /// assert_true!(g.adjacents_iter(&0).eq(Adj!(g, &0)));
     ///
     /// // Iterate over the adjacent set.
-    /// for &x in Adj!(g, &0)? {
+    /// for &x in Adj!(g, &0) {
     ///     assert_true!(g.has_edge(&0, &x)?);
     /// }
-    ///
-    /// // Iterating over non-existing vertex yields an error.
-    /// assert_true!(Adj!(g, &3).is_err());
     /// # Ok(())
     /// # }
     /// ```
@@ -527,7 +524,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     fn adjacents_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Order of the graph.
     ///

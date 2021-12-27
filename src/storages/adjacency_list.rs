@@ -56,12 +56,10 @@ where
     fn adjacents_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+        assert!(self.has_vertex(x));
         // Get iterator over adjacent vertices.
-        match self.get(x) {
-            None => Err(Error::VertexNotDefined(x.clone())),
-            Some(x) => Ok(Box::new(x.iter())),
-        }
+        Box::new(self[x].iter())
     }
 
     fn order(&self) -> usize {

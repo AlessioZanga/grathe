@@ -256,7 +256,7 @@ macro_rules! impl_ungraph_trait {
                     fn shrink_to_fit(&mut self);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
-                    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
                     fn order(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
                     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>>;
@@ -383,7 +383,7 @@ macro_rules! impl_digraph_trait {
                     fn shrink_to_fit(&mut self);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
-                    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;

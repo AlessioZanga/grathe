@@ -27,10 +27,7 @@ impl<T> UndirectedTrait for UndirectedAdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
-    fn neighbors_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+    fn neighbors_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         self.adjacents_iter(x)
     }
 
@@ -57,27 +54,19 @@ impl<T> DirectedTrait for DirectedAdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
-    fn parents_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
-        match self.data.contains_key(x) {
-            false => Err(Error::VertexNotDefined(x.clone())),
-            true => Ok(Box::new(self.data.iter().filter_map(|(y, z)| match z.contains(x) {
-                false => None,
-                true => Some(y),
-            }))),
-        }
+    fn parents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+        assert!(self.data.contains_key(x));
+        Box::new(self.data.iter().filter_map(|(y, z)| match z.contains(x) {
+            false => None,
+            true => Some(y),
+        }))
     }
 
     fn children_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
-        match self.data.get(x) {
-            None => Err(Error::VertexNotDefined(x.clone())),
-            Some(x) => Ok(Box::new(x.iter())),
-        }
+    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+        Box::new(self.data[x].iter())
     }
 
     fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {

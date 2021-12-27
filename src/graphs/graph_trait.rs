@@ -137,18 +137,15 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     ///
     /// // Get the degree of `1`.
     /// assert_true!(
-    ///     g.degree_of(&1)? == 3 &&
-    ///     g.degree_of(&1)? == Adj!(g, &1)?.count()
+    ///     g.degree_of(&1) == 3 &&
+    ///     g.degree_of(&1) == Adj!(g, &1).count()
     /// );
-    ///
-    /// // Getting the degree of a non-existing vertex yields an error.
-    /// assert_true!(g.degree_of(&4).is_err());
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
-        Ok(Adj!(self, x)?.count())
+    fn degree_of(&self, x: &Self::Vertex) -> usize {
+        Adj!(self, x).count()
     }
 
     /// Is isolated vertex.
@@ -170,16 +167,13 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     /// let g = Graph::from_edges(&[(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is isolated (a.k.a not connected).
-    /// assert_false!(g.is_isolated_vertex(&0)?);
-    ///
-    /// // Checking a non-existing vertex yields an error.
-    /// assert_true!(g.is_isolated_vertex(&4).is_err());
+    /// assert_false!(g.is_isolated_vertex(&0));
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn is_isolated_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
-        Ok(self.degree_of(x)? == 0)
+    fn is_isolated_vertex(&self, x: &Self::Vertex) -> bool {
+        self.degree_of(x) == 0
     }
 
     /// Is pendant vertex.
@@ -201,16 +195,13 @@ pub trait GraphTrait: DirectionalTrait + StorageTrait {
     /// let g = Graph::from_edges(&[(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is pendant (a.k.a is connected to just one vertex).
-    /// assert_true!(g.is_pendant_vertex(&0)?);
-    ///
-    /// // Checking a non-existing vertex yields an error.
-    /// assert_true!(g.is_pendant_vertex(&4).is_err());
+    /// assert_true!(g.is_pendant_vertex(&0));
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn is_pendant_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
-        Ok(self.degree_of(x)? == 1)
+    fn is_pendant_vertex(&self, x: &Self::Vertex) -> bool {
+        self.degree_of(x) == 1
     }
 
     /// From DOT string constructor.

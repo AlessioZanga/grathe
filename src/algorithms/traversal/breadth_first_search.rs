@@ -39,7 +39,7 @@ macro_rules! bfs {
         // While there are still vertices to be visited.
         while let Some(y) = queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for z in $reachable!($g, y).unwrap() {
+            for z in $reachable!($g, y) {
                 // If the vertex has never seen before.
                 if !$search.distance.contains_key(z) {
                     // Compute the distance from its predecessor.

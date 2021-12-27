@@ -16,7 +16,7 @@ pub trait DirectedTrait: GraphTrait {
     fn ancestors_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Initialize ancestors.
         let mut ancestors = BTreeSet::new();
         // Initialize visiting queue.
@@ -26,13 +26,13 @@ pub trait DirectedTrait: GraphTrait {
             // There is at least one vertex that has not been visited yet, therefore ...
             queue.extend(
                 // ... insert any parent of this vertex ...
-                self.parents_iter(x)?
+                self.parents_iter(x)
                     // ... that has not already been added to the ancestors set.
                     .filter(|&x| ancestors.insert(x)),
             )
         }
         // Return ancestors set iterator.
-        Ok(Box::new(ancestors.into_iter()))
+        Box::new(ancestors.into_iter())
     }
 
     /// Parents iterator.
@@ -46,7 +46,7 @@ pub trait DirectedTrait: GraphTrait {
     fn parents_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Children iterator.
     ///
@@ -59,7 +59,7 @@ pub trait DirectedTrait: GraphTrait {
     fn children_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Descendants iterator.
     ///
@@ -72,7 +72,7 @@ pub trait DirectedTrait: GraphTrait {
     fn descendants_iter<'a>(
         &'a self,
         x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Initialize descendants.
         let mut descendants = BTreeSet::new();
         // Initialize visiting queue.
@@ -82,13 +82,13 @@ pub trait DirectedTrait: GraphTrait {
             // There is at least one vertex that has not been visited yet, therefore ...
             queue.extend(
                 // ... insert any child of this vertex ...
-                self.children_iter(x)?
+                self.children_iter(x)
                     // ... that has not already been added to the descendants set.
                     .filter(|&x| descendants.insert(x)),
             )
         }
         // Return descendants set iterator.
-        Ok(Box::new(descendants.into_iter()))
+        Box::new(descendants.into_iter())
     }
 
     /// Adds directed edge to the graph.
