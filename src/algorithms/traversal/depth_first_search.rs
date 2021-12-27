@@ -87,6 +87,34 @@ where
     ///
     /// Panics if the source vertex is not in the graph.
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a directed graph.
+    /// let g = DiGraph::from_edges(&[
+    ///     (0,  1), (1, 2), (0, 3), (0, 4), (4, 5)
+    /// ]);
+    ///
+    /// // Run DFS over said graph with `0` as source vertex.
+    /// let search = DFS::from_directed(&g, &0);
+    ///
+    /// // The source vertex has discovery-time equals to zero ...
+    /// assert_eq!(search.discovery_time[&0], 0);
+    /// // ... finish-time equals to two times the number of discovered vertices minus one ...
+    /// assert_eq!(search.finish_time[&0], 2 * search.discovery_time.len() - 1);
+    /// // ... and no predecessor by definition.
+    /// assert_eq!(search.predecessor.contains_key(&0), false);
+    ///
+    /// // For example, vertex `5` has discovery-time equals to eight ...
+    /// assert_eq!(search.discovery_time[&5], 8);
+    /// // ... finish-time equals to nine ...
+    /// assert_eq!(search.finish_time[&5], 9);
+    /// // ... and its predecessor is `4`.
+    /// assert_eq!(search.predecessor[&5], &4);
+    /// ```
+    ///
     pub fn from_directed<U>(g: &'a U, x: &'a T) -> Self
     where
         U: DirectedTrait<Vertex = T>,

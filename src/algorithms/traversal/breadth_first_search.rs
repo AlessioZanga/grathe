@@ -64,6 +64,30 @@ where
     ///
     /// Panics if the source vertex is not in the graph.
     ///
+    /// # Examples
+    ///
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a directed graph.
+    /// let g = DiGraph::from_edges(&[
+    ///     (0,  1), (1, 2), (0, 3), (0, 4), (4, 5)
+    /// ]);
+    ///
+    /// // Run BFS over said graph with `0` as source vertex.
+    /// let search = BFS::from_directed(&g, &0);
+    ///
+    /// // The source vertex has distance zero from itself ...
+    /// assert_eq!(search.distance[&0], 0);
+    /// // ... and no predecessor by definition.
+    /// assert_eq!(search.predecessor.contains_key(&0), false);
+    ///
+    /// // For example, vertex `5` has distance two from `0` ...
+    /// assert_eq!(search.distance[&5], 2);
+    /// // ... and its predecessor is `4`.
+    /// assert_eq!(search.predecessor[&5], &4);
+    /// ```
+    ///
     pub fn from_directed<U>(g: &'a U, x: &'a T) -> Self
     where
         U: DirectedTrait<Vertex = T>,
