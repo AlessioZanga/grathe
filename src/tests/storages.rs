@@ -715,30 +715,6 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<i32>>
-    where
-        T: StorageTrait<Vertex = i32>,
-    {
-        let mut g = T::new();
-
-        // Test for missing vertex
-        assert_true!(g.degree_of(&0).is_err());
-
-        // Test for isolated vertex
-        let i = g.add_vertex(&0)?;
-        assert_eq!(g.degree_of(&i)?, 0);
-        assert_true!(g.is_isolated_vertex(&i)?);
-
-        // Test for pendant vertex
-        let j = g.add_vertex(&1)?;
-        g.add_edge(&i, &j)?;
-        assert_eq!(g.degree_of(&i)?, 1);
-        assert_true!(g.is_pendant_vertex(&i)?);
-
-        Ok(())
-    }
-
     #[instantiate_tests(<AdjacencyList<i32>>)]
     mod adjacency_list_storage {}
 }
