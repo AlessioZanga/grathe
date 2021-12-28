@@ -64,7 +64,7 @@ mod tests {
         g.add_edge(&l, &k)?;
         assert_eq!(An!(g, &i).count(), 0);
         assert_eq!(An!(g, &j).count(), 3);
-        assert_eq!(An!(g, &j).collect::<Vec<_>>(), [&i, &k, &l]);
+        assert_true!(An!(g, &j).eq(&[i, k, l]));
 
         assert_true!(An!(g, &j).eq(g.ancestors_iter(&j)));
         // assert_true!(An!(g, &j)?.all(|&x| g.has_edge(&x, &j).unwrap() && !g.has_edge(&j, &x).unwrap()));
@@ -101,7 +101,7 @@ mod tests {
         g.add_edge(&k, &j)?;
         assert_eq!(Pa!(g, &i).count(), 0);
         assert_eq!(Pa!(g, &j).count(), 2);
-        assert_eq!(Pa!(g, &j).collect::<Vec<_>>(), [&i, &k]);
+        assert_true!(Pa!(g, &j).eq(&[i, k]));
 
         assert_true!(Pa!(g, &j).eq(g.parents_iter(&j)));
         assert_true!(Pa!(g, &j).all(|&x| g.has_edge(&x, &j).unwrap() && !g.has_edge(&j, &x).unwrap()));
@@ -138,7 +138,7 @@ mod tests {
         g.add_edge(&j, &k)?;
         assert_eq!(Ch!(g, &i).count(), 0);
         assert_eq!(Ch!(g, &j).count(), 2);
-        assert_eq!(Ch!(g, &j).collect::<Vec<_>>(), [&i, &k]);
+        assert_true!(Ch!(g, &j).eq(&[i, k]));
 
         assert_true!(Ch!(g, &j).eq(g.children_iter(&j)));
         assert_true!(Ch!(g, &j).all(|&x| !g.has_edge(&x, &j).unwrap() && g.has_edge(&j, &x).unwrap()));
@@ -177,7 +177,7 @@ mod tests {
         g.add_edge(&k, &l)?;
         assert_eq!(De!(g, &i).count(), 0);
         assert_eq!(De!(g, &j).count(), 3);
-        assert_eq!(De!(g, &j).collect::<Vec<_>>(), [&i, &k, &l]);
+        assert_true!(De!(g, &j).eq(&[i, k, l]));
 
         assert_true!(De!(g, &j).eq(g.descendants_iter(&j)));
         // assert_true!(An!(g, &j)?.all(|&x| g.has_edge(&x, &j).unwrap() && !g.has_edge(&j, &x).unwrap()));

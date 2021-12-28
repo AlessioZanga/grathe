@@ -12,10 +12,7 @@ pub trait UndirectedTrait: GraphTrait {
     ///
     /// Panics if the vertex identifier does not exist in the graph.
     ///
-    fn neighbors_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
+    fn neighbors_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Adds undirected edge to the graph.
     ///

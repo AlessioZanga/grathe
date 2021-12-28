@@ -2,7 +2,7 @@
 #[generic_tests::define]
 mod tests {
     use crate::errors::Error;
-    use crate::storages::{AdjacencyList, StorageTrait};
+    use crate::storages::{AdjacencyListStorage, StorageTrait};
     use crate::types::*;
     use crate::{Adj, E, V};
     use all_asserts::*;
@@ -63,9 +63,10 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::new();
-        let h = T::new();
+        let mut h = T::new();
 
         // Null graphs are equals by definition.
+        assert_true!(g == h);
         assert_false!(g < h);
         assert_true!(g <= h);
         assert_false!(g > h);
@@ -73,6 +74,32 @@ mod tests {
 
         // The null graph is subgraph of every graph.
         g.add_vertex(&0)?;
+        assert_false!(g == h);
+        assert_false!(g < h);
+        assert_false!(g <= h);
+        assert_true!(g > h);
+        assert_true!(g >= h);
+
+        // Checks for equal graphs.
+        h.add_vertex(&0)?;
+        assert_true!(g == h);
+        assert_false!(g < h);
+        assert_true!(g <= h);
+        assert_false!(g > h);
+        assert_true!(g >= h);
+
+        // Checks for sub- graphs.
+        g.add_vertex(&1)?;
+        g.add_edge(&0, &1)?;
+        assert_false!(g == h);
+        assert_false!(g < h);
+        assert_false!(g <= h);
+        assert_true!(g > h);
+        assert_true!(g >= h);
+
+        // Checks for sub- graphs.
+        h.add_vertex(&1)?;
+        assert_false!(g == h);
         assert_false!(g < h);
         assert_false!(g <= h);
         assert_true!(g > h);
@@ -684,6 +711,25 @@ mod tests {
     }
 
     #[test]
+    fn subgraph<T>() -> Result<(), Error<i32>>
+    where
+        T: StorageTrait<Vertex = i32>,
+    {
+        let g = T::from_edges(&[(0, 1), (0, 2), (1, 2), (2, 3), (3, 3)]);
+
+        // Build subgraph over 0, 2 and 3.
+        let h = g.subgraph(&[0, 2, 3]);
+
+        // Check if it is a subgraph.
+        assert_le!(h, g);
+
+        // Check if only selected vertices are preserved.
+        assert_true!(V!(h).eq(&[0, 2, 3]));
+
+        Ok(())
+    }
+
+    #[test]
     fn is_subgraph<T>() -> Result<(), Error<i32>>
     where
         T: StorageTrait<Vertex = i32>,
@@ -711,6 +757,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<AdjacencyList<i32>>)]
+    #[instantiate_tests(<AdjacencyListStorage<i32>>)]
     mod adjacency_list_storage {}
 }

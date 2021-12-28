@@ -42,6 +42,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn new() -> Self;
 
+    /// Return immutable reference to underlying raw storage.
+    fn storage(&self) -> &Self::Storage;
+
     /// Clears the graph.
     ///
     /// Clears the graph, removing both vertex and edges.
@@ -442,8 +445,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_order(3);
     ///
     /// // Use the vertex set iterator.
-    /// let V: Vec<_> = g.vertices_iter().cloned().collect();
-    /// assert_eq!(V, [0, 1, 2]);
+    /// assert_true!(g.vertices_iter().eq(&[0, 1, 2]));
     ///
     /// // Use the associated macro 'V!'.
     /// assert_true!(g.vertices_iter().eq(V!(g)));
@@ -471,8 +473,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_edges(&[(0, 1), (1, 0)]);
     ///
     /// // Use the vertex set iterator.
-    /// let x: Vec<_> = g.edges_iter().collect();
-    /// assert_eq!(x, [(&0, &1), (&1, &0)]);
+    /// assert_true!(g.edges_iter().eq([(&0, &1), (&1, &0)]));
     ///
     /// // Use the associated macro 'E!'.
     /// assert_true!(g.edges_iter().eq(E!(g)));
@@ -507,8 +508,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_edges(&[(0, 1), (2, 0), (0, 0)]);
     ///
     /// // Use the adjacent iterator.
-    /// let A: Vec<_> = g.adjacents_iter(&0).cloned().collect();
-    /// assert_eq!(A, [0, 1, 2]);
+    /// assert_true!(g.adjacents_iter(&0).eq(&[0, 1, 2]));
     ///
     /// // Use the associated macro 'Adj!'.
     /// assert_true!(g.adjacents_iter(&0).eq(Adj!(g, &0)));
@@ -521,10 +521,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// # }
     /// ```
     ///
-    fn adjacents_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
+    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Order of the graph.
     ///
@@ -917,6 +914,35 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+
+    /// Builds subgraph from given vertices.
+    ///
+    /// Builds a subgraph, preserving edges between given vertices.
+    /// Ignores additional attributes (for now).
+    ///
+    /// TODO: Choose a retention policy for graph/vertex/edge attributes.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifiers do not exist in the graph.
+    ///
+    fn subgraph<'a, I>(&self, iter: I) -> Self
+    where
+        Self: 'a,
+        I: IntoIterator<Item = &'a Self::Vertex>,
+    {
+        // Build a subgraph from the given vertices.
+        let mut subgraph = Self::from_vertices(iter);
+        // Check if is it a proper subgraph of self,
+        // i.e. given vertices are contained in self.
+        assert!(subgraph.is_subgraph(self));
+        // Copy edges into subgraph.
+        for (x, y) in E!(self) {
+            subgraph.add_edge(x, y).ok();
+        }
+
+        subgraph
+    }
 
     /// Is subgraph of another graph.
     ///

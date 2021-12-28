@@ -239,6 +239,10 @@ macro_rules! impl_ungraph_trait {
                 Default::default()
             }
 
+            fn storage(&self) -> &Self::Storage {
+                &self.data
+            }
+
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: Self::Storage::with_capacity(capacity),
@@ -366,6 +370,10 @@ macro_rules! impl_digraph_trait {
                 Default::default()
             }
 
+            fn storage(&self) -> &Self::Storage {
+                &self.data
+            }
+
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: Self::Storage::with_capacity(capacity),
@@ -410,5 +418,22 @@ macro_rules! impl_digraph_trait {
         }
 
         impl_graph_trait!($graph, $storage);
+    };
+}
+
+/// Partial compares sets.
+#[macro_export]
+macro_rules! partial_cmp_sets {
+    ($a:ident, $b:ident) => {
+        match $a.eq(&$b) {
+            false => match $a.is_subset(&$b) {
+                false => match $a.is_superset(&$b) {
+                    false => None,
+                    true => Some(Ordering::Greater),
+                },
+                true => Some(Ordering::Less),
+            },
+            true => Some(Ordering::Equal),
+        }
     };
 }

@@ -13,10 +13,7 @@ pub trait DirectedTrait: GraphTrait {
     ///
     /// Panics if the vertex identifier does not exist in the graph.
     ///
-    fn ancestors_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+    fn ancestors_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Initialize ancestors.
         let mut ancestors = BTreeSet::new();
         // Initialize visiting queue.
@@ -43,10 +40,7 @@ pub trait DirectedTrait: GraphTrait {
     ///
     /// Panics if the vertex identifier does not exist in the graph.
     ///
-    fn parents_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
+    fn parents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Children iterator.
     ///
@@ -56,10 +50,7 @@ pub trait DirectedTrait: GraphTrait {
     ///
     /// Panics if the vertex identifier does not exist in the graph.
     ///
-    fn children_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
+    fn children_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Descendants iterator.
     ///
@@ -69,10 +60,7 @@ pub trait DirectedTrait: GraphTrait {
     ///
     /// Panics if the vertex identifier does not exist in the graph.
     ///
-    fn descendants_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+    fn descendants_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Initialize descendants.
         let mut descendants = BTreeSet::new();
         // Initialize visiting queue.
