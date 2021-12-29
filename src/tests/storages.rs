@@ -105,6 +105,15 @@ mod tests {
         assert_true!(g > h);
         assert_true!(g >= h);
 
+        // Checks for non comparable graphs.
+        h.add_vertex(&2)?;
+        assert_false!(g == h);
+        assert_false!(g < h);
+        assert_false!(g <= h);
+        assert_false!(g > h);
+        assert_false!(g >= h);
+        assert_true!(matches!(g.partial_cmp(&h), None));
+
         Ok(())
     }
 

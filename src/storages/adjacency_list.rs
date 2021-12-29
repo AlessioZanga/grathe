@@ -40,14 +40,18 @@ where
 
             // If edges are comparable.
             if let Some(edges) = edges {
-                // If vertices are equal, then order is determined by edges.
+                // If vertices are equal,
+                // then order is determined by edges.
                 if matches!(vertices, Ordering::Equal) {
                     return Some(edges);
                 }
                 // If vertices are different but edges are equal,
-                // or at least are coherent with vertices ordering,
                 // then order is determined by vertices.
-                if matches!(edges, Ordering::Equal) || vertices == edges {
+                if matches!(edges, Ordering::Equal) {
+                    return Some(vertices);
+                }
+                // If orders are coherent, then return the order.
+                if vertices == edges {
                     return Some(vertices);
                 }
             }

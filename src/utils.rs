@@ -425,15 +425,14 @@ macro_rules! impl_digraph_trait {
 #[macro_export]
 macro_rules! partial_cmp_sets {
     ($a:ident, $b:ident) => {
-        match $a.eq(&$b) {
-            false => match $a.is_subset(&$b) {
-                false => match $a.is_superset(&$b) {
-                    false => None,
-                    true => Some(Ordering::Greater),
-                },
-                true => Some(Ordering::Less),
-            },
-            true => Some(Ordering::Equal),
+        if $a.len() == $b.len() && $a.eq(&$b) {
+            Some(Ordering::Equal)
+        } else if $a.len() < $b.len() && $a.is_subset(&$b) {
+            Some(Ordering::Less)
+        } else if $a.len() > $b.len() && $a.is_superset(&$b) {
+            Some(Ordering::Greater)
+        } else {
+            None
         }
     };
 }
