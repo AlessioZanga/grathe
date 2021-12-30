@@ -735,6 +735,9 @@ mod tests {
         // Check if only selected vertices are preserved.
         assert_true!(V!(h).eq(&[0, 2, 3]));
 
+        // Check if only associated edges are preserved.
+        assert_true!(E!(h).eq([(&0, &2), (&2, &3), (&3, &3)]));
+
         Ok(())
     }
 
