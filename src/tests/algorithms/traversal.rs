@@ -121,6 +121,17 @@ mod directed_tests {
     }
 
     #[test]
+    #[should_panic]
+    fn breadth_first_search_tree_panics<T>()
+    where
+        T: DirectedTrait<Vertex = i32>,
+    {
+        // Build a null graph.
+        let g = T::new();
+        BFS::from_directed(&g, &0);
+    }
+
+    #[test]
     fn depth_first_search_tree<T>() -> Result<(), Error<i32>>
     where
         T: DirectedTrait<Vertex = i32>,
@@ -253,6 +264,17 @@ mod directed_tests {
         Ok(())
     }
 
+    #[test]
+    #[should_panic]
+    fn depth_first_search_tree_panics<T>()
+    where
+        T: DirectedTrait<Vertex = i32>,
+    {
+        // Build a null graph.
+        let g = T::new();
+        DFS::from_directed(&g, &0);
+    }
+
     #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
     mod directed_adjacency_list_graph {}
 }
@@ -376,6 +398,17 @@ mod undirected_tests {
         assert_eq!(search.predecessor.get(&7), Some(&&5));
 
         Ok(())
+    }
+
+    #[test]
+    #[should_panic]
+    fn breadth_first_search_tree_panics<T>()
+    where
+        T: UndirectedTrait<Vertex = i32>,
+    {
+        // Build a null graph.
+        let g = T::new();
+        BFS::from_undirected(&g, &0);
     }
 
     #[test]
@@ -509,6 +542,17 @@ mod undirected_tests {
         assert_eq!(search.predecessor.get(&7), Some(&&6));
 
         Ok(())
+    }
+
+    #[test]
+    #[should_panic]
+    fn depth_first_search_tree_panics<T>()
+    where
+        T: UndirectedTrait<Vertex = i32>,
+    {
+        // Build a null graph.
+        let g = T::new();
+        DFS::from_undirected(&g, &0);
     }
 
     #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
