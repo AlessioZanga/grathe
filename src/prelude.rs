@@ -1,5 +1,8 @@
 // Re-export macros
-pub use crate::{Adj, Ne, E, V};
+pub use crate::{Adj, An, Ch, De, Ne, Pa, E, V};
+
+// Re-export algorithms
+pub use crate::algorithms::{BFS, DFS};
 
 // Re-export directions
 pub use crate::directions::{DirectedTrait, DirectionalTrait, UndirectedTrait};

@@ -3,8 +3,30 @@
 mod tests {
     use crate::errors::Error;
     use crate::graphs::{GraphTrait, UndirectedAdjacencyListGraph};
+    use all_asserts::*;
     use std::path::Path;
     use tempfile::NamedTempFile;
+
+    #[test]
+    fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<String>>
+    where
+        T: GraphTrait<Vertex = String>,
+    {
+        let mut g = T::new();
+
+        // Test for isolated vertex
+        let i = g.add_vertex(&"0")?;
+        assert_eq!(g.degree_of(&i), 0);
+        assert_true!(g.is_isolated_vertex(&i));
+
+        // Test for pendant vertex
+        let j = g.add_vertex(&"1")?;
+        g.add_edge(&i, &j)?;
+        assert_eq!(g.degree_of(&i), 1);
+        assert_true!(g.is_pendant_vertex(&i));
+
+        Ok(())
+    }
 
     // Set DOT string
     const DOT: &str = "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n";

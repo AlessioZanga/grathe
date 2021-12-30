@@ -1,3 +1,4 @@
+mod algorithms;
 mod directions;
 mod graphs;
 mod io;

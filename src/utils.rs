@@ -239,6 +239,10 @@ macro_rules! impl_ungraph_trait {
                 Default::default()
             }
 
+            fn storage(&self) -> &Self::Storage {
+                &self.data
+            }
+
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: Self::Storage::with_capacity(capacity),
@@ -256,7 +260,7 @@ macro_rules! impl_ungraph_trait {
                     fn shrink_to_fit(&mut self);
                     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
                     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
-                    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+                    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
                     fn order(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
                     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>>;
@@ -366,6 +370,10 @@ macro_rules! impl_digraph_trait {
                 Default::default()
             }
 
+            fn storage(&self) -> &Self::Storage {
+                &self.data
+            }
+
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: Self::Storage::with_capacity(capacity),
@@ -397,14 +405,14 @@ macro_rules! impl_digraph_trait {
             fn adjacents_iter<'a>(
                 &'a self,
                 x: &'a Self::Vertex,
-            ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>> {
+            ) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
                 // Initialize adjacents.
                 let mut adjacents = BTreeSet::new();
                 // Adjacents are parents plus children vertices.
-                adjacents.extend(self.parents_iter(x)?);
-                adjacents.extend(self.children_iter(x)?);
+                adjacents.extend(self.parents_iter(x));
+                adjacents.extend(self.children_iter(x));
                 // Return adjacents set iterator.
-                Ok(Box::new(adjacents.into_iter()))
+                Box::new(adjacents.into_iter())
             }
         }
 
@@ -422,5 +430,21 @@ macro_rules! impl_digraph_trait {
         }
 
         impl_graph_trait!($graph, $storage);
+    };
+}
+
+/// Partial compares sets.
+#[macro_export]
+macro_rules! partial_cmp_sets {
+    ($a:ident, $b:ident) => {
+        if $a.len() == $b.len() && $a.eq(&$b) {
+            Some(Ordering::Equal)
+        } else if $a.len() < $b.len() && $a.is_subset(&$b) {
+            Some(Ordering::Less)
+        } else if $a.len() > $b.len() && $a.is_superset(&$b) {
+            Some(Ordering::Greater)
+        } else {
+            None
+        }
     };
 }

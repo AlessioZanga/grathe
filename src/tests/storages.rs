@@ -2,7 +2,7 @@
 #[generic_tests::define]
 mod tests {
     use crate::errors::Error;
-    use crate::storages::{AdjacencyList, StorageTrait};
+    use crate::storages::{AdjacencyListStorage, StorageTrait};
     use crate::types::*;
     use crate::{Adj, E, V};
     use all_asserts::*;
@@ -63,9 +63,10 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::new();
-        let h = T::new();
+        let mut h = T::new();
 
         // Null graphs are equals by definition.
+        assert_true!(g == h);
         assert_false!(g < h);
         assert_true!(g <= h);
         assert_false!(g > h);
@@ -73,10 +74,45 @@ mod tests {
 
         // The null graph is subgraph of every graph.
         g.add_vertex(&0)?;
+        assert_false!(g == h);
         assert_false!(g < h);
         assert_false!(g <= h);
         assert_true!(g > h);
         assert_true!(g >= h);
+
+        // Checks for equal graphs.
+        h.add_vertex(&0)?;
+        assert_true!(g == h);
+        assert_false!(g < h);
+        assert_true!(g <= h);
+        assert_false!(g > h);
+        assert_true!(g >= h);
+
+        // Checks for sub- graphs.
+        g.add_vertex(&1)?;
+        g.add_edge(&0, &1)?;
+        assert_false!(g == h);
+        assert_false!(g < h);
+        assert_false!(g <= h);
+        assert_true!(g > h);
+        assert_true!(g >= h);
+
+        // Checks for sub- graphs.
+        h.add_vertex(&1)?;
+        assert_false!(g == h);
+        assert_false!(g < h);
+        assert_false!(g <= h);
+        assert_true!(g > h);
+        assert_true!(g >= h);
+
+        // Checks for non comparable graphs.
+        h.add_vertex(&2)?;
+        assert_false!(g == h);
+        assert_false!(g < h);
+        assert_false!(g <= h);
+        assert_false!(g > h);
+        assert_false!(g >= h);
+        assert_true!(matches!(g.partial_cmp(&h), None));
 
         Ok(())
     }
@@ -352,20 +388,17 @@ mod tests {
         T: StorageTrait<Vertex = i32>,
     {
         let mut g = T::from_order(1);
-        assert_eq!(Adj!(g, &0)?.count(), 0);
-
-        // Test missing vertex identifier
-        assert_true!(Adj!(g, &1).is_err());
+        assert_eq!(Adj!(g, &0).count(), 0);
 
         g = T::from_order(N as usize);
         g.add_edge(&1, &1)?;
         g.add_edge(&0, &1)?;
         g.add_edge(&0, &0)?;
-        assert_eq!(Adj!(g, &0)?.count(), 2);
+        assert_eq!(Adj!(g, &0).count(), 2);
 
-        assert_true!(Adj!(g, &0)?.eq(g.adjacents_iter(&0)?));
-        assert_true!(Adj!(g, &0)?.all(|&x| g.has_edge(&0, &x).unwrap()));
-        assert_true!(is_sorted(Adj!(g, &0)?));
+        assert_true!(Adj!(g, &0).eq(g.adjacents_iter(&0)));
+        assert_true!(Adj!(g, &0).all(|&x| g.has_edge(&0, &x).unwrap()));
+        assert_true!(is_sorted(Adj!(g, &0)));
 
         Ok(())
     }
@@ -376,8 +409,8 @@ mod tests {
     where
         T: StorageTrait<Vertex = i32>,
     {
-        let g = T::from_order(0);
-        assert_eq!(Adj!(g, &0).unwrap().count(), 0);
+        let g = T::new();
+        Adj!(g, &0);
     }
 
     #[test]
@@ -547,8 +580,7 @@ mod tests {
         g.del_vertex(&i)?;
         assert_true!(g.has_edge(&i, &j).is_err());
         assert_true!(g.has_edge(&j, &i).is_err());
-        assert_true!(Adj!(g, &i).is_err());
-        assert_true!(!Adj!(g, &j)?.any(|&x| x == i));
+        assert_true!(!Adj!(g, &j).any(|&x| x == i));
 
         Ok(())
     }
@@ -688,6 +720,28 @@ mod tests {
     }
 
     #[test]
+    fn subgraph<T>() -> Result<(), Error<i32>>
+    where
+        T: StorageTrait<Vertex = i32>,
+    {
+        let g = T::from_edges(&[(0, 1), (0, 2), (1, 2), (2, 3), (3, 3)]);
+
+        // Build subgraph over 0, 2 and 3.
+        let h = g.subgraph(&[0, 2, 3]);
+
+        // Check if it is a subgraph.
+        assert_le!(h, g);
+
+        // Check if only selected vertices are preserved.
+        assert_true!(V!(h).eq(&[0, 2, 3]));
+
+        // Check if only associated edges are preserved.
+        assert_true!(E!(h).eq([(&0, &2), (&2, &3), (&3, &3)]));
+
+        Ok(())
+    }
+
+    #[test]
     fn is_subgraph<T>() -> Result<(), Error<i32>>
     where
         T: StorageTrait<Vertex = i32>,
@@ -715,30 +769,6 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<i32>>
-    where
-        T: StorageTrait<Vertex = i32>,
-    {
-        let mut g = T::new();
-
-        // Test for missing vertex
-        assert_true!(g.degree_of(&0).is_err());
-
-        // Test for isolated vertex
-        let i = g.add_vertex(&0)?;
-        assert_eq!(g.degree_of(&i)?, 0);
-        assert_true!(g.is_isolated_vertex(&i)?);
-
-        // Test for pendant vertex
-        let j = g.add_vertex(&1)?;
-        g.add_edge(&i, &j)?;
-        assert_eq!(g.degree_of(&i)?, 1);
-        assert_true!(g.is_pendant_vertex(&i)?);
-
-        Ok(())
-    }
-
-    #[instantiate_tests(<AdjacencyList<i32>>)]
-    mod adjacency_list {}
+    #[instantiate_tests(<AdjacencyListStorage<i32>>)]
+    mod adjacency_list_storage {}
 }

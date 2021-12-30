@@ -70,8 +70,7 @@ mod tests {
         g.del_vertex(&i)?;
         assert_true!(g.has_edge(&i, &j).is_err());
         assert_true!(g.has_edge(&j, &i).is_err());
-        assert_true!(Ne!(g, &i).is_err());
-        assert_true!(!Ne!(g, &j)?.any(|&x| x == i));
+        assert_true!(!Ne!(g, &j).any(|&x| x == i));
 
         Ok(())
     }
@@ -106,25 +105,32 @@ mod tests {
     {
         let mut g = T::new();
 
-        // Test for empty graph
-        assert_true!(Ne!(g, &0).is_err());
-
         // Test for existing vertex
         let i = g.add_vertex(&0)?;
-        assert_eq!(Ne!(g, &i)?.count(), 0);
+        assert_eq!(Ne!(g, &i).count(), 0);
 
         // Test for existing neighbors
         let j = g.add_vertex(&1)?;
         g.add_edge(&i, &i)?;
         g.add_edge(&i, &j)?;
         g.add_edge(&j, &j)?;
-        assert_eq!(Ne!(g, &j)?.count(), 2);
+        assert_eq!(Ne!(g, &j).count(), 2);
 
-        assert_true!(Ne!(g, &j)?.eq(g.neighbors_iter(&j)?));
-        assert_true!(Ne!(g, &j)?.all(|&x| g.has_edge(&x, &j).unwrap() && g.has_edge(&j, &x).unwrap()));
-        assert_true!(is_sorted(Ne!(g, &j)?));
+        assert_true!(Ne!(g, &j).eq(g.neighbors_iter(&j)));
+        assert_true!(Ne!(g, &j).all(|&x| g.has_edge(&x, &j).unwrap() && g.has_edge(&j, &x).unwrap()));
+        assert_true!(is_sorted(Ne!(g, &j)));
 
         Ok(())
+    }
+
+    #[test]
+    #[should_panic]
+    fn neighbors_iter_panics<T>()
+    where
+        T: UndirectedTrait<Vertex = i32>,
+    {
+        let g = T::new();
+        Ne!(g, &0);
     }
 
     #[test]

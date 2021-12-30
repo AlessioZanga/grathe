@@ -1,6 +1,6 @@
 use crate::errors::Error;
 use crate::types::*;
-use crate::{Adj, E, V};
+use crate::{E, V};
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::str::FromStr;
@@ -41,6 +41,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn new() -> Self;
+
+    /// Return immutable reference to underlying raw storage.
+    fn storage(&self) -> &Self::Storage;
 
     /// Clears the graph.
     ///
@@ -442,8 +445,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_order(3);
     ///
     /// // Use the vertex set iterator.
-    /// let V: Vec<_> = g.vertices_iter().cloned().collect();
-    /// assert_eq!(V, [0, 1, 2]);
+    /// assert_true!(g.vertices_iter().eq(&[0, 1, 2]));
     ///
     /// // Use the associated macro 'V!'.
     /// assert_true!(g.vertices_iter().eq(V!(g)));
@@ -471,8 +473,7 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_edges(&[(0, 1), (1, 0)]);
     ///
     /// // Use the vertex set iterator.
-    /// let x: Vec<_> = g.edges_iter().collect();
-    /// assert_eq!(x, [(&0, &1), (&1, &0)]);
+    /// assert_true!(g.edges_iter().eq([(&0, &1), (&1, &0)]));
     ///
     /// // Use the associated macro 'E!'.
     /// assert_true!(g.edges_iter().eq(E!(g)));
@@ -491,9 +492,9 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     /// Iterates over the vertex set $Adj(G, X)$ of a given vertex $X$.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// The vertex identifier does not exist in the graph.
+    /// Panics if the vertex identifier does not exist in the graph.
     ///
     /// # Examples
     ///
@@ -507,27 +508,20 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// let g = Graph::from_edges(&[(0, 1), (2, 0), (0, 0)]);
     ///
     /// // Use the adjacent iterator.
-    /// let A: Vec<_> = g.adjacents_iter(&0)?.cloned().collect();
-    /// assert_eq!(A, [0, 1, 2]);
+    /// assert_true!(g.adjacents_iter(&0).eq(&[0, 1, 2]));
     ///
     /// // Use the associated macro 'Adj!'.
-    /// assert_true!(g.adjacents_iter(&0)?.eq(Adj!(g, &0)?));
+    /// assert_true!(g.adjacents_iter(&0).eq(Adj!(g, &0)));
     ///
     /// // Iterate over the adjacent set.
-    /// for &x in Adj!(g, &0)? {
+    /// for &x in Adj!(g, &0) {
     ///     assert_true!(g.has_edge(&0, &x)?);
     /// }
-    ///
-    /// // Iterating over non-existing vertex yields an error.
-    /// assert_true!(Adj!(g, &3).is_err());
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn adjacents_iter<'a>(
-        &'a self,
-        x: &'a Self::Vertex,
-    ) -> Result<Box<dyn VertexIterator<'a, Self::Vertex> + 'a>, Error<Self::Vertex>>;
+    fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
 
     /// Order of the graph.
     ///
@@ -921,6 +915,35 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
 
+    /// Builds subgraph from given vertices.
+    ///
+    /// Builds a subgraph, preserving edges between given vertices.
+    /// Ignores additional attributes (for now).
+    ///
+    /// TODO: Choose a retention policy for graph/vertex/edge attributes.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifiers do not exist in the graph.
+    ///
+    fn subgraph<'a, I>(&self, iter: I) -> Self
+    where
+        Self: 'a,
+        I: IntoIterator<Item = &'a Self::Vertex>,
+    {
+        // Build a subgraph from the given vertices.
+        let mut subgraph = Self::from_vertices(iter);
+        // Check if is it a proper subgraph of self,
+        // i.e. given vertices are contained in self.
+        assert!(subgraph.is_subgraph(self));
+        // Copy edges into subgraph.
+        for (x, y) in E!(self) {
+            subgraph.add_edge(x, y).ok();
+        }
+
+        subgraph
+    }
+
     /// Is subgraph of another graph.
     ///
     /// Checks if this graph is subgraph of given graph.
@@ -969,102 +992,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     ///
     fn is_supergraph(&self, other: &Self) -> bool {
         self >= other
-    }
-
-    /// Degree of vertex.
-    ///
-    /// Degree of given vertex identifier $E$ as $|Adj(G, X)|$.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exist in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), anyhow::Error> {
-    /// // Build a graph.
-    /// let g = Graph::from_edges(&[(0, 1), (2, 1), (3, 1)]);
-    ///
-    /// // Get the degree of `1`.
-    /// assert_true!(
-    ///     g.degree_of(&1)? == 3 &&
-    ///     g.degree_of(&1)? == Adj!(g, &1)?.count()
-    /// );
-    ///
-    /// // Getting the degree of a non-existing vertex yields an error.
-    /// assert_true!(g.degree_of(&4).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn degree_of(&self, x: &Self::Vertex) -> Result<usize, Error<Self::Vertex>> {
-        Ok(Adj!(self, x)?.count())
-    }
-
-    /// Is isolated vertex.
-    ///
-    /// Checks whether the vertex is not adjacent to any other vertex in the graph.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exist in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), anyhow::Error> {
-    /// // Build a graph.
-    /// let g = Graph::from_edges(&[(0, 1), (2, 1), (3, 1)]);
-    ///
-    /// // Check if `0` is isolated (a.k.a not connected).
-    /// assert_false!(g.is_isolated_vertex(&0)?);
-    ///
-    /// // Checking a non-existing vertex yields an error.
-    /// assert_true!(g.is_isolated_vertex(&4).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn is_isolated_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
-        Ok(self.degree_of(x)? == 0)
-    }
-
-    /// Is pendant vertex.
-    ///
-    /// Checks whether the vertex is adjacent to only one vertex in the graph.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exist in the graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// # fn main() -> Result<(), anyhow::Error> {
-    /// // Build a graph.
-    /// let g = Graph::from_edges(&[(0, 1), (2, 1), (3, 1)]);
-    ///
-    /// // Check if `0` is pendant (a.k.a is connected to just one vertex).
-    /// assert_true!(g.is_pendant_vertex(&0)?);
-    ///
-    /// // Checking a non-existing vertex yields an error.
-    /// assert_true!(g.is_pendant_vertex(&4).is_err());
-    /// # Ok(())
-    /// # }
-    /// ```
-    ///
-    fn is_pendant_vertex(&self, x: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
-        Ok(self.degree_of(x)? == 1)
     }
 }
 

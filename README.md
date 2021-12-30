@@ -36,7 +36,7 @@ fn main() -> Result<()> {
     }
 
     // Iterate over the neighbors of `1`.
-    for x in Ne!(G, &1)? {
+    for x in Ne!(G, &1) {
         assert_true!(G.has_edge(x, &1)?);
     }
 

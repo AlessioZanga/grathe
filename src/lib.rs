@@ -3,6 +3,9 @@
 
 //! A Rust implementation of a GRAph THEory library.
 
+/// Algorithms over graphs.
+pub mod algorithms;
+
 /// Graph directions trait, such as UndirectedTrait.
 pub mod directions;
 
