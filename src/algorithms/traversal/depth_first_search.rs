@@ -140,7 +140,7 @@ where
                 }
             }
             // Return next vertex.
-            return Some(&y);
+            return Some(y);
         }
 
         // Otherwise end is reached.
