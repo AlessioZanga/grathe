@@ -30,6 +30,7 @@ thiserror = "^1.0.30"
 all_asserts = "^2.3.0"
 anyhow = "^1.0.51"
 generic-tests = "^0.1.2"
+paste = "^1.0.6"
 tempfile = "^3.2.0"
 
 [package.metadata.docs.rs]

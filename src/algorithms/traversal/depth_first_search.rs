@@ -1,6 +1,5 @@
-use crate::directions::{DirectedTrait, UndirectedTrait};
+use crate::graphs::GraphTrait;
 use crate::types::*;
-use crate::{Ch, Ne};
 use std::collections::{HashMap, VecDeque};
 use std::vec::Vec;
 
@@ -10,76 +9,29 @@ use std::vec::Vec;
 /// The underlying algorithm implements a depth-first search *tree* procedure,
 /// where all-and-only the vertices reachable form a given source vertex are visited.
 ///
-/// TODO: Once `min_specialization` and `Fn*` traits will be stabilized,
-/// replace `from_*` using specialized `From` traits and
-/// replace `run_*` using specialized `FnMut` traits.
-///
-#[derive(Default, Debug)]
 pub struct DepthFirstSearch<'a, T>
 where
-    T: VertexTrait,
+    T: GraphTrait,
 {
+    /// Given graph reference.
+    graph: &'a T,
+    /// Reachable vertices of distance one from given vertex.
+    reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    /// The visit stack.
+    stack: Vec<&'a T::Vertex>,
     /// Global time counter.
     pub time: usize,
     /// Discovery time of each discovered vertex.
-    pub discovery_time: HashMap<&'a T, usize>,
+    pub discovery_time: HashMap<&'a T::Vertex, usize>,
     /// Finish time of each discovered vertex.
-    pub finish_time: HashMap<&'a T, usize>,
+    pub finish_time: HashMap<&'a T::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
-    pub predecessor: HashMap<&'a T, &'a T>,
-}
-
-/// Reachable-agnostic implementation of DFS.
-macro_rules! dfs {
-    ($search:expr, $g:expr, $x:expr, $reachable:ident) => {{
-        // Initialize the visit stack.
-        let mut stack: Vec<_> = Vec::from([$x]);
-
-        // Assert that source vertex is in graph.
-        assert!($g.has_vertex($x));
-
-        // While there are still vertices to be visited.
-        while let Some(&y) = stack.last() {
-            // Check if vertex is WHITE (i.e. was not seen before).
-            if !$search.discovery_time.contains_key(y) {
-                // Set its discover time (as GRAY).
-                $search.discovery_time.insert(y, $search.time);
-                // Initialize visiting queue.
-                let mut queue = VecDeque::new();
-                // Iterate over reachable vertices.
-                for z in $reachable!($g, y) {
-                    // Filter already visited vertices (as GRAY).
-                    if !$search.discovery_time.contains_key(z) {
-                        // Set predecessor.
-                        $search.predecessor.insert(z, y);
-                        // Add to queue.
-                        queue.push_back(z);
-                    }
-                }
-                // Push vertices onto the stack in reverse order, this makes
-                // traversal order and neighborhood order the same.
-                stack.extend(queue.iter().rev());
-                // Increment time.
-                $search.time += 1;
-            // If the vertex is NOT WHITE.
-            } else {
-                // Remove it from stack.
-                stack.pop();
-                // Check if it is GRAY (not BLACK).
-                if !$search.finish_time.contains_key(y) {
-                    // Set its finish time (as BLACK).
-                    $search.finish_time.insert(y, $search.time);
-                    // Increment time.
-                    $search.time += 1;
-                }
-            }
-        }
-    }};
+    pub predecessor: HashMap<&'a T::Vertex, &'a T::Vertex>,
 }
 
 impl<'a, T> DepthFirstSearch<'a, T>
 where
-    T: VertexTrait,
+    T: GraphTrait,
 {
     /// Run DFS *tree* for a given directed graph.
     ///
@@ -98,7 +50,10 @@ where
     /// ]);
     ///
     /// // Run DFS over said graph with `0` as source vertex.
-    /// let search = DFS::from_directed(&g, &0);
+    /// let mut search = DFS::from((&g, &0));
+    ///
+    /// // Consume the iterator in-place and assert later.
+    /// while let Some(_) = search.next() {}
     ///
     /// // The source vertex has discovery-time equals to zero ...
     /// assert_eq!(search.discovery_time[&0], 0);
@@ -115,55 +70,80 @@ where
     /// assert_eq!(search.predecessor[&5], &4);
     /// ```
     ///
-    pub fn from_directed<U>(g: &'a U, x: &'a T) -> Self
-    where
-        U: DirectedTrait<Vertex = T>,
-    {
-        // Initialize the DFS object.
-        let mut search: Self = Default::default();
-        search.run_directed(g, x);
-        search
-    }
+    pub fn new(
+        g: &'a T,
+        x: &'a T::Vertex,
+        f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    ) -> Self {
+        // Assert that source vertex is in graph.
+        assert!(g.has_vertex(x));
 
-    /// Incrementally run DFS *tree* for a given directed graph.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the source vertex is not in the graph.
-    ///
-    pub fn run_directed<U>(&mut self, g: &'a U, x: &'a T)
-    where
-        U: DirectedTrait<Vertex = T>,
-    {
-        dfs!(self, g, x, Ch);
+        Self {
+            // Set target graph.
+            graph: g,
+            // Set reachability function.
+            reachable: f,
+            // Initialize the to-be-visited queue with the source vertex.
+            stack: From::from([x]),
+            // Initialize the global clock.
+            time: 0,
+            // Initialize the discovery-time map.
+            discovery_time: Default::default(),
+            // Initialize the finish-time map.
+            finish_time: Default::default(),
+            // Initialize the predecessor map.
+            predecessor: Default::default(),
+        }
     }
+}
 
-    /// Run DFS *tree* for a given undirected graph.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the source vertex is not in the graph.
-    ///
-    pub fn from_undirected<U>(g: &'a U, x: &'a T) -> Self
-    where
-        U: UndirectedTrait<Vertex = T>,
-    {
-        // Initialize the DFS object.
-        let mut search: Self = Default::default();
-        search.run_undirected(g, x);
-        search
-    }
+impl<'a, T> Iterator for DepthFirstSearch<'a, T>
+where
+    T: GraphTrait,
+{
+    type Item = &'a T::Vertex;
 
-    /// Incrementally run DFS *tree* for a given undirected graph.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the source vertex is not in the graph.
-    ///
-    pub fn run_undirected<U>(&mut self, g: &'a U, x: &'a T)
-    where
-        U: UndirectedTrait<Vertex = T>,
-    {
-        dfs!(self, g, x, Ne);
+    fn next(&mut self) -> Option<Self::Item> {
+        // If there are still vertices to be visited.
+        if let Some(&y) = self.stack.last() {
+            // Check if vertex is WHITE (i.e. was not seen before).
+            if !self.discovery_time.contains_key(y) {
+                // Set its discover time (as GRAY).
+                self.discovery_time.insert(y, self.time);
+                // Initialize visiting queue.
+                let mut queue = VecDeque::new();
+                // Iterate over reachable vertices.
+                for z in (self.reachable)(self.graph, y) {
+                    // Filter already visited vertices (as GRAY).
+                    if !self.discovery_time.contains_key(z) {
+                        // Set predecessor.
+                        self.predecessor.insert(z, y);
+                        // Add to queue.
+                        queue.push_back(z);
+                    }
+                }
+                // Push vertices onto the stack in reverse order, this makes
+                // traversal order and neighborhood order the same.
+                self.stack.extend(queue.iter().rev());
+                // Increment time.
+                self.time += 1;
+            // If the vertex is NOT WHITE.
+            } else {
+                // Remove it from stack.
+                self.stack.pop();
+                // Check if it is GRAY (not BLACK).
+                if !self.finish_time.contains_key(y) {
+                    // Set its finish time (as BLACK).
+                    self.finish_time.insert(y, self.time);
+                    // Increment time.
+                    self.time += 1;
+                }
+            }
+            // Return next vertex.
+            return Some(&y);
+        }
+
+        // Otherwise end is reached.
+        None
     }
 }

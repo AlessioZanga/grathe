@@ -1,6 +1,5 @@
-use crate::directions::{DirectedTrait, UndirectedTrait};
+use crate::graphs::GraphTrait;
 use crate::types::*;
-use crate::{Ch, Ne};
 use std::collections::{HashMap, VecDeque};
 
 /// Breadth-first search structure.
@@ -9,56 +8,29 @@ use std::collections::{HashMap, VecDeque};
 /// The underlying algorithm implements a breadth-first search *tree* procedure,
 /// where all-and-only the vertices reachable form a given source vertex are visited.
 ///
-/// TODO: Once `min_specialization` and `Fn*` traits will be stabilized,
-/// replace `from_*` using specialized `From` traits and
-/// replace `run_*` using specialized `FnMut` traits.
-///
-#[derive(Default, Debug)]
 pub struct BreadthFirstSearch<'a, T>
 where
-    T: VertexTrait,
+    T: GraphTrait,
 {
+    /// Given graph reference.
+    graph: &'a T,
+    /// Reachable vertices of distance one from given vertex.
+    reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    /// To-be-visited queue with the source vertex.
+    queue: VecDeque<&'a T::Vertex>,
     /// Distance from the source vertex.
-    pub distance: HashMap<&'a T, usize>,
+    pub distance: HashMap<&'a T::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
-    pub predecessor: HashMap<&'a T, &'a T>,
-}
-
-/// Reachable-agnostic implementation of BFS.
-macro_rules! bfs {
-    ($search:expr, $g:expr, $x:expr, $reachable:ident) => {{
-        // Initialize the distance map.
-        $search.distance.insert($x, 0);
-
-        // Initialize the to-be-visited queue with the source vertex.
-        let mut queue: VecDeque<_> = VecDeque::from([$x]);
-
-        // Assert that source vertex is in graph.
-        assert!($g.has_vertex($x));
-
-        // While there are still vertices to be visited.
-        while let Some(y) = queue.pop_front() {
-            // Iterate over the reachable vertices of the popped vertex.
-            for z in $reachable!($g, y) {
-                // If the vertex has never seen before.
-                if !$search.distance.contains_key(z) {
-                    // Compute the distance from its predecessor.
-                    $search.distance.insert(z, $search.distance[y] + 1);
-                    // Set its predecessor.
-                    $search.predecessor.insert(z, y);
-                    // Push it into the to-be-visited queue.
-                    queue.push_back(z);
-                }
-            }
-        }
-    }};
+    pub predecessor: HashMap<&'a T::Vertex, &'a T::Vertex>,
 }
 
 impl<'a, T> BreadthFirstSearch<'a, T>
 where
-    T: VertexTrait,
+    T: GraphTrait,
 {
-    /// Run BFS *tree* for a given directed graph.
+    /// Build a new BFS iterator.
+    ///
+    /// Build a BFS *tree* iterator for a given graph.
     ///
     /// # Panics
     ///
@@ -74,8 +46,11 @@ where
     ///     (0,  1), (1, 2), (0, 3), (0, 4), (4, 5)
     /// ]);
     ///
-    /// // Run BFS over said graph with `0` as source vertex.
-    /// let search = BFS::from_directed(&g, &0);
+    /// // Build a BFS iterator over graph with `0` as source vertex.
+    /// let mut search = BFS::from((&g, &0));
+    ///
+    /// // Consume the iterator in-place and assert later.
+    /// while let Some(_) = search.next() {}
     ///
     /// // The source vertex has distance zero from itself ...
     /// assert_eq!(search.distance[&0], 0);
@@ -88,55 +63,55 @@ where
     /// assert_eq!(search.predecessor[&5], &4);
     /// ```
     ///
-    pub fn from_directed<U>(g: &'a U, x: &'a T) -> Self
-    where
-        U: DirectedTrait<Vertex = T>,
-    {
-        // Initialize the BFS object.
-        let mut search: Self = Default::default();
-        search.run_directed(g, x);
-        search
-    }
+    pub fn new(
+        g: &'a T,
+        x: &'a T::Vertex,
+        f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    ) -> Self {
+        // Assert that source vertex is in graph.
+        assert!(g.has_vertex(x));
 
-    /// Incrementally run BFS *tree* for a given directed graph.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the source vertex is not in the graph.
-    ///
-    pub fn run_directed<U>(&mut self, g: &'a U, x: &'a T)
-    where
-        U: DirectedTrait<Vertex = T>,
-    {
-        bfs!(self, g, x, Ch);
+        Self {
+            // Set target graph.
+            graph: g,
+            // Set reachability function.
+            reachable: f,
+            // Initialize the to-be-visited queue with the source vertex.
+            queue: From::from([x]),
+            // Initialize the distance map.
+            distance: From::from([(x, 0)]),
+            // Initialize the predecessor map.
+            predecessor: Default::default(),
+        }
     }
+}
 
-    /// Run BFS *tree* for a given undirected graph.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the source vertex is not in the graph.
-    ///
-    pub fn from_undirected<U>(g: &'a U, x: &'a T) -> Self
-    where
-        U: UndirectedTrait<Vertex = T>,
-    {
-        // Initialize the BFS object.
-        let mut search: Self = Default::default();
-        search.run_undirected(g, x);
-        search
-    }
+impl<'a, T> Iterator for BreadthFirstSearch<'a, T>
+where
+    T: GraphTrait,
+{
+    type Item = &'a T::Vertex;
 
-    /// Incrementally run BFS *tree* for a given undirected graph.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the source vertex is not in the graph.
-    ///
-    pub fn run_undirected<U>(&mut self, g: &'a U, x: &'a T)
-    where
-        U: UndirectedTrait<Vertex = T>,
-    {
-        bfs!(self, g, x, Ne);
+    fn next(&mut self) -> Option<Self::Item> {
+        // If there are still vertices to be visited.
+        if let Some(y) = self.queue.pop_front() {
+            // Iterate over the reachable vertices of the popped vertex.
+            for z in (self.reachable)(self.graph, y) {
+                // If the vertex has never seen before.
+                if !self.distance.contains_key(z) {
+                    // Compute the distance from its predecessor.
+                    self.distance.insert(z, self.distance[y] + 1);
+                    // Set its predecessor.
+                    self.predecessor.insert(z, y);
+                    // Push it into the to-be-visited queue.
+                    self.queue.push_back(z);
+                }
+            }
+            // Return next vertex.
+            return Some(y);
+        }
+
+        // Otherwise end is reached.
+        None
     }
 }

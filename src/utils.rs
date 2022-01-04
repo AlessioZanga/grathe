@@ -331,6 +331,28 @@ macro_rules! impl_ungraph_trait {
         }
 
         impl_graph_trait!($graph, $storage);
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
+        impl<'a, T> From<(&'a $graph<T>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T>>
+        where
+            T: VertexTrait,
+        {
+            fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
+                Self::new(g, x, $graph::<T>::neighbors_iter)
+            }
+        }
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
+        impl<'a, T> From<(&'a $graph<T>, &'a T)> for $crate::algorithms::DepthFirstSearch<'a, $graph<T>>
+        where
+            T: VertexTrait,
+        {
+            fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
+                Self::new(g, x, $graph::<T>::neighbors_iter)
+            }
+        }
     };
 }
 
@@ -418,6 +440,28 @@ macro_rules! impl_digraph_trait {
         }
 
         impl_graph_trait!($graph, $storage);
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
+        impl<'a, T> From<(&'a $graph<T>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T>>
+        where
+            T: VertexTrait,
+        {
+            fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
+                Self::new(g, x, $graph::<T>::children_iter)
+            }
+        }
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
+        impl<'a, T> From<(&'a $graph<T>, &'a T)> for $crate::algorithms::DepthFirstSearch<'a, $graph<T>>
+        where
+            T: VertexTrait,
+        {
+            fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
+                Self::new(g, x, $graph::<T>::children_iter)
+            }
+        }
     };
 }
 
