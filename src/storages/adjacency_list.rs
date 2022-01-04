@@ -149,11 +149,11 @@ where
                 .data
                 .iter()
                 // For each entry in the current graph.
-                .filter_map(|(x, ys)| match other.data.get(x) {
-                    // If there a common vertex, then intersect its adjacent vertices.
-                    Some(zs) => Some((x.clone(), ys.intersection(zs).cloned().collect())),
-                    // Else ignore it.
-                    None => None,
+                .filter_map(|(x, ys)| {
+                    other.data.get(x).map(|zs| {
+                        // If there a common vertex, then intersect its adjacent vertices.
+                        (x.clone(), ys.intersection(zs).cloned().collect())
+                    })
                 })
                 .collect(),
         }
