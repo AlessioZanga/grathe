@@ -1,12 +1,8 @@
-use crate::directions::{DirectedTrait, DirectionalTrait, UndirectedTrait};
+use crate::directions::{DirectedTrait, UndirectedTrait};
 use crate::errors::Error;
-use crate::graphs::GraphTrait;
 use crate::storages::{AdjacencyListStorage, StorageTrait};
 use crate::types::*;
-use crate::{impl_digraph_trait, impl_graph_trait, impl_ungraph_trait};
-use delegate::delegate;
-use std::any::Any;
-use std::cmp::Ordering;
+use crate::{impl_digraph_trait, impl_ungraph_trait};
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
