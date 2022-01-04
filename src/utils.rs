@@ -1,100 +1,116 @@
-/// Storage delegation and graph trait implementation for graphs.
+/// Storage trait implementation of union, intersection, symmetric difference and difference operators.
 #[macro_export]
-macro_rules! impl_graph_trait {
-    ($graph:ident, $storage:ident) => {
-        impl<T> std::ops::BitAnd for &$graph<T>
+macro_rules! impl_storage_set_operators {
+    ($storage:ident) => {
+        impl<T> std::ops::Not for &$storage<T>
         where
             T: $crate::types::VertexTrait,
         {
-            type Output = $graph<T>;
+            type Output = $storage<T>;
+
+            /// Complement of a graph.
+            ///
+            /// Let $G$ be a graph, then the complement graph $\overline{G}$ is defined as:
+            ///
+            /// $$ \overline{G} \thinspace \equiv \thinspace \lbrace (x, y) \thinspace | \thinspace (x, y) \in (V(G) \times V(G)) \wedge (x, y) \not \in E(G) \rbrace $$
+            ///
+            /// Ignores additional attributes (for now).
+            ///
+            fn not(self) -> Self::Output {
+                self.complement()
+            }
+        }
+
+        impl<T> std::ops::BitAnd for &$storage<T>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            type Output = $storage<T>;
 
             /// Intersection of two graphs.
             ///
             /// Let $G$ and $H$ be two graphs, then the intersection graph $G \cap H$ is defined as:
             ///
-            /// $$ G \cap H \implies V(G) \cap V(H) \wedge E(G) \cap E(H) $$
+            /// $$ G \cap H \thinspace \equiv \thinspace V(G) \cap V(H) \wedge E(G) \cap E(H) $$
             ///
             /// Ignores additional attributes (for now).
             ///
             fn bitand(self, rhs: Self) -> Self::Output {
-                todo!()
+                self.intersection(rhs)
             }
         }
-        impl<T> std::ops::BitOr for &$graph<T>
+
+        impl<T> std::ops::BitOr for &$storage<T>
         where
             T: $crate::types::VertexTrait,
         {
-            type Output = $graph<T>;
+            type Output = $storage<T>;
 
             /// Union of two graphs.
             ///
             /// Let $G$ and $H$ be two graphs, then the union graph $G \cup H$ is defined as:
             ///
-            /// $$ G \cup H \implies V(G) \cup V(H) \wedge E(G) \cup E(H) $$
+            /// $$ G \cup H \thinspace \equiv \thinspace V(G) \cup V(H) \wedge E(G) \cup E(H) $$
             ///
             /// Ignores additional attributes (for now).
             ///
             fn bitor(self, rhs: Self) -> Self::Output {
-                todo!()
+                self.union(rhs)
             }
         }
-        impl<T> std::ops::BitXor for &$graph<T>
+
+        impl<T> std::ops::BitXor for &$storage<T>
         where
             T: $crate::types::VertexTrait,
         {
-            type Output = $graph<T>;
+            type Output = $storage<T>;
 
             /// Symmetric difference of two graphs.
             ///
             /// Let $G$ and $H$ be two graphs, then the symmetric difference graph $G \thinspace \Delta \thinspace H$ is defined as:
             ///
-            /// $$ G \thinspace \Delta \thinspace H \implies V(G) \thinspace \Delta \thinspace V(H) \wedge E(G) \thinspace \Delta \thinspace E(H) $$
+            /// $$ G \thinspace \Delta \thinspace H \thinspace \equiv \thinspace E(G) \thinspace \Delta \thinspace E(H) $$
+            ///
+            /// It can also be expressed as:
+            ///
+            /// $$ G \thinspace \Delta \thinspace H \thinspace \equiv \thinspace (G - H) \cup (H - G) $$
             ///
             /// Ignores additional attributes (for now).
             ///
             fn bitxor(self, rhs: Self) -> Self::Output {
-                todo!()
+                self.symmetric_difference(rhs)
             }
         }
-        impl<T> std::ops::Sub for &$graph<T>
+
+        impl<T> std::ops::Sub for &$storage<T>
         where
             T: $crate::types::VertexTrait,
         {
-            type Output = $graph<T>;
+            type Output = $storage<T>;
 
             /// Difference of two graphs.
             ///
             /// Let $G$ and $H$ be two graphs, then the difference graph $G - H$ is defined as:
             ///
-            /// $$ G - H \implies V(G) - V(H) \wedge E(G) - E(H) $$
+            /// $$ G - H \thinspace \equiv \thinspace E(G) - E(H) $$
             ///
             /// Ignores additional attributes (for now).
             ///
             fn sub(self, rhs: Self) -> Self::Output {
-                todo!()
+                self.difference(rhs)
             }
         }
+    };
+}
 
+/// Storage delegation and graph trait implementation for graphs.
+#[macro_export]
+macro_rules! impl_graph_trait {
+    ($graph:ident, $storage:ident) => {
         impl<T> $crate::graphs::GraphTrait for $graph<T>
         where
             T: $crate::types::VertexTrait,
         {
-            fn union(&self, other: &Self) -> Self {
-                self | other
-            }
-
-            fn intersection(&self, other: &Self) -> Self {
-                self & other
-            }
-
-            fn symmetric_difference(&self, other: &Self) -> Self {
-                self ^ other
-            }
-
-            fn difference(&self, other: &Self) -> Self {
-                self - other
-            }
-
             fn as_vertex_attrs(&self) -> &$crate::types::Attributes<Self::Vertex> {
                 &self.vattrs
             }
@@ -335,6 +351,8 @@ macro_rules! impl_ungraph_trait {
             }
         }
 
+        $crate::impl_storage_set_operators!($graph);
+
         impl<T> $crate::storages::StorageTrait for $graph<T>
         where
             T: $crate::types::VertexTrait,
@@ -354,6 +372,46 @@ macro_rules! impl_ungraph_trait {
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: Self::Storage::with_capacity(capacity),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn complement(&self) -> Self {
+                Self {
+                    data: self.data.complement(),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn union(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.union(&other.data),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn intersection(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.intersection(&other.data),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn symmetric_difference(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.symmetric_difference(&other.data),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn difference(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.difference(&other.data),
                     vattrs: Default::default(),
                     eattrs: Default::default(),
                 }
@@ -438,7 +496,7 @@ macro_rules! impl_ungraph_trait {
             }
         }
 
-        impl_graph_trait!($graph, $storage);
+        $crate::impl_graph_trait!($graph, $storage);
     };
 }
 
@@ -466,6 +524,8 @@ macro_rules! impl_digraph_trait {
             }
         }
 
+        $crate::impl_storage_set_operators!($graph);
+
         impl<T> $crate::storages::StorageTrait for $graph<T>
         where
             T: $crate::types::VertexTrait,
@@ -485,6 +545,46 @@ macro_rules! impl_digraph_trait {
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: Self::Storage::with_capacity(capacity),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn complement(&self) -> Self {
+                Self {
+                    data: self.data.complement(),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn union(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.union(&other.data),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn intersection(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.intersection(&other.data),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn symmetric_difference(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.symmetric_difference(&other.data),
+                    vattrs: Default::default(),
+                    eattrs: Default::default(),
+                }
+            }
+
+            fn difference(&self, other: &Self) -> Self {
+                Self {
+                    data: self.data.difference(&other.data),
                     vattrs: Default::default(),
                     eattrs: Default::default(),
                 }
@@ -525,7 +625,7 @@ macro_rules! impl_digraph_trait {
             }
         }
 
-        impl_graph_trait!($graph, $storage);
+        $crate::impl_graph_trait!($graph, $storage);
     };
 }
 

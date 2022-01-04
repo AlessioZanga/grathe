@@ -9,46 +9,6 @@ use std::path::Path;
 
 /// The base graph trait.
 pub trait GraphTrait: DirectionalTrait + StorageTrait {
-    /// Union of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the union graph $G \cup H$ is defined as:
-    ///
-    /// $$ G \cup H \implies V(G) \cup V(H) \wedge E(G) \cup E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn union(&self, other: &Self) -> Self;
-
-    /// Intersection of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the intersection graph $G \cap H$ is defined as:
-    ///
-    /// $$ G \cap H \implies V(G) \cap V(H) \wedge E(G) \cap E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn intersection(&self, other: &Self) -> Self;
-
-    /// Symmetric difference of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the symmetric difference graph $G \thinspace \Delta \thinspace H$ is defined as:
-    ///
-    /// $$ G \thinspace \Delta \thinspace H \implies V(G) \thinspace \Delta \thinspace V(H) \wedge E(G) \thinspace \Delta \thinspace E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn symmetric_difference(&self, other: &Self) -> Self;
-
-    /// Difference of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the difference graph $G - H$ is defined as:
-    ///
-    /// $$ G - H \implies V(G) - V(H) \wedge E(G) - E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn difference(&self, other: &Self) -> Self;
-
     /// Reference to vertex attributes.
     ///
     /// Returns the reference to the vertex attributes map.

@@ -2,7 +2,7 @@ use crate::directions::{DirectedTrait, UndirectedTrait};
 use crate::errors::Error;
 use crate::storages::{AdjacencyListStorage, StorageTrait};
 use crate::types::*;
-use crate::{impl_digraph_trait, impl_graph_trait, impl_ungraph_trait};
+use crate::{impl_digraph_trait, impl_ungraph_trait};
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
