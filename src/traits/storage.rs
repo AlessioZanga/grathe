@@ -1,11 +1,11 @@
 use crate::errors::Error;
-use crate::traits::Capacity;
+use crate::traits::{Capacity, Operators};
 use crate::types::{EdgeIterator, VertexIterator, VertexTrait};
 use std::fmt::Debug;
 use std::str::FromStr;
 
 /// The graph storage trait.
-pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity {
+pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable, use combination of x = T::new()
     // and x = Step::forward(x, 1) to increase Vertex in from(order) constructor,

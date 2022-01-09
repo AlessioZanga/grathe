@@ -219,7 +219,7 @@ macro_rules! impl_directed_trait {
             }
         }
 
-        $crate::traits::impl_capacity_trait!($graph, $storage);
+        $crate::traits::impl_capacity_trait!($graph);
         $crate::traits::impl_operators_trait!($graph);
         $crate::traits::impl_with_attributes_trait!($graph);
 
