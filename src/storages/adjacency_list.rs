@@ -104,7 +104,7 @@ where
                 .map(|x| {
                     (
                         x.clone(),
-                        vertices.difference(self.data.get(x).unwrap()).cloned().collect(),
+                        vertices.difference(&self.data[x]).cloned().collect(),
                     )
                 })
                 .collect(),

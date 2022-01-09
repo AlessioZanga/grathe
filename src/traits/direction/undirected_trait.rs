@@ -132,7 +132,7 @@ macro_rules! impl_undirected_trait {
                     // Write the vertex identifier.
                     write!(dot, "\t{:?}", x).ok();
                     // Get vertex attributes.
-                    let attrs = vattrs.get(x).unwrap();
+                    let attrs = &vattrs[x];
                     // Write its attributes, if any.
                     if !attrs.is_empty() {
                         // Format key-value pairs.
