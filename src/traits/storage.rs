@@ -1,4 +1,5 @@
 use crate::errors::Error;
+use crate::traits::*;
 use crate::types::*;
 use crate::{E, V};
 use std::collections::HashMap;
@@ -6,7 +7,7 @@ use std::fmt::Debug;
 use std::str::FromStr;
 
 /// The base graph storage trait.
-pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
+pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable, use combination of x = T::new()
     // and x = Step::forward(x, 1) to increase Vertex in from(order) constructor,
@@ -71,193 +72,6 @@ pub trait StorageTrait: Eq + PartialOrd + Default + Debug {
     /// ```
     ///
     fn clear(&mut self);
-
-    /// Returns the capacity.
-    ///
-    /// Returns the number of vertex the graph can hold.
-    /// Depending on the underlying storage, this could avoid reallocations.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build a graph with a specific capacity.
-    /// let g = Graph::with_capacity(3);
-    ///
-    /// // Capacity constraints is soft-enforced.
-    /// assert_le!(g.capacity(), 3);
-    ///
-    /// // The order is still zero.
-    /// assert_eq!(g.order(), 0);
-    ///
-    /// // The size is still zero.
-    /// assert_eq!(g.size(), 0);
-    /// ```
-    ///
-    fn capacity(&self) -> usize;
-
-    /// With capacity constructor.
-    ///
-    /// Construct a graph of a given capacity (a.k.a. order).
-    /// Depending on the underlying storage, this could avoid reallocations.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build a graph with a specific capacity.
-    /// let g = Graph::with_capacity(3);
-    ///
-    /// // Capacity constraints is soft-enforced.
-    /// assert_le!(g.capacity(), 3);
-    ///
-    /// // The order is still zero.
-    /// assert_eq!(g.order(), 0);
-    ///
-    /// // The size is still zero.
-    /// assert_eq!(g.size(), 0);
-    /// ```
-    ///
-    fn with_capacity(capacity: usize) -> Self;
-
-    /// Reserves additional capacity.
-    ///
-    /// Reserves capacity for at least `additional` vertex to be inserted in the graph.
-    /// Depending on the underlying storage, this could avoid reallocations.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the additional capacity overflows `usize`.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graph::new();
-    ///
-    /// // Reserve additional capacity.
-    /// g.reserve(3);
-    ///
-    /// // Capacity constraints is soft-enforced.
-    /// assert_le!(g.capacity(), 3);
-    ///
-    /// // The order is still zero.
-    /// assert_eq!(g.order(), 0);
-    ///
-    /// // The size is still zero.
-    /// assert_eq!(g.size(), 0);
-    /// ```
-    ///
-    fn reserve(&mut self, additional: usize);
-
-    /// Shrinks the capacity with a lower limit.
-    ///
-    /// Shrinks the capacity of the graph with a lower limit.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build graph with given capacity.
-    /// let mut g = Graph::with_capacity(100);
-    ///
-    /// // Capacity constraints is soft-enforced.
-    /// assert_le!(g.capacity(), 100);
-    ///
-    /// // Shrink capacity to given minimum.
-    /// g.shrink_to(50);
-    ///
-    /// assert_le!(g.capacity(), 50);
-    /// ```
-    ///
-    fn shrink_to(&mut self, min_capacity: usize);
-
-    /// Shrinks the capacity.
-    ///
-    /// Shrinks the capacity of the graph as much as possible.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build graph with given capacity.
-    /// let mut g = Graph::with_capacity(100);
-    ///
-    /// // Capacity constraints is soft-enforced.
-    /// assert_le!(g.capacity(), 100);
-    ///
-    /// // Shrink capacity as much as possible.
-    /// g.shrink_to_fit();
-    ///
-    /// assert_le!(g.capacity(), 0);
-    /// ```
-    ///
-    fn shrink_to_fit(&mut self);
-
-    /// Complement of a graph.
-    ///
-    /// Let $G$ be a graph, then the complement graph $\overline{G}$ is defined as:
-    ///
-    /// $$ \overline{G} \thinspace \equiv \thinspace \lbrace (x, y) \thinspace | \thinspace (x, y) \in (V(G) \times V(G)) \wedge (x, y) \not \in E(G) \rbrace $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn complement(&self) -> Self;
-
-    /// Union of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the union graph $G \cup H$ is defined as:
-    ///
-    /// $$ G \cup H \thinspace \equiv \thinspace V(G) \cup V(H) \wedge E(G) \cup E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn union(&self, other: &Self) -> Self;
-
-    /// Intersection of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the intersection graph $G \cap H$ is defined as:
-    ///
-    /// $$ G \cap H \thinspace \equiv \thinspace V(G) \cap V(H) \wedge E(G) \cap E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn intersection(&self, other: &Self) -> Self;
-
-    /// Symmetric difference of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the symmetric difference graph $G \thinspace \Delta \thinspace H$ is defined as:
-    ///
-    /// $$ G \thinspace \Delta \thinspace H \thinspace \equiv \thinspace E(G) \thinspace \Delta \thinspace E(H) $$
-    ///
-    /// It can also be expressed as:
-    ///
-    /// $$ G \thinspace \Delta \thinspace H \thinspace \equiv \thinspace (G - H) \cup (H - G) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn symmetric_difference(&self, other: &Self) -> Self;
-
-    /// Difference of two graphs.
-    ///
-    /// Let $G$ and $H$ be two graphs, then the difference graph $G - H$ is defined as:
-    ///
-    /// $$ G - H \thinspace \equiv \thinspace E(G) - E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
-    ///
-    fn difference(&self, other: &Self) -> Self;
 
     /// From order constructor.
     ///

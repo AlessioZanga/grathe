@@ -2,12 +2,12 @@
 #[generic_tests::define]
 mod tests {
     use crate::errors::Error;
-    use crate::storages::{AdjacencyListStorage, StorageTrait};
+    use crate::storages::AdjacencyListStorage;
+    use crate::traits::Storage;
     use crate::types::*;
     use crate::{Adj, E, V};
     use all_asserts::*;
     use itertools::Itertools;
-    use std::ops::{BitAnd, BitOr, BitXor, Not, Sub};
 
     const N: i32 = 1e3 as i32;
     const E: [(i32, i32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
@@ -34,7 +34,7 @@ mod tests {
     #[test]
     fn eq<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
         let mut h = T::new();
@@ -61,7 +61,7 @@ mod tests {
     #[test]
     fn partial_cmp<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
         let mut h = T::new();
@@ -121,7 +121,7 @@ mod tests {
     #[test]
     fn new<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         // Test empty new call.
         T::new();
@@ -132,7 +132,7 @@ mod tests {
     #[test]
     fn default<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         // Test default call.
         let g = T::new();
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn clear<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -168,7 +168,7 @@ mod tests {
     #[test]
     fn with_capacity<T>()
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let g = T::with_capacity(3);
         // FIXME: capacity constraints is soft-enforced.
@@ -184,7 +184,7 @@ mod tests {
     #[test]
     fn reserve<T>()
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -199,99 +199,9 @@ mod tests {
     }
 
     #[test]
-    fn complement<T>()
-    where
-        T: StorageTrait<Vertex = i32>,
-        for<'a> &'a T: Not<Output = T>,
-    {
-        let g = T::from_edges(&[(0, 1), (2, 3)]);
-        let u = g.complement();
-
-        assert_eq!(u, !&g);
-        assert_true!(V!(u).eq(&[0, 1, 2, 3]));
-        assert_true!(E!(u).eq([
-            (&0, &0),
-            (&0, &2),
-            (&0, &3),
-            (&1, &0),
-            (&1, &1),
-            (&1, &2),
-            (&1, &3),
-            (&2, &0),
-            (&2, &1),
-            (&2, &2),
-            (&3, &0),
-            (&3, &1),
-            (&3, &2),
-            (&3, &3)
-        ]));
-    }
-
-    #[test]
-    fn union<T>()
-    where
-        T: StorageTrait<Vertex = i32>,
-        for<'a> &'a T: BitOr<&'a T, Output = T>,
-    {
-        let g = T::from_edges(&[(0, 1), (2, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4)]);
-        let u = g.union(&h);
-
-        assert_eq!(u, &g | &h);
-        assert_true!(V!(u).eq(&[0, 1, 2, 3, 4]));
-        assert_true!(E!(u).eq([(&0, &1), (&0, &2), (&2, &3), (&3, &4)]));
-    }
-
-    #[test]
-    fn intersection<T>()
-    where
-        T: StorageTrait<Vertex = i32>,
-        for<'a> &'a T: BitAnd<&'a T, Output = T>,
-    {
-        let g = T::from_edges(&[(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4), (3, 3)]);
-        let u = g.intersection(&h);
-
-        assert_eq!(u, &g & &h);
-        assert_true!(V!(u).eq(&[0, 2, 3]));
-        assert_true!(E!(u).eq([(&3, &3)]));
-    }
-
-    #[test]
-    fn symmetric_difference<T>()
-    where
-        T: StorageTrait<Vertex = i32>,
-        for<'a> &'a T: BitOr<&'a T, Output = T> + BitXor<&'a T, Output = T> + Sub<&'a T, Output = T>,
-    {
-        let g = T::from_edges(&[(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4), (3, 3)]);
-        let u = g.symmetric_difference(&h);
-
-        assert_eq!(u, &g ^ &h);
-        assert_eq!(&g ^ &h, &(&g - &h) | &(&h - &g));
-        assert_true!(V!(u).eq(&[0, 1, 2, 3, 4]));
-        assert_true!(E!(u).eq([(&0, &1), (&0, &2), (&2, &3), (&3, &4)]));
-    }
-
-    #[test]
-    fn difference<T>()
-    where
-        T: StorageTrait<Vertex = i32>,
-        for<'a> &'a T: Sub<&'a T, Output = T>,
-    {
-        let g = T::from_edges(&[(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4), (3, 3)]);
-        let u = g.difference(&h);
-
-        assert_eq!(u, &g - &h);
-        assert_true!(V!(u).eq(&[0, 1, 2, 3]));
-        assert_true!(E!(u).eq([(&0, &1), (&2, &3)]));
-    }
-
-    #[test]
     fn from_order<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::from_order(0);
 
@@ -312,7 +222,7 @@ mod tests {
     #[test]
     fn from_vertices<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::from_vertices::<_, i32>(&[]);
 
@@ -337,7 +247,7 @@ mod tests {
     #[test]
     fn from_edges<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::from_edges::<_, i32>(&[]);
 
@@ -366,7 +276,7 @@ mod tests {
     #[test]
     fn to_edge_list<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         assert_eq!(g.to_edge_list(), EdgeList::from(E));
@@ -377,7 +287,7 @@ mod tests {
     #[test]
     fn to_adjacency_list<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         let mut a = AdjacencyList::new();
@@ -392,7 +302,7 @@ mod tests {
     #[test]
     fn to_dense_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         let mut a = DenseAdjacencyMatrix::zeros((8, 8));
@@ -407,7 +317,7 @@ mod tests {
     #[test]
     fn to_sparse_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         let (x, y): (Vec<_>, Vec<_>) = E
@@ -428,7 +338,7 @@ mod tests {
     #[test]
     fn vertices_iter<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::from_order(0);
         assert_eq!(V!(g).count(), 0);
@@ -451,7 +361,7 @@ mod tests {
     #[test]
     fn edges_iter<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::from_order(0);
         assert_eq!(E!(g).count(), 0);
@@ -476,7 +386,7 @@ mod tests {
     #[test]
     fn adjacents_iter<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::from_order(1);
         assert_eq!(Adj!(g, &0).count(), 0);
@@ -498,7 +408,7 @@ mod tests {
     #[should_panic]
     fn adjacents_iter_panics<T>()
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let g = T::new();
         Adj!(g, &0);
@@ -507,7 +417,7 @@ mod tests {
     #[test]
     fn order<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -532,7 +442,7 @@ mod tests {
     #[test]
     fn size<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -561,7 +471,7 @@ mod tests {
     #[test]
     fn has_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -586,7 +496,7 @@ mod tests {
     #[test]
     fn add_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         // Add min Vertex.
         let mut g = T::new();
@@ -620,7 +530,7 @@ mod tests {
     #[test]
     fn extend_vertices<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -636,7 +546,7 @@ mod tests {
     #[test]
     fn del_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -679,7 +589,7 @@ mod tests {
     #[test]
     fn has_edge<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -708,7 +618,7 @@ mod tests {
     #[test]
     fn add_edge<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -750,7 +660,7 @@ mod tests {
     #[test]
     fn extend_edges<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -767,7 +677,7 @@ mod tests {
     #[test]
     fn del_edge<T>() -> Result<(), Error<i32>>
     where
-        T: StorageTrait<Vertex = i32>,
+        T: Storage<Vertex = i32>,
     {
         let mut g = T::new();
 

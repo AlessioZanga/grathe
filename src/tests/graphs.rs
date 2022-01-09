@@ -2,14 +2,15 @@
 #[generic_tests::define]
 mod integer {
     use crate::errors::Error;
-    use crate::graphs::{DirectedAdjacencyListGraph, GraphTrait};
+    use crate::graphs::DirectedAdjacencyListGraph;
+    use crate::traits::Base;
     use crate::{E, V};
     use all_asserts::*;
 
     #[test]
     fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<i32>>
     where
-        T: GraphTrait<Vertex = i32>,
+        T: Base<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -30,7 +31,7 @@ mod integer {
     #[test]
     fn subgraph<T>() -> Result<(), Error<i32>>
     where
-        T: GraphTrait<Vertex = i32>,
+        T: Base<Vertex = i32>,
     {
         let g = T::from_edges(&[(0, 1), (0, 2), (1, 2), (2, 3), (3, 3)]);
 
@@ -52,7 +53,7 @@ mod integer {
     #[test]
     fn is_subgraph<T>() -> Result<(), Error<i32>>
     where
-        T: GraphTrait<Vertex = i32>,
+        T: Base<Vertex = i32>,
     {
         let g = T::from_edges(&[(0, 1)]);
         let h = T::from_edges(&[(0, 1), (0, 2)]);
@@ -66,7 +67,7 @@ mod integer {
     #[test]
     fn is_supergraph<T>() -> Result<(), Error<i32>>
     where
-        T: GraphTrait<Vertex = i32>,
+        T: Base<Vertex = i32>,
     {
         let g = T::from_edges(&[(0, 1), (0, 2)]);
         let h = T::from_edges(&[(0, 1)]);
@@ -85,7 +86,8 @@ mod integer {
 #[generic_tests::define]
 mod string {
     use crate::errors::Error;
-    use crate::graphs::{GraphTrait, UndirectedAdjacencyListGraph};
+    use crate::graphs::UndirectedAdjacencyListGraph;
+    use crate::traits::Base;
     use std::path::Path;
     use tempfile::NamedTempFile;
 
@@ -95,14 +97,14 @@ mod string {
     #[test]
     fn from_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = String>,
+        T: Base<Vertex = String>,
     {
         // Read DOT file to string
         let dot = std::fs::read_to_string("src/tests/data/14.dot").unwrap();
         // Load graph using io function
         let g = crate::io::from_dot::<T>(&dot).unwrap().pop().unwrap();
         // Test from DOT string constructor
-        assert_eq!(T::from_dot(&dot)?, g);
+        assert_eq!(T::from_dot(&dot).unwrap(), g);
 
         Ok(())
     }
@@ -110,7 +112,7 @@ mod string {
     #[test]
     fn to_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = String>,
+        T: Base<Vertex = String>,
     {
         // Init graph
         let mut g = T::new();
@@ -118,7 +120,7 @@ mod string {
         let j = g.add_vertex(&"B")?;
         g.add_edge(&i, &j)?;
         // Test
-        assert_eq!(g.to_dot()?, DOT);
+        assert_eq!(g.into_dot(), DOT);
 
         Ok(())
     }
@@ -126,14 +128,14 @@ mod string {
     #[test]
     fn read_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = String>,
+        T: Base<Vertex = String>,
     {
         // Read DOT file to string
         let dot = Path::new("src/tests/data/14.dot");
         // Load graph using io function
-        let g = crate::io::read_dot::<T>(dot).unwrap().pop().unwrap();
+        let g = T::read_dot(dot).unwrap();
         // Test from DOT string constructor
-        assert_eq!(T::read_dot(dot)?, g);
+        assert_eq!(T::read_dot(dot).unwrap(), g);
 
         Ok(())
     }
@@ -141,7 +143,7 @@ mod string {
     #[test]
     fn write_dot<T>() -> Result<(), Error<String>>
     where
-        T: GraphTrait<Vertex = String>,
+        T: Base<Vertex = String>,
     {
         // Init graph
         let mut g = T::new();
@@ -151,9 +153,9 @@ mod string {
         // Get temporary file path
         let path = NamedTempFile::new().unwrap().into_temp_path();
         // Write to DOT file
-        g.write_dot(&path)?;
+        g.write_dot(&path).ok();
         // Test
-        assert_eq!(g, T::read_dot(&path)?);
+        assert_eq!(g, T::read_dot(&path).unwrap());
 
         Ok(())
     }

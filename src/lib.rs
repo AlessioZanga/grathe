@@ -6,9 +6,6 @@
 /// Algorithms over graphs.
 pub mod algorithms;
 
-/// Graph directions trait, such as UndirectedTrait.
-pub mod directions;
-
 /// Error enums declaration.
 pub mod errors;
 
@@ -26,6 +23,8 @@ pub mod storages;
 
 /// Libray-wide types and type-traits.
 pub mod types;
+
+pub mod traits;
 
 /// Tools, macros, etc.
 pub mod utils;

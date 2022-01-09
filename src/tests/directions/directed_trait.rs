@@ -1,9 +1,9 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::directions::DirectedTrait;
     use crate::errors::Error;
     use crate::graphs::DirectedAdjacencyListGraph;
+    use crate::traits::Directed;
     use crate::{An, Ch, De, Pa};
     use all_asserts::*;
 
@@ -27,27 +27,9 @@ mod tests {
     }
 
     #[test]
-    fn is_directed<T>()
-    where
-        T: DirectedTrait<Vertex = i32>,
-    {
-        let g = T::new();
-        assert_true!(g.is_directed());
-    }
-
-    #[test]
-    fn is_partially_directed<T>()
-    where
-        T: DirectedTrait<Vertex = i32>,
-    {
-        let g = T::new();
-        assert_false!(g.is_partially_directed());
-    }
-
-    #[test]
     fn ancestors_iter<T>() -> Result<(), Error<i32>>
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -77,7 +59,7 @@ mod tests {
     #[should_panic]
     fn ancestors_iter_panics<T>()
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let g = T::new();
         An!(g, &0);
@@ -86,7 +68,7 @@ mod tests {
     #[test]
     fn parents_iter<T>() -> Result<(), Error<i32>>
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -114,7 +96,7 @@ mod tests {
     #[should_panic]
     fn parents_iter_panics<T>()
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let g = T::new();
         Pa!(g, &0);
@@ -123,7 +105,7 @@ mod tests {
     #[test]
     fn children_iter<T>() -> Result<(), Error<i32>>
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -151,7 +133,7 @@ mod tests {
     #[should_panic]
     fn children_iter_panics<T>()
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let g = T::new();
         Ch!(g, &0);
@@ -160,7 +142,7 @@ mod tests {
     #[test]
     fn descendants_iter<T>() -> Result<(), Error<i32>>
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -190,7 +172,7 @@ mod tests {
     #[should_panic]
     fn descendants_iter_panics<T>()
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let g = T::new();
         De!(g, &0);
@@ -199,7 +181,7 @@ mod tests {
     #[test]
     fn add_directed_edge<T>() -> Result<(), Error<i32>>
     where
-        T: DirectedTrait<Vertex = i32>,
+        T: Directed<Vertex = i32>,
     {
         let mut g = T::new();
 

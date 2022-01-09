@@ -1,8 +1,10 @@
 #[cfg(test)]
 mod tests {
     use crate::errors::Error;
-    use crate::graphs::{GraphTrait, UndirectedAdjacencyListGraph};
-    use crate::storages::StorageTrait;
+    use crate::graphs::UndirectedAdjacencyListGraph;
+    use crate::traits::convert::{FromDOT, IntoDOT};
+    use crate::traits::Base;
+    use crate::traits::Storage;
     use std::path::PathBuf;
     use tempfile::NamedTempFile;
 
@@ -40,7 +42,7 @@ mod tests {
         g.set_vertex_attr(&i, "label", "A")?;
         g.set_vertex_attr(&j, "label", String::from("B"))?;
         assert_eq!(
-            g.to_dot()?.as_str(),
+            g.into_dot().as_str(),
             "graph {\n\t0 [label=\"A\"];\n\t1 [label=\"B\"];\n}\n"
         );
 
@@ -50,7 +52,7 @@ mod tests {
     #[test]
     fn read_dot() {
         for path in load_test_data() {
-            let parsed = crate::io::read_dot::<UndirectedAdjacencyListGraph<String>>(&path).unwrap();
+            let parsed = UndirectedAdjacencyListGraph::<String>::read_dot(&path).unwrap();
             println!("{:?}", parsed);
         }
     }
@@ -65,12 +67,9 @@ mod tests {
         // Get temporary file path
         let path = NamedTempFile::new().unwrap().into_temp_path();
         // Write to DOT file
-        crate::io::write_dot(&path, &g).unwrap();
+        g.write_dot(&path).unwrap();
         // Read from DOT file
-        let h = crate::io::read_dot::<UndirectedAdjacencyListGraph<String>>(&path)
-            .unwrap()
-            .pop()
-            .unwrap();
+        let h = UndirectedAdjacencyListGraph::<String>::read_dot(&path).unwrap();
         // Compare
         assert_eq!(g, h);
     }

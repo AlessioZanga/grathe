@@ -248,7 +248,7 @@ mod directed_tests {
         use crate::algorithms::{BFS, DFS};
         use crate::errors::*;
         use crate::graphs::DirectedAdjacencyListGraph;
-        use crate::storages::StorageTrait;
+        use crate::traits::Storage;
 
         directed_tests!(DirectedAdjacencyListGraph, i32);
     }
@@ -544,7 +544,7 @@ mod undirected_tests {
         use crate::algorithms::{BFS, DFS};
         use crate::errors::*;
         use crate::graphs::UndirectedAdjacencyListGraph;
-        use crate::storages::StorageTrait;
+        use crate::traits::Storage;
 
         undirected_tests!(UndirectedAdjacencyListGraph, i32);
     }

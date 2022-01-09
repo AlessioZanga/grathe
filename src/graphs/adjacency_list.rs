@@ -1,8 +1,8 @@
-use crate::directions::{DirectedTrait, UndirectedTrait};
 use crate::errors::Error;
-use crate::storages::{AdjacencyListStorage, StorageTrait};
+use crate::storages::AdjacencyListStorage;
+use crate::traits::*;
 use crate::types::*;
-use crate::{impl_digraph_trait, impl_ungraph_trait};
+use crate::{impl_directed_trait, impl_undirected_trait};
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
@@ -16,9 +16,9 @@ where
 }
 
 // Storage delegation and graph trait implementation.
-impl_ungraph_trait!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
+impl_undirected_trait!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
 
-impl<T> UndirectedTrait for UndirectedAdjacencyListGraph<T>
+impl<T> Undirected for UndirectedAdjacencyListGraph<T>
 where
     T: VertexTrait,
 {
@@ -43,9 +43,9 @@ where
 }
 
 // Storage delegation and graph trait implementation.
-impl_digraph_trait!(DirectedAdjacencyListGraph, AdjacencyListStorage);
+impl_directed_trait!(DirectedAdjacencyListGraph, AdjacencyListStorage);
 
-impl<T> DirectedTrait for DirectedAdjacencyListGraph<T>
+impl<T> Directed for DirectedAdjacencyListGraph<T>
 where
     T: VertexTrait,
 {

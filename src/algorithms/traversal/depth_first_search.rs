@@ -1,4 +1,4 @@
-use crate::graphs::GraphTrait;
+use crate::traits::*;
 use crate::types::*;
 use std::collections::{HashMap, VecDeque};
 use std::vec::Vec;
@@ -11,7 +11,7 @@ use std::vec::Vec;
 ///
 pub struct DepthFirstSearch<'a, T>
 where
-    T: GraphTrait,
+    T: Base,
 {
     /// Given graph reference.
     graph: &'a T,
@@ -31,7 +31,7 @@ where
 
 impl<'a, T> DepthFirstSearch<'a, T>
 where
-    T: GraphTrait,
+    T: Base,
 {
     /// Run DFS *tree* for a given directed graph.
     ///
@@ -99,7 +99,7 @@ where
 
 impl<'a, T> Iterator for DepthFirstSearch<'a, T>
 where
-    T: GraphTrait,
+    T: Base,
 {
     type Item = &'a T::Vertex;
 

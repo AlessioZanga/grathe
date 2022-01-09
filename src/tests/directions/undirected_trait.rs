@@ -1,9 +1,9 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::directions::UndirectedTrait;
     use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
+    use crate::traits::Undirected;
     use crate::Ne;
     use all_asserts::*;
 
@@ -27,27 +27,9 @@ mod tests {
     }
 
     #[test]
-    fn is_directed<T>()
-    where
-        T: UndirectedTrait<Vertex = i32>,
-    {
-        let g = T::new();
-        assert_false!(g.is_directed());
-    }
-
-    #[test]
-    fn is_partially_directed<T>()
-    where
-        T: UndirectedTrait<Vertex = i32>,
-    {
-        let g = T::new();
-        assert_false!(g.is_partially_directed());
-    }
-
-    #[test]
     fn add_edge<T>() -> Result<(), Error<i32>>
     where
-        T: UndirectedTrait<Vertex = i32>,
+        T: Undirected<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -78,7 +60,7 @@ mod tests {
     #[test]
     fn del_edge<T>() -> Result<(), Error<i32>>
     where
-        T: UndirectedTrait<Vertex = i32>,
+        T: Undirected<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -101,7 +83,7 @@ mod tests {
     #[test]
     fn neighbors_iter<T>() -> Result<(), Error<i32>>
     where
-        T: UndirectedTrait<Vertex = i32>,
+        T: Undirected<Vertex = i32>,
     {
         let mut g = T::new();
 
@@ -127,7 +109,7 @@ mod tests {
     #[should_panic]
     fn neighbors_iter_panics<T>()
     where
-        T: UndirectedTrait<Vertex = i32>,
+        T: Undirected<Vertex = i32>,
     {
         let g = T::new();
         Ne!(g, &0);
@@ -136,7 +118,7 @@ mod tests {
     #[test]
     fn add_undirected_edge<T>() -> Result<(), Error<i32>>
     where
-        T: UndirectedTrait<Vertex = i32>,
+        T: Undirected<Vertex = i32>,
     {
         let mut g = T::new();
 

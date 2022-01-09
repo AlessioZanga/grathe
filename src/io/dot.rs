@@ -1,13 +1,11 @@
 use crate::errors::Error;
-use crate::graphs::GraphTrait;
+use crate::traits::*;
 use crate::{E, V};
 use itertools::Itertools;
 use pest::error::Error as PestError;
 use pest::iterators::Pair;
 use pest::Parser;
 use std::fmt::Write;
-use std::fs::{read_to_string, write};
-use std::path::Path;
 use std::str::FromStr;
 
 // Workaround to print warning messages during tests
@@ -27,7 +25,7 @@ pub struct DOTParser;
 /// Enumerator for DOT values.
 enum DOTValue<T>
 where
-    T: GraphTrait,
+    T: Base,
 {
     None,
     Path(Vec<(T::Vertex, T::Vertex)>),
@@ -40,7 +38,7 @@ where
 ///
 pub fn from_dot<T>(string: &str) -> Result<Vec<T>, PestError<Rule>>
 where
-    T: GraphTrait,
+    T: Base,
 {
     // Init result vector
     let mut graphs = vec![];
@@ -63,7 +61,7 @@ where
     // Match rules recursively
     fn match_rules<T>(graph: &mut T, pair: Pair<Rule>) -> Result<DOTValue<T>, PestError<Rule>>
     where
-        T: GraphTrait,
+        T: Base,
     {
         match pair.as_rule() {
             Rule::graph => {
@@ -216,13 +214,14 @@ where
     Ok(graphs)
 }
 
+/*
 /// To DOT string.
 ///
 /// Export a sequence of graphs into DOT string.
 ///
 pub fn to_dot<T>(graph: &T) -> Result<String, std::fmt::Error>
 where
-    T: GraphTrait,
+    T: Base,
 {
     // Initialize empty string.
     let mut dot = String::new();
@@ -285,33 +284,4 @@ where
     // Return resulting DOT string
     Ok(dot)
 }
-
-/// Read DOT file.
-///
-/// Read DOT file into sequence of graphs.
-///
-pub fn read_dot<T>(path: &Path) -> Result<Vec<T>, PestError<Rule>>
-where
-    T: GraphTrait,
-{
-    // Read DOT file
-    let string = read_to_string(path).unwrap_or_else(|_| panic!("Failed to read file \"{:?}\"", &path));
-    // Parse dot string.
-    from_dot(&string)
-}
-
-/// Write DOT file.
-///
-/// Write sequence of graphs to DOT file.
-///
-pub fn write_dot<T>(path: &Path, graph: &T) -> Result<(), std::fmt::Error>
-where
-    T: GraphTrait,
-{
-    // Export a sequence of graph into DOT string.
-    let dot = to_dot(graph)?;
-    // Write string to file
-    write(path, dot).unwrap_or_else(|_| panic!("Failed to write file \"{:?}\"", &path));
-
-    Ok(())
-}
+*/

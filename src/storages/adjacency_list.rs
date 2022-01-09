@@ -1,7 +1,7 @@
 use crate::errors::Error;
-use crate::storages::StorageTrait;
+use crate::partial_cmp_sets;
+use crate::traits::*;
 use crate::types::*;
-use crate::{impl_storage_set_operators, partial_cmp_sets};
 use std::cmp::Ordering;
 use std::collections::HashSet;
 
@@ -62,31 +62,10 @@ where
     }
 }
 
-impl_storage_set_operators!(AdjacencyListStorage);
-
-impl<T> StorageTrait for AdjacencyListStorage<T>
+impl<T> Capacity for AdjacencyListStorage<T>
 where
     T: VertexTrait,
 {
-    type Vertex = T;
-
-    type Storage = AdjacencyList<T>;
-
-    fn new() -> Self {
-        Self {
-            data: Self::Storage::new(),
-        }
-    }
-
-    fn storage(&self) -> &Self::Storage {
-        &self.data
-    }
-
-    fn clear(&mut self) {
-        // Clear the data structures
-        self.data.clear();
-    }
-
     fn capacity(&self) -> usize {
         // INFO: BTreeMap as no `capacity` concept.
         0
@@ -108,89 +87,29 @@ where
     fn shrink_to_fit(&mut self) {
         // INFO: BTreeMap as no `capacity` concept.
     }
+}
 
-    fn complement(&self) -> Self {
-        // Copy the vertex set.
-        let vertices: std::collections::BTreeSet<_> = self.data.keys().cloned().collect();
+impl<T> Storage for AdjacencyListStorage<T>
+where
+    T: VertexTrait,
+{
+    type Vertex = T;
 
-        // Iterate over every permutation of V^2.
+    type Storage = AdjacencyList<T>;
+
+    fn new() -> Self {
         Self {
-            data: vertices
-                .iter()
-                .map(|x| {
-                    (
-                        x.clone(),
-                        vertices.difference(self.data.get(x).unwrap()).cloned().collect(),
-                    )
-                })
-                .collect(),
+            data: Self::Storage::new(),
         }
     }
 
-    fn union(&self, other: &Self) -> Self {
-        // Clone internal storage status.
-        let mut union = self.data.clone();
-
-        // For each other entry.
-        for (x, ys) in other.data.iter() {
-            // Get the correspondent entry on the union (or default it).
-            let zs = union.entry(x.clone()).or_default();
-            // Perform union of entries.
-            *zs = zs.union(ys).cloned().collect();
-        }
-
-        // Return the union graph.
-        Self { data: union }
+    fn storage(&self) -> &Self::Storage {
+        &self.data
     }
 
-    fn intersection(&self, other: &Self) -> Self {
-        Self {
-            data: self
-                .data
-                .iter()
-                // For each entry in the current graph.
-                .filter_map(|(x, ys)| {
-                    other.data.get(x).map(|zs| {
-                        // If there a common vertex, then intersect its adjacent vertices.
-                        (x.clone(), ys.intersection(zs).cloned().collect())
-                    })
-                })
-                .collect(),
-        }
-    }
-
-    fn symmetric_difference(&self, other: &Self) -> Self {
-        // Clone internal storage status.
-        let mut symmetric_difference = self.data.clone();
-
-        // For each other entry.
-        for (x, ys) in other.data.iter() {
-            // Get the correspondent entry on the union (or default it).
-            let zs = symmetric_difference.entry(x.clone()).or_default();
-            // Perform symmetric difference of entries.
-            *zs = zs.symmetric_difference(ys).cloned().collect();
-        }
-
-        // Return the symmetric difference graph.
-        Self {
-            data: symmetric_difference,
-        }
-    }
-
-    fn difference(&self, other: &Self) -> Self {
-        Self {
-            data: self
-                .data
-                .iter()
-                // For each entry in the current graph.
-                .map(|(x, ys)| match other.data.get(x) {
-                    // If there a common vertex, then subtract its adjacent vertices.
-                    Some(zs) => (x.clone(), ys.difference(zs).cloned().collect()),
-                    // Else return as it is.
-                    None => (x.clone(), ys.clone()),
-                })
-                .collect(),
-        }
+    fn clear(&mut self) {
+        // Clear the data structures
+        self.data.clear();
     }
 
     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
@@ -311,6 +230,95 @@ where
                     true => Ok(()),
                 },
             },
+        }
+    }
+}
+
+impl<T> Operators for AdjacencyListStorage<T>
+where
+    T: VertexTrait,
+{
+    fn complement(&self) -> Self {
+        // Copy the vertex set.
+        let vertices: std::collections::BTreeSet<_> = self.data.keys().cloned().collect();
+
+        // Iterate over every permutation of V^2.
+        Self {
+            data: vertices
+                .iter()
+                .map(|x| {
+                    (
+                        x.clone(),
+                        vertices.difference(self.data.get(x).unwrap()).cloned().collect(),
+                    )
+                })
+                .collect(),
+        }
+    }
+
+    fn union(&self, other: &Self) -> Self {
+        // Clone internal storage status.
+        let mut union = self.data.clone();
+
+        // For each other entry.
+        for (x, ys) in other.data.iter() {
+            // Get the correspondent entry on the union (or default it).
+            let zs = union.entry(x.clone()).or_default();
+            // Perform union of entries.
+            *zs = zs.union(ys).cloned().collect();
+        }
+
+        // Return the union graph.
+        Self { data: union }
+    }
+
+    fn intersection(&self, other: &Self) -> Self {
+        Self {
+            data: self
+                .data
+                .iter()
+                // For each entry in the current graph.
+                .filter_map(|(x, ys)| {
+                    other.data.get(x).map(|zs| {
+                        // If there a common vertex, then intersect its adjacent vertices.
+                        (x.clone(), ys.intersection(zs).cloned().collect())
+                    })
+                })
+                .collect(),
+        }
+    }
+
+    fn symmetric_difference(&self, other: &Self) -> Self {
+        // Clone internal storage status.
+        let mut symmetric_difference = self.data.clone();
+
+        // For each other entry.
+        for (x, ys) in other.data.iter() {
+            // Get the correspondent entry on the union (or default it).
+            let zs = symmetric_difference.entry(x.clone()).or_default();
+            // Perform symmetric difference of entries.
+            *zs = zs.symmetric_difference(ys).cloned().collect();
+        }
+
+        // Return the symmetric difference graph.
+        Self {
+            data: symmetric_difference,
+        }
+    }
+
+    fn difference(&self, other: &Self) -> Self {
+        Self {
+            data: self
+                .data
+                .iter()
+                // For each entry in the current graph.
+                .map(|(x, ys)| match other.data.get(x) {
+                    // If there a common vertex, then subtract its adjacent vertices.
+                    Some(zs) => (x.clone(), ys.difference(zs).cloned().collect()),
+                    // Else return as it is.
+                    None => (x.clone(), ys.clone()),
+                })
+                .collect(),
         }
     }
 }

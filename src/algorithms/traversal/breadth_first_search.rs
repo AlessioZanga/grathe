@@ -1,4 +1,4 @@
-use crate::graphs::GraphTrait;
+use crate::traits::*;
 use crate::types::*;
 use std::collections::{HashMap, VecDeque};
 
@@ -10,7 +10,7 @@ use std::collections::{HashMap, VecDeque};
 ///
 pub struct BreadthFirstSearch<'a, T>
 where
-    T: GraphTrait,
+    T: Base,
 {
     /// Given graph reference.
     graph: &'a T,
@@ -26,7 +26,7 @@ where
 
 impl<'a, T> BreadthFirstSearch<'a, T>
 where
-    T: GraphTrait,
+    T: Base,
 {
     /// Build a new BFS iterator.
     ///
@@ -88,7 +88,7 @@ where
 
 impl<'a, T> Iterator for BreadthFirstSearch<'a, T>
 where
-    T: GraphTrait,
+    T: Base,
 {
     type Item = &'a T::Vertex;
 
