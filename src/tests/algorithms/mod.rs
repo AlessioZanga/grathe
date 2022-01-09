@@ -1,3 +1,1 @@
-mod traversal;
-
-pub use traversal::*;
+pub mod traversal;

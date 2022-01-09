@@ -1,5 +1,5 @@
-use crate::traits::*;
-use crate::types::*;
+use crate::traits::Base;
+use crate::types::VertexIterator;
 use std::collections::{HashMap, VecDeque};
 use std::vec::Vec;
 

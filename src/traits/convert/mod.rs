@@ -1,7 +1,5 @@
-mod convert_trait;
-
-pub use convert_trait::Convert;
+mod convert;
+pub use convert::Convert;
 
 mod dot;
-
 pub use dot::*;

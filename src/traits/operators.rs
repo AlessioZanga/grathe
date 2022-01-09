@@ -54,11 +54,9 @@ pub trait Operators {
     fn difference(&self, other: &Self) -> Self;
 }
 
-/// Storage trait implementation of union, intersection, symmetric difference and difference operators.
-#[macro_export]
 macro_rules! impl_operators_trait {
     ($graph:ident) => {
-        impl<T> Operators for $graph<T>
+        impl<T> $crate::traits::Operators for $graph<T>
         where
             T: $crate::types::VertexTrait,
         {
@@ -203,3 +201,5 @@ macro_rules! impl_operators_trait {
         }
     };
 }
+
+pub(crate) use impl_operators_trait;

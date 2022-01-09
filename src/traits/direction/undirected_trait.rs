@@ -1,9 +1,9 @@
 use crate::errors::Error;
-use crate::traits::*;
-use crate::types::*;
+use crate::traits::{Base, Convert};
+use crate::types::VertexIterator;
 
 /// Undirected graph trait.
-pub trait Undirected: Base {
+pub trait Undirected: Base + Convert {
     /// Neighbor iterator.
     ///
     /// Iterates over the vertex set $Ne(G, X)$ of a given vertex $X$.
@@ -37,8 +37,6 @@ macro_rules! Ne {
     };
 }
 
-/// Storage delegation and graph trait implementation for undirected graphs.
-#[macro_export]
 macro_rules! impl_undirected_trait {
     ($graph:ident, $storage:ident) => {
         impl<T> PartialEq for $graph<T>
@@ -59,8 +57,7 @@ macro_rules! impl_undirected_trait {
             /// # Examples
             ///
             /// ```
-            /// use grathe::graphs::Graph;
-            /// use grathe::storages::Storage;
+            /// use grathe::prelude::*;
             ///
             /// let g = Graph::new();
             /// let h = Graph::new();
@@ -108,8 +105,71 @@ macro_rules! impl_undirected_trait {
             }
         }
 
-        $crate::impl_capacity_trait!($graph, $storage);
-        $crate::impl_operators_trait!($graph);
+        impl<T> $crate::traits::convert::FromDOT for $graph<T>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            fn from_dot(value: &String) -> Result<Self, Error<Self::Vertex>> {
+                Ok($crate::io::from_dot::<Self>(value).map_err(|e| Error::ParseFailed(format!("{}", e)))?.pop().unwrap())
+            }
+        }
+
+        impl<T> $crate::traits::convert::IntoDOT for $graph<T>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            fn into_dot(&self) -> String {
+                use std::fmt::Write;
+                use itertools::Itertools;
+                // Initialize empty string.
+                let mut dot = String::new();
+                // Get reference to vertices attributes.
+                let vattrs = self.as_vertex_attrs();
+                // Open DOT string by escaping "{".
+                writeln!(dot, "graph {{").ok();
+                // Write vertex with its attributes.
+                for x in self.vertices_iter() {
+                    // Write the vertex identifier.
+                    write!(dot, "\t{:?}", x).ok();
+                    // Get vertex attributes.
+                    let attrs = vattrs.get(x).unwrap();
+                    // Write its attributes, if any.
+                    if !attrs.is_empty() {
+                        // Format key-value pairs.
+                        let attrs = attrs
+                            .iter()
+                            .map(|(k, v)| {
+                                // Try to downcast the Any type to a printable one.
+                                if let Some(v) = v.downcast_ref::<String>() {
+                                    format!("{}={:?}", k, v)
+                                } else if let Some(v) = v.downcast_ref::<&str>() {
+                                    format!("{}={:?}", k, v)
+                                } else {
+                                    format!("{}=\"{:?}\"", k, v)
+                                }
+                            })
+                            .join(", ");
+                        // Write key-value pair.
+                        write!(dot, " [{}]", attrs).ok();
+                    }
+                    // End vertex statement.
+                    writeln!(dot, ";").ok();
+                }
+                // Write edges with label
+                for (x, y) in self.edges_iter().filter(|(x, y)| x <= y) {
+                    writeln!(dot, "\t{:?} -- {:?};", x, y).ok();
+                    // FIXME: writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z).ok();
+                }
+                // Close DOT string by escaping "}"
+                writeln!(dot, "}}").ok();
+                // Return resulting DOT string
+                dot
+            }
+        }
+
+        $crate::traits::impl_capacity_trait!($graph, $storage);
+        $crate::traits::impl_operators_trait!($graph);
+        $crate::traits::impl_with_attributes_trait!($graph);
 
         impl<T> $crate::traits::Storage for $graph<T>
         where
@@ -210,7 +270,7 @@ macro_rules! impl_undirected_trait {
                 Self::new(g, x, $graph::<T>::neighbors_iter)
             }
         }
-
-        $crate::impl_base_trait!($graph, $storage);
     };
 }
+
+pub(crate) use impl_undirected_trait;

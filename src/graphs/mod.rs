@@ -1,5 +1,4 @@
 mod adjacency_list;
-
 pub use adjacency_list::{DirectedAdjacencyListGraph, UndirectedAdjacencyListGraph};
 
 /// Default undirected graph implementation based on adjacency list.

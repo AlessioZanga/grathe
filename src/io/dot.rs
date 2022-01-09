@@ -1,11 +1,9 @@
 use crate::errors::Error;
-use crate::traits::*;
-use crate::{E, V};
+use crate::traits::Base;
 use itertools::Itertools;
 use pest::error::Error as PestError;
 use pest::iterators::Pair;
 use pest::Parser;
-use std::fmt::Write;
 use std::str::FromStr;
 
 // Workaround to print warning messages during tests
@@ -213,75 +211,3 @@ where
     // Return result vector
     Ok(graphs)
 }
-
-/*
-/// To DOT string.
-///
-/// Export a sequence of graphs into DOT string.
-///
-pub fn to_dot<T>(graph: &T) -> Result<String, std::fmt::Error>
-where
-    T: Base,
-{
-    // Initialize empty string.
-    let mut dot = String::new();
-    // Set the graph_type.
-    let mut graph_type = "graph";
-    if graph.is_directed() {
-        graph_type = "digraph";
-    }
-    // Set the edge_type.
-    let mut edge_type = "--";
-    if graph.is_directed() {
-        edge_type = "->";
-    }
-    // De-symmetrize edge set for undirected graphs.
-    // TODO: Avoid 'collect' workaround to deal with
-    //       different iterator resulting types.
-    let mut edges = E!(graph).collect::<Vec<_>>();
-    if !graph.is_directed() {
-        edges = E!(graph).filter(|(x, y)| x <= y).collect();
-    }
-    // Get reference to vertices attributes.
-    let vattrs = graph.as_vertex_attrs();
-    // Open DOT string by escaping "{".
-    writeln!(dot, "{} {{", graph_type)?;
-    // Write vertex with its attributes.
-    for x in V!(graph) {
-        // Write the vertex identifier.
-        write!(dot, "\t{:?}", x)?;
-        // Get vertex attributes.
-        let attrs = vattrs.get(x).unwrap();
-        // Write its attributes, if any.
-        if !attrs.is_empty() {
-            // Format key-value pairs.
-            let attrs = attrs
-                .iter()
-                .map(|(k, v)| {
-                    // Try to downcast the Any type to a printable one.
-                    if let Some(v) = v.downcast_ref::<String>() {
-                        format!("{}={:?}", k, v)
-                    } else if let Some(v) = v.downcast_ref::<&str>() {
-                        format!("{}={:?}", k, v)
-                    } else {
-                        format!("{}=\"{:?}\"", k, v)
-                    }
-                })
-                .join(", ");
-            // Write key-value pair.
-            write!(dot, " [{}]", attrs)?;
-        }
-        // End vertex statement.
-        writeln!(dot, ";")?;
-    }
-    // Write edges with label
-    for (x, y) in edges {
-        writeln!(dot, "\t{:?} {} {:?};", x, edge_type, y)?;
-        // FIXME: writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z)?;
-    }
-    // Close DOT string by escaping "}"
-    writeln!(dot, "}}")?;
-    // Return resulting DOT string
-    Ok(dot)
-}
-*/

@@ -133,10 +133,9 @@ pub trait Capacity {
     fn shrink_to_fit(&mut self);
 }
 
-#[macro_export]
 macro_rules! impl_capacity_trait {
     ($graph:ident, $storage:ident) => {
-        impl<T> Capacity for $graph<T>
+        impl<T> $crate::traits::Capacity for $graph<T>
         where
             T: $crate::types::VertexTrait,
         {
@@ -159,3 +158,5 @@ macro_rules! impl_capacity_trait {
         }
     };
 }
+
+pub(crate) use impl_capacity_trait;

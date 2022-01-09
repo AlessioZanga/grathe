@@ -1,8 +1,7 @@
 use crate::errors::Error;
 use crate::storages::AdjacencyListStorage;
-use crate::traits::*;
-use crate::types::*;
-use crate::{impl_directed_trait, impl_undirected_trait};
+use crate::traits::{Directed, Operators, Storage, Undirected, WithAttributes};
+use crate::types::{Attributes, VertexIterator, VertexTrait};
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
@@ -16,7 +15,7 @@ where
 }
 
 // Storage delegation and graph trait implementation.
-impl_undirected_trait!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
+crate::traits::direction::impl_undirected_trait!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
 
 impl<T> Undirected for UndirectedAdjacencyListGraph<T>
 where
@@ -43,7 +42,7 @@ where
 }
 
 // Storage delegation and graph trait implementation.
-impl_directed_trait!(DirectedAdjacencyListGraph, AdjacencyListStorage);
+crate::traits::direction::impl_directed_trait!(DirectedAdjacencyListGraph, AdjacencyListStorage);
 
 impl<T> Directed for DirectedAdjacencyListGraph<T>
 where

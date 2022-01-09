@@ -3,8 +3,8 @@ mod tests {
     use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::traits::convert::{FromDOT, IntoDOT};
-    use crate::traits::Base;
     use crate::traits::Storage;
+    use crate::traits::WithAttributes;
     use std::path::PathBuf;
     use tempfile::NamedTempFile;
 
@@ -35,7 +35,7 @@ mod tests {
     }
 
     #[test]
-    fn to_dot() -> Result<(), Error<i32>> {
+    fn into_dot() -> Result<(), Error<i32>> {
         let mut g = UndirectedAdjacencyListGraph::<i32>::new();
         let i = g.add_vertex(&0)?;
         let j = g.add_vertex(&1)?;
@@ -67,7 +67,7 @@ mod tests {
         // Get temporary file path
         let path = NamedTempFile::new().unwrap().into_temp_path();
         // Write to DOT file
-        g.write_dot(&path).unwrap();
+        g.write_dot(&path);
         // Read from DOT file
         let h = UndirectedAdjacencyListGraph::<String>::read_dot(&path).unwrap();
         // Compare

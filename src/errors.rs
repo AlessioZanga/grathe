@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 /// Error enumerator.
-#[derive(Error, Debug)]
+#[derive(Error, PartialEq, Debug)]
 pub enum Error<T> {
     /// Vertex not defined error type.
     #[error("vertex identifier `{0:?}` not defined")]
