@@ -1,10 +1,14 @@
 use crate::errors::Error;
 use crate::traits::Storage;
-use std::fmt::Debug;
 use std::path::Path;
 
+/// Build graph given DOT representation.
 pub trait FromDOT: Storage {
-    fn from_dot(value: &String) -> Result<Self, Error<Self::Vertex>>;
+    /// From DOT string.
+    ///
+    /// Map DOT string into graph.
+    ///
+    fn from_dot(value: &str) -> Result<Self, Error<Self::Vertex>>;
 
     /// Read DOT file.
     ///
@@ -18,7 +22,12 @@ pub trait FromDOT: Storage {
     }
 }
 
+/// Build DOT representation given graph.
 pub trait IntoDOT: Storage {
+    /// Into DOT string.
+    ///
+    /// Map graph into DOT string.
+    ///
     fn into_dot(&self) -> String;
 
     /// Write DOT file.

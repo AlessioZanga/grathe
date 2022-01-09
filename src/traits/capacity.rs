@@ -1,3 +1,4 @@
+/// The graph capacity trait.
 pub trait Capacity {
     /// Returns the capacity.
     ///

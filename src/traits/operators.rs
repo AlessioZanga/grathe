@@ -1,3 +1,4 @@
+/// The graph operators trait.
 pub trait Operators {
     /// Complement of a graph.
     ///

@@ -4,6 +4,7 @@ use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacenc
 use crate::{E, V};
 use std::collections::HashMap;
 
+/// The graph conversion trait.
 pub trait Convert: Storage + FromDOT + IntoDOT {
     /// Edge list adapter.
     ///

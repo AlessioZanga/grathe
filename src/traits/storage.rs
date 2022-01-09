@@ -4,7 +4,7 @@ use crate::types::{EdgeIterator, VertexIterator, VertexTrait};
 use std::fmt::Debug;
 use std::str::FromStr;
 
-/// The base graph storage trait.
+/// The graph storage trait.
 pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity {
     /// Vertex identifier type.
     // TODO: Change FromPrimitive to Step once stable, use combination of x = T::new()

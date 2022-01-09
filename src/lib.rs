@@ -21,10 +21,11 @@ pub mod prelude;
 /// Backend graph storage implementations.
 pub mod storages;
 
-/// Libray-wide types and type-traits.
-pub mod types;
-
+/// Crate-wide traits.
 pub mod traits;
+
+/// Crate-wide types.
+pub mod types;
 
 /// Tools, macros, etc.
 pub mod utils;

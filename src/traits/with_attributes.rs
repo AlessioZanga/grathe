@@ -3,6 +3,7 @@ use crate::traits::Storage;
 use crate::types::Attributes;
 use std::any::Any;
 
+/// The graph attribute trait.
 pub trait WithAttributes: Storage {
     /// Reference to vertex attributes.
     ///

@@ -109,7 +109,7 @@ macro_rules! impl_undirected_trait {
         where
             T: $crate::types::VertexTrait,
         {
-            fn from_dot(value: &String) -> Result<Self, Error<Self::Vertex>> {
+            fn from_dot(value: &str) -> Result<Self, Error<Self::Vertex>> {
                 Ok($crate::io::from_dot::<Self>(value).map_err(|e| Error::ParseFailed(format!("{}", e)))?.pop().unwrap())
             }
         }
