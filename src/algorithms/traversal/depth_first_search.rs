@@ -105,21 +105,21 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         // If there are still vertices to be visited.
-        if let Some(&y) = self.stack.last() {
+        if let Some(&x) = self.stack.last() {
             // Check if vertex is WHITE (i.e. was not seen before).
-            if !self.discovery_time.contains_key(y) {
+            if !self.discovery_time.contains_key(x) {
                 // Set its discover time (as GRAY).
-                self.discovery_time.insert(y, self.time);
+                self.discovery_time.insert(x, self.time);
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for z in (self.reachable)(self.graph, y) {
+                for y in (self.reachable)(self.graph, x) {
                     // Filter already visited vertices (as GRAY).
-                    if !self.discovery_time.contains_key(z) {
+                    if !self.discovery_time.contains_key(y) {
                         // Set predecessor.
-                        self.predecessor.insert(z, y);
+                        self.predecessor.insert(y, x);
                         // Add to queue.
-                        queue.push_back(z);
+                        queue.push_back(y);
                     }
                 }
                 // Push vertices onto the stack in reverse order, this makes
@@ -132,15 +132,15 @@ where
                 // Remove it from stack.
                 self.stack.pop();
                 // Check if it is GRAY (not BLACK).
-                if !self.finish_time.contains_key(y) {
+                if !self.finish_time.contains_key(x) {
                     // Set its finish time (as BLACK).
-                    self.finish_time.insert(y, self.time);
+                    self.finish_time.insert(x, self.time);
                     // Increment time.
                     self.time += 1;
                 }
             }
             // Return next vertex.
-            return Some(y);
+            return Some(x);
         }
 
         // Otherwise end is reached.

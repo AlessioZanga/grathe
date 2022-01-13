@@ -94,21 +94,21 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         // If there are still vertices to be visited.
-        if let Some(y) = self.queue.pop_front() {
+        if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for z in (self.reachable)(self.graph, y) {
+            for y in (self.reachable)(self.graph, x) {
                 // If the vertex has never seen before.
-                if !self.distance.contains_key(z) {
+                if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
-                    self.distance.insert(z, self.distance[y] + 1);
+                    self.distance.insert(y, self.distance[x] + 1);
                     // Set its predecessor.
-                    self.predecessor.insert(z, y);
+                    self.predecessor.insert(y, x);
                     // Push it into the to-be-visited queue.
-                    self.queue.push_back(z);
+                    self.queue.push_back(y);
                 }
             }
             // Return next vertex.
-            return Some(y);
+            return Some(x);
         }
 
         // Otherwise end is reached.
