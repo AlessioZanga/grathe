@@ -83,7 +83,7 @@ pub type EdgeList<T> = BTreeSet<(T, T)>;
 pub type AdjacencyList<T> = BTreeMap<T, BTreeSet<T>>;
 
 /// Dense adjacency matrix type.
-pub type DenseAdjacencyMatrix = Array2<i8>;
+pub type DenseAdjacencyMatrix = Array2<bool>;
 
 /// Sparse adjacency matrix type.
-pub type SparseAdjacencyMatrix = TriMat<i8>;
+pub type SparseAdjacencyMatrix = TriMat<bool>;

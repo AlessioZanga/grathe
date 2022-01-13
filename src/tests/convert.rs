@@ -41,9 +41,9 @@ mod tests {
         T: Storage<Vertex = i32> + Convert,
     {
         let g = T::from_edges(&E);
-        let mut a = DenseAdjacencyMatrix::zeros((8, 8));
+        let mut a = DenseAdjacencyMatrix::from_elem((8, 8), false);
         for (x, y) in E {
-            a[(x as usize, y as usize)] = 1;
+            a[(x as usize, y as usize)] = true;
         }
         assert_eq!(g.into_dense_adjacency_matrix(), a);
 
@@ -62,7 +62,7 @@ mod tests {
             .sorted()
             .map(|(x, y)| (x as usize, y as usize))
             .unzip();
-        let v = std::iter::repeat(1).take(g.size()).collect();
+        let v = std::iter::repeat(true).take(g.size()).collect();
         assert_eq!(
             g.into_sparse_adjacency_matrix(),
             SparseAdjacencyMatrix::from_triplets((g.order(), g.order()), x, y, v)

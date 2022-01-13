@@ -86,12 +86,12 @@ where
     fn into_dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
         let n = self.order();
         let mut idx = HashMap::new();
-        let mut out = DenseAdjacencyMatrix::zeros((n, n));
+        let mut out = DenseAdjacencyMatrix::from_elem((n, n), false);
         // Build vid-to-index mapping.
         idx.extend(V!(self).into_iter().enumerate().map(|(i, x)| (x, i)));
         // Populate the output value.
         for (x, y) in E!(self) {
-            out[(idx[&x], idx[&y])] = 1;
+            out[(idx[&x], idx[&y])] = true;
         }
         out
     }
@@ -105,7 +105,7 @@ where
         // Populate the output value.
         out.reserve(self.size());
         for (x, y) in E!(self) {
-            out.add_triplet(idx[&x], idx[&y], 1);
+            out.add_triplet(idx[&x], idx[&y], true);
         }
         out
     }
