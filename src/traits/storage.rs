@@ -1,5 +1,5 @@
+use super::{Capacity, Operators};
 use crate::errors::Error;
-use crate::traits::{Capacity, Operators};
 use crate::types::{EdgeIterator, VertexIterator, VertexTrait};
 use std::fmt::Debug;
 use std::str::FromStr;

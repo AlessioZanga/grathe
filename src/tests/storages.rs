@@ -164,39 +164,6 @@ mod tests {
     }
 
     #[test]
-    fn with_capacity<T>()
-    where
-        T: Storage<Vertex = i32>,
-    {
-        let g = T::with_capacity(3);
-        // FIXME: capacity constraints is soft-enforced.
-        assert_le!(g.capacity(), 3);
-
-        // The order is still zero.
-        assert_eq!(g.order(), 0);
-
-        // The size is still zero.
-        assert_eq!(g.size(), 0);
-    }
-
-    #[test]
-    fn reserve<T>()
-    where
-        T: Storage<Vertex = i32>,
-    {
-        let mut g = T::new();
-
-        // Reserve additional capacity.
-        g.reserve(3);
-
-        // The order is still zero.
-        assert_eq!(g.order(), 0);
-
-        // The size is still zero.
-        assert_eq!(g.size(), 0);
-    }
-
-    #[test]
     fn from_order<T>() -> Result<(), Error<i32>>
     where
         T: Storage<Vertex = i32>,
@@ -342,7 +309,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn adjacents_iter_panics<T>()
+    fn adjacents_iter_should_panic<T>()
     where
         T: Storage<Vertex = i32>,
     {

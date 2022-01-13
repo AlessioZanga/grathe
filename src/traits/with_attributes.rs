@@ -1,5 +1,5 @@
+use super::Storage;
 use crate::errors::Error;
-use crate::traits::Storage;
 use crate::types::Attributes;
 use std::any::Any;
 

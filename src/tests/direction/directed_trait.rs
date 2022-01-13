@@ -57,7 +57,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn ancestors_iter_panics<T>()
+    fn ancestors_iter_should_panic<T>()
     where
         T: Directed<Vertex = i32>,
     {
@@ -94,7 +94,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn parents_iter_panics<T>()
+    fn parents_iter_should_panic<T>()
     where
         T: Directed<Vertex = i32>,
     {
@@ -131,7 +131,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn children_iter_panics<T>()
+    fn children_iter_should_panic<T>()
     where
         T: Directed<Vertex = i32>,
     {
@@ -170,7 +170,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn descendants_iter_panics<T>()
+    fn descendants_iter_should_panic<T>()
     where
         T: Directed<Vertex = i32>,
     {

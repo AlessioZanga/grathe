@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn neighbors_iter_panics<T>()
+    fn neighbors_iter_should_panic<T>()
     where
         T: Undirected<Vertex = i32>,
     {

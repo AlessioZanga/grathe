@@ -1,4 +1,4 @@
-use crate::traits::{Capacity, Operators, Storage, WithAttributes};
+use super::{Capacity, Operators, Storage, WithAttributes};
 use crate::Adj;
 
 /// The base graph trait.

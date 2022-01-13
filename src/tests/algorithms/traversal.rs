@@ -106,7 +106,7 @@ mod directed_tests {
 
                 #[test]
                 #[should_panic]
-                fn breadth_first_search_tree_panics()
+                fn breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
@@ -234,7 +234,7 @@ mod directed_tests {
 
                 #[test]
                 #[should_panic]
-                fn depth_first_search_tree_panics()
+                fn depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
@@ -382,7 +382,7 @@ mod undirected_tests {
 
                 #[test]
                 #[should_panic]
-                fn breadth_first_search_tree_panics()
+                fn breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
@@ -530,7 +530,7 @@ mod undirected_tests {
 
                 #[test]
                 #[should_panic]
-                fn depth_first_search_tree_panics()
+                fn depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();

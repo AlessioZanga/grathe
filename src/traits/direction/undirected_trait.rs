@@ -1,9 +1,9 @@
 use crate::errors::Error;
-use crate::traits::{Base, Convert};
+use crate::traits::{Base, Connectivity, Convert};
 use crate::types::VertexIterator;
 
 /// Undirected graph trait.
-pub trait Undirected: Base + Convert {
+pub trait Undirected: Base + Connectivity + Convert {
     /// Neighbor iterator.
     ///
     /// Iterates over the vertex set $Ne(G, X)$ of a given vertex $X$.
@@ -105,6 +105,50 @@ macro_rules! impl_undirected_trait {
             }
         }
 
+        $crate::traits::impl_capacity_trait!($graph);
+
+        impl<T> $crate::traits::Connectivity for $graph<T>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
+                // Sanitize input.
+                assert!(self.has_vertex(x) && self.has_vertex(y));
+                // Initialize the to-be-visited queue with the source vertex.
+                let mut queue = std::collections::VecDeque::from([x]);
+                // Initialize the visited set.
+                let mut visited = std::collections::HashSet::from([x]);
+                // If there are still vertices to be visited.
+                while let Some(z) = queue.pop_front() {
+                    // Iterate over the reachable vertices of the popped vertex.
+                    for w in self.neighbors_iter(z) {
+                        // If the vertex has never seen before.
+                        if !visited.contains(w) {
+                            // Check if vertex is target.
+                            if w == y {
+                                // Return has undirected path.
+                                return true;
+                            }
+                            // Set as visited.
+                            visited.insert(w);
+                            // Push it into the to-be-visited queue.
+                            queue.push_back(w);
+                        }
+                    }
+                }
+
+                false
+            }
+
+            fn is_connected(&self) -> bool {
+                todo!()
+            }
+
+            fn is_acyclic(&self) -> bool {
+                todo!()
+            }
+        }
+
         impl<T> $crate::traits::convert::FromDOT for $graph<T>
         where
             T: $crate::types::VertexTrait,
@@ -167,7 +211,6 @@ macro_rules! impl_undirected_trait {
             }
         }
 
-        $crate::traits::impl_capacity_trait!($graph);
         $crate::traits::impl_operators_trait!($graph);
         $crate::traits::impl_with_attributes_trait!($graph);
 
