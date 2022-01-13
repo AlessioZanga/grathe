@@ -11,11 +11,13 @@ mod undirected {
     where
         T: Connectivity<Vertex = i32>,
     {
+        // Test single edge graph.
         let g = T::from_edges(&[(0, 1)]);
 
         assert_false!(g.has_path(&0, &0));
         assert_true!(g.has_path(&0, &1));
 
+        // Test single path graph.
         let g = T::from_edges(&[(0, 1), (1, 2)]);
 
         assert_true!(g.has_path(&0, &1));
@@ -24,12 +26,14 @@ mod undirected {
         assert_true!(g.has_path(&2, &0));
         assert_true!(g.has_path(&2, &1));
 
+        // Test multi path edge graph.
         let g = T::from_edges(&[(0, 1), (1, 2), (1, 3), (3, 4)]);
 
         assert_true!(g.has_path(&0, &4));
         assert_true!(g.has_path(&1, &4));
         assert_true!(g.has_path(&2, &4));
 
+        // Test disconnected graph.
         let g = T::from_edges(&[(0, 1), (1, 2), (3, 4)]);
 
         assert_false!(g.has_path(&0, &4));
@@ -46,6 +50,7 @@ mod undirected {
     where
         T: Connectivity<Vertex = i32>,
     {
+        // Test null path.
         let g = T::new();
         assert_false!(g.has_path(&0, &0));
     }
@@ -67,11 +72,13 @@ mod directed {
     where
         T: Connectivity<Vertex = i32>,
     {
+        // Test single edge graph.
         let g = T::from_edges(&[(0, 1)]);
 
         assert_false!(g.has_path(&0, &0));
         assert_true!(g.has_path(&0, &1));
 
+        // Test single path graph.
         let g = T::from_edges(&[(0, 1), (1, 2)]);
 
         assert_true!(g.has_path(&0, &1));
@@ -80,12 +87,14 @@ mod directed {
         assert_false!(g.has_path(&2, &0));
         assert_false!(g.has_path(&2, &1));
 
+        // Test multi path graph.
         let g = T::from_edges(&[(0, 1), (1, 2), (1, 3), (3, 4)]);
 
         assert_true!(g.has_path(&0, &4));
         assert_true!(g.has_path(&1, &4));
         assert_false!(g.has_path(&2, &4));
 
+        // Test disconnected graph.
         let g = T::from_edges(&[(0, 1), (1, 2), (3, 4)]);
 
         assert_false!(g.has_path(&0, &4));
@@ -102,6 +111,7 @@ mod directed {
     where
         T: Connectivity<Vertex = i32>,
     {
+        // Test null graph.
         let g = T::new();
         assert_false!(g.has_path(&0, &0));
     }
