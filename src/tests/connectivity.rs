@@ -55,6 +55,40 @@ mod undirected {
         assert_false!(g.has_path(&0, &0));
     }
 
+    #[test]
+    fn is_connected<T>() -> Result<(), Error<i32>>
+    where
+        T: Connectivity<Vertex = i32>,
+    {
+        // Test null graph.
+        let g = T::new();
+        assert_true!(g.is_connected());
+
+        // Test single edge graph.
+        let g = T::from_edges(&[(0, 1)]);
+        assert_true!(g.is_connected());
+
+        // Test multiple edges graph.
+        let g = T::from_edges(&[(0, 1), (1, 2)]);
+        assert_true!(g.is_connected());
+
+        // Test disconnected graph.
+        let mut g = T::from_edges(&[(0, 1), (1, 2)]);
+        g.add_vertex(&3)?;
+        assert_false!(g.is_connected());
+
+        // Test connected cyclic graph.
+        let g = T::from_edges(&[(0, 1), (1, 2), (2, 0)]);
+        assert_true!(g.is_connected());
+
+        // Test disconnected cyclic graph.
+        let mut g = T::from_edges(&[(0, 1), (1, 2), (2, 0)]);
+        g.add_vertex(&3)?;
+        assert_false!(g.is_connected());
+
+        Ok(())
+    }
+
     #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
     mod undirected_adjacency_list_graph {}
 }
@@ -114,6 +148,40 @@ mod directed {
         // Test null graph.
         let g = T::new();
         assert_false!(g.has_path(&0, &0));
+    }
+
+    #[test]
+    fn is_connected<T>() -> Result<(), Error<i32>>
+    where
+        T: Connectivity<Vertex = i32>,
+    {
+        // Test null graph.
+        let g = T::new();
+        assert_true!(g.is_connected());
+
+        // Test single edge graph.
+        let g = T::from_edges(&[(0, 1)]);
+        assert_true!(g.is_connected());
+
+        // Test multiple edges graph.
+        let g = T::from_edges(&[(0, 1), (1, 2)]);
+        assert_true!(g.is_connected());
+
+        // Test disconnected graph.
+        let mut g = T::from_edges(&[(0, 1), (1, 2)]);
+        g.add_vertex(&3)?;
+        assert_false!(g.is_connected());
+
+        // Test connected cyclic graph.
+        let g = T::from_edges(&[(0, 1), (1, 2), (2, 0)]);
+        assert_true!(g.is_connected());
+
+        // Test disconnected cyclic graph.
+        let mut g = T::from_edges(&[(0, 1), (1, 2), (2, 0)]);
+        g.add_vertex(&3)?;
+        assert_false!(g.is_connected());
+
+        Ok(())
     }
 
     #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]

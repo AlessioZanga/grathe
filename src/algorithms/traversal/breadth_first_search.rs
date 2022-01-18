@@ -97,7 +97,7 @@ where
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
             for y in (self.reachable)(self.graph, x) {
-                // If the vertex has never seen before.
+                // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
                     self.distance.insert(y, self.distance[x] + 1);

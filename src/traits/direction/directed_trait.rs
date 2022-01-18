@@ -174,7 +174,7 @@ macro_rules! impl_directed_trait {
                 while let Some(z) = queue.pop_front() {
                     // Iterate over the reachable vertices of the popped vertex.
                     for w in self.children_iter(z) {
-                        // If the vertex has never seen before.
+                        // If the vertex was never seen before.
                         if !visited.contains(w) {
                             // Check if vertex is target.
                             if w == y {
@@ -190,10 +190,6 @@ macro_rules! impl_directed_trait {
                 }
 
                 false
-            }
-
-            fn is_connected(&self) -> bool {
-                todo!()
             }
 
             fn is_acyclic(&self) -> bool {
