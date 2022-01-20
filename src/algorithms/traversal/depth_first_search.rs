@@ -1,4 +1,4 @@
-use crate::traits::Base;
+use crate::traits::Storage;
 use crate::types::VertexIterator;
 use std::collections::{HashMap, VecDeque};
 use std::vec::Vec;
@@ -11,7 +11,7 @@ use std::vec::Vec;
 ///
 pub struct DepthFirstSearch<'a, T>
 where
-    T: Base,
+    T: Storage,
 {
     /// Given graph reference.
     graph: &'a T,
@@ -31,7 +31,7 @@ where
 
 impl<'a, T> DepthFirstSearch<'a, T>
 where
-    T: Base,
+    T: Storage,
 {
     /// Run DFS *tree* for a given directed graph.
     ///
@@ -49,7 +49,7 @@ where
     ///     (0,  1), (1, 2), (0, 3), (0, 4), (4, 5)
     /// ]);
     ///
-    /// // Run DFS over said graph with `0` as source vertex.
+    /// // Build the search object over said graph with `0` as source vertex.
     /// let mut search = DFS::from((&g, &0));
     ///
     /// // Consume the iterator in-place and assert later.
@@ -100,14 +100,16 @@ where
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> &Self {
         while let Some(_) = self.next() {}
+
+        self
     }
 }
 
 impl<'a, T> Iterator for DepthFirstSearch<'a, T>
 where
-    T: Base,
+    T: Storage,
 {
     type Item = &'a T::Vertex;
 
