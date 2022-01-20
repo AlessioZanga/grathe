@@ -50,7 +50,7 @@ where
     /// let mut search = BFS::from((&g, &0));
     ///
     /// // Consume the iterator in-place and assert later.
-    /// while let Some(_) = search.next() {}
+    /// search.run();
     ///
     /// // The source vertex has distance zero from itself ...
     /// assert_eq!(search.distance[&0], 0);
@@ -83,6 +83,14 @@ where
             // Initialize the predecessor map.
             predecessor: Default::default(),
         }
+    }
+
+    /// Execute the procedure.
+    ///
+    /// Execute the procedure and store the results for later queries.
+    ///
+    pub fn run(&mut self) {
+        while let Some(_) = self.next() {}
     }
 }
 

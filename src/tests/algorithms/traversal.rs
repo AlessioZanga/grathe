@@ -1,7 +1,7 @@
 #[cfg(test)]
-mod directed_tests {
+mod directed {
 
-    macro_rules! directed_tests {
+    macro_rules! generic_tests {
         ($T:ident, $U:ident) => {
             paste::item! {
 
@@ -27,7 +27,7 @@ mod directed_tests {
                     // Execute BFS for the non-trivial graph.
                     let mut search = BFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 2);
                     assert_eq!(search.predecessor.len(), 1);
@@ -42,7 +42,7 @@ mod directed_tests {
                     // Execute BFS for the non-connected graph.
                     let mut search = BFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 2);
                     assert_eq!(search.predecessor.len(), 1);
@@ -79,7 +79,7 @@ mod directed_tests {
                     // Execute DFS for the non-trivial graph.
                     let mut search = BFS::from((&g, &0));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 8);
                     assert_eq!(search.predecessor.len(), 7);
@@ -122,7 +122,7 @@ mod directed_tests {
                     // Execute DFS for the trivial graph.
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
                     // The DFS on a trivial graph contains only the root ...
                     assert_eq!(search.discovery_time.len(), 1);
                     assert_eq!(search.finish_time.len(), 1);
@@ -140,7 +140,7 @@ mod directed_tests {
                     // Execute DFS for the non-trivial graph.
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
                     assert_eq!(search.finish_time.len(), 2);
@@ -158,7 +158,7 @@ mod directed_tests {
                     // Execute DFS for the non-connected graph.
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
                     assert_eq!(search.finish_time.len(), 2);
@@ -198,7 +198,7 @@ mod directed_tests {
                     // Execute DFS for the non-trivial graph.
                     let mut search = DFS::from((&g, &0));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 8);
                     assert_eq!(search.finish_time.len(), 8);
@@ -250,14 +250,14 @@ mod directed_tests {
         use crate::graphs::DirectedAdjacencyListGraph;
         use crate::traits::Storage;
 
-        directed_tests!(DirectedAdjacencyListGraph, i32);
+        generic_tests!(DirectedAdjacencyListGraph, i32);
     }
 }
 
 #[cfg(test)]
-mod undirected_tests {
+mod undirected {
 
-    macro_rules! undirected_tests {
+    macro_rules! generic_tests {
         ($T:ident, $U:ident) => {
             paste::item! {
 
@@ -271,7 +271,7 @@ mod undirected_tests {
                     // Execute BFS for the trivial graph.
                     let mut search = BFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // The BFS on a trivial graph contains only the root ...
                     assert_eq!(search.distance.len(), 1);
@@ -289,7 +289,7 @@ mod undirected_tests {
                     // Execute BFS for the non-trivial graph.
                     let mut search = BFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 2);
@@ -309,7 +309,7 @@ mod undirected_tests {
                     // Execute BFS for the non-connected graph.
                     let mut search = BFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 2);
@@ -351,7 +351,7 @@ mod undirected_tests {
                     // Execute DFS for the non-trivial graph.
                     let mut search = BFS::from((&g, &0));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 8);
@@ -399,7 +399,7 @@ mod undirected_tests {
                     // Execute DFS for the trivial graph.
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // The DFS on a trivial graph contains only the root ...
                     assert_eq!(search.discovery_time.len(), 1);
@@ -420,7 +420,7 @@ mod undirected_tests {
                     // Execute DFS for the non-trivial graph.
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
@@ -443,7 +443,7 @@ mod undirected_tests {
                     // Execute DFS for the non-connected graph.
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
@@ -490,7 +490,7 @@ mod undirected_tests {
                     // Execute DFS for the non-trivial graph.
                     let mut search = DFS::from((&g, &0));
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 8);
@@ -546,6 +546,6 @@ mod undirected_tests {
         use crate::graphs::UndirectedAdjacencyListGraph;
         use crate::traits::Storage;
 
-        undirected_tests!(UndirectedAdjacencyListGraph, i32);
+        generic_tests!(UndirectedAdjacencyListGraph, i32);
     }
 }
