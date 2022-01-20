@@ -3,7 +3,7 @@
 mod tests {
     use crate::errors::Error;
     use crate::graphs::DirectedAdjacencyListGraph;
-    use crate::traits::{Convert, Storage};
+    use crate::traits::Convert;
     use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
     use itertools::Itertools;
 
@@ -12,7 +12,7 @@ mod tests {
     #[test]
     fn into_edge_list<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + Convert,
+        T: Convert<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         assert_eq!(g.into_edge_list(), EdgeList::from(E));
@@ -23,7 +23,7 @@ mod tests {
     #[test]
     fn into_adjacency_list<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + Convert,
+        T: Convert<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         let mut a = AdjacencyList::new();
@@ -38,7 +38,7 @@ mod tests {
     #[test]
     fn into_dense_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + Convert,
+        T: Convert<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         let mut a = DenseAdjacencyMatrix::from_elem((8, 8), false);
@@ -53,7 +53,7 @@ mod tests {
     #[test]
     fn into_sparse_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + Convert,
+        T: Convert<Vertex = i32>,
     {
         let g = T::from_edges(&E);
         let (x, y): (Vec<_>, Vec<_>) = E
@@ -80,7 +80,7 @@ mod tests {
 mod dot {
     use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
-    use crate::traits::{Base, Convert};
+    use crate::traits::{Convert, WithAttributes};
     use std::path::Path;
     use tempfile::NamedTempFile;
 
@@ -90,7 +90,7 @@ mod dot {
     #[test]
     fn from_dot<T>() -> Result<(), Error<String>>
     where
-        T: Base<Vertex = String> + Convert,
+        T: Convert<Vertex = String> + WithAttributes,
     {
         // Read DOT file to string
         let dot = std::fs::read_to_string("src/tests/data/14.dot").unwrap();
@@ -105,7 +105,7 @@ mod dot {
     #[test]
     fn into_dot<T>() -> Result<(), Error<String>>
     where
-        T: Base<Vertex = String> + Convert,
+        T: Convert<Vertex = String>,
     {
         // Init graph
         let mut g = T::new();
@@ -121,7 +121,7 @@ mod dot {
     #[test]
     fn read_dot<T>() -> Result<(), Error<String>>
     where
-        T: Base<Vertex = String> + Convert,
+        T: Convert<Vertex = String>,
     {
         // Read DOT file to string
         let dot = Path::new("src/tests/data/14.dot");
@@ -136,7 +136,7 @@ mod dot {
     #[test]
     fn write_dot<T>() -> Result<(), Error<String>>
     where
-        T: Base<Vertex = String> + Convert,
+        T: Convert<Vertex = String>,
     {
         // Init graph
         let mut g = T::new();

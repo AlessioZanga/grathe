@@ -1,9 +1,9 @@
 mod algorithms;
+mod base;
 mod capacity;
 mod connectivity;
 mod convert;
 mod direction;
-mod graphs;
 mod io;
 mod operators;
 mod readme;
