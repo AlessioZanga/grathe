@@ -290,6 +290,17 @@ macro_rules! impl_undirected_trait {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
+        impl<'a, T> From<(&'a $graph<T>, &'a T, &'a T)> for $crate::algorithms::AllSimplePaths<'a, $graph<T>>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            fn from((g, x, y): (&'a $graph<T>, &'a T, &'a T)) -> Self {
+                Self::new(g, x, y, $graph::<T>::neighbors_iter)
+            }
+        }
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
         impl<'a, T> From<(&'a $graph<T>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T>>
         where
             T: $crate::types::VertexTrait,

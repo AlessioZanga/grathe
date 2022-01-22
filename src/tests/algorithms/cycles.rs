@@ -13,13 +13,18 @@ mod directed {
                     search.run();
                     assert_eq!(
                         search.cycles,
-                        vec![
+                        [
                             vec![&1, &2, &3, &4, &1],
                             vec![&1, &2, &4, &1]
                         ]
                     );
+                    assert_eq!(search.popularity.get(&0), None);
+                    assert_eq!(search.popularity[&1], 2);
+                    assert_eq!(search.popularity[&2], 2);
+                    assert_eq!(search.popularity[&3], 1);
+                    assert_eq!(search.popularity[&4], 2);
 
-                    // Test from Figure 9 of reference paper, removed multi-edges .
+                    // Test from Figure 9 of reference paper, removed multi-edges.
                     let g = $T::<$U>::from_edges(&[
                         (0, 2),
                         (0, 10),
@@ -63,13 +68,13 @@ mod directed {
                             vec![&0, &10, &11, &6, &13, &12, &1, &8, &4, &15, &0],
                             vec![&0, &10, &11, &6, &13, &15, &0],
                             vec![&0, &14, &11, &6, &13, &3, &4, &15, &0],
-                            // vec![&0, &14, &11, &6, &13, &12, &1, &8, &0], // <- MISS
-                            // vec![&0, &14, &11, &6, &13, &12, &1, &8, &4, &15, &0], // <- MISS
+                            vec![&0, &14, &11, &6, &13, &12, &1, &8, &0], // <- MISS
+                            vec![&0, &14, &11, &6, &13, &12, &1, &8, &4, &15, &0], // <- MISS
                             vec![&0, &14, &11, &6, &13, &15, &0],
                             vec![&1, &8, &4, &13, &12, &1],
                             vec![&3, &3],
                             vec![&3, &4, &13, &3],
-                            // vec![&3, &6, &13, &3], // <- MISS
+                            vec![&3, &6, &13, &3], // <- MISS
                             vec![&6, &13, &12, &10, &11, &6],
                             vec![&6, &13, &12, &14, &11, &6],
                             vec![&8, &8],

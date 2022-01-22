@@ -298,6 +298,17 @@ macro_rules! impl_directed_trait {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
+        impl<'a, T> From<(&'a $graph<T>, &'a T, &'a T)> for $crate::algorithms::AllSimplePaths<'a, $graph<T>>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            fn from((g, x, y): (&'a $graph<T>, &'a T, &'a T)) -> Self {
+                Self::new(g, x, y, $graph::<T>::children_iter)
+            }
+        }
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
         impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::AllCycles<'a, $graph<T>>
         where
             T: $crate::types::VertexTrait,

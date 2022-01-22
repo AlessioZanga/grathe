@@ -3,11 +3,22 @@ use crate::types::VertexIterator;
 use std::collections::{HashMap, HashSet};
 use std::vec::Vec;
 
-/// Find all cycles.
+// Workaround to print tracing messages during tests
+#[cfg(not(test))]
+use log::trace;
+#[cfg(test)]
+use std::println as trace;
+
+/// Find all cycles in a given graph.
 ///
-/// Find all cycles in a graph[^note].
+/// Find all cycles in a given graph (or a multi-graph[^note]). This algorithm [^ref]
+/// returns all elementary circuits (i.e. *cycles*) present in a graph.
+/// The graph can contain self-edges and can also be disconnected.
 ///
-/// [^note]: [Hawick, K. A., & James, H. A. (2008). Enumerating Circuits and Loops in Graphs with Self-Arcs and Multiple-Arcs.](https://scholar.google.com/scholar?q=Enumerating+Circuits+and+Loops+in+Graphs+with+Self-Arcs+and+Multiple-Arcs)
+/// [^note]: TODO: Currently, this specific implementation does not work in multi-graphs.
+/// However, once multi-graphs will be supported library-wide, it will be restored to its original formulation.
+///
+/// [^ref]: [Hawick, K. A., & James, H. A. (2008). Enumerating Circuits and Loops in Graphs with Self-Arcs and Multiple-Arcs.](https://scholar.google.com/scholar?q=Enumerating+Circuits+and+Loops+in+Graphs+with+Self-Arcs+and+Multiple-Arcs)
 ///
 pub struct AllCycles<'a, T>
 where
@@ -20,15 +31,60 @@ where
     /// The currently visited stack.
     stack: Vec<&'a T::Vertex>,
     /// Map of *blocked* vertices in order to avoid double counting.
+    // TODO: Replace HashSet with a Vec to account for multi-graphs once supported.
     blocked: HashMap<&'a T::Vertex, HashSet<&'a T::Vertex>>,
-    /// Set of found cycles.
+    /// Vector of found cycles.
     pub cycles: Vec<Vec<&'a T::Vertex>>,
+    /// Map of vertices popularity (i.e. how many cycles a vertex appears in).
+    pub popularity: HashMap<&'a T::Vertex, usize>,
 }
 
 impl<'a, T> AllCycles<'a, T>
 where
     T: Storage,
 {
+    /// Build an *all cycles* search structure.
+    ///
+    /// Build an *all cycles* search structure which retains the cycles found,
+    /// together with the popularity count of each vertex.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a directed graph.
+    /// let g = DiGraph::from_edges(&[
+    ///     (0, 1), (1, 2), (2, 3), (2, 4), (3, 4), (4, 1)
+    /// ]);
+    ///
+    /// // Build the search object over said graph.
+    /// let mut search = AllCycles::from(&g);
+    ///
+    /// // Run the algorithm and assert later.
+    /// search.run();
+    ///
+    /// // In this graph there are two directed cycles,
+    /// // these are reported ordered by discovery time.
+    /// assert_eq!(
+    ///     search.cycles,
+    ///     [
+    ///         vec![&1, &2, &3, &4, &1],
+    ///         vec![&1, &2, &4, &1]
+    ///     ]
+    /// );
+    ///
+    /// // Vertex `0` is not present in any cycle,
+    /// // therefore it is not in the popularity map.
+    /// assert_eq!(search.popularity.get(&0), None);
+    /// // Vertices `1`, `2` and `4` are present in both cycles,
+    /// // while vertex `3` is present only in the first one.
+    /// assert_eq!(search.popularity[&1], 2);
+    /// assert_eq!(search.popularity[&2], 2);
+    /// assert_eq!(search.popularity[&3], 1);
+    /// assert_eq!(search.popularity[&4], 2);
+    /// ```
+    ///
     pub fn new(g: &'a T, f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>) -> Self {
         Self {
             // Set target graph.
@@ -41,6 +97,8 @@ where
             blocked: Default::default(),
             // Initialize cycles set.
             cycles: Default::default(),
+            // Initialize popularity map.
+            popularity: Default::default(),
         }
     }
 
@@ -71,6 +129,13 @@ where
 
         // Iterate over reachable vertices from graph.
         for w in (self.reachable)(self.graph, v) {
+            // Print current stack trace.
+            trace!(
+                "AllCycles: stack trace: {:?}[{:?}], blocked map: {:?}.",
+                self.stack,
+                w,
+                self.blocked
+            );
             // If current vertex is lower then starting vertex,
             // then skip this iteration.
             if w < self.stack[0] {
@@ -87,11 +152,15 @@ where
                     // Return the completed cycle.
                     c
                 });
+                // Update popularity.
+                for u in self.stack.iter() {
+                    *self.popularity.entry(u).or_default() += 1;
+                }
                 // Set the found flag.
                 found = true;
             // Finally, if the current vertex has not been blocked...
             } else if !self.blocked.contains_key(&w) {
-                // ... visit it recursively.
+                // ...visit it recursively.
                 found = self.circuit(w);
             }
         }
@@ -114,12 +183,14 @@ where
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> &Self {
         for v in self.graph.vertices_iter() {
             // Visit current vertex recursively.
             self.circuit(v);
             // Clear map of blocked vertices.
             self.blocked.clear();
         }
+
+        self
     }
 }
