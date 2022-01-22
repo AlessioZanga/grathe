@@ -4,7 +4,6 @@ mod directed {
     macro_rules! generic_tests {
         ($T:ident, $U:ident) => {
             paste::item! {
-
                 #[test]
                 fn all_cycles() {
                     // Test from Figure 1 of reference paper.
@@ -62,7 +61,7 @@ mod directed {
                     search.run();
                     assert_eq!(
                         search.cycles,
-                        vec![
+                        [
                             vec![&0, &10, &11, &6, &13, &3, &4, &15, &0],
                             vec![&0, &10, &11, &6, &13, &12, &1, &8, &0],
                             vec![&0, &10, &11, &6, &13, &12, &1, &8, &4, &15, &0],

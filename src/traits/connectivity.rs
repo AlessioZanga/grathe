@@ -1,4 +1,6 @@
 use super::Storage;
+use crate::V;
+use std::collections::{HashSet, VecDeque};
 
 /// The graph connectivity trait.
 pub trait Connectivity: Storage {
@@ -26,11 +28,11 @@ pub trait Connectivity: Storage {
             return true;
         }
         // Otherwise select a random vertex as source vertex.
-        let x = self.vertices_iter().next().unwrap();
+        let x = V!(self).next().unwrap();
         // Initialize the to-be-visited queue with the source vertex.
-        let mut queue = std::collections::VecDeque::from([x]);
+        let mut queue = VecDeque::from([x]);
         // Initialize the visited set.
-        let mut visited = std::collections::HashSet::from([x]);
+        let mut visited = HashSet::from([x]);
         // If there are still vertices to be visited.
         while let Some(y) = queue.pop_front() {
             // Iterate over the adjacent vertices of the popped vertex.

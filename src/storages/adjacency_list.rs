@@ -3,7 +3,7 @@ use crate::partial_cmp_sets;
 use crate::traits::{Capacity, Operators, Storage};
 use crate::types::{AdjacencyList, EdgeIterator, ExactSizeIter, VertexIterator, VertexTrait};
 use std::cmp::Ordering;
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 
 /// Graph structure based on adjacency list storage.
 #[derive(PartialEq, Eq, Default, Debug)]
@@ -95,7 +95,7 @@ where
 {
     fn complement(&self) -> Self {
         // Copy the vertex set.
-        let vertices: std::collections::BTreeSet<_> = self.data.keys().cloned().collect();
+        let vertices: BTreeSet<_> = self.data.keys().cloned().collect();
 
         // Iterate over every permutation of V^2.
         Self {

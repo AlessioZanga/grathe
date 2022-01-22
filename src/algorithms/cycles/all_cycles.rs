@@ -1,13 +1,8 @@
 use crate::traits::Storage;
 use crate::types::VertexIterator;
+use crate::V;
 use std::collections::{HashMap, HashSet};
 use std::vec::Vec;
-
-// Workaround to print tracing messages during tests
-#[cfg(not(test))]
-use log::trace;
-#[cfg(test)]
-use std::println as trace;
 
 /// Find all cycles in a given graph.
 ///
@@ -65,7 +60,7 @@ where
     /// search.run();
     ///
     /// // In this graph there are two directed cycles,
-    /// // these are reported ordered by discovery time.
+    /// // these are reported in discovery order.
     /// assert_eq!(
     ///     search.cycles,
     ///     [
@@ -102,74 +97,65 @@ where
         }
     }
 
-    fn block(&mut self, v: &'a T::Vertex) {
-        for w in (self.reachable)(self.graph, v) {
-            if w < self.stack[0] {
+    fn block(&mut self, x: &'a T::Vertex) {
+        for y in (self.reachable)(self.graph, x) {
+            if y < self.stack[0] {
                 continue;
             }
-            self.blocked.entry(w).or_default().insert(v);
+            self.blocked.entry(y).or_default().insert(x);
         }
     }
 
-    fn unblock(&mut self, u: &'a T::Vertex) {
-        if let Some(u) = self.blocked.remove(u) {
-            for w in u {
-                self.unblock(w);
-            }
+    fn unblock(&mut self, x: &'a T::Vertex) {
+        if let Some(y) = self.blocked.remove(x) {
+            y.iter().for_each(|y| self.unblock(y));
         }
     }
 
-    fn circuit(&mut self, v: &'a T::Vertex) -> bool {
+    fn circuit(&mut self, x: &'a T::Vertex) -> bool {
         // Initialize found flag.
         let mut found = false;
         // Update the call stack.
-        self.stack.push(v);
+        self.stack.push(x);
         // Initialize blocked map of current vertex.
-        self.blocked.entry(v).or_default();
+        self.blocked.entry(x).or_default();
 
         // Iterate over reachable vertices from graph.
-        for w in (self.reachable)(self.graph, v) {
-            // Print current stack trace.
-            trace!(
-                "AllCycles: stack trace: {:?}[{:?}], blocked map: {:?}.",
-                self.stack,
-                w,
-                self.blocked
-            );
+        for y in (self.reachable)(self.graph, x) {
             // If current vertex is lower then starting vertex,
             // then skip this iteration.
-            if w < self.stack[0] {
+            if y < self.stack[0] {
                 continue;
             // If current vertex is the starting vertex,
             // then a cycle has been found.
-            } else if w == self.stack[0] {
+            } else if y == self.stack[0] {
                 // Store the cycle.
                 self.cycles.push({
                     // Clone the current stack.
                     let mut c = self.stack.clone();
                     // Add the leading vertex.
-                    c.push(w);
+                    c.push(y);
                     // Return the completed cycle.
                     c
                 });
                 // Update popularity.
-                for u in self.stack.iter() {
-                    *self.popularity.entry(u).or_default() += 1;
+                for z in self.stack.iter() {
+                    *self.popularity.entry(z).or_default() += 1;
                 }
                 // Set the found flag.
                 found = true;
             // Finally, if the current vertex has not been blocked...
-            } else if !self.blocked.contains_key(&w) {
+            } else if !self.blocked.contains_key(&y) {
                 // ...visit it recursively.
-                found = self.circuit(w);
+                found = self.circuit(y);
             }
         }
 
         match found {
             // If no cycle has been found, block the current vertex.
-            false => self.block(v),
+            false => self.block(x),
             // Otherwise, unblock it.
-            true => self.unblock(v),
+            true => self.unblock(x),
         };
 
         // Pop from stack.
@@ -184,9 +170,9 @@ where
     /// Execute the procedure and store the results for later queries.
     ///
     pub fn run(&mut self) -> &Self {
-        for v in self.graph.vertices_iter() {
+        for x in V!(self.graph) {
             // Visit current vertex recursively.
-            self.circuit(v);
+            self.circuit(x);
             // Clear map of blocked vertices.
             self.blocked.clear();
         }
