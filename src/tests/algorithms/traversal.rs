@@ -4,7 +4,6 @@ mod directed {
     macro_rules! generic_tests {
         ($T:ident, $U:ident) => {
             paste::item! {
-
                 #[test]
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
@@ -260,7 +259,6 @@ mod undirected {
     macro_rules! generic_tests {
         ($T:ident, $U:ident) => {
             paste::item! {
-
                 #[test]
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
