@@ -15,7 +15,7 @@ where
 }
 
 // Storage delegation and graph trait implementation.
-crate::traits::direction::impl_undirected_trait!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
+crate::traits::direction::impl_undirected!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
 
 impl<T> Undirected for UndirectedAdjacencyListGraph<T>
 where
@@ -42,7 +42,7 @@ where
 }
 
 // Storage delegation and graph trait implementation.
-crate::traits::direction::impl_directed_trait!(DirectedAdjacencyListGraph, AdjacencyListStorage);
+crate::traits::direction::impl_directed!(DirectedAdjacencyListGraph, AdjacencyListStorage);
 
 impl<T> Directed for DirectedAdjacencyListGraph<T>
 where

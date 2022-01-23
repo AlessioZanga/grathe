@@ -1,7 +1,7 @@
-mod directed_trait;
-pub(crate) use directed_trait::impl_directed_trait;
-pub use directed_trait::Directed;
+mod directed;
+pub(crate) use directed::impl_directed;
+pub use directed::Directed;
 
-mod undirected_trait;
-pub(crate) use undirected_trait::impl_undirected_trait;
-pub use undirected_trait::Undirected;
+mod undirected;
+pub(crate) use undirected::impl_undirected;
+pub use undirected::Undirected;

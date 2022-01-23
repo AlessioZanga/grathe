@@ -2,7 +2,7 @@ mod base;
 pub use base::Base;
 
 mod capacity;
-pub(crate) use capacity::impl_capacity_trait;
+pub(crate) use capacity::impl_capacity;
 pub use capacity::Capacity;
 
 mod connectivity;
@@ -17,12 +17,12 @@ pub mod direction;
 pub use direction::{Directed, Undirected};
 
 mod operators;
-pub(crate) use operators::impl_operators_trait;
+pub(crate) use operators::impl_operators;
 pub use operators::Operators;
 
 mod storage;
 pub use storage::Storage;
 
 mod with_attributes;
-pub(crate) use with_attributes::impl_with_attributes_trait;
+pub(crate) use with_attributes::impl_with_attributes;
 pub use with_attributes::WithAttributes;

@@ -37,7 +37,7 @@ macro_rules! Ne {
     };
 }
 
-macro_rules! impl_undirected_trait {
+macro_rules! impl_undirected {
     ($graph:ident, $storage:ident) => {
         impl<T> PartialEq for $graph<T>
         where
@@ -105,7 +105,7 @@ macro_rules! impl_undirected_trait {
             }
         }
 
-        $crate::traits::impl_capacity_trait!($graph);
+        $crate::traits::impl_capacity!($graph);
 
         impl<T> $crate::traits::Connectivity for $graph<T>
         where
@@ -207,8 +207,8 @@ macro_rules! impl_undirected_trait {
             }
         }
 
-        $crate::traits::impl_operators_trait!($graph);
-        $crate::traits::impl_with_attributes_trait!($graph);
+        $crate::traits::impl_operators!($graph);
+        $crate::traits::impl_with_attributes!($graph);
 
         impl<T> $crate::traits::Storage for $graph<T>
         where
@@ -323,4 +323,4 @@ macro_rules! impl_undirected_trait {
     };
 }
 
-pub(crate) use impl_undirected_trait;
+pub(crate) use impl_undirected;

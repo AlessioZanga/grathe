@@ -134,7 +134,7 @@ pub trait Capacity {
     fn shrink_to_fit(&mut self);
 }
 
-macro_rules! impl_capacity_trait {
+macro_rules! impl_capacity {
     ($graph:ident) => {
         impl<T> $crate::traits::Capacity for $graph<T>
         where
@@ -160,4 +160,4 @@ macro_rules! impl_capacity_trait {
     };
 }
 
-pub(crate) use impl_capacity_trait;
+pub(crate) use impl_capacity;

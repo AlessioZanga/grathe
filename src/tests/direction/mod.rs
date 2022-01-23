@@ -1,5 +1,5 @@
-mod directed_trait;
-mod undirected_trait;
+mod directed;
+mod undirected;
 
-pub use directed_trait::*;
-pub use undirected_trait::*;
+pub use directed::*;
+pub use undirected::*;

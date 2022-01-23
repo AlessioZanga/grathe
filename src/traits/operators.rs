@@ -55,7 +55,7 @@ pub trait Operators {
     fn difference(&self, other: &Self) -> Self;
 }
 
-macro_rules! impl_operators_trait {
+macro_rules! impl_operators {
     ($graph:ident) => {
         impl<T> $crate::traits::Operators for $graph<T>
         where
@@ -203,4 +203,4 @@ macro_rules! impl_operators_trait {
     };
 }
 
-pub(crate) use impl_operators_trait;
+pub(crate) use impl_operators;

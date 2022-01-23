@@ -114,7 +114,7 @@ pub trait WithAttributes: Storage {
     ) -> Result<Box<dyn Any>, Error<Self::Vertex>>;
 }
 
-macro_rules! impl_with_attributes_trait {
+macro_rules! impl_with_attributes {
     ($graph:ident) => {
         impl<T> $crate::traits::WithAttributes for $graph<T>
         where
@@ -289,4 +289,4 @@ macro_rules! impl_with_attributes_trait {
     };
 }
 
-pub(crate) use impl_with_attributes_trait;
+pub(crate) use impl_with_attributes;
