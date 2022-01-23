@@ -243,7 +243,7 @@ mod directed {
         };
     }
 
-    mod directed_adjacency_list_graph {
+    mod adjacency_list_graph {
         use crate::algorithms::{BFS, DFS};
         use crate::errors::*;
         use crate::graphs::DirectedAdjacencyListGraph;
@@ -538,7 +538,7 @@ mod undirected {
         };
     }
 
-    mod undirected_adjacency_list_graph {
+    mod adjacency_list_graph {
         use crate::algorithms::{BFS, DFS};
         use crate::errors::*;
         use crate::graphs::UndirectedAdjacencyListGraph;

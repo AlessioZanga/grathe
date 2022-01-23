@@ -301,6 +301,17 @@ macro_rules! impl_undirected {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
+        impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::AllCycles<'a, $graph<T>>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            fn from(g: &'a $graph<T>) -> Self {
+                todo!()
+            }
+        }
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
         impl<'a, T> From<(&'a $graph<T>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T>>
         where
             T: $crate::types::VertexTrait,

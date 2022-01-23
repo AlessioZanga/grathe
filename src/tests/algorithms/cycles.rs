@@ -86,11 +86,48 @@ mod directed {
         };
     }
 
-    mod directed_adjacency_list_graph {
+    mod adjacency_list_graph {
         use crate::algorithms::AllCycles;
         use crate::graphs::DirectedAdjacencyListGraph;
         use crate::traits::Storage;
 
         generic_tests!(DirectedAdjacencyListGraph, i32);
+    }
+}
+
+#[cfg(test)]
+mod undirected {
+
+    macro_rules! generic_tests {
+        ($T:ident, $U:ident) => {
+            paste::item! {
+                #[test]
+                fn all_cycles() {
+                    let g = $T::<$U>::from_edges(&[
+                        (1, 2), (2, 3), (3, 4), (3, 5),
+                        (4, 6), (4, 6), (5, 6), (5, 9),
+                        (6, 10), (4, 7), (7, 8), (10, 11),
+                        (11, 12), (11, 13), (12, 13)
+                    ]);
+                    let mut search = AllCycles::from(&g);
+                    search.run();
+                    assert_eq!(
+                        search.cycles,
+                        [
+                            vec![&3, &4, &6, &5, &3],
+                            vec![&11, &12, &13, &11]
+                        ]
+                    );
+                }
+            }
+        };
+    }
+
+    mod adjacency_list_graph {
+        use crate::algorithms::AllCycles;
+        use crate::graphs::UndirectedAdjacencyListGraph;
+        use crate::traits::Storage;
+
+        generic_tests!(UndirectedAdjacencyListGraph, i32);
     }
 }

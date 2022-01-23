@@ -36,7 +36,7 @@ mod directed {
         };
     }
 
-    mod directed_adjacency_list_graph {
+    mod adjacency_list_graph {
         use crate::algorithms::AllSimplePaths;
         use crate::graphs::DirectedAdjacencyListGraph;
         use crate::traits::Storage;
@@ -84,7 +84,7 @@ mod undirected {
         };
     }
 
-    mod undirected_adjacency_list_graph {
+    mod adjacency_list_graph {
         use crate::algorithms::AllSimplePaths;
         use crate::graphs::UndirectedAdjacencyListGraph;
         use crate::traits::Storage;

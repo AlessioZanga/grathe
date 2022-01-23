@@ -90,7 +90,7 @@ mod undirected {
     }
 
     #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
-    mod undirected_adjacency_list_graph {}
+    mod adjacency_list_graph {}
 }
 
 #[cfg(test)]
@@ -185,5 +185,5 @@ mod directed {
     }
 
     #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
-    mod directed_adjacency_list_graph {}
+    mod adjacency_list_graph {}
 }

@@ -136,5 +136,5 @@ mod tests {
     }
 
     #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
-    mod undirected_adjacency_list_graph {}
+    mod adjacency_list_graph {}
 }
