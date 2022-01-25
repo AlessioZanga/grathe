@@ -57,6 +57,7 @@ where
             // Add the selected vertex to the ordering.
             let s = Some((self.index, x));
             // Iterate over the queue.
+            // TODO: Refactor using BTreeSet once `pop_first()` is stabilized.
             self.queue = self
                 .queue
                 .drain(..)
