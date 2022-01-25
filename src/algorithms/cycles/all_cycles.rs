@@ -6,14 +6,14 @@ use std::vec::Vec;
 
 /// Find all cycles in a given graph.
 ///
-/// Find all cycles in a given graph (or a multi-graph[^note]). This algorithm [^ref]
+/// Find all cycles in a given graph (or a multi-graph[^1]). This algorithm [^2]
 /// returns all elementary circuits (i.e. *cycles*) present in a graph.
 /// The graph can contain self-edges and can also be disconnected.
 ///
-/// [^note]: TODO: Currently, this specific implementation does not work in multi-graphs.
+/// [^1]: TODO: Currently, this specific implementation does not work in multi-graphs.
 /// However, once multi-graphs will be supported library-wide, it will be restored to its original formulation.
 ///
-/// [^ref]: [Hawick, K. A., & James, H. A. (2008). Enumerating Circuits and Loops in Graphs with Self-Arcs and Multiple-Arcs.](https://scholar.google.com/scholar?q=Enumerating+Circuits+and+Loops+in+Graphs+with+Self-Arcs+and+Multiple-Arcs)
+/// [^2]: [Hawick, K. A., & James, H. A. (2008). Enumerating Circuits and Loops in Graphs with Self-Arcs and Multiple-Arcs.](https://scholar.google.com/scholar?q=Enumerating+Circuits+and+Loops+in+Graphs+with+Self-Arcs+and+Multiple-Arcs)
 ///
 pub struct AllCycles<'a, T>
 where
