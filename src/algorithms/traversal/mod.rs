@@ -15,3 +15,9 @@ pub use lexicographic_breadth_first_search::LexicographicBreadthFirstSearch;
 
 /// Alias for lexicographic breadth-first search.
 pub type LexBFS<'a, T> = LexicographicBreadthFirstSearch<'a, T>;
+
+mod lexicographic_depth_first_search;
+pub use lexicographic_depth_first_search::LexicographicDepthFirstSearch;
+
+/// Alias for lexicographic depth-first search.
+pub type LexDFS<'a, T> = LexicographicDepthFirstSearch<'a, T>;

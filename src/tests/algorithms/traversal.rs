@@ -721,12 +721,35 @@ mod undirected_tests {
                     assert_eq!(search.next(), None);
                     assert_eq!(search.partitions, Q::from_iter([]));
                 }
+
+                #[test]
+                fn lexicographic_depth_first_search()
+                {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    let mut search = LexDFS::from(&g);
+                    assert_eq!(search.next(), None);
+
+                    let g = $T::<$U>::from_edges(&[
+                        (0, 1), (0, 2), (0, 4),
+                        (1, 2), (1, 3),
+                        (2, 4), (2, 3)
+                    ]);
+                    let mut search = LexDFS::from(&g);
+
+                    assert_eq!(search.next(), Some((0, &0)));
+                    assert_eq!(search.next(), Some((1, &1)));
+                    assert_eq!(search.next(), Some((2, &2)));
+                    assert_eq!(search.next(), Some((3, &3)));
+                    assert_eq!(search.next(), Some((4, &4)));
+                    assert_eq!(search.next(), None);
+                }
             }
         };
     }
 
     mod undirected_adjacency_list_graph {
-        use crate::algorithms::{LexBFS, BFS, DFS};
+        use crate::algorithms::{LexBFS, LexDFS, BFS, DFS};
         use crate::errors::*;
         use crate::graphs::UndirectedAdjacencyListGraph;
         use crate::traits::Storage;
