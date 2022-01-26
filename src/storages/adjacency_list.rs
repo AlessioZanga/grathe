@@ -101,12 +101,7 @@ where
         Self {
             data: vertices
                 .iter()
-                .map(|x| {
-                    (
-                        x.clone(),
-                        vertices.difference(&self.data[x]).cloned().collect(),
-                    )
-                })
+                .map(|x| (x.clone(), vertices.difference(&self.data[x]).cloned().collect()))
                 .collect(),
         }
     }

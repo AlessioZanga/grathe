@@ -9,10 +9,10 @@ where
 {
     /// Given graph reference.
     graph: &'a T,
-    /// To-be-visited queue.
-    queue: VecDeque<VecDeque<&'a T::Vertex>>,
     /// Current index.
     index: usize,
+    /// To-be-visited queue.
+    pub partitions: VecDeque<VecDeque<&'a T::Vertex>>,
 }
 
 impl<'a, T> LexicographicBreadthFirstSearch<'a, T>
@@ -29,16 +29,16 @@ where
         Self {
             // Set target graph.
             graph: g,
-            // Initialize the to-be-visited queue with the first partition.
-            queue: {
+            // Initialize index.
+            index: Default::default(),
+            // Initialize the to-be-visited queue with the first partition, if any.
+            partitions: {
                 // Cover the null-graph case.
                 match g.order() > 0 {
                     false => Default::default(),
                     true => From::from([FromIterator::from_iter(g.vertices_iter())]),
                 }
             },
-            // Initialize index.
-            index: Default::default(),
         }
     }
 }
@@ -51,15 +51,15 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         // While the queue is non-empty, select the first partition.
-        while let Some(p) = self.queue.front_mut() {
+        while let Some(p) = self.partitions.front_mut() {
             // Select the first vertex from the partition.
             let x = p.pop_front().unwrap();
             // Add the selected vertex to the ordering.
             let s = Some((self.index, x));
             // Iterate over the queue.
             // TODO: Refactor using BTreeSet once `pop_first()` is stabilized.
-            self.queue = self
-                .queue
+            self.partitions = self
+                .partitions
                 .drain(..)
                 // For each partition in the queue...
                 .flat_map(|p| {
@@ -78,7 +78,7 @@ where
                 .collect();
             // Increase current index.
             self.index += 1;
-            // Return ordering
+            // Return lexicographic order.
             return s;
         }
 

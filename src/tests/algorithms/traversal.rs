@@ -110,7 +110,7 @@ mod directed_tests {
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
-                    BFS::from((&g, &0));
+                    BFS::from((&g, &0)).next();
                 }
 
                 #[test]
@@ -238,7 +238,7 @@ mod directed_tests {
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
-                    DFS::from((&g, &0));
+                    DFS::from((&g, &0)).next();
                 }
             }
         };
@@ -386,7 +386,7 @@ mod undirected_tests {
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
-                    BFS::from((&g, &0));
+                    BFS::from((&g, &0)).next();
                 }
 
                 #[test]
@@ -534,7 +534,7 @@ mod undirected_tests {
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
-                    DFS::from((&g, &0));
+                    DFS::from((&g, &0)).next();
                 }
 
                 #[test]
@@ -557,19 +557,105 @@ mod undirected_tests {
                         (8, 1), (8, 2), (8, 4), (8, 5),
                         (9, 1), (9, 2), (9, 4), (9, 5),
                         (0, 3), (1, 2), (3, 6), (4, 5),
-                        (7, 8), (8, 9)
+                        (7, 8), (7, 9)
                     ]);
-                    let search = LexBFS::from(&g);
-                    for (i, j) in search {
-                        assert_eq!(i, *j as usize);
-                    }
+                    let mut search = LexBFS::from(&g);
+                    
+                    // Alias of VecDequeue.
+                    type Q<T> = std::collections::VecDeque<T>;
+
+                    // Test from Table 1 of reference paper.
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [x, y, w, z, u, v, a, d, c, b]
+                        Q::from_iter(&[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((0, &0)));   // [0, x]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [y, w, z, u, v]
+                        Q::from_iter(&[1, 2, 3, 4, 5]),
+                        // [a, d, c, b]
+                        Q::from_iter(&[6, 7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((1, &1)));   // [1, y]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [w, z]
+                        Q::from_iter(&[2, 3]),
+                        // [u, v]
+                        Q::from_iter(&[4, 5]),
+                        // [a, d, c, b]
+                        Q::from_iter(&[6, 7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((2, &2)));   // [2, w]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [z]
+                        Q::from_iter(&[3]),
+                        // [u, v]
+                        Q::from_iter(&[4, 5]),
+                        // [a, d, c, b]
+                        Q::from_iter(&[6, 7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((3, &3)));   // [3, z]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [u, v]
+                        Q::from_iter(&[4, 5]),
+                        // [a]
+                        Q::from_iter(&[6]),
+                        // [d, c, b]
+                        Q::from_iter(&[7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((4, &4)));   // [4, u]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [v]
+                        Q::from_iter(&[5]),
+                        // [a]
+                        Q::from_iter(&[6]),
+                        // [d, c, b]
+                        Q::from_iter(&[7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((5, &5)));   // [5, v]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [a]
+                        Q::from_iter(&[6]),
+                        // [d, c, b]
+                        Q::from_iter(&[7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((6, &6)));   // [6, a]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [d, c, b]
+                        Q::from_iter(&[7, 8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((7, &7)));   // [7, d]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [c, b]
+                        Q::from_iter(&[8, 9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((8, &8)));   // [8, c]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [b]
+                        Q::from_iter(&[9])
+                    ]));
+
+                    assert_eq!(search.next(), Some((9, &9)));   // [9, b]
+                    assert_eq!(search.partitions, Q::from_iter([]));
+
+                    assert_eq!(search.next(), None);
+                    assert_eq!(search.partitions, Q::from_iter([]));
                 }
             }
         };
     }
 
     mod undirected_adjacency_list_graph {
-        use crate::algorithms::{BFS, DFS, LexBFS};
+        use crate::algorithms::{LexBFS, BFS, DFS};
         use crate::errors::*;
         use crate::graphs::UndirectedAdjacencyListGraph;
         use crate::traits::Storage;
