@@ -1,5 +1,5 @@
 use crate::traits::Undirected;
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 use std::iter::FusedIterator;
 
 /// Lexicographic breadth-first search structure.
@@ -56,26 +56,44 @@ where
             let x = p.pop_front().unwrap();
             // Add the selected vertex to the ordering.
             let s = Some((self.index, x));
-            // Iterate over the queue.
-            // TODO: Refactor using BTreeSet once `pop_first()` is stabilized.
-            self.partitions = self
-                .partitions
-                .drain(..)
-                // For each partition in the queue...
-                .flat_map(|p| {
-                    // ... for each vertex in the partition...
-                    let (p0, p1): (VecDeque<_>, VecDeque<_>) = p
-                        .into_iter()
-                        // ... split the partition into adjacent vs. non-adjacent
-                        // partitions w.r.t. previously selected vertex.
-                        .partition(|&y| self.graph.has_edge(x, y).unwrap());
-                    // Return splitted partitions.
-                    [p0, p1]
-                })
-                // Ignore empty partitions.
-                .filter(|p| !p.is_empty())
-                // Push into queue.
-                .collect();
+            // Get neighbors of selected vertex.
+            let mut neighbors: HashSet<_> = self.graph.neighbors_iter(x).collect();
+            // The new partitioning ordering.
+            let mut partitions: VecDeque<_> = Default::default();
+            // Get iterator over the partitions.
+            let mut iter = self.partitions.drain(..);
+            // For each neighbor of the selected vertex ...
+            while !neighbors.is_empty() {
+                // ... for each partition in the queue.
+                match iter.next() {
+                    // No more partition to be checked, break,
+                    None => break,
+                    // Check next partition,
+                    Some(p) => {
+                        // For each vertex in the partition ...
+                        let (p0, p1): (VecDeque<_>, VecDeque<_>) = p
+                            .into_iter()
+                            // ... split the partition into neighbor vs. non-neighbor
+                            // vertices w.r.t. previously selected vertex.
+                            .partition(|&y| neighbors.remove(y));
+                        // If p0 is non-empty ...
+                        if !p0.is_empty() {
+                            // .. push it onto the queue.
+                            partitions.push_back(p0);
+                        }
+                        // If p1 is non-empty ...
+                        if !p1.is_empty() {
+                            // ... push it onto the queue, after p0.
+                            partitions.push_back(p1);
+                        }
+                    }
+                }
+            }
+            // Append remaining partitions, if neighbor set was emptied
+            // before reaching the end of the partitions queue.
+            partitions.extend(iter);
+            // Set new partitioning ordering.
+            self.partitions = partitions;
             // Increase current index.
             self.index += 1;
             // Return lexicographic order.
