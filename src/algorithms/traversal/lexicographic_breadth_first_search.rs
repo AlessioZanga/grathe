@@ -21,7 +21,7 @@ where
 {
     /// Build a new LexBFS iterator.
     ///
-    /// Build a LexBFS[^1] iterator for a given graph.
+    /// Build a LexBFS[^1] iterator for a given undirected graph.
     ///
     /// [^1]: [Bretscher, A., Corneil, D., Habib, M., & Paul, C. (2003, June). A simple linear time LexBFS cograph recognition algorithm.](https://scholar.google.com/scholar?q=+A+simple+linear+time+LexBFS+cograph+recognition+algorithm)
     ///
@@ -51,7 +51,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         // While the queue is non-empty, select the first partition.
-        while let Some(p) = self.partitions.front_mut() {
+        if let Some(p) = self.partitions.front_mut() {
             // Select the first vertex from the partition.
             let x = p.pop_front().unwrap();
             // Add the selected vertex to the ordering.
