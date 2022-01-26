@@ -540,6 +540,9 @@ mod undirected_tests {
                 #[test]
                 fn lexicographic_breadth_first_search()
                 {
+                    // Alias of VecDequeue.
+                    type Q<T> = std::collections::VecDeque<T>;
+
                     // Build a null graph.
                     let g = $T::<$U>::new();
                     let mut search = LexBFS::from(&g);
@@ -560,9 +563,6 @@ mod undirected_tests {
                         (7, 8), (7, 9)
                     ]);
                     let mut search = LexBFS::from(&g);
-                    
-                    // Alias of VecDequeue.
-                    type Q<T> = std::collections::VecDeque<T>;
 
                     // Test from Table 1 of reference paper.
                     assert_eq!(search.partitions, Q::from_iter([
@@ -645,6 +645,77 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some((9, &9)));   // [9, b]
+                    assert_eq!(search.partitions, Q::from_iter([]));
+
+                    assert_eq!(search.next(), None);
+                    assert_eq!(search.partitions, Q::from_iter([]));
+
+                    // Test from course slides
+                    // with (f, g, c, d, b, a, e)
+                    // as   (0, 1, 2, 3, 4, 5, 6).
+                    let g = $T::<$U>::from_edges(&[
+                        (0, 1), (0, 2), (1, 2), (1, 3),
+                        (2, 3), (2, 4), (2, 5), (3, 4),
+                        (3, 5), (3, 6), (4, 5)
+                    ]);
+                    let mut search = LexBFS::from(&g);
+
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [f, g, c, d, b, a, e]
+                        Q::from_iter(&[0, 1, 2, 3, 4, 5, 6])
+                    ]));
+
+                    assert_eq!(search.next(), Some((0, &0)));   // [0, f]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [g, c]
+                        Q::from_iter(&[1, 2]),
+                        // [d, b, a, e]
+                        Q::from_iter(&[3, 4, 5, 6])
+                    ]));
+
+                    assert_eq!(search.next(), Some((1, &1)));   // [1, g]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [c]
+                        Q::from_iter(&[2]),
+                        // [d]
+                        Q::from_iter(&[3]),
+                        // [b, a, e]
+                        Q::from_iter(&[4, 5, 6])
+                    ]));
+
+                    assert_eq!(search.next(), Some((2, &2)));   // [2, c]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [d]
+                        Q::from_iter(&[3]),
+                        // [b, a]
+                        Q::from_iter(&[4, 5]),
+                        // [e]
+                        Q::from_iter(&[6]),
+                    ]));
+
+                    assert_eq!(search.next(), Some((3, &3)));   // [3, d]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [b, a]
+                        Q::from_iter(&[4, 5]),
+                        // [e]
+                        Q::from_iter(&[6]),
+                    ]));
+
+                    assert_eq!(search.next(), Some((4, &4)));   // [4, b]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [a]
+                        Q::from_iter(&[5]),
+                        // [e]
+                        Q::from_iter(&[6])
+                    ]));
+
+                    assert_eq!(search.next(), Some((5, &5)));   // [5, a]
+                    assert_eq!(search.partitions, Q::from_iter([
+                        // [e]
+                        Q::from_iter(&[6])
+                    ]));
+
+                    assert_eq!(search.next(), Some((6, &6)));   // [6, e]
                     assert_eq!(search.partitions, Q::from_iter([]));
 
                     assert_eq!(search.next(), None);
