@@ -571,6 +571,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&0));   // [0, x]
+                    assert_eq!(search.predecessor.get(&0), None);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [y, w, z, u, v]
                         Q::from_iter(&[1, 2, 3, 4, 5]),
@@ -579,6 +580,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&1));   // [1, y]
+                    assert_eq!(search.predecessor[&1], &0);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [w, z]
                         Q::from_iter(&[2, 3]),
@@ -589,6 +591,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&2));   // [2, w]
+                    assert_eq!(search.predecessor[&2], &0);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [z]
                         Q::from_iter(&[3]),
@@ -599,6 +602,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&3));   // [3, z]
+                    assert_eq!(search.predecessor[&3], &0);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [u, v]
                         Q::from_iter(&[4, 5]),
@@ -609,6 +613,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&4));   // [4, u]
+                    assert_eq!(search.predecessor[&4], &0);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [v]
                         Q::from_iter(&[5]),
@@ -619,6 +624,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&5));   // [5, v]
+                    assert_eq!(search.predecessor[&5], &0);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [a]
                         Q::from_iter(&[6]),
@@ -627,24 +633,28 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&6));   // [6, a]
+                    assert_eq!(search.predecessor[&6], &1);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [d, c, b]
                         Q::from_iter(&[7, 8, 9])
                     ]));
 
                     assert_eq!(search.next(), Some(&7));   // [7, d]
+                    assert_eq!(search.predecessor[&7], &1);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [c, b]
                         Q::from_iter(&[8, 9])
                     ]));
 
                     assert_eq!(search.next(), Some(&8));   // [8, c]
+                    assert_eq!(search.predecessor[&8], &1);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [b]
                         Q::from_iter(&[9])
                     ]));
 
                     assert_eq!(search.next(), Some(&9));   // [9, b]
+                    assert_eq!(search.predecessor[&9], &1);
                     assert_eq!(search.partitions, Q::from_iter([]));
 
                     assert_eq!(search.next(), None);
@@ -666,6 +676,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&0));   // [0, f]
+                    assert_eq!(search.predecessor.get(&0), None);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [g, c]
                         Q::from_iter(&[1, 2]),
@@ -674,6 +685,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&1));   // [1, g]
+                    assert_eq!(search.predecessor[&1], &0);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [c]
                         Q::from_iter(&[2]),
@@ -684,6 +696,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&2));   // [2, c]
+                    assert_eq!(search.predecessor[&2], &0);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [d]
                         Q::from_iter(&[3]),
@@ -694,6 +707,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&3));   // [3, d]
+                    assert_eq!(search.predecessor[&3], &1);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [b, a]
                         Q::from_iter(&[4, 5]),
@@ -702,6 +716,7 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&4));   // [4, b]
+                    assert_eq!(search.predecessor[&4], &2);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [a]
                         Q::from_iter(&[5]),
@@ -710,12 +725,14 @@ mod undirected_tests {
                     ]));
 
                     assert_eq!(search.next(), Some(&5));   // [5, a]
+                    assert_eq!(search.predecessor[&5], &2);
                     assert_eq!(search.partitions, Q::from_iter([
                         // [e]
                         Q::from_iter(&[6])
                     ]));
 
                     assert_eq!(search.next(), Some(&6));   // [6, e]
+                    assert_eq!(search.predecessor[&6], &3);
                     assert_eq!(search.partitions, Q::from_iter([]));
 
                     assert_eq!(search.next(), None);
@@ -738,10 +755,20 @@ mod undirected_tests {
                     let mut search = LexDFS::from(&g);
 
                     assert_eq!(search.next(), Some(&0));
+                    assert_eq!(search.predecessor.get(&0), None);
+
                     assert_eq!(search.next(), Some(&1));
+                    assert_eq!(search.predecessor[&1], &0);
+
                     assert_eq!(search.next(), Some(&2));
+                    assert_eq!(search.predecessor[&2], &1);
+
                     assert_eq!(search.next(), Some(&3));
+                    assert_eq!(search.predecessor[&3], &2);
+
                     assert_eq!(search.next(), Some(&4));
+                    assert_eq!(search.predecessor[&4], &2);
+
                     assert_eq!(search.next(), None);
                 }
             }

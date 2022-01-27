@@ -14,6 +14,8 @@ where
     index: usize,
     /// To-be-visited queue.
     queue: HashMap<&'a T::Vertex, VecDeque<usize>>,
+    /// Predecessor of each discovered vertex (except the source vertex).
+    pub predecessor: HashMap<&'a T::Vertex, &'a T::Vertex>,
 }
 
 impl<'a, T> LexicographicDepthFirstSearch<'a, T>
@@ -34,6 +36,8 @@ where
             index: Default::default(),
             // Initialize the to-be-visited queue with labels.
             queue: FromIterator::from_iter(g.vertices_iter().map(|x| (x, Default::default()))),
+            // Initialize the predecessor map.
+            predecessor: Default::default(),
         }
     }
 }
@@ -52,9 +56,9 @@ where
                 .queue
                 .iter()
                 // Get min vertex with max label.
-                .max_by(|x, y| match x.1.cmp(y.1) {
-                    // If labels are equal, then prefer min key found.
-                    Ordering::Equal => y.0.cmp(x.0),
+                .max_by(|(x, x_label), (y, y_label)| match x_label.cmp(y_label) {
+                    // If labels are equal, then prefer min vertex.
+                    Ordering::Equal => y.cmp(x),
                     // Otherwise, return ordering result.
                     ordering => ordering,
                 })
@@ -65,9 +69,11 @@ where
             // Iterate over vertex neighbors.
             for y in self.graph.neighbors_iter(x) {
                 // If neighbor has not been visited yet.
-                if let Some(y) = self.queue.get_mut(y) {
+                if let Some(y_label) = self.queue.get_mut(y) {
+                    // Set its predecessor.
+                    self.predecessor.insert(y, x);
                     // Update neighbor label.
-                    y.push_front(self.index);
+                    y_label.push_front(self.index);
                 }
             }
             // Increase current index.

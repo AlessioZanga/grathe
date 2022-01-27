@@ -1,5 +1,5 @@
 use crate::traits::Undirected;
-use std::collections::{HashSet, VecDeque};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::iter::FusedIterator;
 
 /// Lexicographic breadth-first search structure.
@@ -11,6 +11,8 @@ where
     graph: &'a T,
     /// To-be-visited queue.
     pub partitions: VecDeque<VecDeque<&'a T::Vertex>>,
+    /// Predecessor of each discovered vertex (except the source vertex).
+    pub predecessor: HashMap<&'a T::Vertex, &'a T::Vertex>,
 }
 
 impl<'a, T> LexicographicBreadthFirstSearch<'a, T>
@@ -35,6 +37,8 @@ where
                     true => From::from([FromIterator::from_iter(g.vertices_iter())]),
                 }
             },
+            // Initialize the predecessor map.
+            predecessor: Default::default(),
         }
     }
 }
@@ -52,7 +56,9 @@ where
             let x = p.pop_front().unwrap();
             // Get neighbors of selected vertex.
             let mut neighbors: HashSet<_> = self.graph.neighbors_iter(x).collect();
-            // The new partitioning ordering.
+            // Initialize the new partitioning ordering.
+            // TODO: Replace the partitions queue with a vector and begin/end
+            // indices pairs once `partition_in_place` is stabilized.
             let mut partitions: VecDeque<_> = Default::default();
             // Get iterator over the partitions.
             let mut iter = self.partitions.drain(..);
@@ -69,7 +75,18 @@ where
                             .into_iter()
                             // ... split the partition into neighbor vs. non-neighbor
                             // vertices w.r.t. previously selected vertex.
-                            .partition(|&y| neighbors.remove(y));
+                            .partition(|&y| {
+                                // If `y` is a neighbor of `x` and it is still in a partition,
+                                // i.e. it was not visited before ...
+                                if neighbors.remove(y) {
+                                    // ... set its predecessor, if not already present.
+                                    self.predecessor.entry(y).or_insert(x);
+                                    // ... and return true.
+                                    return true;
+                                }
+                                // Otherwise, return false.
+                                false
+                            });
                         // If p0 is non-empty ...
                         if !p0.is_empty() {
                             // .. push it onto the queue.
