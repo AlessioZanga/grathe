@@ -42,7 +42,7 @@ impl<'a, T> Iterator for LexicographicDepthFirstSearch<'a, T>
 where
     T: Undirected,
 {
-    type Item = (usize, &'a T::Vertex);
+    type Item = &'a T::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
         // While the queue is non-empty.
@@ -53,17 +53,15 @@ where
                 .iter()
                 // Get min vertex with max label.
                 .max_by(|x, y| match x.1.cmp(y.1) {
-                    // If labels are equal, then prefer first found.
+                    // If labels are equal, then prefer min key found.
                     Ordering::Equal => y.0.cmp(x.0),
-                    // Otherwise, return comparison result.
-                    comparison => comparison,
+                    // Otherwise, return ordering result.
+                    ordering => ordering,
                 })
                 .map(|(&x, _)| x)
                 .unwrap();
             // Remove selected vertex from the visit queue.
             self.queue.remove(x);
-            // Add the selected vertex to the ordering.
-            let s = Some((self.index, x));
             // Iterate over vertex neighbors.
             for y in self.graph.neighbors_iter(x) {
                 // If neighbor has not been visited yet.
@@ -75,7 +73,7 @@ where
             // Increase current index.
             self.index += 1;
             // Return lexicographic order.
-            return s;
+            return Some(x);
         }
 
         None

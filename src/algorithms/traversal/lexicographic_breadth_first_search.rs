@@ -9,8 +9,6 @@ where
 {
     /// Given graph reference.
     graph: &'a T,
-    /// Current index.
-    index: usize,
     /// To-be-visited queue.
     pub partitions: VecDeque<VecDeque<&'a T::Vertex>>,
 }
@@ -29,8 +27,6 @@ where
         Self {
             // Set target graph.
             graph: g,
-            // Initialize index.
-            index: Default::default(),
             // Initialize the to-be-visited queue with the first partition, if any.
             partitions: {
                 // Cover the null-graph case.
@@ -47,15 +43,13 @@ impl<'a, T> Iterator for LexicographicBreadthFirstSearch<'a, T>
 where
     T: Undirected,
 {
-    type Item = (usize, &'a T::Vertex);
+    type Item = &'a T::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
         // While the queue is non-empty, select the first partition.
         if let Some(p) = self.partitions.front_mut() {
             // Select the first vertex from the partition.
             let x = p.pop_front().unwrap();
-            // Add the selected vertex to the ordering.
-            let s = Some((self.index, x));
             // Get neighbors of selected vertex.
             let mut neighbors: HashSet<_> = self.graph.neighbors_iter(x).collect();
             // The new partitioning ordering.
@@ -94,10 +88,8 @@ where
             partitions.extend(iter);
             // Set new partitioning ordering.
             self.partitions = partitions;
-            // Increase current index.
-            self.index += 1;
             // Return lexicographic order.
-            return s;
+            return Some(x);
         }
 
         None
