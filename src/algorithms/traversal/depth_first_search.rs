@@ -1,5 +1,6 @@
 use crate::traits::Base;
 use crate::types::VertexIterator;
+use crate::V;
 use std::collections::{HashMap, VecDeque};
 use std::vec::Vec;
 
@@ -72,19 +73,17 @@ where
     ///
     pub fn new(
         g: &'a T,
-        x: &'a T::Vertex,
+        x: Option<&'a T::Vertex>,
         f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
     ) -> Self {
-        // Assert that source vertex is in graph.
-        assert!(g.has_vertex(x));
-
-        Self {
+        // Initialize default search object.
+        let mut search = Self {
             // Set target graph.
             graph: g,
             // Set reachability function.
             reachable: f,
             // Initialize the to-be-visited queue with the source vertex.
-            stack: From::from([x]),
+            stack: Default::default(),
             // Initialize the global clock.
             time: 0,
             // Initialize the discovery-time map.
@@ -93,7 +92,31 @@ where
             finish_time: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
-        }
+        };
+        // Get source vertex, if any.
+        let x = match x {
+            // If no source vertex is given ...
+            None => {
+                // If the graph is null.
+                if g.order() == 0 {
+                    // Then, return the default search object.
+                    return search;
+                }
+                // ... choose the first one in the vertex set as source.
+                V!(g).next().unwrap()
+            }
+            // Otherwise ...
+            Some(x) => {
+                // ... assert that source vertex is in graph.
+                assert!(g.has_vertex(x));
+                // Return given source vertex.
+                x
+            }
+        };
+        // Push source vertex onto the stack.
+        search.stack.push(x);
+        // Return search object.
+        search
     }
 }
 

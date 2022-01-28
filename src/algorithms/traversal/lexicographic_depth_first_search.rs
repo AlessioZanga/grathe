@@ -1,9 +1,13 @@
 use crate::traits::Undirected;
+use crate::V;
 use std::cmp::Ordering;
 use std::collections::{HashMap, VecDeque};
 use std::iter::FusedIterator;
 
 /// Lexicographic depth-first search structure.
+///
+/// This structure contains the `predecessor` map.
+///
 pub struct LexicographicDepthFirstSearch<'a, T>
 where
     T: Undirected,
@@ -28,17 +32,63 @@ where
     ///
     /// [^1]: [Corneil, D. G., & Krueger, R. M. (2008). A unified view of graph searching.](https://scholar.google.com/scholar?q=A+unified+view+of+graph+searching)
     ///
-    pub fn new(g: &'a T) -> Self {
-        Self {
+    /// # Panics
+    ///
+    /// Panics if the (optional) source vertex is not in the graph.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use grathe::prelude::*;
+    /// use grathe::algorithms::LexDFS;
+    ///
+    /// // Build an undirected graph.
+    /// let g = Graph::from_edges(&[
+    ///     (0, 1), (0, 2), (0, 4),
+    ///     (1, 2), (1, 3),
+    ///     (2, 4), (2, 3)
+    /// ]);
+    ///
+    /// // Build a LexDFS iterator.
+    /// let mut search = LexDFS::from(&g);
+    ///
+    /// // Check iterator order.
+    /// assert_eq!(search.next(), Some(&0));
+    /// assert_eq!(search.next(), Some(&1));
+    /// assert_eq!(search.next(), Some(&2));
+    /// assert_eq!(search.next(), Some(&3));
+    /// assert_eq!(search.next(), Some(&4));
+    /// assert_eq!(search.next(), None);
+    ///
+    /// // Check visiting tree.
+    /// assert_eq!(search.predecessor.get(&0), None);
+    /// assert_eq!(search.predecessor[&1], &0);
+    /// assert_eq!(search.predecessor[&2], &1);
+    /// assert_eq!(search.predecessor[&3], &2);
+    /// assert_eq!(search.predecessor[&4], &2);
+    /// ```
+    ///
+    pub fn new(g: &'a T, x: Option<&'a T::Vertex>) -> Self {
+        // Initialize default search object.
+        let mut search = Self {
             // Set target graph.
             graph: g,
             // Initialize index.
             index: Default::default(),
             // Initialize the to-be-visited queue with labels.
-            queue: FromIterator::from_iter(g.vertices_iter().map(|x| (x, Default::default()))),
+            queue: FromIterator::from_iter(V!(g).map(|x| (x, Default::default()))),
             // Initialize the predecessor map.
             predecessor: Default::default(),
+        };
+        // If source vertex is non-null ...
+        if let Some(x) = x {
+            // Assert that source vertex is in graph.
+            assert!(g.has_vertex(x));
+            // ... then push it in front.
+            search.queue.get_mut(x).unwrap().push_front(search.index);
         }
+        // Return search object.
+        search
     }
 }
 
@@ -92,7 +142,26 @@ impl<'a, T> From<&'a T> for LexicographicDepthFirstSearch<'a, T>
 where
     T: Undirected,
 {
+    /// Builds a search object from a given graph, without a source vertex.
+    ///
+    /// The first vertex of the vertex set is chosen as source vertex.
+    ///
     fn from(g: &'a T) -> Self {
-        Self::new(g)
+        Self::new(g, None)
+    }
+}
+
+impl<'a, T> From<(&'a T, &'a T::Vertex)> for LexicographicDepthFirstSearch<'a, T>
+where
+    T: Undirected,
+{
+    /// Builds a search object from a given graph, with a source vertex.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    fn from((g, x): (&'a T, &'a T::Vertex)) -> Self {
+        Self::new(g, Some(x))
     }
 }

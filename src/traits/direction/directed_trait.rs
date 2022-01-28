@@ -259,12 +259,48 @@ macro_rules! impl_directed_trait {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
+        impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T>>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            /// Builds a search object from a given graph, without a source vertex.
+            ///
+            /// The first vertex of the vertex set is chosen as source vertex.
+            ///
+            fn from(g: &'a $graph<T>) -> Self {
+                Self::new(g, None, $graph::<T>::children_iter)
+            }
+        }
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
         impl<'a, T> From<(&'a $graph<T>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T>>
         where
             T: $crate::types::VertexTrait,
         {
+            /// Builds a search object from a given graph, with a source vertex.
+            ///
+            /// # Panics
+            ///
+            /// Panics if the source vertex is not in the graph.
+            ///
             fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
-                Self::new(g, x, $graph::<T>::children_iter)
+                Self::new(g, Some(x), $graph::<T>::children_iter)
+            }
+        }
+
+        // TODO: Once `min_specialization` will be stabilized,
+        // replace this with blanket `From` implementation.
+        impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::DepthFirstSearch<'a, $graph<T>>
+        where
+            T: $crate::types::VertexTrait,
+        {
+            /// Builds a search object from a given graph, without a source vertex.
+            ///
+            /// The first vertex of the vertex set is chosen as source vertex.
+            ///
+            fn from(g: &'a $graph<T>) -> Self {
+                Self::new(g, None, $graph::<T>::children_iter)
             }
         }
 
@@ -274,8 +310,14 @@ macro_rules! impl_directed_trait {
         where
             T: $crate::types::VertexTrait,
         {
+            /// Builds a search object from a given graph, with a source vertex.
+            ///
+            /// # Panics
+            ///
+            /// Panics if the source vertex is not in the graph.
+            ///
             fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
-                Self::new(g, x, $graph::<T>::children_iter)
+                Self::new(g, Some(x), $graph::<T>::children_iter)
             }
         }
     };

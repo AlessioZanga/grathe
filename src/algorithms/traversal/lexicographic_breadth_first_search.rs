@@ -1,8 +1,12 @@
 use crate::traits::Undirected;
+use crate::V;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::iter::FusedIterator;
 
 /// Lexicographic breadth-first search structure.
+///
+/// This structure contains the `predecessor` map.
+///
 pub struct LexicographicBreadthFirstSearch<'a, T>
 where
     T: Undirected,
@@ -25,21 +29,36 @@ where
     ///
     /// [^1]: [Bretscher, A., Corneil, D., Habib, M., & Paul, C. (2003, June). A simple linear time LexBFS cograph recognition algorithm.](https://scholar.google.com/scholar?q=+A+simple+linear+time+LexBFS+cograph+recognition+algorithm)
     ///
-    pub fn new(g: &'a T) -> Self {
-        Self {
+    /// # Panics
+    ///
+    /// Panics if the (optional) source vertex is not in the graph.
+    ///
+    pub fn new(g: &'a T, x: Option<&'a T::Vertex>) -> Self {
+        // Initialize default search object.
+        let mut search = Self {
             // Set target graph.
             graph: g,
             // Initialize the to-be-visited queue with the first partition, if any.
-            partitions: {
-                // Cover the null-graph case.
-                match g.order() > 0 {
-                    false => Default::default(),
-                    true => From::from([FromIterator::from_iter(g.vertices_iter())]),
-                }
-            },
+            partitions: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
+        };
+        // If graph is non-null, fill partition queue with all vertices.
+        if g.order() > 0 {
+            search.partitions = From::from([FromIterator::from_iter(V!(g))]);
         }
+        // If source vertex is non-null ...
+        if let Some(x) = x {
+            // Assert that source vertex is in graph.
+            assert!(g.has_vertex(x));
+            // ... then push it in front.
+            let p = search.partitions.get_mut(0).unwrap();
+            let index = p.binary_search(&x).unwrap();
+            p.remove(index);
+            p.push_front(x);
+        }
+        // Return search object.
+        search
     }
 }
 
@@ -119,7 +138,26 @@ impl<'a, T> From<&'a T> for LexicographicBreadthFirstSearch<'a, T>
 where
     T: Undirected,
 {
+    /// Builds a search object from a given graph, without a source vertex.
+    ///
+    /// The first vertex of the vertex set is chosen as source vertex.
+    ///
     fn from(g: &'a T) -> Self {
-        Self::new(g)
+        Self::new(g, None)
+    }
+}
+
+impl<'a, T> From<(&'a T, &'a T::Vertex)> for LexicographicBreadthFirstSearch<'a, T>
+where
+    T: Undirected,
+{
+    /// Builds a search object from a given graph, with a source vertex.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the source vertex is not in the graph.
+    ///
+    fn from((g, x): (&'a T, &'a T::Vertex)) -> Self {
+        Self::new(g, Some(x))
     }
 }

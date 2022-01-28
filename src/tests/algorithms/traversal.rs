@@ -740,6 +740,15 @@ mod undirected_tests {
                 }
 
                 #[test]
+                #[should_panic]
+                fn lexicographic_breadth_first_search_panics()
+                {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    LexBFS::from((&g, &0)).next();
+                }
+
+                #[test]
                 fn lexicographic_depth_first_search()
                 {
                     // Build a null graph.
@@ -770,6 +779,15 @@ mod undirected_tests {
                     assert_eq!(search.predecessor[&4], &2);
 
                     assert_eq!(search.next(), None);
+                }
+
+                #[test]
+                #[should_panic]
+                fn lexicographic_depth_first_search_panics()
+                {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    LexDFS::from((&g, &0)).next();
                 }
             }
         };
