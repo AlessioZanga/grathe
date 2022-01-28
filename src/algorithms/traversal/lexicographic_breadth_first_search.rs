@@ -44,20 +44,33 @@ where
             // Initialize the predecessor map.
             predecessor: Default::default(),
         };
-        // If graph is non-null, fill partition queue with all vertices.
-        if g.order() > 0 {
-            search.partitions = From::from([FromIterator::from_iter(V!(g))]);
+        // If the graph is null.
+        if g.order() == 0 {
+            // Assert source vertex is none.
+            assert!(x.is_none());
+            // Then, return the default search object.
+            return search;
         }
-        // If source vertex is non-null ...
-        if let Some(x) = x {
-            // Assert that source vertex is in graph.
-            assert!(g.has_vertex(x));
-            // ... then push it in front.
-            let p = search.partitions.get_mut(0).unwrap();
-            let index = p.binary_search(&x).unwrap();
-            p.remove(index);
-            p.push_front(x);
-        }
+        // Get source vertex, if any.
+        let x = match x {
+            // If no source vertex is given, choose the first one in the vertex set.
+            None => V!(g).next().unwrap(),
+            // Otherwise ...
+            Some(x) => {
+                // ... assert that source vertex is in graph.
+                assert!(g.has_vertex(x));
+                // Return given source vertex.
+                x
+            }
+        };
+        // Initialize partition with predefined capacity.
+        let mut partition = VecDeque::with_capacity(g.order());
+        // Add any vertex except the source vertex.
+        partition.extend(V!(g).filter(|&y| y != x));
+        // Push source vertex in front.
+        partition.push_front(x);
+        // Set partition as first partition.
+        search.partitions.push_front(partition);
         // Return search object.
         search
     }

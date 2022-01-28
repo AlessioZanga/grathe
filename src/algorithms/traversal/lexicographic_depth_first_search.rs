@@ -77,17 +77,33 @@ where
             // Initialize index.
             index: Default::default(),
             // Initialize the to-be-visited queue with labels.
-            queue: FromIterator::from_iter(V!(g).map(|x| (x, Default::default()))),
+            queue: HashMap::with_capacity(g.order()),
             // Initialize the predecessor map.
             predecessor: Default::default(),
         };
-        // If source vertex is non-null ...
-        if let Some(x) = x {
-            // Assert that source vertex is in graph.
-            assert!(g.has_vertex(x));
-            // ... then push it in front.
-            search.queue.get_mut(x).unwrap().push_front(search.index);
+        // If the graph is null.
+        if g.order() == 0 {
+            // Assert source vertex is none.
+            assert!(x.is_none());
+            // Then, return the default search object.
+            return search;
         }
+        // Get source vertex, if any.
+        let x = match x {
+            // If no source vertex is given, choose the first one in the vertex set.
+            None => V!(g).next().unwrap(),
+            // Otherwise ...
+            Some(x) => {
+                // ... assert that source vertex is in graph.
+                assert!(g.has_vertex(x));
+                // Return given source vertex.
+                x
+            }
+        };
+        // Add any vertex except the source vertex.
+        search.queue.extend(V!(g).map(|x| (x, VecDeque::default())));
+        // Push source vertex in front.
+        search.queue.get_mut(x).unwrap().push_front(search.index);
         // Return search object.
         search
     }
