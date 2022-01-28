@@ -2,6 +2,7 @@ use crate::traits::Base;
 use crate::types::VertexIterator;
 use crate::V;
 use std::collections::{HashMap, VecDeque};
+use std::iter::FusedIterator;
 
 /// Breadth-first search structure.
 ///
@@ -35,7 +36,7 @@ where
     ///
     /// # Panics
     ///
-    /// Panics if the source vertex is not in the graph.
+    /// Panics if the (optional) source vertex is not in the graph.
     ///
     /// # Examples
     ///
@@ -140,3 +141,5 @@ where
         None
     }
 }
+
+impl<'a, T> FusedIterator for BreadthFirstSearch<'a, T> where T: Base {}
