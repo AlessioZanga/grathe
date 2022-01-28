@@ -260,7 +260,7 @@ macro_rules! impl_undirected_trait {
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
             fn from(g: &'a $graph<T>) -> Self {
-                Self::new(g, None, $graph::<T>::neighbors_iter)
+                Self::new(g, None, $graph::<T>::neighbors_iter, $crate::algorithms::Traversal::Tree)
             }
         }
 
@@ -277,7 +277,7 @@ macro_rules! impl_undirected_trait {
             /// Panics if the source vertex is not in the graph.
             ///
             fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
-                Self::new(g, Some(x), $graph::<T>::neighbors_iter)
+                Self::new(g, Some(x), $graph::<T>::neighbors_iter, $crate::algorithms::Traversal::Tree)
             }
         }
 
@@ -292,7 +292,7 @@ macro_rules! impl_undirected_trait {
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
             fn from(g: &'a $graph<T>) -> Self {
-                Self::new(g, None, $graph::<T>::neighbors_iter)
+                Self::new(g, None, $graph::<T>::neighbors_iter, $crate::algorithms::Traversal::Tree)
             }
         }
 
@@ -309,7 +309,7 @@ macro_rules! impl_undirected_trait {
             /// Panics if the source vertex is not in the graph.
             ///
             fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
-                Self::new(g, Some(x), $graph::<T>::neighbors_iter)
+                Self::new(g, Some(x), $graph::<T>::neighbors_iter, $crate::algorithms::Traversal::Tree)
             }
         }
     };

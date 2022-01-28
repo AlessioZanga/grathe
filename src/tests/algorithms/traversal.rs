@@ -538,7 +538,7 @@ mod undirected_tests {
                 }
 
                 #[test]
-                fn lexicographic_breadth_first_search()
+                fn lexicographic_breadth_first_search_tree()
                 {
                     // Alias of VecDequeue.
                     type Q<T> = std::collections::VecDeque<T>;
@@ -741,7 +741,7 @@ mod undirected_tests {
 
                 #[test]
                 #[should_panic]
-                fn lexicographic_breadth_first_search_panics()
+                fn lexicographic_breadth_first_search_tree_panics()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
@@ -783,7 +783,7 @@ mod undirected_tests {
 
                 #[test]
                 #[should_panic]
-                fn lexicographic_depth_first_search_panics()
+                fn lexicographic_depth_first_search_tree_panics()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();

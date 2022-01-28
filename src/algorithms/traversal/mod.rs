@@ -1,3 +1,11 @@
+/// Traversal enumerator.
+pub enum Traversal {
+    /// Tree variant, i.e. only vertices reachable from the source vertex are visited.
+    Tree,
+    /// Forest variant, i.e. any vertex in the graph is visited.
+    Forest,
+}
+
 mod breadth_first_search;
 pub use breadth_first_search::BreadthFirstSearch;
 

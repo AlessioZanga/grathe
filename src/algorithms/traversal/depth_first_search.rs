@@ -1,3 +1,4 @@
+use super::Traversal;
 use crate::traits::Base;
 use crate::types::VertexIterator;
 use crate::V;
@@ -8,8 +9,6 @@ use std::vec::Vec;
 /// Depth-first search structure.
 ///
 /// This structure contains the `discovery_time`, `finish_time` and `predecessor` maps.
-/// The underlying algorithm implements a depth-first search *tree* procedure,
-/// where all-and-only the vertices reachable form a given source vertex are visited.
 ///
 pub struct DepthFirstSearch<'a, T>
 where
@@ -35,7 +34,10 @@ impl<'a, T> DepthFirstSearch<'a, T>
 where
     T: Base,
 {
-    /// Run DFS *tree* for a given directed graph.
+    /// Build a new DFS iterator.
+    ///
+    /// Build a DFS iterator for a given graph. This will execute the *tree*
+    /// variant of the algorithm, if not specified otherwise.
     ///
     /// # Panics
     ///
@@ -76,6 +78,7 @@ where
         g: &'a T,
         x: Option<&'a T::Vertex>,
         f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+        m: Traversal,
     ) -> Self {
         // Initialize default search object.
         let mut search = Self {
@@ -94,18 +97,17 @@ where
             // Initialize the predecessor map.
             predecessor: Default::default(),
         };
+        // If the graph is null.
+        if g.order() == 0 {
+            // Assert source vertex is none.
+            assert!(x.is_none());
+            // Then, return the default search object.
+            return search;
+        }
         // Get source vertex, if any.
         let x = match x {
-            // If no source vertex is given ...
-            None => {
-                // If the graph is null.
-                if g.order() == 0 {
-                    // Then, return the default search object.
-                    return search;
-                }
-                // ... choose the first one in the vertex set as source.
-                V!(g).next().unwrap()
-            }
+            // If no source vertex is given, choose the first one in the vertex set.
+            None => V!(g).next().unwrap(),
             // Otherwise ...
             Some(x) => {
                 // ... assert that source vertex is in graph.
@@ -114,6 +116,13 @@ where
                 x
             }
         };
+        // If visit variant is `forest`.
+        if matches!(m, Traversal::Forest) {
+            // Add vertices to the visit stack in reverse to preserve order.
+            let mut queue = VecDeque::with_capacity(g.order());
+            queue.extend(V!(g).filter(|&y| y != x));
+            search.stack.extend(queue.iter().rev());
+        }
         // Push source vertex onto the stack.
         search.stack.push(x);
         // Return search object.

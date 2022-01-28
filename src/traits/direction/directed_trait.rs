@@ -268,7 +268,7 @@ macro_rules! impl_directed_trait {
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
             fn from(g: &'a $graph<T>) -> Self {
-                Self::new(g, None, $graph::<T>::children_iter)
+                Self::new(g, None, $graph::<T>::children_iter, $crate::algorithms::Traversal::Tree)
             }
         }
 
@@ -285,7 +285,7 @@ macro_rules! impl_directed_trait {
             /// Panics if the source vertex is not in the graph.
             ///
             fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
-                Self::new(g, Some(x), $graph::<T>::children_iter)
+                Self::new(g, Some(x), $graph::<T>::children_iter, $crate::algorithms::Traversal::Tree)
             }
         }
 
@@ -300,7 +300,7 @@ macro_rules! impl_directed_trait {
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
             fn from(g: &'a $graph<T>) -> Self {
-                Self::new(g, None, $graph::<T>::children_iter)
+                Self::new(g, None, $graph::<T>::children_iter, $crate::algorithms::Traversal::Tree)
             }
         }
 
@@ -317,7 +317,7 @@ macro_rules! impl_directed_trait {
             /// Panics if the source vertex is not in the graph.
             ///
             fn from((g, x): (&'a $graph<T>, &'a T)) -> Self {
-                Self::new(g, Some(x), $graph::<T>::children_iter)
+                Self::new(g, Some(x), $graph::<T>::children_iter, $crate::algorithms::Traversal::Tree)
             }
         }
     };

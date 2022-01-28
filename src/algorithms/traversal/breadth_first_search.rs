@@ -1,3 +1,4 @@
+use super::Traversal;
 use crate::traits::Base;
 use crate::types::VertexIterator;
 use crate::V;
@@ -7,8 +8,6 @@ use std::iter::FusedIterator;
 /// Breadth-first search structure.
 ///
 /// This structure contains the `distance` and `predecessor` maps.
-/// The underlying algorithm implements a breadth-first search *tree* procedure,
-/// where all-and-only the vertices reachable form a given source vertex are visited.
 ///
 pub struct BreadthFirstSearch<'a, T>
 where
@@ -32,7 +31,8 @@ where
 {
     /// Build a new BFS iterator.
     ///
-    /// Build a BFS *tree* iterator for a given graph.
+    /// Build a BFS iterator for a given graph. This will execute the *tree*
+    /// variant of the algorithm, if not specified otherwise.
     ///
     /// # Panics
     ///
@@ -69,8 +69,9 @@ where
         g: &'a T,
         x: Option<&'a T::Vertex>,
         f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+        m: Traversal,
     ) -> Self {
-        //
+        // Initialize default search object.
         let mut search = Self {
             // Set target graph.
             graph: g,
@@ -83,18 +84,17 @@ where
             // Initialize the predecessor map.
             predecessor: Default::default(),
         };
+        // If the graph is null.
+        if g.order() == 0 {
+            // Assert source vertex is none.
+            assert!(x.is_none());
+            // Then, return the default search object.
+            return search;
+        }
         // Get source vertex, if any.
         let x = match x {
-            // If no source vertex is given ...
-            None => {
-                // If the graph is null.
-                if g.order() == 0 {
-                    // Then, return the default search object.
-                    return search;
-                }
-                // ... choose the first one in the vertex set as source.
-                V!(g).next().unwrap()
-            }
+            // If no source vertex is given, choose the first one in the vertex set.
+            None => V!(g).next().unwrap(),
             // Otherwise ...
             Some(x) => {
                 // ... assert that source vertex is in graph.
@@ -103,6 +103,10 @@ where
                 x
             }
         };
+        // If visit variant is `forest`.
+        if matches!(m, Traversal::Forest) {
+            todo!()
+        }
         // Push the source vertex into the queue.
         search.queue.push_front(x);
         // Set its distance to zero.
