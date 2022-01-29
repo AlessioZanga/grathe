@@ -141,6 +141,7 @@ mod directed_tests {
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
                     while let Some(_) = search.next() {}
+
                     // The DFS on a trivial graph contains only the root ...
                     assert_eq!(search.discovery_time.len(), 1);
                     assert_eq!(search.finish_time.len(), 1);
@@ -152,6 +153,7 @@ mod directed_tests {
                     assert_eq!(search.finish_time.get(&i), Some(&1));
                     // ... and no predecessors by definition.
                     assert_eq!(search.predecessor.get(&i), None);
+
                     // Add an edge.
                     let j = g.add_vertex(&1)?;
                     g.add_edge(&i, &j)?;
@@ -159,28 +161,34 @@ mod directed_tests {
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
                     while let Some(_) = search.next() {}
+
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
                     assert_eq!(search.finish_time.len(), 2);
                     assert_eq!(search.predecessor.len(), 1);
+
                     // Check distances.
                     assert_eq!(search.discovery_time.get(&i), Some(&0));
                     assert_eq!(search.discovery_time.get(&j), Some(&1));
                     assert_eq!(search.finish_time.get(&j), Some(&2));
                     assert_eq!(search.finish_time.get(&i), Some(&3));
+
                     // Check predecessors.
                     assert_eq!(search.predecessor.get(&i), None);
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
+
                     // Add a disconnected vertex.
                     let k = g.add_vertex(&2)?;
                     // Execute DFS for the non-connected graph.
                     let mut search = DFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
                     while let Some(_) = search.next() {}
+
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
                     assert_eq!(search.finish_time.len(), 2);
                     assert_eq!(search.predecessor.len(), 1);
+
                     // Check distances.
                     assert_eq!(search.discovery_time.get(&i), Some(&0));
                     assert_eq!(search.discovery_time.get(&j), Some(&1));
@@ -188,10 +196,12 @@ mod directed_tests {
                     assert_eq!(search.finish_time.get(&i), Some(&3));
                     assert_eq!(search.discovery_time.get(&k), None);
                     assert_eq!(search.finish_time.get(&k), None);
+
                     // Check predecessors.
                     assert_eq!(search.predecessor.get(&i), None);
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
                     assert_eq!(search.predecessor.get(&k), None);
+
                     // Build non-trivial graph.
                     let g = $T::<$U>::from_edges(&[
                         (0, 1),
@@ -217,10 +227,12 @@ mod directed_tests {
                     let mut search = DFS::from((&g, &0));
                     // Consume the iterator in-place and assert later.
                     while let Some(_) = search.next() {}
+
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 8);
                     assert_eq!(search.finish_time.len(), 8);
                     assert_eq!(search.predecessor.len(), 7);
+
                     // Check distances.
                     assert_eq!(search.discovery_time.get(&0), Some(&0));
                     assert_eq!(search.discovery_time.get(&1), Some(&1));
@@ -238,6 +250,7 @@ mod directed_tests {
                     assert_eq!(search.finish_time.get(&4), Some(&13));
                     assert_eq!(search.finish_time.get(&3), Some(&14));
                     assert_eq!(search.finish_time.get(&0), Some(&15));
+
                     // Check predecessors.
                     assert_eq!(search.predecessor.get(&0), None);
                     assert_eq!(search.predecessor.get(&1), Some(&&0));
@@ -258,6 +271,64 @@ mod directed_tests {
                     let g = $T::<$U>::new();
                     DFS::from((&g, &0)).next();
                 }
+
+                #[test]
+                fn depth_first_search_forest() -> Result<(), Error<i32>>
+                {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    // Build a search object.
+                    let mut search = DFS::new(
+                        &g,
+                        None,
+                        ($T::children_iter),
+                        $crate::algorithms::Traversal::Forest
+                    );
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
+                    assert_eq!(search.next(), None);
+
+                    // Build a disconnected graph.
+                    let g = $T::<$U>::from_edges(&[
+                        (0, 1), (1, 2), (3, 4)
+                    ]);
+                    // Build a search object.
+                    let mut search = DFS::new(
+                        &g,
+                        None,
+                        ($T::children_iter),
+                        $crate::algorithms::Traversal::Forest
+                    );
+                    // Consume the iterator in-place and assert later.
+                    while let Some(_) = search.next() {}
+
+                    // Check DFS coherence.
+                    assert_eq!(search.discovery_time.len(), 5);
+                    assert_eq!(search.finish_time.len(), 5);
+                    assert_eq!(search.predecessor.len(), 3);
+
+                    // Check distances.
+                    assert_eq!(search.discovery_time.get(&0), Some(&0));
+                    assert_eq!(search.discovery_time.get(&1), Some(&1));
+                    assert_eq!(search.discovery_time.get(&2), Some(&2));
+                    assert_eq!(search.finish_time.get(&2), Some(&3));
+                    assert_eq!(search.finish_time.get(&1), Some(&4));
+                    assert_eq!(search.finish_time.get(&0), Some(&5));
+                    assert_eq!(search.discovery_time.get(&3), Some(&6));
+                    assert_eq!(search.discovery_time.get(&4), Some(&7));
+                    assert_eq!(search.finish_time.get(&4), Some(&8));
+                    assert_eq!(search.finish_time.get(&3), Some(&9));
+
+                    // Check predecessors.
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
+                    assert_eq!(search.predecessor.get(&2), Some(&&1));
+                    assert_eq!(search.predecessor.get(&3), None);
+                    assert_eq!(search.predecessor.get(&4), Some(&&3));
+
+                    Ok(())
+                }
             }
         };
     }
@@ -266,7 +337,7 @@ mod directed_tests {
         use crate::algorithms::{BFS, DFS};
         use crate::errors::*;
         use crate::graphs::DirectedAdjacencyListGraph;
-        use crate::traits::Storage;
+        use crate::traits::{Directed, Storage};
 
         directed_tests!(DirectedAdjacencyListGraph, i32);
     }
