@@ -9,6 +9,15 @@ mod directed_tests {
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
+                    let g = $T::<$U>::new();
+                    // Build a search object.
+                    let mut search = BFS::from(&g);
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
+                    assert_eq!(search.next(), None);
+
+                    // Build a null graph.
                     let mut g = $T::<$U>::new();
                     let i = g.add_vertex(&0)?;
                     // Execute BFS for the trivial graph.
@@ -116,6 +125,15 @@ mod directed_tests {
                 #[test]
                 fn depth_first_search_tree() -> Result<(), Error<i32>>
                 {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    // Build a search object.
+                    let mut search = DFS::from(&g);
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
+                    assert_eq!(search.next(), None);
+
                     // Build a null graph.
                     let mut g = $T::<$U>::new();
                     let i = g.add_vertex(&0)?;
@@ -265,6 +283,15 @@ mod undirected_tests {
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
+                    let g = $T::<$U>::new();
+                    // Build a search object.
+                    let mut search = BFS::from(&g);
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
+                    assert_eq!(search.next(), None);
+
+                    // Build a null graph.
                     let mut g = $T::<$U>::new();
                     let i = g.add_vertex(&0)?;
 
@@ -392,6 +419,15 @@ mod undirected_tests {
                 #[test]
                 fn depth_first_search_tree() -> Result<(), Error<i32>>
                 {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    // Build a search object.
+                    let mut search = DFS::from(&g);
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
+                    assert_eq!(search.next(), None);
+
                     // Build a null graph.
                     let mut g = $T::<$U>::new();
                     let i = g.add_vertex(&0)?;
@@ -545,7 +581,11 @@ mod undirected_tests {
 
                     // Build a null graph.
                     let g = $T::<$U>::new();
+                    // Build a search object.
                     let mut search = LexBFS::from(&g);
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
                     assert_eq!(search.next(), None);
 
                     // Test from Figure 1 of reference paper,
@@ -753,7 +793,11 @@ mod undirected_tests {
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
+                    // Build a search object.
                     let mut search = LexDFS::from(&g);
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
                     assert_eq!(search.next(), None);
 
                     let g = $T::<$U>::from_edges(&[
