@@ -321,7 +321,7 @@ mod directed {
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
                     assert_eq!(order, [&0, &1, &2, &3, &4, &5, &6, &7]);
-                    
+
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 8);

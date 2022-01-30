@@ -51,14 +51,16 @@ where
     ///
     /// // Build a directed graph.
     /// let g = DiGraph::from_edges(&[
-    ///     (0,  1), (1, 2), (0, 3), (0, 4), (4, 5)
+    ///     (0, 1), (1, 2), (0, 3), (0, 4), (4, 5)
     /// ]);
     ///
     /// // Build the search object over graph with `0` as source vertex.
     /// let mut search = BFS::from((&g, &0));
     ///
-    /// // Consume the iterator in-place and assert later.
-    /// search.run();
+    /// // Collect visit order, preserving search structure.
+    /// let order: Vec<_> = search.by_ref().collect();
+    /// // The visit returns a pre-order.
+    /// assert_eq!(order, [&0, &1, &3, &4, &2, &5]);
     ///
     /// // The source vertex has distance zero from itself ...
     /// assert_eq!(search.distance[&0], 0);
@@ -122,16 +124,6 @@ where
         search.distance.insert(x, 0);
         // Return search object.
         search
-    }
-
-    /// Execute the procedure.
-    ///
-    /// Execute the procedure and store the results for later queries.
-    ///
-    pub fn run(&mut self) -> &Self {
-        while let Some(_) = self.next() {}
-
-        self
     }
 }
 
