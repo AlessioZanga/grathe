@@ -1,13 +1,14 @@
+use super::Traversal;
 use crate::traits::Storage;
 use crate::types::VertexIterator;
+use crate::V;
 use std::collections::{HashMap, VecDeque};
+use std::iter::FusedIterator;
 use std::vec::Vec;
 
 /// Depth-first search structure.
 ///
 /// This structure contains the `discovery_time`, `finish_time` and `predecessor` maps.
-/// The underlying algorithm implements a depth-first search *tree* procedure,
-/// where all-and-only the vertices reachable form a given source vertex are visited.
 ///
 pub struct DepthFirstSearch<'a, T>
 where
@@ -33,11 +34,14 @@ impl<'a, T> DepthFirstSearch<'a, T>
 where
     T: Storage,
 {
-    /// Run DFS *tree* for a given directed graph.
+    /// Build a new DFS iterator.
+    ///
+    /// Build a DFS iterator for a given graph. This will execute the [`Tree`](super::Traversal)
+    /// variant of the algorithm, if not specified otherwise.
     ///
     /// # Panics
     ///
-    /// Panics if the source vertex is not in the graph.
+    /// Panics if the (optional) source vertex is not in the graph.
     ///
     /// # Examples
     ///
@@ -72,19 +76,18 @@ where
     ///
     pub fn new(
         g: &'a T,
-        x: &'a T::Vertex,
+        x: Option<&'a T::Vertex>,
         f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+        m: Traversal,
     ) -> Self {
-        // Assert that source vertex is in graph.
-        assert!(g.has_vertex(x));
-
-        Self {
+        // Initialize default search object.
+        let mut search = Self {
             // Set target graph.
             graph: g,
             // Set reachability function.
             reachable: f,
             // Initialize the to-be-visited queue with the source vertex.
-            stack: From::from([x]),
+            stack: Default::default(),
             // Initialize the global clock.
             time: 0,
             // Initialize the discovery-time map.
@@ -93,7 +96,37 @@ where
             finish_time: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
+        };
+        // If the graph is null.
+        if g.order() == 0 {
+            // Assert source vertex is none.
+            assert!(x.is_none());
+            // Then, return the default search object.
+            return search;
         }
+        // Get source vertex, if any.
+        let x = match x {
+            // If no source vertex is given, choose the first one in the vertex set.
+            None => V!(g).next().unwrap(),
+            // Otherwise ...
+            Some(x) => {
+                // ... assert that source vertex is in graph.
+                assert!(g.has_vertex(x));
+                // Return given source vertex.
+                x
+            }
+        };
+        // If visit variant is Forest.
+        if matches!(m, Traversal::Forest) {
+            // Add vertices to the visit stack in reverse to preserve order.
+            let mut queue = VecDeque::with_capacity(g.order());
+            queue.extend(V!(g).filter(|&y| y != x));
+            search.stack.extend(queue.iter().rev());
+        }
+        // Push source vertex onto the stack.
+        search.stack.push(x);
+        // Return search object.
+        search
     }
 
     /// Execute the procedure.
@@ -157,3 +190,5 @@ where
         None
     }
 }
+
+impl<'a, T> FusedIterator for DepthFirstSearch<'a, T> where T: Storage {}

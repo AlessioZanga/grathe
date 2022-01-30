@@ -1,12 +1,17 @@
+use super::Traversal;
 use crate::traits::Storage;
 use crate::types::VertexIterator;
+use crate::V;
 use std::collections::{HashMap, VecDeque};
+use std::iter::FusedIterator;
 
 /// Breadth-first search structure.
 ///
 /// This structure contains the `distance` and `predecessor` maps.
-/// The underlying algorithm implements a breadth-first search *tree* procedure,
-/// where all-and-only the vertices reachable form a given source vertex are visited.
+///
+/// If the algorithm is set to the [`Forest`](super::Traversal) variant, a vertex with distance
+/// [`usize::MAX`] means that such vertex is not reachable from the given
+/// source vertex (i.e. the graph is disconnected).
 ///
 pub struct BreadthFirstSearch<'a, T>
 where
@@ -14,6 +19,8 @@ where
 {
     /// Given graph reference.
     graph: &'a T,
+    /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
+    vertices: VecDeque<&'a T::Vertex>,
     /// Reachable vertices of distance one from given vertex.
     reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
     /// To-be-visited queue with the source vertex.
@@ -30,11 +37,12 @@ where
 {
     /// Build a new BFS iterator.
     ///
-    /// Build a BFS *tree* iterator for a given graph.
+    /// Build a BFS iterator for a given graph. This will execute the [`Tree`](super::Traversal)
+    /// variant of the algorithm, if not specified otherwise.
     ///
     /// # Panics
     ///
-    /// Panics if the source vertex is not in the graph.
+    /// Panics if the (optional) source vertex is not in the graph.
     ///
     /// # Examples
     ///
@@ -65,24 +73,55 @@ where
     ///
     pub fn new(
         g: &'a T,
-        x: &'a T::Vertex,
+        x: Option<&'a T::Vertex>,
         f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+        m: Traversal,
     ) -> Self {
-        // Assert that source vertex is in graph.
-        assert!(g.has_vertex(x));
-
-        Self {
+        // Initialize default search object.
+        let mut search = Self {
             // Set target graph.
             graph: g,
+            // Initialize the [`Forest`] to-be-visited queue.
+            vertices: Default::default(),
             // Set reachability function.
             reachable: f,
             // Initialize the to-be-visited queue with the source vertex.
-            queue: From::from([x]),
+            queue: Default::default(),
             // Initialize the distance map.
-            distance: From::from([(x, 0)]),
+            distance: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
+        };
+        // If the graph is null.
+        if g.order() == 0 {
+            // Assert source vertex is none.
+            assert!(x.is_none());
+            // Then, return the default search object.
+            return search;
         }
+        // Get source vertex, if any.
+        let x = match x {
+            // If no source vertex is given, choose the first one in the vertex set.
+            None => V!(g).next().unwrap(),
+            // Otherwise ...
+            Some(x) => {
+                // ... assert that source vertex is in graph.
+                assert!(g.has_vertex(x));
+                // Return given source vertex.
+                x
+            }
+        };
+        // If visit variant is [`Forest`] ...
+        if matches!(m, Traversal::Forest) {
+            // ... fill the vertices queue.
+            search.vertices.extend(V!(g));
+        }
+        // Push the source vertex into the queue.
+        search.queue.push_front(x);
+        // Set its distance to zero.
+        search.distance.insert(x, 0);
+        // Return search object.
+        search
     }
 
     /// Execute the procedure.
@@ -103,6 +142,23 @@ where
     type Item = &'a T::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // If the current algorithm is set to Forest
+        // and there are no more vertices in the queue ...
+        if self.queue.is_empty() {
+            // ... but there is at least one vertex ...
+            while let Some(x) = self.vertices.pop_front() {
+                // ... that was not visited.
+                if !self.distance.contains_key(x) {
+                    // Push such vertex into the visiting queue.
+                    self.queue.push_front(x);
+                    // Set its distance to usize::MAX, since it is
+                    // not reachable from the original source vertex.
+                    self.distance.insert(x, usize::MAX);
+                    // Continue search visit.
+                    break;
+                }
+            }
+        }
         // If there are still vertices to be visited.
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
@@ -110,7 +166,10 @@ where
                 // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
-                    self.distance.insert(y, self.distance[x] + 1);
+                    // NOTE: This operation is implemented using a
+                    // `saturating_add` in order to avoid overflowing in
+                    // the [`Forest`] variant, where `infinity` is usize::MAX.
+                    self.distance.insert(y, self.distance[x].saturating_add(1));
                     // Set its predecessor.
                     self.predecessor.insert(y, x);
                     // Push it into the to-be-visited queue.
@@ -125,3 +184,5 @@ where
         None
     }
 }
+
+impl<'a, T> FusedIterator for BreadthFirstSearch<'a, T> where T: Storage {}
