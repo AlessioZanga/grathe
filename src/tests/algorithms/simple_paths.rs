@@ -30,7 +30,7 @@ mod directed {
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
-                    AllSimplePaths::from((&g, &0, &1));
+                    AllSimplePaths::from((&g, &0, &1)).run();
                 }
             }
         };
@@ -78,7 +78,7 @@ mod undirected {
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
-                    AllSimplePaths::from((&g, &0, &1));
+                    AllSimplePaths::from((&g, &0, &1)).run();
                 }
             }
         };

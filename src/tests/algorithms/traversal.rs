@@ -378,8 +378,10 @@ mod directed {
                         ($T::children_iter),
                         $crate::algorithms::Traversal::Forest
                     );
-                    // Consume the iterator in-place and assert later.
-                    search.run();
+                    // Collect the node in pre-order.
+                    let order: Vec<_> = search.by_ref().collect();
+                    // Check visit order.
+                    assert_eq!(order, [&0, &1, &2, &3, &4]);
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 5);
@@ -582,8 +584,10 @@ mod undirected {
 
                     // Execute DFS for the trivial graph.
                     let mut search = DFS::from((&g, &i));
-                    // Consume the iterator in-place and assert later.
-                    search.run();
+                    // Collect the node in pre-order.
+                    let order: Vec<_> = search.by_ref().collect();
+                    // Check visit order.
+                    assert_eq!(order, [&0]);
 
                     // The DFS on a trivial graph contains only the root ...
                     assert_eq!(search.discovery_time.len(), 1);
@@ -603,8 +607,10 @@ mod undirected {
 
                     // Execute DFS for the non-trivial graph.
                     let mut search = DFS::from((&g, &i));
-                    // Consume the iterator in-place and assert later.
-                    search.run();
+                    // Collect the node in pre-order.
+                    let order: Vec<_> = search.by_ref().collect();
+                    // Check visit order.
+                    assert_eq!(order, [&0, &1]);
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
@@ -624,10 +630,12 @@ mod undirected {
                     // Add a disconnected vertex.
                     let k = g.add_vertex(&2)?;
 
-                    // Execute DFS for the non-connected graph.
+                    // Execute DFS for the disconnected graph.
                     let mut search = DFS::from((&g, &i));
-                    // Consume the iterator in-place and assert later.
-                    search.run();
+                    // Collect the node in pre-order.
+                    let order: Vec<_> = search.by_ref().collect();
+                    // Check visit order.
+                    assert_eq!(order, [&0, &1]);
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 2);
@@ -673,8 +681,10 @@ mod undirected {
 
                     // Execute DFS for the non-trivial graph.
                     let mut search = DFS::from((&g, &0));
-                    // Consume the iterator in-place and assert later.
-                    search.run();
+                    // Collect the node in pre-order.
+                    let order: Vec<_> = search.by_ref().collect();
+                    // Check visit order.
+                    assert_eq!(order, [&0, &1, &2, &3, &4, &5, &6, &7]);
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 8);

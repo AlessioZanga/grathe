@@ -5,11 +5,15 @@ mod directed {
         ($T:ident, $U:ident) => {
             paste::item! {
                 #[test]
+                #[ignore]
                 fn all_cycles() {
                     // Test from Figure 1 of reference paper.
-                    let g = $T::<$U>::from_edges(&[(0, 1), (1, 2), (2, 3), (2, 4), (3, 4), (4, 1)]);
+                    let g = $T::<$U>::from_edges(&[
+                        (0, 1), (1, 2), (2, 3), (2, 4), (3, 4), (4, 1)
+                    ]);
                     let mut search = AllCycles::from(&g);
                     search.run();
+
                     assert_eq!(
                         search.cycles,
                         [
@@ -17,6 +21,7 @@ mod directed {
                             vec![&1, &2, &4, &1]
                         ]
                     );
+
                     assert_eq!(search.popularity.get(&0), None);
                     assert_eq!(search.popularity[&1], 2);
                     assert_eq!(search.popularity[&2], 2);
@@ -59,6 +64,7 @@ mod directed {
                     ]);
                     let mut search = AllCycles::from(&g);
                     search.run();
+
                     assert_eq!(
                         search.cycles,
                         [
@@ -102,6 +108,7 @@ mod undirected {
         ($T:ident, $U:ident) => {
             paste::item! {
                 #[test]
+                #[ignore]
                 fn all_cycles() {
                     let g = $T::<$U>::from_edges(&[
                         (1, 2), (2, 3), (3, 4), (3, 5),

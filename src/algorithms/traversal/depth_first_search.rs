@@ -148,7 +148,7 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         // If there are still vertices to be visited.
-        if let Some(&x) = self.stack.last() {
+        while let Some(&x) = self.stack.last() {
             // Check if vertex is WHITE (i.e. was not seen before).
             if !self.discovery_time.contains_key(x) {
                 // Set its discover time (as GRAY).
@@ -170,6 +170,8 @@ where
                 self.stack.extend(queue.iter().rev());
                 // Increment time.
                 self.time += 1;
+                // Return vertex in pre-order.
+                return Some(x);
             // If the vertex is NOT WHITE.
             } else {
                 // Remove it from stack.
@@ -182,11 +184,8 @@ where
                     self.time += 1;
                 }
             }
-            // Return next vertex.
-            return Some(x);
         }
 
-        // Otherwise end is reached.
         None
     }
 }
