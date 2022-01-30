@@ -132,17 +132,20 @@ where
     type Item = &'a T::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // If there are no more vertices in the queue ...
+        // If the current algorithm is set to Forest
+        // and there are no more vertices in the queue ...
         if self.queue.is_empty() {
-            // ... but there is still a vertex ...
+            // ... but there is at least one vertex ...
             while let Some(x) = self.vertices.pop_front() {
                 // ... that was not visited.
-                if self.distance.contains_key(x) {
+                if !self.distance.contains_key(x) {
                     // Push such vertex into the visiting queue.
                     self.queue.push_front(x);
                     // Set its distance to usize::MAX, since it is
                     // not reachable from the original source vertex.
                     self.distance.insert(x, usize::MAX);
+                    // Continue search visit.
+                    break;
                 }
             }
         }
