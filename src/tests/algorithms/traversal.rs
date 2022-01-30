@@ -22,6 +22,7 @@ mod directed_tests {
                     let i = g.add_vertex(&0)?;
                     // Execute BFS for the trivial graph.
                     let search = BFS::from((&g, &i));
+
                     // The BFS on a trivial graph contains only the root ...
                     assert_eq!(search.distance.len(), 1);
                     // ... and no predecessors by definition.
@@ -30,6 +31,7 @@ mod directed_tests {
                     assert_eq!(search.distance.get(&i), Some(&0));
                     // ... and no predecessors by definition.
                     assert_eq!(search.predecessor.get(&i), None);
+
                     // Add an edge.
                     let j = g.add_vertex(&1)?;
                     g.add_edge(&i, &j)?;
@@ -37,32 +39,40 @@ mod directed_tests {
                     let mut search = BFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
                     while let Some(_) = search.next() {}
+
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 2);
                     assert_eq!(search.predecessor.len(), 1);
+
                     // Check distances.
                     assert_eq!(search.distance.get(&i), Some(&0));
                     assert_eq!(search.distance.get(&j), Some(&1));
+
                     // Check predecessors.
                     assert_eq!(search.predecessor.get(&i), None);
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
+
                     // Add a disconnected vertex.
                     let k = g.add_vertex(&2)?;
                     // Execute BFS for the non-connected graph.
                     let mut search = BFS::from((&g, &i));
                     // Consume the iterator in-place and assert later.
                     while let Some(_) = search.next() {}
+
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 2);
                     assert_eq!(search.predecessor.len(), 1);
+
                     // Check distances.
                     assert_eq!(search.distance.get(&i), Some(&0));
                     assert_eq!(search.distance.get(&j), Some(&1));
                     assert_eq!(search.distance.get(&k), None);
+
                     // Check predecessors.
                     assert_eq!(search.predecessor.get(&i), None);
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
                     assert_eq!(search.predecessor.get(&k), None);
+
                     // Build non-trivial graph.
                     let g = $T::<$U>::from_edges(&[
                         (0, 1),
@@ -89,9 +99,11 @@ mod directed_tests {
                     let mut search = BFS::from((&g, &0));
                     // Consume the iterator in-place and assert later.
                     while let Some(_) = search.next() {}
+
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 8);
                     assert_eq!(search.predecessor.len(), 7);
+
                     // Check distances.
                     assert_eq!(search.distance.get(&0), Some(&0));
                     assert_eq!(search.distance.get(&1), Some(&1));
@@ -101,6 +113,7 @@ mod directed_tests {
                     assert_eq!(search.distance.get(&5), Some(&2));
                     assert_eq!(search.distance.get(&6), Some(&3));
                     assert_eq!(search.distance.get(&7), Some(&3));
+
                     // Check predecessors.
                     assert_eq!(search.predecessor.get(&0), None);
                     assert_eq!(search.predecessor.get(&1), Some(&&0));
@@ -110,6 +123,7 @@ mod directed_tests {
                     assert_eq!(search.predecessor.get(&5), Some(&&3));
                     assert_eq!(search.predecessor.get(&6), Some(&&4));
                     assert_eq!(search.predecessor.get(&7), Some(&&5));
+
                     Ok(())
                 }
 
@@ -120,6 +134,71 @@ mod directed_tests {
                     // Build a null graph.
                     let g = $T::<$U>::new();
                     BFS::from((&g, &0)).next();
+                }
+
+                #[test]
+                fn breadth_first_search_forest() -> Result<(), Error<i32>>
+                {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    // Build a search object.
+                    let mut search = BFS::new(
+                        &g,
+                        None,
+                        ($T::children_iter),
+                        $crate::algorithms::Traversal::Forest
+                    );
+                    // To search on a null graph
+                    // without a source vertex
+                    // yields no result.
+                    assert_eq!(search.next(), None);
+
+                    // Build a disconnected graph.
+                    let g = $T::<$U>::from_edges(&[
+                        (0, 1), (0, 2), (0, 3),
+                        (1, 4), (2, 1), (3, 5),
+                        (5, 4), (6, 7), (7, 8),
+                        (6, 9), (9, 8)
+                    ]);
+                    // Build a search object.
+                    let mut search = BFS::new(
+                        &g,
+                        None,
+                        ($T::children_iter),
+                        $crate::algorithms::Traversal::Forest
+                    );
+                    // Consume the iterator in-place and assert later.
+                    while let Some(_) = search.next() {}
+
+                    // Check BFS coherence.
+                    assert_eq!(search.distance.len(), 10);
+                    assert_eq!(search.predecessor.len(), 8);
+
+                    // Check distances.
+                    assert_eq!(search.distance.get(&0), Some(&0));
+                    assert_eq!(search.distance.get(&1), Some(&1));
+                    assert_eq!(search.distance.get(&2), Some(&1));
+                    assert_eq!(search.distance.get(&3), Some(&1));
+                    assert_eq!(search.distance.get(&4), Some(&2));
+                    assert_eq!(search.distance.get(&5), Some(&2));
+                    assert_eq!(search.distance.get(&6), Some(&usize::MAX));
+                    assert_eq!(search.distance.get(&7), Some(&usize::MAX));
+                    assert_eq!(search.distance.get(&8), Some(&usize::MAX));
+                    assert_eq!(search.distance.get(&9), Some(&usize::MAX));
+
+                    // Check predecessors.
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
+                    assert_eq!(search.predecessor.get(&2), Some(&&0));
+                    assert_eq!(search.predecessor.get(&3), Some(&&0));
+                    assert_eq!(search.predecessor.get(&4), Some(&&1));
+                    assert_eq!(search.predecessor.get(&5), Some(&&3));
+                    assert_eq!(search.predecessor.get(&6), None);
+                    assert_eq!(search.predecessor.get(&7), Some(&&6));
+                    assert_eq!(search.predecessor.get(&8), Some(&&7));
+                    assert_eq!(search.predecessor.get(&9), Some(&&6));
+
+                    Ok(())
                 }
 
                 #[test]
