@@ -9,12 +9,18 @@ use std::iter::FusedIterator;
 ///
 /// This structure contains the `distance` and `predecessor` maps.
 ///
+/// If the algorithm is set to the [`Forest`](super::Traversal) variant, a vertex with distance
+/// [`usize::MAX`] means that such vertex is not reachable from the given
+/// source vertex (i.e. the graph is disconnected).
+///
 pub struct BreadthFirstSearch<'a, T>
 where
     T: Base,
 {
     /// Given graph reference.
     graph: &'a T,
+    /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
+    vertices: VecDeque<&'a T::Vertex>,
     /// Reachable vertices of distance one from given vertex.
     reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
     /// To-be-visited queue with the source vertex.
@@ -31,7 +37,7 @@ where
 {
     /// Build a new BFS iterator.
     ///
-    /// Build a BFS iterator for a given graph. This will execute the *tree*
+    /// Build a BFS iterator for a given graph. This will execute the [`Tree`](super::Traversal)
     /// variant of the algorithm, if not specified otherwise.
     ///
     /// # Panics
@@ -75,6 +81,8 @@ where
         let mut search = Self {
             // Set target graph.
             graph: g,
+            // Initialize the [`Forest`] to-be-visited queue.
+            vertices: Default::default(),
             // Set reachability function.
             reachable: f,
             // Initialize the to-be-visited queue with the source vertex.
@@ -103,9 +111,10 @@ where
                 x
             }
         };
-        // If visit variant is `forest`.
+        // If visit variant is [`Forest`] ...
         if matches!(m, Traversal::Forest) {
-            todo!()
+            // ... fill the vertices queue.
+            search.vertices.extend(V!(g));
         }
         // Push the source vertex into the queue.
         search.queue.push_front(x);
@@ -123,6 +132,20 @@ where
     type Item = &'a T::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // If there are no more vertices in the queue ...
+        if self.queue.is_empty() {
+            // ... but there is still a vertex ...
+            while let Some(x) = self.vertices.pop_front() {
+                // ... that was not visited.
+                if self.distance.contains_key(x) {
+                    // Push such vertex into the visiting queue.
+                    self.queue.push_front(x);
+                    // Set its distance to usize::MAX, since it is
+                    // not reachable from the original source vertex.
+                    self.distance.insert(x, usize::MAX);
+                }
+            }
+        }
         // If there are still vertices to be visited.
         if let Some(y) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
@@ -130,7 +153,10 @@ where
                 // If the vertex has never seen before.
                 if !self.distance.contains_key(z) {
                     // Compute the distance from its predecessor.
-                    self.distance.insert(z, self.distance[y] + 1);
+                    // NOTE: This operation is implemented using a
+                    // `saturating_add` in order to avoid overflowing in
+                    // the [`Forest`] variant, where `infinity` is usize::MAX.
+                    self.distance.insert(z, self.distance[y].saturating_add(1));
                     // Set its predecessor.
                     self.predecessor.insert(z, y);
                     // Push it into the to-be-visited queue.

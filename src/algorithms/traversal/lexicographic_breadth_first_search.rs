@@ -26,7 +26,8 @@ where
     /// Build a new LexBFS iterator.
     ///
     /// Build a LexBFS[^1] iterator for a given undirected graph.
-    /// This will execute the *forest* variant of the algorithm.
+    ///
+    /// This will execute the [`Forest`](super::Traversal) variant of the algorithm.
     ///
     /// [^1]: [Bretscher, A., Corneil, D., Habib, M., & Paul, C. (2003, June). A simple linear time LexBFS cograph recognition algorithm.](https://scholar.google.com/scholar?q=+A+simple+linear+time+LexBFS+cograph+recognition+algorithm)
     ///

@@ -36,7 +36,7 @@ where
 {
     /// Build a new DFS iterator.
     ///
-    /// Build a DFS iterator for a given graph. This will execute the *tree*
+    /// Build a DFS iterator for a given graph. This will execute the [`Tree`](super::Traversal)
     /// variant of the algorithm, if not specified otherwise.
     ///
     /// # Panics
@@ -116,7 +116,7 @@ where
                 x
             }
         };
-        // If visit variant is `forest`.
+        // If visit variant is Forest.
         if matches!(m, Traversal::Forest) {
             // Add vertices to the visit stack in reverse to preserve order.
             let mut queue = VecDeque::with_capacity(g.order());

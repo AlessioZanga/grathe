@@ -29,7 +29,8 @@ where
     /// Build a new LexDFS iterator.
     ///
     /// Build a LexDFS[^1] iterator for a given undirected graph.
-    /// This will execute the *forest* variant of the algorithm.
+    ///
+    /// This will execute the [`Forest`](super::Traversal) variant of the algorithm.
     ///
     /// [^1]: [Corneil, D. G., & Krueger, R. M. (2008). A unified view of graph searching.](https://scholar.google.com/scholar?q=A+unified+view+of+graph+searching)
     ///
