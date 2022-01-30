@@ -167,7 +167,7 @@ mod directed {
                         $crate::algorithms::Traversal::Forest
                     );
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check BFS coherence.
                     assert_eq!(search.distance.len(), 10);
@@ -379,7 +379,7 @@ mod directed {
                         $crate::algorithms::Traversal::Forest
                     );
                     // Consume the iterator in-place and assert later.
-                    while let Some(_) = search.next() {}
+                    search.run();
 
                     // Check DFS coherence.
                     assert_eq!(search.discovery_time.len(), 5);
