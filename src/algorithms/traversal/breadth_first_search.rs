@@ -168,7 +168,7 @@ where
                     // Compute the distance from its predecessor.
                     // NOTE: This operation is implemented using a
                     // `saturating_add` in order to avoid overflowing in
-                    // the [`Forest`] variant, where `infinity` is usize::MAX.
+                    // the Forest variant, where `infinity` is usize::MAX.
                     self.distance.insert(y, self.distance[x].saturating_add(1));
                     // Set its predecessor.
                     self.predecessor.insert(y, x);
