@@ -120,6 +120,9 @@ where
         // Initialize blocked map of current vertex.
         self.blocked.entry(x).or_default();
 
+        println!("S: {:?}", self.stack);
+        println!("B: {:?}", self.blocked);
+        println!();
         // Iterate over reachable vertices from graph.
         for y in (self.reachable)(self.graph, x) {
             // If current vertex is lower then starting vertex,
@@ -147,7 +150,7 @@ where
             // Finally, if the current vertex has not been blocked...
             } else if !self.blocked.contains_key(&y) {
                 // ...visit it recursively.
-                found = self.circuit(y);
+                found |= self.circuit(y);
             }
         }
 

@@ -5,7 +5,6 @@ mod directed {
         ($T:ident, $U:ident) => {
             paste::item! {
                 #[test]
-                #[ignore]
                 fn all_cycles() {
                     // Test from Figure 1 of reference paper.
                     let g = $T::<$U>::from_edges(&[
