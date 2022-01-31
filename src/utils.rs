@@ -1,5 +1,4 @@
 /// Partial compares sets.
-#[macro_export]
 macro_rules! partial_cmp_sets {
     ($a:ident, $b:ident) => {
         if $a.len() == $b.len() && $a.eq(&$b) {
@@ -13,3 +12,5 @@ macro_rules! partial_cmp_sets {
         }
     };
 }
+
+pub(crate) use partial_cmp_sets;

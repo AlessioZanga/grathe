@@ -28,7 +28,7 @@ pub mod traits;
 pub mod types;
 
 /// Tools, macros, etc.
-pub mod utils;
+mod utils;
 
 mod tests;
 

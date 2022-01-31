@@ -1,5 +1,4 @@
 use crate::errors::Error;
-use crate::partial_cmp_sets;
 use crate::traits::{Capacity, Operators, Storage};
 use crate::types::{AdjacencyList, EdgeIterator, ExactSizeIter, VertexIterator, VertexTrait};
 use std::cmp::Ordering;
@@ -27,7 +26,7 @@ where
         let b: HashSet<_> = other.vertices_iter().collect();
 
         // Partial ordering of vertex sets.
-        let vertices: Option<Ordering> = partial_cmp_sets!(a, b);
+        let vertices: Option<Ordering> = crate::utils::partial_cmp_sets!(a, b);
 
         // If vertices are comparable.
         if let Some(vertices) = vertices {
@@ -36,7 +35,7 @@ where
             let b: HashSet<_> = other.edges_iter().collect();
 
             // Partial ordering of edge sets.
-            let edges: Option<Ordering> = partial_cmp_sets!(a, b);
+            let edges: Option<Ordering> = crate::utils::partial_cmp_sets!(a, b);
 
             // If edges are comparable.
             if let Some(edges) = edges {
