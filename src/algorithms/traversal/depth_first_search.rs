@@ -145,6 +145,8 @@ where
             if !self.discovery_time.contains_key(x) {
                 // Set its discover time (as GRAY).
                 self.discovery_time.insert(x, self.time);
+                // Increment time.
+                self.time += 1;
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
@@ -160,8 +162,6 @@ where
                 // Push vertices onto the stack in reverse order, this makes
                 // traversal order and neighborhood order the same.
                 self.stack.extend(queue.iter().rev());
-                // Increment time.
-                self.time += 1;
                 // Return vertex in pre-order.
                 return Some(x);
             // If the vertex is NOT WHITE.
