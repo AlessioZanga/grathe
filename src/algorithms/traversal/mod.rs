@@ -29,3 +29,6 @@ pub use lexicographic_depth_first_search::LexicographicDepthFirstSearch;
 
 /// Alias for lexicographic depth-first search.
 pub type LexDFS<'a, T> = LexicographicDepthFirstSearch<'a, T>;
+
+mod topological_sort;
+pub use topological_sort::TopologicalSort;

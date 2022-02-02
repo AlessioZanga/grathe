@@ -426,12 +426,51 @@ mod directed {
 
                     Ok(())
                 }
+
+                #[test]
+                fn topological_sort()
+                {
+                    // Build a null graph.
+                    let g = $T::<$U>::new();
+                    let mut search = TopologicalSort::from(&g);
+
+                    assert_eq!(search.next(), None);
+
+                    let g = $T::<$U>::from_edges(&[
+                        (5, 11), (7, 11), (7, 8), (3, 8), (3, 10),
+                        (11, 2), (11, 9), (11, 10), (8, 9)
+                    ]);
+                    let mut search = TopologicalSort::from(&g);
+
+                    assert_eq!(search.next(), Some(&3));
+                    assert_eq!(search.next(), Some(&5));
+                    assert_eq!(search.next(), Some(&7));
+                    assert_eq!(search.next(), Some(&8));
+                    assert_eq!(search.next(), Some(&11));
+                    assert_eq!(search.next(), Some(&2));
+                    assert_eq!(search.next(), Some(&9));
+                    assert_eq!(search.next(), Some(&10));
+                    assert_eq!(search.next(), None);
+                }
+
+                #[test]
+                #[should_panic]
+                fn topological_sort_should_panic()
+                {
+                    let g = $T::<$U>::from_edges(&[
+                        (0, 1), (1, 2), (2, 1)
+                    ]);
+                    let mut search = TopologicalSort::from(&g);
+
+                    assert_eq!(search.next(), Some(&0));
+                    assert_eq!(search.next(), None);
+                }
             }
         };
     }
 
     mod adjacency_list_graph {
-        use crate::algorithms::{BFS, DFS};
+        use crate::algorithms::{TopologicalSort, BFS, DFS};
         use crate::errors::*;
         use crate::graphs::DirectedAdjacencyListGraph;
         use crate::traits::{Directed, Storage};
