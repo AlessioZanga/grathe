@@ -35,7 +35,7 @@ impl<'a, T> BreadthFirstSearch<'a, T>
 where
     T: Storage,
 {
-    /// Build a new BFS iterator.
+    /// Build a BFS iterator.
     ///
     /// Build a BFS iterator for a given graph. This will execute the [`Tree`](super::Traversal)
     /// variant of the algorithm, if not specified otherwise.

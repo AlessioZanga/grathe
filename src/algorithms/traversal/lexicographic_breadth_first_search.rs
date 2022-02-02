@@ -23,7 +23,7 @@ impl<'a, T> LexicographicBreadthFirstSearch<'a, T>
 where
     T: Undirected,
 {
-    /// Build a new LexBFS iterator.
+    /// Build a LexBFS iterator.
     ///
     /// Build a LexBFS[^1] iterator for a given undirected graph.
     ///

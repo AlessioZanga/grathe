@@ -123,28 +123,44 @@ pub trait Directed: Base + Connectivity + Convert {
     /// [^1]: [Kahn, A. B. (1962). Topological sorting of large networks. Communications of the ACM, 5(11), 558-562.](https://scholar.google.com/scholar?q=Topological+sorting+of+large+networks)
     ///
     fn topological_sort(&self) -> Option<Vec<&Self::Vertex>> {
+        // Topological order.
         let mut order = Vec::new();
+        // To-be-visited queue.
         let mut queue = VecDeque::new();
+        // Visit map with vertices in-degrees.
         let mut visit = HashMap::new();
 
+        // For each vertex in the graph.
         for x in self.vertices_iter() {
+            // Compute its in-degree.
             match self.in_degree_of(x) {
+                // If the in-degree is zero, then add it to the queue.
                 0 => queue.push_back(x),
+                // Otherwise, add it to the map.
                 y => {
                     visit.insert(x, y);
                 }
             }
         }
 
+        // While there are still vertices with zero in-degree.
         while let Some(x) = queue.pop_front() {
+            // Push it into the topological order.
             order.push(x);
+            // For each child of the selected vertex.
             for y in self.children_iter(x) {
+                // If it was not visited before.
                 if let Some(z) = visit.get(y) {
+                    // Update its in-degree.
                     match z - 1 {
+                        // If the in-degree is zero ...
                         0 => {
+                            // ... then add it to the queue ...
                             queue.push_back(y);
+                            // ... and remove it from the visit map.
                             visit.remove(y);
                         }
+                        // Otherwise, update its in-degree into the map.
                         z => {
                             visit.insert(y, z);
                         }
@@ -153,7 +169,10 @@ pub trait Directed: Base + Connectivity + Convert {
             }
         }
 
+        // If there are still vertices with non-zero in-degree ...
         if !visit.is_empty() {
+            // ... return `None`, since no topological ordering is defined,
+            // i.e. the graph contains at least one cycle.
             return None;
         }
 

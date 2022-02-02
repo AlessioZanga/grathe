@@ -34,7 +34,7 @@ impl<'a, T> DepthFirstSearch<'a, T>
 where
     T: Storage,
 {
-    /// Build a new DFS iterator.
+    /// Build a DFS iterator.
     ///
     /// Build a DFS iterator for a given graph. This will execute the [`Tree`](super::Traversal)
     /// variant of the algorithm, if not specified otherwise.

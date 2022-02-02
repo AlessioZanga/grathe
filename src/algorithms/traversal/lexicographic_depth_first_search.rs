@@ -26,7 +26,7 @@ impl<'a, T> LexicographicDepthFirstSearch<'a, T>
 where
     T: Undirected,
 {
-    /// Build a new LexDFS iterator.
+    /// Build a LexDFS iterator.
     ///
     /// Build a LexDFS[^1] iterator for a given undirected graph.
     ///
