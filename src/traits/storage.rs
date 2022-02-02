@@ -704,7 +704,7 @@ macro_rules! V {
 
 /// Edge iterator.
 ///
-/// Return the edges iterator representing $x(G)$.
+/// Return the edges iterator representing $E(G)$.
 ///
 #[macro_export]
 macro_rules! E {
