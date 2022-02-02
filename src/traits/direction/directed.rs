@@ -1,7 +1,8 @@
 use crate::errors::Error;
 use crate::traits::{Base, Connectivity, Convert};
 use crate::types::VertexIterator;
-use std::collections::{BTreeSet, VecDeque};
+use std::collections::{BTreeSet, HashMap, VecDeque};
+use std::vec::Vec;
 
 /// Directed graph trait.
 pub trait Directed: Base + Connectivity + Convert {
@@ -89,6 +90,75 @@ pub trait Directed: Base + Connectivity + Convert {
     /// or the directed edge identifier already exists in the graph.
     ///
     fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+
+    /// In-degree of a given vertex.
+    ///
+    /// Computes the in-degree of a given vertex, i.e. $|Pa(G, X)|$.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifier does not exist in the graph.
+    ///
+    fn in_degree_of(&self, x: &Self::Vertex) -> usize {
+        return self.parents_iter(x).count();
+    }
+
+    /// Out-degree of a given vertex.
+    ///
+    /// Computes the out-degree of a given vertex, i.e. $|Ch(G, X)|$.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the vertex identifier does not exist in the graph.
+    ///
+    fn out_degree_of(&self, x: &Self::Vertex) -> usize {
+        return self.children_iter(x).count();
+    }
+
+    /// Topological order of the graph, if any.
+    ///
+    /// This algorithms[^1] computes a topological ordering of the graph.
+    /// It returns `None` if the graph is cyclic.
+    ///
+    /// [^1]: [Kahn, A. B. (1962). Topological sorting of large networks. Communications of the ACM, 5(11), 558-562.](https://scholar.google.com/scholar?q=Topological+sorting+of+large+networks)
+    ///
+    fn topological_sort(&self) -> Option<Vec<&Self::Vertex>> {
+        let mut order = Vec::new();
+        let mut queue = VecDeque::new();
+        let mut visit = HashMap::new();
+
+        for x in self.vertices_iter() {
+            match self.in_degree_of(x) {
+                0 => queue.push_back(x),
+                y => {
+                    visit.insert(x, y);
+                }
+            }
+        }
+
+        while let Some(x) = queue.pop_front() {
+            order.push(x);
+            for y in self.children_iter(x) {
+                if let Some(z) = visit.get(y) {
+                    match z - 1 {
+                        0 => {
+                            queue.push_back(y);
+                            visit.remove(y);
+                        }
+                        z => {
+                            visit.insert(y, z);
+                        }
+                    }
+                }
+            }
+        }
+
+        if !visit.is_empty() {
+            return None;
+        }
+
+        Some(order)
+    }
 }
 
 /// Ancestors iterator.
@@ -193,7 +263,7 @@ macro_rules! impl_directed {
             }
 
             fn is_acyclic(&self) -> bool {
-                todo!()
+                self.topological_sort().is_some()
             }
         }
 

@@ -198,6 +198,101 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn in_degree_of<T>() -> Result<(), Error<i32>>
+    where
+        T: Directed<Vertex = i32>,
+    {
+        let mut g = T::new();
+        let i = g.add_vertex(&0)?;
+
+        assert_eq!(g.in_degree_of(&i), 0);
+
+        let j = g.add_vertex(&1)?;
+        g.add_edge(&i, &j)?;
+
+        assert_eq!(g.in_degree_of(&i), 0);
+        assert_eq!(g.in_degree_of(&j), 1);
+
+        let k = g.add_vertex(&2)?;
+        g.add_edge(&i, &k)?;
+        g.add_edge(&j, &k)?;
+
+        assert_eq!(g.in_degree_of(&i), 0);
+        assert_eq!(g.in_degree_of(&j), 1);
+        assert_eq!(g.in_degree_of(&k), 2);
+
+        Ok(())
+    }
+
+    #[test]
+    #[should_panic]
+    fn in_degree_of_should_panic<T>()
+    where
+        T: Directed<Vertex = i32>,
+    {
+        let g = T::new();
+        g.in_degree_of(&0);
+    }
+
+    #[test]
+    fn out_degree_of<T>() -> Result<(), Error<i32>>
+    where
+        T: Directed<Vertex = i32>,
+    {
+        let mut g = T::new();
+        let i = g.add_vertex(&0)?;
+
+        assert_eq!(g.out_degree_of(&i), 0);
+
+        let j = g.add_vertex(&1)?;
+        g.add_edge(&i, &j)?;
+
+        assert_eq!(g.out_degree_of(&i), 1);
+        assert_eq!(g.out_degree_of(&j), 0);
+
+        let k = g.add_vertex(&2)?;
+        g.add_edge(&i, &k)?;
+        g.add_edge(&j, &k)?;
+
+        assert_eq!(g.out_degree_of(&i), 2);
+        assert_eq!(g.out_degree_of(&j), 1);
+        assert_eq!(g.out_degree_of(&k), 0);
+
+        Ok(())
+    }
+
+    #[test]
+    #[should_panic]
+    fn out_degree_of_should_panic<T>()
+    where
+        T: Directed<Vertex = i32>,
+    {
+        let g = T::new();
+        g.out_degree_of(&0);
+    }
+
+    #[test]
+    fn topological_sort<T>() -> Result<(), Error<i32>>
+    where
+        T: Directed<Vertex = i32>,
+    {
+        let mut g = T::new();
+        assert_eq!(g.topological_sort(), Some(vec![]));
+
+        let i = g.add_vertex(&0)?;
+        assert_eq!(g.topological_sort(), Some(vec![&i]));
+
+        let j = g.add_vertex(&1)?;
+        g.add_edge(&i, &j)?;
+        assert_eq!(g.topological_sort(), Some(vec![&i, &j]));
+
+        g.add_edge(&j, &i)?;
+        assert_eq!(g.topological_sort(), None);
+
+        Ok(())
+    }
+
     #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
     mod adjacency_list_graph {}
 }

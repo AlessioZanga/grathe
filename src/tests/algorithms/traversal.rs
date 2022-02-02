@@ -964,7 +964,7 @@ mod undirected {
 
                 #[test]
                 #[should_panic]
-                fn lexicographic_breadth_first_search_tree_panics()
+                fn lexicographic_breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
@@ -1010,7 +1010,7 @@ mod undirected {
 
                 #[test]
                 #[should_panic]
-                fn lexicographic_depth_first_search_tree_panics()
+                fn lexicographic_depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
                     let g = $T::<$U>::new();
