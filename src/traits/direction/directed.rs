@@ -188,8 +188,6 @@ macro_rules! impl_directed {
             T: $crate::types::VertexTrait,
         {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-                // Sanitize input.
-                assert!(self.has_vertex(x) && self.has_vertex(y));
                 // Check edge case.
                 if self.has_edge(x, y).unwrap() {
                     return true;

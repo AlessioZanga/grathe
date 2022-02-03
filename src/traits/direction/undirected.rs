@@ -114,8 +114,6 @@ macro_rules! impl_undirected {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
                 // Import `tuple_windows`.
                 use itertools::Itertools;
-                // Sanitize input.
-                assert!(self.has_vertex(x) && self.has_vertex(y));
                 // Check edge case.
                 if self.has_edge(x, y).unwrap() {
                     return true;
