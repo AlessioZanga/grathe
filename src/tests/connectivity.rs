@@ -11,6 +11,10 @@ mod directed {
     where
         T: Connectivity<Vertex = i32>,
     {
+        // Test self edge graph.
+        let g = T::from_edges(&[(0, 0)]);
+        assert_true!(g.has_path(&0, &0));
+
         // Test single edge graph.
         let g = T::from_edges(&[(0, 1)]);
 
@@ -40,6 +44,10 @@ mod directed {
         assert_false!(g.has_path(&1, &4));
         assert_false!(g.has_path(&2, &4));
         assert_true!(g.has_path(&3, &4));
+
+        // Test cyclic graph.
+        let g = T::from_edges(&[(0, 1), (1, 2), (3, 4), (2, 0)]);
+        assert_true!(g.has_path(&0, &0));
 
         Ok(())
     }
@@ -127,6 +135,10 @@ mod undirected {
     where
         T: Connectivity<Vertex = i32>,
     {
+        // Test self edge graph.
+        let g = T::from_edges(&[(0, 0)]);
+        assert_true!(g.has_path(&0, &0));
+
         // Test single edge graph.
         let g = T::from_edges(&[(0, 1)]);
 
@@ -156,6 +168,10 @@ mod undirected {
         assert_false!(g.has_path(&1, &4));
         assert_false!(g.has_path(&2, &4));
         assert_true!(g.has_path(&3, &4));
+
+        // Test cyclic graph.
+        let g = T::from_edges(&[(0, 1), (1, 2), (3, 4), (2, 0)]);
+        assert_true!(g.has_path(&0, &0));
 
         Ok(())
     }
