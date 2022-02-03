@@ -114,33 +114,17 @@ macro_rules! impl_undirected {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
                 // Sanitize input.
                 assert!(self.has_vertex(x) && self.has_vertex(y));
-                // Initialize the to-be-visited queue with the source vertex.
-                let mut queue = std::collections::VecDeque::from([x]);
-                // Initialize the visited set.
-                let mut visited = std::collections::HashSet::from([x]);
-                // If there are still vertices to be visited.
-                while let Some(z) = queue.pop_front() {
-                    // Iterate over the reachable vertices of the popped vertex.
-                    for w in self.neighbors_iter(z) {
-                        // If the vertex was never seen before.
-                        if !visited.contains(w) {
-                            // Check if vertex is target.
-                            if w == y {
-                                // Return has undirected path.
-                                return true;
-                            }
-                            // Set as visited.
-                            visited.insert(w);
-                            // Push it into the to-be-visited queue.
-                            queue.push_back(w);
-                        }
-                    }
-                }
+                // Check if search object reaches the target vertex, skipping the source.
+                $crate::algorithms::BFS::from((self, x)).skip(1).any(|x| x == y)
+            }
 
-                false
+            fn is_connected(&self) -> bool {
+                // Check if search object reaches any vertex in the graph.
+                $crate::algorithms::BFS::from(self).count() == self.order()
             }
 
             fn is_acyclic(&self) -> bool {
+                // TODO: Find DFS edge such that Back(_, _).
                 todo!()
             }
         }

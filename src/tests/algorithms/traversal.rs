@@ -434,7 +434,7 @@ mod directed {
                     let g = $T::<$U>::new();
                     let mut search = TopologicalSort::from(&g);
 
-                    assert_eq!(search.next(), None);
+                    assert_eq!(search.next().transpose().unwrap(), None);
 
                     let g = $T::<$U>::from_edges(&[
                         (5, 11), (7, 11), (7, 8), (3, 8), (3, 10),
@@ -442,15 +442,15 @@ mod directed {
                     ]);
                     let mut search = TopologicalSort::from(&g);
 
-                    assert_eq!(search.next(), Some(&3));
-                    assert_eq!(search.next(), Some(&5));
-                    assert_eq!(search.next(), Some(&7));
-                    assert_eq!(search.next(), Some(&8));
-                    assert_eq!(search.next(), Some(&11));
-                    assert_eq!(search.next(), Some(&2));
-                    assert_eq!(search.next(), Some(&9));
-                    assert_eq!(search.next(), Some(&10));
-                    assert_eq!(search.next(), None);
+                    assert_eq!(search.next().transpose().unwrap(), Some(&3));
+                    assert_eq!(search.next().transpose().unwrap(), Some(&5));
+                    assert_eq!(search.next().transpose().unwrap(), Some(&7));
+                    assert_eq!(search.next().transpose().unwrap(), Some(&8));
+                    assert_eq!(search.next().transpose().unwrap(), Some(&11));
+                    assert_eq!(search.next().transpose().unwrap(), Some(&2));
+                    assert_eq!(search.next().transpose().unwrap(), Some(&9));
+                    assert_eq!(search.next().transpose().unwrap(), Some(&10));
+                    assert_eq!(search.next().transpose().unwrap(), None);
                 }
 
                 #[test]
@@ -462,8 +462,8 @@ mod directed {
                     ]);
                     let mut search = TopologicalSort::from(&g);
 
-                    assert_eq!(search.next(), Some(&0));
-                    assert_eq!(search.next(), None);
+                    assert_eq!(search.next().transpose().unwrap(), Some(&0));
+                    assert_eq!(search.next().transpose().unwrap(), None);
                 }
             }
         };

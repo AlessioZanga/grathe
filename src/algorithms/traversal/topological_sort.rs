@@ -22,15 +22,11 @@ where
     /// Build a TopologicalSort iterator.
     ///
     /// Build a TopologicalSort[^1] iterator for a given directed graph.
-    /// 
-    /// If the graph has at least one cycle, this iterator will panics while unrolling.
-    /// If it cannot be assumed a priori that the graph is acyclic, then the [`topological_sort`](crate::traits::Directed::topological_sort)
-    /// method can be used as an equivalent alterative. The only advantage of this iterator
-    /// over the method is the lazy approach that is typical of any iterator, given that they
-    /// implement the same algorithm.
+    ///
+    /// If the graph is cyclic, this iterator returns an error while unrolling.
     ///
     /// [^1]: [Kahn, A. B. (1962). Topological sorting of large networks. Communications of the ACM, 5(11), 558-562.](https://scholar.google.com/scholar?q=Topological+sorting+of+large+networks)
-    /// 
+    ///
     pub fn new(g: &'a T) -> Self {
         // Initialize default search object.
         let mut search = Self {
@@ -62,7 +58,7 @@ impl<'a, T> Iterator for TopologicalSort<'a, T>
 where
     T: Directed,
 {
-    type Item = &'a T::Vertex;
+    type Item = Result<&'a T::Vertex, ()>;
 
     fn next(&mut self) -> Option<Self::Item> {
         // While there are still vertices with zero in-degree.
@@ -88,12 +84,14 @@ where
                 }
             }
             // Return current vertex.
-            return Some(x);
+            return Some(Ok(x));
         }
 
-        // If there are still vertices with non-zero in-degree,
-        // then no topological sort is defined, i.e. cyclic graph.
-        assert!(self.visit.is_empty());
+        // If there are still vertices with non-zero in-degree ...
+        if !self.visit.is_empty() {
+            // ... no topological sort is defined, i.e. cyclic graph.
+            return Some(Err(()));
+        }
 
         None
     }

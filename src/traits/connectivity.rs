@@ -1,6 +1,4 @@
 use super::Storage;
-use crate::V;
-use std::collections::{HashSet, VecDeque};
 
 /// The graph connectivity trait.
 pub trait Connectivity: Storage {
@@ -22,34 +20,7 @@ pub trait Connectivity: Storage {
     /// is *weakly connected*, that means testing whether the undirected graph
     /// obtained by replacing all the edges with undirected edges is connected.
     ///
-    fn is_connected(&self) -> bool {
-        // If the graph is null the return true.
-        if self.order() == 0 {
-            return true;
-        }
-        // Otherwise select a random vertex as source vertex.
-        let x = V!(self).next().unwrap();
-        // Initialize the to-be-visited queue with the source vertex.
-        let mut queue = VecDeque::from([x]);
-        // Initialize the visited set.
-        let mut visited = HashSet::from([x]);
-        // If there are still vertices to be visited.
-        while let Some(y) = queue.pop_front() {
-            // Iterate over the adjacent vertices of the popped vertex.
-            // This step allow to visit any graph irrespectively of their direction.
-            for z in self.adjacents_iter(y) {
-                // If the vertex was never seen before.
-                if !visited.contains(z) {
-                    // Set as visited.
-                    visited.insert(z);
-                    // Push it into the to-be-visited queue.
-                    queue.push_back(z);
-                }
-            }
-        }
-        // If there are still vertices not visited, the graph is not connected.
-        visited.len() == self.order()
-    }
+    fn is_connected(&self) -> bool;
 
     /// Checks global acyclicity.
     ///

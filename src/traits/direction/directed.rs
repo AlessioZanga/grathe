@@ -1,8 +1,7 @@
 use crate::errors::Error;
 use crate::traits::{Base, Connectivity, Convert};
 use crate::types::VertexIterator;
-use std::collections::{BTreeSet, HashMap, VecDeque};
-use std::vec::Vec;
+use std::collections::{BTreeSet, VecDeque};
 
 /// Directed graph trait.
 pub trait Directed: Base + Connectivity + Convert {
@@ -114,70 +113,6 @@ pub trait Directed: Base + Connectivity + Convert {
     fn out_degree_of(&self, x: &Self::Vertex) -> usize {
         return self.children_iter(x).count();
     }
-
-    /// Topological order of the graph, if any.
-    ///
-    /// This algorithms[^1] computes a topological ordering of the graph.
-    /// It returns `None` if the graph is cyclic.
-    ///
-    /// [^1]: [Kahn, A. B. (1962). Topological sorting of large networks. Communications of the ACM, 5(11), 558-562.](https://scholar.google.com/scholar?q=Topological+sorting+of+large+networks)
-    ///
-    fn topological_sort(&self) -> Option<Vec<&Self::Vertex>> {
-        // Topological order.
-        let mut order = Vec::new();
-        // To-be-visited queue.
-        let mut queue = VecDeque::new();
-        // Visit map with vertices in-degrees.
-        let mut visit = HashMap::new();
-
-        // For each vertex in the graph.
-        for x in self.vertices_iter() {
-            // Compute its in-degree.
-            match self.in_degree_of(x) {
-                // If the in-degree is zero, then add it to the queue.
-                0 => queue.push_back(x),
-                // Otherwise, add it to the map.
-                y => {
-                    visit.insert(x, y);
-                }
-            }
-        }
-
-        // While there are still vertices with zero in-degree.
-        while let Some(x) = queue.pop_front() {
-            // Push it into the topological order.
-            order.push(x);
-            // For each child of the selected vertex.
-            for y in self.children_iter(x) {
-                // If it was not visited before.
-                if let Some(z) = visit.get(y) {
-                    // Update its in-degree.
-                    match z - 1 {
-                        // If the in-degree is zero ...
-                        0 => {
-                            // ... then add it to the queue ...
-                            queue.push_back(y);
-                            // ... and remove it from the visit map.
-                            visit.remove(y);
-                        }
-                        // Otherwise, update its in-degree into the map.
-                        z => {
-                            visit.insert(y, z);
-                        }
-                    }
-                }
-            }
-        }
-
-        // If there are still vertices with non-zero in-degree ...
-        if !visit.is_empty() {
-            // ... return `None`, since no topological ordering is defined,
-            // i.e. the graph contains at least one cycle.
-            return None;
-        }
-
-        Some(order)
-    }
 }
 
 /// Ancestors iterator.
@@ -255,34 +190,18 @@ macro_rules! impl_directed {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
                 // Sanitize input.
                 assert!(self.has_vertex(x) && self.has_vertex(y));
-                // Initialize the to-be-visited queue with the source vertex.
-                let mut queue = std::collections::VecDeque::from([x]);
-                // Initialize the visited set.
-                let mut visited = std::collections::HashSet::from([x]);
-                // If there are still vertices to be visited.
-                while let Some(z) = queue.pop_front() {
-                    // Iterate over the reachable vertices of the popped vertex.
-                    for w in self.children_iter(z) {
-                        // If the vertex was never seen before.
-                        if !visited.contains(w) {
-                            // Check if vertex is target.
-                            if w == y {
-                                // Return has directed path.
-                                return true;
-                            }
-                            // Set as visited.
-                            visited.insert(w);
-                            // Push it into the to-be-visited queue.
-                            queue.push_back(w);
-                        }
-                    }
-                }
+                // Check if search object reaches the target vertex, skipping the source.
+                $crate::algorithms::BFS::from((self, x)).skip(1).any(|x| x == y)
+            }
 
-                false
+            fn is_connected(&self) -> bool {
+                // Check if search object reaches any vertex in the graph.
+                $crate::algorithms::BFS::from(self).count() == self.order()
             }
 
             fn is_acyclic(&self) -> bool {
-                self.topological_sort().is_some()
+                // If a topological order exists, then the graph is acyclic.
+                $crate::algorithms::TopologicalSort::from(self).all(|x| x.is_ok())
             }
         }
 

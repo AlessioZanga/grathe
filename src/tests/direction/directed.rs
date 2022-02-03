@@ -272,27 +272,6 @@ mod tests {
         g.out_degree_of(&0);
     }
 
-    #[test]
-    fn topological_sort<T>() -> Result<(), Error<i32>>
-    where
-        T: Directed<Vertex = i32>,
-    {
-        let mut g = T::new();
-        assert_eq!(g.topological_sort(), Some(vec![]));
-
-        let i = g.add_vertex(&0)?;
-        assert_eq!(g.topological_sort(), Some(vec![&i]));
-
-        let j = g.add_vertex(&1)?;
-        g.add_edge(&i, &j)?;
-        assert_eq!(g.topological_sort(), Some(vec![&i, &j]));
-
-        g.add_edge(&j, &i)?;
-        assert_eq!(g.topological_sort(), None);
-
-        Ok(())
-    }
-
     #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
     mod adjacency_list_graph {}
 }
