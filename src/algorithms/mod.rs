@@ -1,6 +1,3 @@
-mod cycles;
-pub use cycles::*;
-
 mod simple_paths;
 pub use simple_paths::*;
 
@@ -22,7 +19,7 @@ macro_rules! impl_algorithms_directed {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::AllCycles<'a, $graph<T>>
+        impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::AllSimpleCycles<'a, $graph<T>>
         where
             T: $crate::types::VertexTrait,
         {
@@ -132,7 +129,7 @@ macro_rules! impl_algorithms_undirected {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::AllCycles<'a, $graph<T>>
+        impl<'a, T> From<&'a $graph<T>> for $crate::algorithms::AllSimpleCycles<'a, $graph<T>>
         where
             T: $crate::types::VertexTrait,
         {

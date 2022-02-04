@@ -15,7 +15,7 @@ use std::vec::Vec;
 ///
 /// [^2]: [Hawick, K. A., & James, H. A. (2008). Enumerating Circuits and Loops in Graphs with Self-Arcs and Multiple-Arcs.](https://scholar.google.com/scholar?q=Enumerating+Circuits+and+Loops+in+Graphs+with+Self-Arcs+and+Multiple-Arcs)
 ///
-pub struct AllCycles<'a, T>
+pub struct AllSimpleCycles<'a, T>
 where
     T: Storage,
 {
@@ -28,13 +28,13 @@ where
     /// Map of *blocked* vertices in order to avoid double counting.
     // TODO: Replace HashSet with a Vec to account for multi-graphs once supported.
     blocked: HashMap<&'a T::Vertex, HashSet<&'a T::Vertex>>,
-    /// Vector of found cycles.
-    pub cycles: Vec<Vec<&'a T::Vertex>>,
+    /// Vector of found simple cycles.
+    pub simple_cycles: Vec<Vec<&'a T::Vertex>>,
     /// Map of vertices popularity (i.e. how many cycles a vertex appears in).
     pub popularity: HashMap<&'a T::Vertex, usize>,
 }
 
-impl<'a, T> AllCycles<'a, T>
+impl<'a, T> AllSimpleCycles<'a, T>
 where
     T: Storage,
 {
@@ -54,7 +54,7 @@ where
     /// ]);
     ///
     /// // Build the search object over said graph.
-    /// let mut search = AllCycles::from(&g);
+    /// let mut search = AllSimpleCycles::from(&g);
     ///
     /// // Run the algorithm and assert later.
     /// search.run();
@@ -62,7 +62,7 @@ where
     /// // In this graph there are two directed cycles,
     /// // these are reported in discovery order.
     /// assert_eq!(
-    ///     search.cycles,
+    ///     search.simple_cycles,
     ///     [
     ///         vec![&1, &2, &3, &4, &1],
     ///         vec![&1, &2, &4, &1]
@@ -91,7 +91,7 @@ where
             // Initialize blocked map.
             blocked: Default::default(),
             // Initialize cycles set.
-            cycles: Default::default(),
+            simple_cycles: Default::default(),
             // Initialize popularity map.
             popularity: Default::default(),
         }
@@ -130,7 +130,7 @@ where
             // then a cycle has been found.
             } else if y == self.stack[0] {
                 // Store the cycle.
-                self.cycles.push({
+                self.simple_cycles.push({
                     // Clone the current stack.
                     let mut c = self.stack.clone();
                     // Add the leading vertex.

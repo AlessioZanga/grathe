@@ -91,7 +91,7 @@ where
             // Initialize the to-be-visited queue with the source vertex.
             stack: Default::default(),
             // Initialize the global clock.
-            time: 0,
+            time: Default::default(),
             // Initialize the discovery-time map.
             discovery_time: Default::default(),
             // Initialize the finish-time map.
@@ -156,12 +156,12 @@ where
                         // Set predecessor.
                         self.predecessor.insert(y, x);
                         // Add to queue.
-                        queue.push_back(y);
+                        queue.push_front(y);
                     }
                 }
                 // Push vertices onto the stack in reverse order, this makes
                 // traversal order and neighborhood order the same.
-                self.stack.extend(queue.iter().rev());
+                self.stack.extend(queue);
                 // Return vertex in pre-order.
                 return Some(x);
             // If the vertex is NOT WHITE.

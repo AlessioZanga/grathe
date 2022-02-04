@@ -188,12 +188,7 @@ macro_rules! impl_directed {
             T: $crate::types::VertexTrait,
         {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-                // Check edge case.
-                if self.has_edge(x, y).unwrap() {
-                    return true;
-                }
                 // Check if search object reaches a vertex that is adjacent to the source.
-                // This solves the problem of checking for cycles, that are not emitted by BFS.
                 $crate::algorithms::BFS::from((self, x)).any(|x| self.has_edge(x, y).unwrap())
             }
 

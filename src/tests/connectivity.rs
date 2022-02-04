@@ -171,6 +171,7 @@ mod undirected {
 
         // Test cyclic graph.
         let g = T::from_edges(&[(0, 1), (1, 2), (3, 4), (2, 0)]);
+        println!("{:?}", g);
         assert_true!(g.has_path(&0, &0));
 
         Ok(())
