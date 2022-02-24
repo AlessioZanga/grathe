@@ -136,13 +136,17 @@ pub trait Capacity {
 
 macro_rules! impl_capacity {
     ($graph:ident) => {
-        impl<T> $crate::traits::Capacity for $graph<T>
+        impl<T, X, Y, Z> $crate::traits::Capacity for $graph<T, X, Y, Z>
         where
             T: $crate::types::VertexTrait,
+            X: Default + std::fmt::Debug,
+            Y: Default + std::fmt::Debug,
+            Z: Default + std::fmt::Debug,
         {
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: $crate::traits::Capacity::with_capacity(capacity),
+                    gattrs: Default::default(),
                     vattrs: Default::default(),
                     eattrs: Default::default(),
                 }

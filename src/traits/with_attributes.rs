@@ -1,289 +1,128 @@
 use super::Storage;
 use crate::errors::Error;
-use crate::types::Attributes;
-use std::any::Any;
 
 /// The graph attribute trait.
 pub trait WithAttributes: Storage {
-    /// Reference to vertex attributes.
-    ///
-    /// Returns the reference to the vertex attributes map.
-    ///
-    fn as_vertex_attrs(&self) -> &Attributes<Self::Vertex>;
+    /// Graph attributes type.
+    type GraphAttributes;
 
-    /// Checks vertex attribute.
-    ///
-    /// Checks whether a vertex has an attribute with given key.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exist in the graph.
-    ///
-    fn has_vertex_attr(&self, x: &Self::Vertex, k: &str) -> Result<bool, Error<Self::Vertex>>;
+    /// Vertex attributes type.
+    type VertexAttributes;
 
-    /// Gets vertex attribute with given key.
-    ///
-    /// Returns a reference to an attribute with given key.
-    ///
-    /// # Errors
-    ///
-    /// The vertex identifier (or its attribute key) does not exist in the graph.
-    ///
-    fn get_vertex_attr<'a>(&'a self, x: &'a Self::Vertex, k: &str) -> Result<&'a dyn Any, Error<Self::Vertex>>;
+    /// Edge attributes type.
+    type EdgeAttributes;
 
-    /// Sets vertex attribute with given key and value.
+    /// Checks vertex attributes.
     ///
-    /// Inserts the vertex attribute into the graph, overwriting any previous assignment.
+    /// Checks whether a vertex has attributes.
     ///
-    /// # Errors
-    ///
-    /// The vertex identifier does not exist in the graph.
-    ///
-    fn set_vertex_attr<V: 'static>(&mut self, x: &Self::Vertex, k: &str, v: V) -> Result<(), Error<Self::Vertex>>;
+    fn has_vertex_attrs(&self, x: &Self::Vertex) -> bool;
 
-    /// Un-sets vertex attribute with given key and returns its value.
+    /// Gets vertex attributes.
     ///
-    /// Removes the vertex attribute from the graph.
+    /// Returns a reference to vertex attributes.
     ///
-    /// # Errors
-    ///
-    /// The vertex identifier (or its attribute key) does not exist in the graph.
-    ///
-    fn unset_vertex_attr(&mut self, x: &Self::Vertex, k: &str) -> Result<Box<dyn Any>, Error<Self::Vertex>>;
+    fn get_vertex_attrs<'a>(&'a self, x: &'a Self::Vertex) -> Result<&'a Self::VertexAttributes, Error<Self::Vertex>>;
 
-    /// Reference to edge attributes.
+    /// Sets vertex attributes.
     ///
-    /// Returns the reference to the edge attributes map.
+    /// Inserts the vertex attributes into the graph, overwriting previous assignment.
     ///
-    fn as_edge_attrs(&self) -> &Attributes<(Self::Vertex, Self::Vertex)>;
+    fn set_vertex_attrs(&mut self, x: &Self::Vertex, y: Self::VertexAttributes);
 
-    /// Checks edge attribute.
+    /// Un-sets vertex attributes and returns their value.
     ///
-    /// Checks whether a edge has an attribute with given key.
+    /// Removes the vertex attributes from the graph.
     ///
-    /// # Errors
-    ///
-    /// The edge identifier does not exist in the graph.
-    ///
-    fn has_edge_attr(&self, x: &Self::Vertex, y: &Self::Vertex, k: &str) -> Result<bool, Error<Self::Vertex>>;
+    fn unset_vertex_attrs(&mut self, x: &Self::Vertex) -> Result<Self::VertexAttributes, Error<Self::Vertex>>;
 
-    /// Gets edge attribute with given key.
+    /// Checks edge attributes.
     ///
-    /// Returns a reference to an attribute with given key.
+    /// Checks whether an edge has attributes.
     ///
-    /// # Errors
+    fn has_edge_attrs(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
+
+    /// Gets edge attributes.
     ///
-    /// The edge identifier (or its attribute key) does not exist in the graph.
+    /// Returns a reference to edge attributes.
     ///
-    fn get_edge_attr<'a>(
+    fn get_edge_attrs<'a>(
         &'a self,
         x: &'a Self::Vertex,
-        y: &Self::Vertex,
-        k: &str,
-    ) -> Result<&'a dyn Any, Error<Self::Vertex>>;
+        y: &'a Self::Vertex,
+    ) -> Result<&'a Self::EdgeAttributes, Error<Self::Vertex>>;
 
-    /// Sets edge attribute with given key and value.
+    /// Sets edge attributes.
     ///
-    /// Inserts the edge attribute into the graph, overwriting any previous assignment.
+    /// Inserts the edge attributes into the graph, overwriting previous assignment.
     ///
-    /// # Errors
+    fn set_edge_attrs(&mut self, x: &Self::Vertex, y: &Self::Vertex, z: Self::EdgeAttributes);
+
+    /// Un-sets edge attributes and returns their value.
     ///
-    /// The edge identifier does not exist in the graph.
+    /// Removes the edge attributes from the graph.
     ///
-    fn set_edge_attr<V: 'static>(
+    fn unset_edge_attrs(
         &mut self,
         x: &Self::Vertex,
         y: &Self::Vertex,
-        k: &str,
-        v: V,
-    ) -> Result<(), Error<Self::Vertex>>;
-
-    /// Un-sets edge attribute with given key and returns its value.
-    ///
-    /// Removes the edge attribute from the graph.
-    ///
-    /// # Errors
-    ///
-    /// The edge identifier (or its attribute key) does not exist in the graph.
-    ///
-    fn unset_edge_attr(
-        &mut self,
-        x: &Self::Vertex,
-        y: &Self::Vertex,
-        k: &str,
-    ) -> Result<Box<dyn Any>, Error<Self::Vertex>>;
+    ) -> Result<Self::EdgeAttributes, Error<Self::Vertex>>;
 }
 
 macro_rules! impl_with_attributes {
     ($graph:ident) => {
-        impl<T> $crate::traits::WithAttributes for $graph<T>
+        impl<T, X, Y, Z> $crate::traits::WithAttributes for $graph<T, X, Y, Z>
         where
             T: $crate::types::VertexTrait,
+            X: Default + std::fmt::Debug,
+            Y: Default + std::fmt::Debug,
+            Z: Default + std::fmt::Debug,
         {
-            fn as_vertex_attrs(&self) -> &$crate::types::Attributes<Self::Vertex> {
-                &self.vattrs
+            type GraphAttributes = X;
+            type VertexAttributes = Y;
+            type EdgeAttributes = Z;
+
+            fn has_vertex_attrs(&self, x: &Self::Vertex) -> bool {
+                todo!()
             }
 
-            fn has_vertex_attr(&self, x: &Self::Vertex, k: &str) -> Result<bool, $crate::errors::Error<Self::Vertex>> {
-                // Check if vertex is valid.
-                match self.vattrs.get(x) {
-                    // If vertex is not defined return error.
-                    None => Err($crate::errors::Error::VertexNotDefined(x.clone())),
-                    // Otherwise, check if vertex has any attribute or an attribute with given key.
-                    Some(attrs) => Ok(attrs.contains_key(k)),
-                }
-            }
-
-            fn get_vertex_attr<'a>(
+            fn get_vertex_attrs<'a>(
                 &'a self,
                 x: &'a Self::Vertex,
-                k: &str,
-            ) -> Result<&'a dyn std::any::Any, $crate::errors::Error<Self::Vertex>> {
-                // Check if vertex is valid.
-                match self.vattrs.get(x) {
-                    // If vertex is not defined return error.
-                    None => Err($crate::errors::Error::VertexNotDefined(x.clone())),
-                    // Otherwise, check if vertex has an attribute with given key.
-                    Some(attrs) => match attrs.get(k) {
-                        // If attribute key is not defined return error.
-                        None => Err($crate::errors::Error::VertexAttributeNotDefined(
-                            x.clone(),
-                            k.to_string(),
-                        )),
-                        // Otherwise, cast pointer to given type.
-                        Some(v) => Ok(v),
-                    },
-                }
+            ) -> Result<&'a Self::VertexAttributes, Error<Self::Vertex>> {
+                todo!()
             }
 
-            fn set_vertex_attr<V: 'static>(
-                &mut self,
-                x: &Self::Vertex,
-                k: &str,
-                v: V,
-            ) -> Result<(), $crate::errors::Error<Self::Vertex>> {
-                // Check if vertex is valid.
-                match self.vattrs.get_mut(x) {
-                    // Vertex is not defined, return error.
-                    None => Err($crate::errors::Error::VertexNotDefined(x.clone())),
-                    // Otherwise, check if vertex has any attribute or an attribute with given key.
-                    Some(attrs) => {
-                        // Insert attribute in map.
-                        attrs.insert(k.to_string(), Box::new(v));
-                        // Return successfully.
-                        Ok(())
-                    }
-                }
+            fn set_vertex_attrs(&mut self, x: &Self::Vertex, y: Self::VertexAttributes) {
+                todo!()
             }
 
-            fn unset_vertex_attr(
-                &mut self,
-                x: &Self::Vertex,
-                k: &str,
-            ) -> Result<Box<dyn std::any::Any>, $crate::errors::Error<Self::Vertex>> {
-                // Check if vertex is valid.
-                match self.vattrs.get_mut(x) {
-                    // If vertex is not defined return error.
-                    None => Err($crate::errors::Error::VertexNotDefined(x.clone())),
-                    // Otherwise, try to remove the attribute with given key.
-                    Some(attrs) => match attrs.remove(k) {
-                        // There is no such attribute, return error.
-                        None => Err($crate::errors::Error::VertexAttributeNotDefined(
-                            x.clone(),
-                            k.to_string(),
-                        )),
-                        // Return successfully.
-                        Some(v) => Ok(v),
-                    },
-                }
+            fn unset_vertex_attrs(&mut self, x: &Self::Vertex) -> Result<Self::VertexAttributes, Error<Self::Vertex>> {
+                todo!()
             }
 
-            fn as_edge_attrs(&self) -> &$crate::types::Attributes<(Self::Vertex, Self::Vertex)> {
-                &self.eattrs
+            fn has_edge_attrs(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
+                todo!()
             }
 
-            fn has_edge_attr(
-                &self,
-                x: &Self::Vertex,
-                y: &Self::Vertex,
-                k: &str,
-            ) -> Result<bool, $crate::errors::Error<Self::Vertex>> {
-                // Check if edge is valid.
-                match self.eattrs.get(&(x.clone(), y.clone())) {
-                    // If edge is not defined return error.
-                    None => Err($crate::errors::Error::EdgeNotDefined(x.clone(), y.clone())),
-                    // Otherwise, check if edge has any attribute or an attribute with given key.
-                    Some(attrs) => Ok(attrs.contains_key(k)),
-                }
-            }
-
-            fn get_edge_attr<'a>(
+            fn get_edge_attrs<'a>(
                 &'a self,
-                x: &Self::Vertex,
-                y: &Self::Vertex,
-                k: &str,
-            ) -> Result<&'a dyn std::any::Any, $crate::errors::Error<Self::Vertex>> {
-                // Check if edge is valid.
-                match self.eattrs.get(&(x.clone(), y.clone())) {
-                    // If edge is not defined return error.
-                    None => Err($crate::errors::Error::EdgeNotDefined(x.clone(), y.clone())),
-                    // Otherwise, check if edge has an attribute with given key.
-                    Some(vattrs) => match vattrs.get(k) {
-                        // If attribute key is not defined return error.
-                        None => Err($crate::errors::Error::EdgeAttributeNotDefined(
-                            x.clone(),
-                            y.clone(),
-                            k.to_string(),
-                        )),
-                        // Otherwise, cast pointer to given type.
-                        Some(v) => Ok(v),
-                    },
-                }
+                x: &'a Self::Vertex,
+                y: &'a Self::Vertex,
+            ) -> Result<&'a Self::EdgeAttributes, Error<Self::Vertex>> {
+                todo!()
             }
 
-            fn set_edge_attr<V: 'static>(
+            fn set_edge_attrs(&mut self, x: &Self::Vertex, y: &Self::Vertex, z: Self::EdgeAttributes) {
+                todo!()
+            }
+
+            fn unset_edge_attrs(
                 &mut self,
                 x: &Self::Vertex,
                 y: &Self::Vertex,
-                k: &str,
-                v: V,
-            ) -> Result<(), $crate::errors::Error<Self::Vertex>> {
-                // Check if edge is valid.
-                match self.eattrs.get_mut(&(x.clone(), y.clone())) {
-                    // Edge is not defined, return error.
-                    None => Err($crate::errors::Error::EdgeNotDefined(x.clone(), y.clone())),
-                    // Otherwise, check if edge has any attribute or an attribute with given key.
-                    Some(attrs) => {
-                        // Insert attribute in map.
-                        attrs.insert(k.to_string(), Box::new(v));
-                        // Return successfully.
-                        Ok(())
-                    }
-                }
-            }
-
-            fn unset_edge_attr(
-                &mut self,
-                x: &Self::Vertex,
-                y: &Self::Vertex,
-                k: &str,
-            ) -> Result<Box<dyn std::any::Any>, $crate::errors::Error<Self::Vertex>> {
-                // Check if edge is valid.
-                match self.vattrs.get_mut(x) {
-                    // If edge is not defined return error.
-                    None => Err($crate::errors::Error::EdgeNotDefined(x.clone(), y.clone())),
-                    // Otherwise, try to remove the attribute with given key.
-                    Some(attrs) => match attrs.remove(k) {
-                        // There is no such attribute, return error.
-                        None => Err($crate::errors::Error::EdgeAttributeNotDefined(
-                            x.clone(),
-                            y.clone(),
-                            k.to_string(),
-                        )),
-                        // Return successfully.
-                        Some(v) => Ok(v),
-                    },
-                }
+            ) -> Result<Self::EdgeAttributes, Error<Self::Vertex>> {
+                todo!()
             }
         }
     };

@@ -118,7 +118,7 @@ mod directed {
         assert_false!(g.is_acyclic());
     }
 
-    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
+    #[instantiate_tests(<DirectedAdjacencyListGraph<i32, (), (), ()>>)]
     mod adjacency_list_graph {}
 }
 
@@ -244,6 +244,6 @@ mod undirected {
         assert_false!(g.is_acyclic());
     }
 
-    #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
+    #[instantiate_tests(<UndirectedAdjacencyListGraph<i32, (), (), ()>>)]
     mod adjacency_list_graph {}
 }

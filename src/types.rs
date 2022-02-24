@@ -1,6 +1,5 @@
 use ndarray::Array2;
 use sprs::TriMat;
-use std::any::Any;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -72,9 +71,6 @@ where
 
 // Implement ExactSizeIter for ExactSizeIterator.
 impl<I> ExactSizeIterator for ExactSizeIter<I> where I: Iterator {}
-
-/// Attribute map type.
-pub type Attributes<T> = BTreeMap<T, BTreeMap<String, Box<dyn Any>>>;
 
 /// Edge list type.
 pub type EdgeList<T> = BTreeSet<(T, T)>;

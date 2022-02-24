@@ -109,7 +109,7 @@ where
                             // Iterate over each edge in the path.
                             for (x, y) in &p {
                                 // Set the same attributes for each edge in the path.
-                                graph.set_edge_attr(x, y, k, v.to_string()).unwrap();
+                                // graph.set_edge_attr(x, y, k, v.to_string()).unwrap();
                             }
                         }
                     }
@@ -162,7 +162,7 @@ where
                             // Get (key, value) pairs as string
                             .map(|(k, v)| (k.as_str(), v.as_str()))
                         {
-                            graph.set_vertex_attr(&x, k, v.to_string()).unwrap();
+                            // graph.set_vertex_attr(&x, k, v.to_string()).unwrap();
                         }
                     }
                 }

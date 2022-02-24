@@ -39,9 +39,12 @@ macro_rules! Ne {
 
 macro_rules! impl_undirected {
     ($graph:ident, $storage:ident) => {
-        impl<T> PartialEq for $graph<T>
+        impl<T, X, Y, Z> PartialEq for $graph<T, X, Y, Z>
         where
             T: $crate::types::VertexTrait,
+            X: Default + std::fmt::Debug,
+            Y: Default + std::fmt::Debug,
+            Z: Default + std::fmt::Debug,
         {
             /// Equality operator.
             ///
@@ -70,11 +73,17 @@ macro_rules! impl_undirected {
             }
         }
 
-        impl<T> Eq for $graph<T> where T: $crate::types::VertexTrait {}
+        impl<T, X, Y, Z> Eq for $graph<T, X, Y, Z> where T: $crate::types::VertexTrait,
+        X: Default + std::fmt::Debug,
+        Y: Default + std::fmt::Debug,
+        Z: Default + std::fmt::Debug, {}
 
-        impl<T> PartialOrd for $graph<T>
+        impl<T, X, Y, Z> PartialOrd for $graph<T, X, Y, Z>
         where
             T: $crate::types::VertexTrait,
+            X: Default + std::fmt::Debug,
+            Y: Default + std::fmt::Debug,
+            Z: Default + std::fmt::Debug,
         {
             /// Comparable operator.
             ///
@@ -107,9 +116,12 @@ macro_rules! impl_undirected {
 
         $crate::traits::impl_capacity!($graph);
 
-        impl<T> $crate::traits::Connectivity for $graph<T>
+        impl<T, X, Y, Z> $crate::traits::Connectivity for $graph<T, X, Y, Z>
         where
             T: $crate::types::VertexTrait,
+            X: Default + std::fmt::Debug,
+            Y: Default + std::fmt::Debug,
+            Z: Default + std::fmt::Debug,
         {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
                 // Import `tuple_windows`.
@@ -135,74 +147,15 @@ macro_rules! impl_undirected {
             }
         }
 
-        impl<T> $crate::traits::convert::FromDOT for $graph<T>
-        where
-            T: $crate::types::VertexTrait,
-        {
-            fn from_dot(value: &str) -> Result<Self, Error<Self::Vertex>> {
-                Ok($crate::io::from_dot::<Self>(value).map_err(|e| Error::ParseFailed(format!("{}", e)))?.pop().unwrap())
-            }
-        }
-
-        impl<T> $crate::traits::convert::IntoDOT for $graph<T>
-        where
-            T: $crate::types::VertexTrait,
-        {
-            fn into_dot(&self) -> String {
-                use std::fmt::Write;
-                use itertools::Itertools;
-                // Initialize empty string.
-                let mut dot = String::new();
-                // Get reference to vertices attributes.
-                let vattrs = self.as_vertex_attrs();
-                // Open DOT string by escaping "{".
-                writeln!(dot, "graph {{").ok();
-                // Write vertex with its attributes.
-                for x in self.vertices_iter() {
-                    // Write the vertex identifier.
-                    write!(dot, "\t{:?}", x).ok();
-                    // Get vertex attributes.
-                    let attrs = &vattrs[x];
-                    // Write its attributes, if any.
-                    if !attrs.is_empty() {
-                        // Format key-value pairs.
-                        let attrs = attrs
-                            .iter()
-                            .map(|(k, v)| {
-                                // Try to downcast the Any type to a printable one.
-                                if let Some(v) = v.downcast_ref::<String>() {
-                                    format!("{}={:?}", k, v)
-                                } else if let Some(v) = v.downcast_ref::<&str>() {
-                                    format!("{}={:?}", k, v)
-                                } else {
-                                    format!("{}=\"{:?}\"", k, v)
-                                }
-                            })
-                            .join(", ");
-                        // Write key-value pair.
-                        write!(dot, " [{}]", attrs).ok();
-                    }
-                    // End vertex statement.
-                    writeln!(dot, ";").ok();
-                }
-                // Write edges with label
-                for (x, y) in self.edges_iter().filter(|(x, y)| x <= y) {
-                    writeln!(dot, "\t{:?} -- {:?};", x, y).ok();
-                    // FIXME: writeln!(dot, "\t{:?} {} {:?} [label=\"{}\"];", x, edge_type, y, z).ok();
-                }
-                // Close DOT string by escaping "}"
-                writeln!(dot, "}}").ok();
-                // Return resulting DOT string
-                dot
-            }
-        }
-
         $crate::traits::impl_operators!($graph);
         $crate::traits::impl_with_attributes!($graph);
 
-        impl<T> $crate::traits::Storage for $graph<T>
+        impl<T, X, Y, Z> $crate::traits::Storage for $graph<T, X, Y, Z>
         where
             T: $crate::types::VertexTrait,
+            X: Default + std::fmt::Debug,
+            Y: Default + std::fmt::Debug,
+            Z: Default + std::fmt::Debug,
         {
             type Vertex = T;
 

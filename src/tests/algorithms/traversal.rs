@@ -8,7 +8,7 @@ mod directed {
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = BFS::from(&g);
                     // To search on a null graph
@@ -17,7 +17,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U, (), (), ()>::new();
                     let i = g.add_vertex(&0)?;
                     // Execute BFS for the trivial graph.
                     let search = BFS::from((&g, &i));
@@ -77,7 +77,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -137,7 +137,7 @@ mod directed {
                 fn breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     BFS::from((&g, &0)).next();
                 }
 
@@ -145,7 +145,7 @@ mod directed {
                 fn breadth_first_search_forest() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = BFS::new(
                         &g,
@@ -159,7 +159,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a disconnected graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1), (0, 2), (0, 3),
                         (1, 4), (2, 1), (3, 5),
                         (5, 4), (6, 7), (7, 8),
@@ -212,7 +212,7 @@ mod directed {
                 fn depth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = DFS::from(&g);
                     // To search on a null graph
@@ -221,7 +221,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U, (), (), ()>::new();
                     let i = g.add_vertex(&0)?;
                     // Execute DFS for the trivial graph.
                     let mut search = DFS::from((&g, &i));
@@ -295,7 +295,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -363,7 +363,7 @@ mod directed {
                 fn depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     DFS::from((&g, &0)).next();
                 }
 
@@ -371,7 +371,7 @@ mod directed {
                 fn depth_first_search_forest() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = DFS::new(
                         &g,
@@ -385,7 +385,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a disconnected graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1), (1, 2), (3, 4)
                     ]);
                     // Build a search object.
@@ -431,12 +431,12 @@ mod directed {
                 fn topological_sort()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     let mut search = TopologicalSort::from(&g);
 
                     assert_eq!(search.next().transpose().unwrap(), None);
 
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (5, 11), (7, 11), (7, 8), (3, 8), (3, 10),
                         (11, 2), (11, 9), (11, 10), (8, 9)
                     ]);
@@ -457,7 +457,7 @@ mod directed {
                 #[should_panic]
                 fn topological_sort_should_panic()
                 {
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1), (1, 2), (2, 1)
                     ]);
                     let mut search = TopologicalSort::from(&g);
@@ -489,7 +489,7 @@ mod undirected {
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = BFS::from(&g);
                     // To search on a null graph
@@ -498,7 +498,7 @@ mod undirected {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U, (), (), ()>::new();
                     let i = g.add_vertex(&0)?;
 
                     // Execute BFS for the trivial graph.
@@ -565,7 +565,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -626,7 +626,7 @@ mod undirected {
                 fn breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     BFS::from((&g, &0)).next();
                 }
 
@@ -634,7 +634,7 @@ mod undirected {
                 fn depth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = DFS::from(&g);
                     // To search on a null graph
@@ -643,7 +643,7 @@ mod undirected {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U, (), (), ()>::new();
                     let i = g.add_vertex(&0)?;
 
                     // Execute DFS for the trivial graph.
@@ -721,7 +721,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -791,7 +791,7 @@ mod undirected {
                 fn depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     DFS::from((&g, &0)).next();
                 }
 
@@ -802,7 +802,7 @@ mod undirected {
                     type Q<T> = std::collections::VecDeque<T>;
 
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = LexBFS::from(&g);
                     // To search on a null graph
@@ -814,7 +814,7 @@ mod undirected {
                     // with vertices (x, y, w, z, u, v, a, d, c, b)
                     // mapped to the (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
                     // sequence for an easy equality check.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1), (0, 2), (0, 4), (0, 5),
                         (3, 1), (3, 2), (3, 4), (3, 5),
                         (6, 1), (6, 2), (6, 4), (6, 5),
@@ -925,7 +925,7 @@ mod undirected {
                     // Test from course slides
                     // with (f, g, c, d, b, a, e)
                     // as   (0, 1, 2, 3, 4, 5, 6).
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1), (0, 2), (1, 2), (1, 3),
                         (2, 3), (2, 4), (2, 5), (3, 4),
                         (3, 5), (3, 6), (4, 5)
@@ -1006,7 +1006,7 @@ mod undirected {
                 fn lexicographic_breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     LexBFS::from((&g, &0)).next();
                 }
 
@@ -1014,7 +1014,7 @@ mod undirected {
                 fn lexicographic_depth_first_search()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     // Build a search object.
                     let mut search = LexDFS::from(&g);
                     // To search on a null graph
@@ -1022,7 +1022,7 @@ mod undirected {
                     // yields no result.
                     assert_eq!(search.next(), None);
 
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U, (), (), ()>::from_edges(&[
                         (0, 1), (0, 2), (0, 4),
                         (1, 2), (1, 3),
                         (2, 4), (2, 3)
@@ -1052,7 +1052,7 @@ mod undirected {
                 fn lexicographic_depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U, (), (), ()>::new();
                     LexDFS::from((&g, &0)).next();
                 }
             }

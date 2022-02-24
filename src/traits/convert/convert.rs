@@ -5,7 +5,7 @@ use crate::{E, V};
 use std::collections::HashMap;
 
 /// The graph conversion trait.
-pub trait Convert: Storage + FromDOT + IntoDOT {
+pub trait Convert: Storage {
     /// Edge list adapter.
     ///
     /// Return the edge list representing the graph.
@@ -65,7 +65,7 @@ pub trait Convert: Storage + FromDOT + IntoDOT {
 
 impl<T> Convert for T
 where
-    T: Storage + FromDOT + IntoDOT,
+    T: Storage,
 {
     fn into_edge_list(&self) -> EdgeList<Self::Vertex> {
         let mut out = EdgeList::new();
