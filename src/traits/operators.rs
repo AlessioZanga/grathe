@@ -57,67 +57,53 @@ pub trait Operators {
 
 macro_rules! impl_operators {
     ($graph:ident) => {
-        impl<T, X, Y, Z> $crate::traits::Operators for $graph<T, X, Y, Z>
+        impl<T, U> $crate::traits::Operators for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             fn complement(&self) -> Self {
                 Self {
                     data: self.data.complement(),
-                    gattrs: Default::default(),
-                    vattrs: Default::default(),
-                    eattrs: Default::default(),
+                    attributes: Default::default(),
                 }
             }
 
             fn union(&self, other: &Self) -> Self {
                 Self {
                     data: self.data.union(&other.data),
-                    gattrs: Default::default(),
-                    vattrs: Default::default(),
-                    eattrs: Default::default(),
+                    attributes: Default::default(),
                 }
             }
 
             fn intersection(&self, other: &Self) -> Self {
                 Self {
                     data: self.data.intersection(&other.data),
-                    gattrs: Default::default(),
-                    vattrs: Default::default(),
-                    eattrs: Default::default(),
+                    attributes: Default::default(),
                 }
             }
 
             fn symmetric_difference(&self, other: &Self) -> Self {
                 Self {
                     data: self.data.symmetric_difference(&other.data),
-                    gattrs: Default::default(),
-                    vattrs: Default::default(),
-                    eattrs: Default::default(),
+                    attributes: Default::default(),
                 }
             }
 
             fn difference(&self, other: &Self) -> Self {
                 Self {
                     data: self.data.difference(&other.data),
-                    gattrs: Default::default(),
-                    vattrs: Default::default(),
-                    eattrs: Default::default(),
+                    attributes: Default::default(),
                 }
             }
         }
 
-        impl<T, X, Y, Z> std::ops::Not for &$graph<T, X, Y, Z>
+        impl<T, U> std::ops::Not for &$graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            type Output = $graph<T, X, Y, Z>;
+            type Output = $graph<T, U>;
 
             /// Complement of a graph.
             ///
@@ -132,14 +118,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, X, Y, Z> std::ops::BitAnd for &$graph<T, X, Y, Z>
+        impl<T, U> std::ops::BitAnd for &$graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            type Output = $graph<T, X, Y, Z>;
+            type Output = $graph<T, U>;
 
             /// Intersection of two graphs.
             ///
@@ -154,14 +138,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, X, Y, Z> std::ops::BitOr for &$graph<T, X, Y, Z>
+        impl<T, U> std::ops::BitOr for &$graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            type Output = $graph<T, X, Y, Z>;
+            type Output = $graph<T, U>;
 
             /// Union of two graphs.
             ///
@@ -176,14 +158,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, X, Y, Z> std::ops::BitXor for &$graph<T, X, Y, Z>
+        impl<T, U> std::ops::BitXor for &$graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            type Output = $graph<T, X, Y, Z>;
+            type Output = $graph<T, U>;
 
             /// Symmetric difference of two graphs.
             ///
@@ -202,14 +182,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, X, Y, Z> std::ops::Sub for &$graph<T, X, Y, Z>
+        impl<T, U> std::ops::Sub for &$graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            type Output = $graph<T, X, Y, Z>;
+            type Output = $graph<T, U>;
 
             /// Difference of two graphs.
             ///

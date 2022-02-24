@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::storages::AdjacencyListStorage;
+    use crate::graphs::storages::AdjacencyListStorage;
     use crate::traits::Storage;
     use all_asserts::*;
 
@@ -11,7 +11,7 @@ mod tests {
         T: Storage<Vertex = i32>,
     {
         let g = T::with_capacity(3);
-        // FIXME: capacity constraints is soft-enforced.
+        // FIXME: capacity constraits is soft-enforced.
         assert_le!(g.capacity(), 3);
 
         // The order is still zero.

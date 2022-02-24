@@ -1,10 +1,10 @@
-use crate::errors::Error;
-use crate::traits::{Base, Connectivity, Convert};
+use crate::traits::{Capacity, Connectivity, Convert, Operators, Storage};
+use crate::types::Error;
 use crate::types::VertexIterator;
 use std::collections::{BTreeSet, VecDeque};
 
 /// Directed graph trait.
-pub trait Directed: Base + Connectivity + Convert {
+pub trait Directed: Capacity + Connectivity + Convert + Operators + Storage {
     /// Ancestors iterator.
     ///
     /// Iterates over the vertex set $An(G, X)$ of a given vertex $X$.
@@ -161,29 +161,26 @@ macro_rules! De {
 
 macro_rules! impl_directed {
     ($graph:ident, $storage:ident) => {
-        impl<T, X, Y, Z> PartialEq for $graph<T, X, Y, Z>
+        impl<T, U> PartialEq for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             fn eq(&self, other: &Self) -> bool {
                 self.data.eq(&other.data)
             }
         }
 
-        impl<T, X, Y, Z> Eq for $graph<T, X, Y, Z> where T: $crate::types::VertexTrait,
-        X: Default + std::fmt::Debug,
-        Y: Default + std::fmt::Debug,
-        Z: Default + std::fmt::Debug, {}
-
-        impl<T, X, Y, Z> PartialOrd for $graph<T, X, Y, Z>
+        impl<T, U> Eq for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
+        {}
+
+        impl<T, U> PartialOrd for $graph<T, U>
+        where
+            T: $crate::types::VertexTrait,
+            U: $crate::traits::WithAttributes<T>,
         {
             fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
                 self.data.partial_cmp(&other.data)
@@ -192,12 +189,10 @@ macro_rules! impl_directed {
 
         $crate::traits::impl_capacity!($graph);
 
-        impl<T, X, Y, Z> $crate::traits::Connectivity for $graph<T, X, Y, Z>
+        impl<T, U> $crate::traits::Connectivity for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
                 // Check if search object reaches a vertex that is adjacent to the source.
@@ -218,12 +213,10 @@ macro_rules! impl_directed {
         $crate::traits::impl_operators!($graph);
         $crate::traits::impl_with_attributes!($graph);
 
-        impl<T, X, Y, Z> $crate::traits::Storage for $graph<T, X, Y, Z>
+        impl<T, U> $crate::traits::Storage for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             type Vertex = T;
 
@@ -246,11 +239,11 @@ macro_rules! impl_directed {
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, $crate::errors::Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex>;
-                    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), $crate::errors::Error<Self::Vertex>>;
-                    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, $crate::errors::Error<Self::Vertex>>;
-                    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::errors::Error<Self::Vertex>>;
-                    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::errors::Error<Self::Vertex>>;
+                    fn add_vertex<V>(&mut self, x: &V) -> Result<Self::Vertex, $crate::types::Error<Self::Vertex>> where V: Eq + Clone + Into<Self::Vertex>;
+                    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>>;
+                    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, $crate::types::Error<Self::Vertex>>;
+                    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>>;
+                    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>>;
                 }
             }
         }

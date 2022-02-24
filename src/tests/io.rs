@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::errors::Error;
+    use crate::types::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::traits::convert::{FromDOT, IntoDOT};
     use crate::traits::Storage;

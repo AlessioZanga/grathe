@@ -1,6 +1,3 @@
-mod base;
-pub use base::Base;
-
 mod capacity;
 pub(crate) use capacity::impl_capacity;
 pub use capacity::Capacity;
@@ -8,8 +5,7 @@ pub use capacity::Capacity;
 mod connectivity;
 pub use connectivity::Connectivity;
 
-/// Graph conversion traits, such as FromDOT.
-pub mod convert;
+mod convert;
 pub use convert::Convert;
 
 /// Graph direction traits, such as Undirected.

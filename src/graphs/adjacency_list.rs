@@ -1,33 +1,27 @@
-use crate::errors::Error;
-use crate::storages::AdjacencyListStorage;
-use crate::traits::{Directed, Operators, Storage, Undirected};
+use super::attributes::AttributesMap;
+use super::storages::AdjacencyListStorage;
+use crate::traits::{Directed, Operators, Storage, Undirected, WithAttributes};
+use crate::types::Error;
 use crate::types::{VertexIterator, VertexTrait};
-use std::collections::HashMap;
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
-pub struct UndirectedAdjacencyListGraph<T, X, Y, Z>
+pub struct UndirectedAdjacencyListGraph<T, U = AttributesMap<T, (), (), ()>>
 where
     T: VertexTrait,
-    X: Default + std::fmt::Debug,
-    Y: Default + std::fmt::Debug,
-    Z: Default + std::fmt::Debug,
+    U: WithAttributes<T>,
 {
     data: AdjacencyListStorage<T>,
-    gattrs: Option<X>,
-    vattrs: HashMap<T, Y>,
-    eattrs: HashMap<(T, T), Z>,
+    attributes: U,
 }
 
 // Storage delegation and graph trait implementation.
 crate::traits::direction::impl_undirected!(UndirectedAdjacencyListGraph, AdjacencyListStorage);
 
-impl<T, X, Y, Z> Undirected for UndirectedAdjacencyListGraph<T, X, Y, Z>
+impl<T, U> Undirected for UndirectedAdjacencyListGraph<T, U>
 where
     T: VertexTrait,
-    X: Default + std::fmt::Debug,
-    Y: Default + std::fmt::Debug,
-    Z: Default + std::fmt::Debug,
+    U: WithAttributes<T>,
 {
     fn neighbors_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         self.adjacents_iter(x)
@@ -40,28 +34,22 @@ where
 
 /// Directed graph based on adjacency list storage.
 #[derive(Default, Debug)]
-pub struct DirectedAdjacencyListGraph<T, X, Y, Z>
+pub struct DirectedAdjacencyListGraph<T, U = AttributesMap<T, (), (), ()>>
 where
     T: VertexTrait,
-    X: Default + std::fmt::Debug,
-    Y: Default + std::fmt::Debug,
-    Z: Default + std::fmt::Debug,
+    U: WithAttributes<T>,
 {
     data: AdjacencyListStorage<T>,
-    gattrs: Option<X>,
-    vattrs: HashMap<T, Y>,
-    eattrs: HashMap<(T, T), Z>,
+    attributes: U,
 }
 
 // Storage delegation and graph trait implementation.
 crate::traits::direction::impl_directed!(DirectedAdjacencyListGraph, AdjacencyListStorage);
 
-impl<T, X, Y, Z> Directed for DirectedAdjacencyListGraph<T, X, Y, Z>
+impl<T, U> Directed for DirectedAdjacencyListGraph<T, U>
 where
     T: VertexTrait,
-    X: Default + std::fmt::Debug,
-    Y: Default + std::fmt::Debug,
-    Z: Default + std::fmt::Debug,
+    U: WithAttributes<T>,
 {
     fn parents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         assert!(self.has_vertex(x));

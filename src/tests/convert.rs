@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::errors::Error;
+    use crate::types::Error;
     use crate::graphs::DirectedAdjacencyListGraph;
     use crate::traits::Convert;
     use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
@@ -71,14 +71,14 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<DirectedAdjacencyListGraph<i32, (), (), ()>>)]
+    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
     mod adjacency_list_graph {}
 }
 
 #[cfg(test)]
 #[generic_tests::define]
 mod dot {
-    use crate::errors::Error;
+    use crate::types::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::traits::{Convert, WithAttributes};
     use std::path::Path;

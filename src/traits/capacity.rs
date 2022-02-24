@@ -14,7 +14,7 @@ pub trait Capacity {
     /// // Build a graph with a specific capacity.
     /// let g = Graph::with_capacity(3);
     ///
-    /// // Capacity constraints is soft-enforced.
+    /// // Capacity constraits is soft-enforced.
     /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
@@ -40,7 +40,7 @@ pub trait Capacity {
     /// // Build a graph with a specific capacity.
     /// let g = Graph::with_capacity(3);
     ///
-    /// // Capacity constraints is soft-enforced.
+    /// // Capacity constraits is soft-enforced.
     /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
@@ -73,7 +73,7 @@ pub trait Capacity {
     /// // Reserve additional capacity.
     /// g.reserve(3);
     ///
-    /// // Capacity constraints is soft-enforced.
+    /// // Capacity constraits is soft-enforced.
     /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
@@ -98,7 +98,7 @@ pub trait Capacity {
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
     ///
-    /// // Capacity constraints is soft-enforced.
+    /// // Capacity constraits is soft-enforced.
     /// assert_le!(g.capacity(), 100);
     ///
     /// // Shrink capacity to given minimum.
@@ -122,7 +122,7 @@ pub trait Capacity {
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
     ///
-    /// // Capacity constraints is soft-enforced.
+    /// // Capacity constraits is soft-enforced.
     /// assert_le!(g.capacity(), 100);
     ///
     /// // Shrink capacity as much as possible.
@@ -136,19 +136,15 @@ pub trait Capacity {
 
 macro_rules! impl_capacity {
     ($graph:ident) => {
-        impl<T, X, Y, Z> $crate::traits::Capacity for $graph<T, X, Y, Z>
+        impl<T, U> $crate::traits::Capacity for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             fn with_capacity(capacity: usize) -> Self {
                 Self {
                     data: $crate::traits::Capacity::with_capacity(capacity),
-                    gattrs: Default::default(),
-                    vattrs: Default::default(),
-                    eattrs: Default::default(),
+                    attributes: Default::default(),
                 }
             }
 

@@ -1,9 +1,9 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::errors::Error;
     use crate::graphs::DirectedAdjacencyListGraph;
     use crate::traits::Directed;
+    use crate::types::Error;
     use crate::{An, Ch, De, Pa};
     use all_asserts::*;
 
@@ -272,6 +272,6 @@ mod tests {
         g.out_degree_of(&0);
     }
 
-    #[instantiate_tests(<DirectedAdjacencyListGraph<i32, (), (), ()>>)]
+    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
     mod adjacency_list_graph {}
 }

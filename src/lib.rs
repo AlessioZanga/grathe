@@ -6,9 +6,6 @@
 /// Algorithms over graphs.
 pub mod algorithms;
 
-/// Error enums declaration.
-pub mod errors;
-
 /// Graphs types, traits and structs.
 pub mod graphs;
 
@@ -17,9 +14,6 @@ pub mod io;
 
 /// Frequently used items.
 pub mod prelude;
-
-/// Backend graph storage implementations.
-pub mod storages;
 
 /// Crate-wide traits.
 pub mod traits;

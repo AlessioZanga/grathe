@@ -1,4 +1,3 @@
-use super::dot::{FromDOT, IntoDOT};
 use crate::traits::Storage;
 use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
 use crate::{E, V};

@@ -1,9 +1,9 @@
-use crate::errors::Error;
-use crate::traits::{Base, Connectivity, Convert};
+use crate::traits::{Capacity, Connectivity, Convert, Operators, Storage};
+use crate::types::Error;
 use crate::types::VertexIterator;
 
 /// Undirected graph trait.
-pub trait Undirected: Base + Connectivity + Convert {
+pub trait Undirected: Capacity + Connectivity + Convert + Operators + Storage {
     /// Neighbor iterator.
     ///
     /// Iterates over the vertex set $Ne(G, X)$ of a given vertex $X$.
@@ -39,12 +39,10 @@ macro_rules! Ne {
 
 macro_rules! impl_undirected {
     ($graph:ident, $storage:ident) => {
-        impl<T, X, Y, Z> PartialEq for $graph<T, X, Y, Z>
+        impl<T, U> PartialEq for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Equality operator.
             ///
@@ -73,17 +71,16 @@ macro_rules! impl_undirected {
             }
         }
 
-        impl<T, X, Y, Z> Eq for $graph<T, X, Y, Z> where T: $crate::types::VertexTrait,
-        X: Default + std::fmt::Debug,
-        Y: Default + std::fmt::Debug,
-        Z: Default + std::fmt::Debug, {}
-
-        impl<T, X, Y, Z> PartialOrd for $graph<T, X, Y, Z>
+        impl<T, U> Eq for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
+        {}
+
+        impl<T, U> PartialOrd for $graph<T, U>
+        where
+            T: $crate::types::VertexTrait,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Comparable operator.
             ///
@@ -116,12 +113,10 @@ macro_rules! impl_undirected {
 
         $crate::traits::impl_capacity!($graph);
 
-        impl<T, X, Y, Z> $crate::traits::Connectivity for $graph<T, X, Y, Z>
+        impl<T, U> $crate::traits::Connectivity for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
                 // Import `tuple_windows`.
@@ -150,12 +145,10 @@ macro_rules! impl_undirected {
         $crate::traits::impl_operators!($graph);
         $crate::traits::impl_with_attributes!($graph);
 
-        impl<T, X, Y, Z> $crate::traits::Storage for $graph<T, X, Y, Z>
+        impl<T, U> $crate::traits::Storage for $graph<T, U>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             type Vertex = T;
 
@@ -177,7 +170,7 @@ macro_rules! impl_undirected {
                     fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn $crate::types::VertexIterator<'a, Self::Vertex> + 'a>;
                     fn order(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, $crate::errors::Error<Self::Vertex>>;
+                    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, $crate::types::Error<Self::Vertex>>;
                 }
             }
 
@@ -186,38 +179,37 @@ macro_rules! impl_undirected {
                 self.edges_iter().filter(|(x, y)| x <= y).count()
             }
 
-            fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, $crate::errors::Error<Self::Vertex>> where U: Eq + Clone + Into<Self::Vertex> {
+            fn add_vertex<V>(&mut self, x: &V) -> Result<Self::Vertex, $crate::types::Error<Self::Vertex>>
+            where
+                V: Eq + Clone + Into<Self::Vertex>
+            {
                 // Add vertex into the graph.
                 let x = self.data.add_vertex(x)?;
-                // Add associated attribute map.
-                self.vattrs.insert(x.clone(), Default::default());
                 // Return successfully.
                 Ok(x)
             }
 
-            fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), $crate::errors::Error<Self::Vertex>> {
+            fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>> {
                 // Delete vertex from the graph.
                 self.data.del_vertex(x)?;
                 // Delete associated attribute map.
-                self.vattrs.remove(x);
+                self.attributes.unset_vertex_attrs(x).ok();
                 // Return successfully.
                 Ok(())
             }
 
-            fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::errors::Error<Self::Vertex>> {
+            fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>> {
                 // Add edge (y, x)
                 self.data.add_edge(y, x)?;
                 // Add edge (x, y)
                 if x != y {
                     self.data.add_edge(x, y)?;
                 }
-                // Add associated attribute map.
-                self.eattrs.insert((x.clone(), y.clone()), Default::default());
                 // Return successfully.
                 Ok(())
             }
 
-            fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::errors::Error<Self::Vertex>> {
+            fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>> {
                 // Del edge (y, x)
                 self.data.del_edge(y, x)?;
                 // Del edge (x, y)
@@ -225,7 +217,7 @@ macro_rules! impl_undirected {
                     self.data.del_edge(x, y)?;
                 }
                 // Delete associated attribute map.
-                self.eattrs.remove(&(x.clone(), y.clone()));
+                self.attributes.unset_edge_attrs(x, y).ok();
                 // Return successfully.
                 Ok(())
             }

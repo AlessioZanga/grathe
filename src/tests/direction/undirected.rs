@@ -1,9 +1,9 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::errors::Error;
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::traits::Undirected;
+    use crate::types::Error;
     use crate::Ne;
     use all_asserts::*;
 
@@ -135,6 +135,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<UndirectedAdjacencyListGraph<i32, (), (), ()>>)]
+    #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
     mod adjacency_list_graph {}
 }

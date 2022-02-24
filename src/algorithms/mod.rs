@@ -8,53 +8,44 @@ macro_rules! impl_algorithms_directed {
     ($graph:ident) => {
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<(&'a $graph<T, X, Y, Z>, &'a T, &'a T)>
-            for $crate::algorithms::AllSimplePaths<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<(&'a $graph<T, U>, &'a T, &'a T)> for $crate::algorithms::AllSimplePaths<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            fn from((g, x, y): (&'a $graph<T, X, Y, Z>, &'a T, &'a T)) -> Self {
-                Self::new(g, x, y, $graph::<T, X, Y, Z>::children_iter)
+            fn from((g, x, y): (&'a $graph<T, U>, &'a T, &'a T)) -> Self {
+                Self::new(g, x, y, $graph::<T, U>::children_iter)
             }
         }
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<&'a $graph<T, X, Y, Z>>
-            for $crate::algorithms::AllSimpleCycles<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::AllSimpleCycles<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            fn from(g: &'a $graph<T, X, Y, Z>) -> Self {
-                Self::new(g, $graph::<T, X, Y, Z>::children_iter)
+            fn from(g: &'a $graph<T, U>) -> Self {
+                Self::new(g, $graph::<T, U>::children_iter)
             }
         }
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<&'a $graph<T, X, Y, Z>>
-            for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
             ///
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
-            fn from(g: &'a $graph<T, X, Y, Z>) -> Self {
+            fn from(g: &'a $graph<T, U>) -> Self {
                 Self::new(
                     g,
                     None,
-                    $graph::<T, X, Y, Z>::children_iter,
+                    $graph::<T, U>::children_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }
@@ -62,13 +53,10 @@ macro_rules! impl_algorithms_directed {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<(&'a $graph<T, X, Y, Z>, &'a T)>
-            for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.
             ///
@@ -76,11 +64,11 @@ macro_rules! impl_algorithms_directed {
             ///
             /// Panics if the source vertex is not in the graph.
             ///
-            fn from((g, x): (&'a $graph<T, X, Y, Z>, &'a T)) -> Self {
+            fn from((g, x): (&'a $graph<T, U>, &'a T)) -> Self {
                 Self::new(
                     g,
                     Some(x),
-                    $graph::<T, X, Y, Z>::children_iter,
+                    $graph::<T, U>::children_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }
@@ -88,23 +76,20 @@ macro_rules! impl_algorithms_directed {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<&'a $graph<T, X, Y, Z>>
-            for $crate::algorithms::DepthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
             ///
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
-            fn from(g: &'a $graph<T, X, Y, Z>) -> Self {
+            fn from(g: &'a $graph<T, U>) -> Self {
                 Self::new(
                     g,
                     None,
-                    $graph::<T, X, Y, Z>::children_iter,
+                    $graph::<T, U>::children_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }
@@ -112,13 +97,10 @@ macro_rules! impl_algorithms_directed {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<(&'a $graph<T, X, Y, Z>, &'a T)>
-            for $crate::algorithms::DepthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.
             ///
@@ -126,11 +108,11 @@ macro_rules! impl_algorithms_directed {
             ///
             /// Panics if the source vertex is not in the graph.
             ///
-            fn from((g, x): (&'a $graph<T, X, Y, Z>, &'a T)) -> Self {
+            fn from((g, x): (&'a $graph<T, U>, &'a T)) -> Self {
                 Self::new(
                     g,
                     Some(x),
-                    $graph::<T, X, Y, Z>::children_iter,
+                    $graph::<T, U>::children_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }
@@ -142,53 +124,44 @@ macro_rules! impl_algorithms_undirected {
     ($graph:ident) => {
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<(&'a $graph<T, X, Y, Z>, &'a T, &'a T)>
-            for $crate::algorithms::AllSimplePaths<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<(&'a $graph<T, U>, &'a T, &'a T)> for $crate::algorithms::AllSimplePaths<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            fn from((g, x, y): (&'a $graph<T, X, Y, Z>, &'a T, &'a T)) -> Self {
-                Self::new(g, x, y, $graph::<T, X, Y, Z>::neighbors_iter)
+            fn from((g, x, y): (&'a $graph<T, U>, &'a T, &'a T)) -> Self {
+                Self::new(g, x, y, $graph::<T, U>::neighbors_iter)
             }
         }
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<&'a $graph<T, X, Y, Z>>
-            for $crate::algorithms::AllSimpleCycles<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::AllSimpleCycles<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
-            fn from(g: &'a $graph<T, X, Y, Z>) -> Self {
+            fn from(g: &'a $graph<T, U>) -> Self {
                 todo!()
             }
         }
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<&'a $graph<T, X, Y, Z>>
-            for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
             ///
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
-            fn from(g: &'a $graph<T, X, Y, Z>) -> Self {
+            fn from(g: &'a $graph<T, U>) -> Self {
                 Self::new(
                     g,
                     None,
-                    $graph::<T, X, Y, Z>::neighbors_iter,
+                    $graph::<T, U>::neighbors_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }
@@ -196,13 +169,10 @@ macro_rules! impl_algorithms_undirected {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<(&'a $graph<T, X, Y, Z>, &'a T)>
-            for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.
             ///
@@ -210,11 +180,11 @@ macro_rules! impl_algorithms_undirected {
             ///
             /// Panics if the source vertex is not in the graph.
             ///
-            fn from((g, x): (&'a $graph<T, X, Y, Z>, &'a T)) -> Self {
+            fn from((g, x): (&'a $graph<T, U>, &'a T)) -> Self {
                 Self::new(
                     g,
                     Some(x),
-                    $graph::<T, X, Y, Z>::neighbors_iter,
+                    $graph::<T, U>::neighbors_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }
@@ -222,23 +192,20 @@ macro_rules! impl_algorithms_undirected {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<&'a $graph<T, X, Y, Z>>
-            for $crate::algorithms::DepthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
             ///
             /// The first vertex of the vertex set is chosen as source vertex.
             ///
-            fn from(g: &'a $graph<T, X, Y, Z>) -> Self {
+            fn from(g: &'a $graph<T, U>) -> Self {
                 Self::new(
                     g,
                     None,
-                    $graph::<T, X, Y, Z>::neighbors_iter,
+                    $graph::<T, U>::neighbors_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }
@@ -246,13 +213,10 @@ macro_rules! impl_algorithms_undirected {
 
         // TODO: Once `min_specialization` will be stabilized,
         // replace this with blanket `From` implementation.
-        impl<'a, T, X, Y, Z> From<(&'a $graph<T, X, Y, Z>, &'a T)>
-            for $crate::algorithms::DepthFirstSearch<'a, $graph<T, X, Y, Z>>
+        impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
             T: $crate::types::VertexTrait,
-            X: Default + std::fmt::Debug,
-            Y: Default + std::fmt::Debug,
-            Z: Default + std::fmt::Debug,
+            U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.
             ///
@@ -260,11 +224,11 @@ macro_rules! impl_algorithms_undirected {
             ///
             /// Panics if the source vertex is not in the graph.
             ///
-            fn from((g, x): (&'a $graph<T, X, Y, Z>, &'a T)) -> Self {
+            fn from((g, x): (&'a $graph<T, U>, &'a T)) -> Self {
                 Self::new(
                     g,
                     Some(x),
-                    $graph::<T, X, Y, Z>::neighbors_iter,
+                    $graph::<T, U>::neighbors_iter,
                     $crate::algorithms::Traversal::Tree,
                 )
             }

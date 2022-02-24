@@ -1,5 +1,5 @@
-use crate::errors::Error;
-use crate::traits::Base;
+use crate::traits::Storage;
+use crate::types::Error;
 use itertools::Itertools;
 use pest::error::Error as PestError;
 use pest::iterators::Pair;
@@ -23,7 +23,7 @@ pub struct DOTParser;
 /// Enumerator for DOT values.
 enum DOTValue<T>
 where
-    T: Base,
+    T: Storage,
 {
     None,
     Path(Vec<(T::Vertex, T::Vertex)>),
@@ -36,7 +36,7 @@ where
 ///
 pub fn from_dot<T>(string: &str) -> Result<Vec<T>, PestError<Rule>>
 where
-    T: Base,
+    T: Storage,
 {
     // Init result vector
     let mut graphs = vec![];
@@ -59,7 +59,7 @@ where
     // Match rules recursively
     fn match_rules<T>(graph: &mut T, pair: Pair<Rule>) -> Result<DOTValue<T>, PestError<Rule>>
     where
-        T: Base,
+        T: Storage,
     {
         match pair.as_rule() {
             Rule::graph => {

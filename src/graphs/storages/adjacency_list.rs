@@ -1,5 +1,5 @@
-use crate::errors::Error;
 use crate::traits::{Capacity, Operators, Storage};
+use crate::types::Error;
 use crate::types::{AdjacencyList, EdgeIterator, ExactSizeIter, VertexIterator, VertexTrait};
 use std::cmp::Ordering;
 use std::collections::{BTreeSet, HashSet};
