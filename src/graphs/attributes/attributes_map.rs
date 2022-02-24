@@ -53,6 +53,10 @@ where
         self.gattrs.as_ref().ok_or(Error::GraphAttributesNotDefined())
     }
 
+    fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<T>> {
+        self.gattrs.as_mut().ok_or(Error::GraphAttributesNotDefined())
+    }
+
     fn set_graph_attrs(&mut self, x: Self::GraphAttributes) {
         self.gattrs = Some(x);
     }
@@ -67,6 +71,12 @@ where
 
     fn get_vertex_attrs(&self, x: &T) -> Result<&Self::VertexAttributes, Error<T>> {
         self.vattrs.get(x).ok_or(Error::VertexAttributesNotDefined(x.clone()))
+    }
+
+    fn get_mut_vertex_attrs(&mut self, x: &T) -> Result<&mut Self::VertexAttributes, Error<T>> {
+        self.vattrs
+            .get_mut(x)
+            .ok_or(Error::VertexAttributesNotDefined(x.clone()))
     }
 
     fn set_vertex_attrs(&mut self, x: &T, y: Self::VertexAttributes) {
@@ -86,6 +96,12 @@ where
     fn get_edge_attrs(&self, x: &T, y: &T) -> Result<&Self::EdgeAttributes, Error<T>> {
         self.eattrs
             .get(&(x.clone(), y.clone()))
+            .ok_or(Error::EdgeAttributesNotDefined(x.clone(), y.clone()))
+    }
+
+    fn get_mut_edge_attrs(&mut self, x: &T, y: &T) -> Result<&mut Self::EdgeAttributes, Error<T>> {
+        self.eattrs
+            .get_mut(&(x.clone(), y.clone()))
             .ok_or(Error::EdgeAttributesNotDefined(x.clone(), y.clone()))
     }
 

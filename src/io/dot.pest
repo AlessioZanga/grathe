@@ -1,8 +1,8 @@
 graphs = _{ graph+ }
 
-graph = { strict_attribute ~ graph_type ~ graph_id ~ "{" ~ statements ~ "}" }
+graph = { strict ~ graph_type ~ graph_id ~ "{" ~ statements ~ "}" }
 
-strict_attribute = { ^"strict"? }
+strict = { ^"strict"? }
 
 graph_type = { ^"graph" | ^"digraph" }
 

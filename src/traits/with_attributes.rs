@@ -28,6 +28,12 @@ where
     ///
     fn get_graph_attrs(&self) -> Result<&Self::GraphAttributes, Error<T>>;
 
+    /// Gets mutable graph attributes.
+    ///
+    /// Returns a mutable reference to graph attributes.
+    ///
+    fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<T>>;
+
     /// Sets graph attributes.
     ///
     /// Inserts the graph attributes into the graph, overwriting previous assignment.
@@ -52,6 +58,12 @@ where
     ///
     fn get_vertex_attrs(&self, x: &T) -> Result<&Self::VertexAttributes, Error<T>>;
 
+    /// Gets mutable vertex attributes.
+    ///
+    /// Returns a mutable reference to vertex attributes.
+    ///
+    fn get_mut_vertex_attrs(&mut self, x: &T) -> Result<&mut Self::VertexAttributes, Error<T>>;
+
     /// Sets vertex attributes.
     ///
     /// Inserts the vertex attributes into the graph, overwriting previous assignment.
@@ -75,6 +87,12 @@ where
     /// Returns a reference to edge attributes.
     ///
     fn get_edge_attrs(&self, x: &T, y: &T) -> Result<&Self::EdgeAttributes, Error<T>>;
+
+    /// Gets mutable edge attributes.
+    ///
+    /// Returns a mutable reference to edge attributes.
+    ///
+    fn get_mut_edge_attrs(&mut self, x: &T, y: &T) -> Result<&mut Self::EdgeAttributes, Error<T>>;
 
     /// Sets edge attributes.
     ///
@@ -104,14 +122,17 @@ macro_rules! impl_with_attributes {
                 to self.attributes {
                     fn has_graph_attrs(&self) -> bool;
                     fn get_graph_attrs(&self) -> Result<&Self::GraphAttributes, Error<T>>;
+                    fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<T>>;
                     fn set_graph_attrs(&mut self, x: Self::GraphAttributes);
                     fn unset_graph_attrs(&mut self) -> Result<Self::GraphAttributes, Error<T>>;
                     fn has_vertex_attrs(&self, x: &T) -> bool;
                     fn get_vertex_attrs(&self, x: &T) -> Result<&Self::VertexAttributes, Error<T>>;
+                    fn get_mut_vertex_attrs(&mut self, x: &T) -> Result<&mut Self::VertexAttributes, Error<T>>;
                     fn set_vertex_attrs(&mut self, x: &T, y: Self::VertexAttributes);
                     fn unset_vertex_attrs(&mut self, x: &T) -> Result<Self::VertexAttributes, Error<T>>;
                     fn has_edge_attrs(&self, x: &T, y: &T) -> bool;
                     fn get_edge_attrs(&self, x: &T, y: &T) -> Result<&Self::EdgeAttributes, Error<T>>;
+                    fn get_mut_edge_attrs(&mut self, x: &T, y: &T) -> Result<&mut Self::EdgeAttributes, Error<T>>;
                     fn set_edge_attrs(&mut self, x: &T, y: &T, z: Self::EdgeAttributes);
                     fn unset_edge_attrs(&mut self, x: &T, y: &T) -> Result<Self::EdgeAttributes, Error<T>>;
                 }
