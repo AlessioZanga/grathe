@@ -1,8 +1,8 @@
 mod algorithms;
 mod capacity;
 mod connectivity;
-// FIXME: mod convert;
+mod convert;
 mod direction;
-// FIXME: mod io;
+mod io;
 mod operators;
 mod readme;

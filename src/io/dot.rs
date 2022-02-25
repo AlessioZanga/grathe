@@ -1,8 +1,10 @@
+use super::IO;
 use itertools::Itertools;
-use pest::error::Error as PestError;
+use pest::error::Error;
 use pest::iterators::Pair;
 use pest::Parser;
 use std::collections::HashMap;
+use std::path::Path;
 use std::vec::Vec;
 
 // Workaround for logging during tests
@@ -12,10 +14,10 @@ use log::debug;
 use std::println as debug;
 
 // Enumerator for parsed values.
-enum Parsed<'a> {
-    Graph(Vec<Parsed<'a>>, Vec<Parsed<'a>>, HashMap<&'a str, &'a str>),
-    Vertex(&'a str, HashMap<&'a str, &'a str>),
-    Edge(&'a str, &'a str, HashMap<&'a str, &'a str>),
+enum Parsed {
+    Graph(Vec<Parsed>, Vec<Parsed>, HashMap<String, String>),
+    Vertex(String, HashMap<String, String>),
+    Edge(String, String, HashMap<String, String>),
 }
 
 /// DOT parser.
@@ -24,13 +26,16 @@ enum Parsed<'a> {
 ///
 #[derive(Parser)]
 #[grammar = "io/dot.pest"]
-pub struct DOT<'a> {
-    data: Vec<Parsed<'a>>,
+pub struct DOT {
+    data: Vec<Parsed>,
 }
 
-impl<'a> DOT<'a> {
-    fn parse_graph(pair: Pair<'a, Rule>) -> Parsed {
-        let mut attributes: HashMap<&'a str, &'a str> = Default::default();
+impl DOT {
+    fn parse_graph(pair: Pair<Rule>) -> Parsed {
+        // Check rule.
+        assert!(matches!(pair.as_rule(), Rule::graph));
+        // Initialize graph attributes.
+        let mut attributes: HashMap<String, String> = Default::default();
         // Get iterator on parsed.
         let mut pair = pair.into_inner();
         // Parse strict attribute.
@@ -38,23 +43,21 @@ impl<'a> DOT<'a> {
         if matches!(strict.as_rule(), Rule::strict) {
             let strict = strict.as_str();
             if !strict.is_empty() {
-                attributes.insert(strict, "true");
-                debug!("Strict attribute '{}' set.", strict);
+                attributes.insert("strict".into(), strict.into());
             }
         }
         // Parse graph type.
         let graph_type = pair.next().unwrap();
         if matches!(graph_type.as_rule(), Rule::graph_type) {
-            // TODO: Check if T is compatible with graph_type.
-            debug!("Graph type check '{}' ignored.", graph_type.as_str());
+            let graph_type = graph_type.as_str();
+            attributes.insert("graph_type".into(), graph_type.into());
         }
         // Parse graph identifier.
         let graph_id = pair.next().unwrap();
         if matches!(graph_id.as_rule(), Rule::graph_id) {
             let graph_id = graph_id.as_str();
             if !graph_id.is_empty() {
-                attributes.insert("label", graph_id);
-                debug!("Graph identifier '{}' set.", graph_id);
+                attributes.insert("graph_id".into(), graph_id.into());
             }
         }
         //
@@ -71,7 +74,7 @@ impl<'a> DOT<'a> {
                     Rule::vertex => {
                         vertices.push(DOT::parse_vertex(statement));
                     }
-                    _ => unreachable!(),
+                    rule => debug!("Ignore 'Rule::{:?}'", rule),
                 };
             }
         }
@@ -79,14 +82,27 @@ impl<'a> DOT<'a> {
         Parsed::Graph(vertices, edges, attributes)
     }
 
-    fn parse_path(pair: Pair<'a, Rule>) -> Vec<Parsed> {
+    fn parse_attributes(pair: Pair<Rule>) -> HashMap<String, String> {
+        // Get iterator on parsed.
+        pair.into_inner()
+            // Map attributes into (key, value) pairs
+            .map(|x| x.into_inner().tuple_windows().next().unwrap())
+            // Get (key, value) pairs as string
+            .map(|(k, v)| (k.as_str().into(), v.as_str().into()))
+            // Collect into a map of attributes
+            .collect()
+    }
+
+    fn parse_path(pair: Pair<Rule>) -> Vec<Parsed> {
+        // Check rule.
+        assert!(matches!(pair.as_rule(), Rule::path));
         // Get iterator on parsed.
         let mut pair = pair.into_inner();
         // Parse the path into a vector of edges.
         let edges = DOT::parse_path_edges(pair.next().unwrap());
         // Parse the attributes of the paths, if any.
         let attributes = match pair.next() {
-            Some(attributes) => DOT::parse_path_attributes(attributes),
+            Some(attributes) => DOT::parse_attributes(attributes),
             None => Default::default(),
         };
         // Combine edges and attributes
@@ -96,61 +112,54 @@ impl<'a> DOT<'a> {
             .collect()
     }
 
-    fn parse_path_edges(pair: Pair<'a, Rule>) -> Vec<(&'a str, &'a str)> {
-        pair
-            // Get iterator on parsed
-            .into_inner()
+    fn parse_path_edges(pair: Pair<Rule>) -> Vec<(String, String)> {
+        // Check rule.
+        assert!(matches!(pair.as_rule(), Rule::path_id));
+        // Get iterator on parsed.
+        pair.into_inner()
             // Discard direction placeholder
             .step_by(2)
             // Group by tuples of vertex
             .tuple_windows()
             // Map tuples to path
-            .map(|(x, y)| {
+            .filter_map(|(x, y)| {
                 match (x.as_rule(), y.as_rule()) {
-                    (Rule::vertex, Rule::vertex) => (x.as_str(), y.as_str()),
+                    (Rule::vertex_id, Rule::vertex_id) => Some((x.as_str().into(), y.as_str().into())),
                     // TODO: Handle subgraphs
-                    _ => unreachable!(),
+                    _ => todo!(),
                 }
             })
             // Collect sequence of edges into path
             .collect()
     }
 
-    fn parse_path_attributes(pair: Pair<'a, Rule>) -> HashMap<&'a str, &'a str> {
-        pair
-            // Get iterator on parsed
-            .into_inner()
-            // Map attributes into (key, value) pairs
-            .map(|x| x.into_inner().tuple_windows().next().unwrap())
-            // Get (key, value) pairs as string
-            .map(|(k, v)| (k.as_str().into(), v.as_str().into()))
-            // Collect into a map of attributes
-            .collect()
-    }
-
-    fn parse_vertex(pair: Pair<'a, Rule>) -> Parsed {
+    fn parse_vertex(pair: Pair<Rule>) -> Parsed {
+        // Check rule.
+        assert!(matches!(pair.as_rule(), Rule::vertex));
         // Get iterator on parsed.
         let mut pair = pair.into_inner();
         // Parse the vertex id.
         let vertex = DOT::parse_vertex_id(pair.next().unwrap());
         // Parse the attributes of the vertex, if any.
         match pair.next() {
-            Some(attributes) => Parsed::Vertex(vertex, DOT::parse_vertex_attributes(attributes)),
+            Some(attributes) => Parsed::Vertex(vertex, DOT::parse_attributes(attributes)),
             None => Parsed::Vertex(vertex, Default::default()),
         }
     }
 
-    fn parse_vertex_id(pair: Pair<'a, Rule>) -> &'a str {
-        // Get iterator on parsed
+    fn parse_vertex_id(pair: Pair<Rule>) -> String {
+        // Check rule.
+        assert!(matches!(pair.as_rule(), Rule::vertex_id));
+        // Get iterator on parsed.
         let mut pair = pair.into_inner();
         // Get vertex identifier
         let vertex_id = pair.next().unwrap();
         // Get underlying text representation
         let vertex_id = match vertex_id.as_rule() {
             // Match text and number type
-            Rule::text | Rule::number => vertex_id.as_str(),
+            Rule::text | Rule::number => vertex_id.as_str().into(),
             // Match quoted text type by removing quoting
-            Rule::quoted_text => vertex_id.as_str().trim_matches('"'),
+            Rule::quoted_text => vertex_id.as_str().trim_matches('"').into(),
             // Match everything else
             _ => unreachable!(),
         };
@@ -160,29 +169,115 @@ impl<'a> DOT<'a> {
         }
         vertex_id
     }
-
-    fn parse_vertex_attributes(pair: Pair<'a, Rule>) -> HashMap<&'a str, &'a str> {
-        pair
-            // Iterate over parsed
-            .into_inner()
-            // Map attributes into (key, value) pairs
-            .map(|x| x.into_inner().tuple_windows().next().unwrap())
-            // Get (key, value) pairs as string
-            .map(|(k, v)| (k.as_str().into(), v.as_str().into()))
-            // Collect into a map of attributes
-            .collect()
-    }
 }
 
-impl<'a> TryFrom<&'a str> for DOT<'a> {
-    type Error = PestError<Rule>;
+impl TryFrom<String> for DOT {
+    type Error = Error<Rule>;
 
-    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+    fn try_from(value: String) -> Result<Self, Self::Error> {
         // Parse the given dot file
         let pairs = DOT::parse(Rule::graphs, value.trim())?;
         // Match each graph in dot file
         let pairs = pairs.map(|pair| DOT::parse_graph(pair)).collect();
 
         Ok(Self { data: pairs })
+    }
+}
+
+impl TryInto<String> for DOT {
+    type Error = std::fmt::Error;
+
+    fn try_into(self) -> Result<String, Self::Error> {
+        // Use Write trait.
+        use std::fmt::Write;
+        // Initialize output result.
+        let mut string: String = Default::default();
+        // Iterate over graphs.
+        for graph in self.data {
+            // Bind enum variant type.
+            match graph {
+                Parsed::Graph(vertices, edges, attributes) => {
+                    // Write graph strict attribute, if any.
+                    if attributes.contains_key("strict") {
+                        write!(string, "strict")?;
+                    }
+                    // Write graph type.
+                    write!(string, "{}", attributes["graph_type"])?;
+                    // Write graph identifier, if any.
+                    if attributes.contains_key("graph_id") {
+                        write!(string, " {}", attributes["graph_id"])?;
+                    }
+                    // Begin graph statement.
+                    writeln!(string, " {{")?;
+                    // Iterate over vertices.
+                    for vertex in vertices {
+                        // Bind enum variant type.
+                        match vertex {
+                            Parsed::Vertex(x, attributes) => {
+                                // Begin vertex statement.
+                                write!(string, "\t{:?}", x)?;
+                                // If there are attributes to write.
+                                if attributes.is_empty() {
+                                    // Write attributes.
+                                    write!(
+                                        string,
+                                        " [{}]",
+                                        attributes
+                                            // Format attributes as key-value pairs.
+                                            .into_iter()
+                                            .map(|(k, v)| format!("{}={}", k, v))
+                                            .join(", ")
+                                    )?;
+                                }
+                                // End vertex statement.
+                                writeln!(string, ";")?;
+                            }
+                            _ => unreachable!(),
+                        };
+                    }
+                    // Iterate over edges.
+                    for edge in edges {
+                        // Bind enum variant type.
+                        match edge {
+                            Parsed::Edge(x, y, attributes) => {
+                                // Begin edge statement.
+                                write!(string, "\t{} -> {}", x, y)?;
+                                // If there are attributes to write.
+                                if attributes.is_empty() {
+                                    // Write attributes.
+                                    write!(
+                                        string,
+                                        " [{}]",
+                                        attributes
+                                            // Format attributes as key-value pairs.
+                                            .into_iter()
+                                            .map(|(k, v)| format!("{}={}", k, v))
+                                            .join(", ")
+                                    )?;
+                                }
+                                // End edge statement.
+                                writeln!(string, ";")?;
+                            }
+                            _ => unreachable!(),
+                        }
+                    }
+                    // End graph statement.
+                    writeln!(string, "}}")?;
+                }
+                _ => unreachable!(),
+            };
+        }
+
+        Ok(string)
+    }
+}
+
+impl IO for DOT {
+    fn read(path: &Path) -> Result<Self, <Self as TryFrom<String>>::Error> {
+        Self::try_from(std::fs::read_to_string(path).unwrap())
+    }
+
+    fn write(self) {
+        todo!()
     }
 }
