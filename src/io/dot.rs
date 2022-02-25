@@ -1,4 +1,3 @@
-use crate::traits::{Storage, WithAttributes};
 use itertools::Itertools;
 use pest::error::Error as PestError;
 use pest::iterators::Pair;
@@ -14,7 +13,7 @@ use std::println as debug;
 
 // Enumerator for parsed values.
 enum Parsed<'a> {
-    Graph(HashMap<&'a str, &'a str>),
+    Graph(Vec<Parsed<'a>>, Vec<Parsed<'a>>, HashMap<&'a str, &'a str>),
     Vertex(&'a str, HashMap<&'a str, &'a str>),
     Edge(&'a str, &'a str, HashMap<&'a str, &'a str>),
 }
@@ -31,7 +30,7 @@ pub struct DOT<'a> {
 
 impl<'a> DOT<'a> {
     fn parse_graph(pair: Pair<'a, Rule>) -> Parsed {
-        let mut parsed: HashMap<&'a str, &'a str> = Default::default();
+        let mut attributes: HashMap<&'a str, &'a str> = Default::default();
         // Get iterator on parsed.
         let mut pair = pair.into_inner();
         // Parse strict attribute.
@@ -39,7 +38,7 @@ impl<'a> DOT<'a> {
         if matches!(strict.as_rule(), Rule::strict) {
             let strict = strict.as_str();
             if !strict.is_empty() {
-                parsed.insert(strict, "true");
+                attributes.insert(strict, "true");
                 debug!("Strict attribute '{}' set.", strict);
             }
         }
@@ -54,23 +53,30 @@ impl<'a> DOT<'a> {
         if matches!(graph_id.as_rule(), Rule::graph_id) {
             let graph_id = graph_id.as_str();
             if !graph_id.is_empty() {
-                parsed.insert("label", graph_id);
+                attributes.insert("label", graph_id);
                 debug!("Graph identifier '{}' set.", graph_id);
             }
         }
+        //
+        let mut vertices: Vec<Parsed> = Default::default();
+        let mut edges: Vec<Parsed> = Default::default();
         // Parse graph statements.
         let statements = pair.next().unwrap();
         if matches!(statements.as_rule(), Rule::statements) {
             for statement in statements.into_inner() {
                 match statement.as_rule() {
-                    Rule::path => DOT::parse_path(statement),
-                    // FIXME: Add missing rules matching
+                    Rule::path => {
+                        edges.extend(DOT::parse_path(statement));
+                    }
+                    Rule::vertex => {
+                        vertices.push(DOT::parse_vertex(statement));
+                    }
                     _ => unreachable!(),
                 };
             }
         }
         // Return parsed values.
-        Parsed::Graph(parsed)
+        Parsed::Graph(vertices, edges, attributes)
     }
 
     fn parse_path(pair: Pair<'a, Rule>) -> Vec<Parsed> {
@@ -79,11 +85,15 @@ impl<'a> DOT<'a> {
         // Parse the path into a vector of edges.
         let edges = DOT::parse_path_edges(pair.next().unwrap());
         // Parse the attributes of the paths, if any.
-        if let Some(pair) = pair.next() {
-            let attributes = DOT::parse_path_attributes(pair);
-        }
-        // FIXME: Combine edges and attributes
-        todo!()
+        let attributes = match pair.next() {
+            Some(attributes) => DOT::parse_path_attributes(attributes),
+            None => Default::default(),
+        };
+        // Combine edges and attributes
+        edges
+            .into_iter()
+            .map(|(x, y)| Parsed::Edge(x, y, attributes.clone()))
+            .collect()
     }
 
     fn parse_path_edges(pair: Pair<'a, Rule>) -> Vec<(&'a str, &'a str)> {
@@ -122,7 +132,7 @@ impl<'a> DOT<'a> {
         // Get iterator on parsed.
         let mut pair = pair.into_inner();
         // Parse the vertex id.
-        let mut vertex = DOT::parse_vertex_id(pair.next().unwrap());
+        let vertex = DOT::parse_vertex_id(pair.next().unwrap());
         // Parse the attributes of the vertex, if any.
         match pair.next() {
             Some(attributes) => Parsed::Vertex(vertex, DOT::parse_vertex_attributes(attributes)),
@@ -164,28 +174,15 @@ impl<'a> DOT<'a> {
     }
 }
 
-/// From DOT string.
-///
-/// Parse DOT string into sequence of graphs.
-///
-pub fn from_dot<T>(string: &str) -> Result<Vec<T>, PestError<Rule>>
-where
-    T: Storage
-        + WithAttributes<T::Vertex, VertexAttributes = HashMap<String, String>, EdgeAttributes = HashMap<String, String>>,
-{
-    // Init result vector
-    let mut graphs = vec![];
-    // Parse the given dot file
-    let pairs = DOT::parse(Rule::graphs, string.trim())?;
-    // Match each graph in dot file
-    for pair in pairs {
-        // Init an empty graph
-        let mut graph = T::new();
-        // FIXME: Match rules for this graph
-        todo!();
-        // Push graph to result vector
-        graphs.push(graph);
+impl<'a> TryFrom<&'a str> for DOT<'a> {
+    type Error = PestError<Rule>;
+
+    fn try_from(value: &'a str) -> Result<Self, Self::Error> {
+        // Parse the given dot file
+        let pairs = DOT::parse(Rule::graphs, value.trim())?;
+        // Match each graph in dot file
+        let pairs = pairs.map(|pair| DOT::parse_graph(pair)).collect();
+
+        Ok(Self { data: pairs })
     }
-    // Return result vector
-    Ok(graphs)
 }
