@@ -1,9 +1,10 @@
 use super::IO;
 use itertools::Itertools;
-use pest::error::Error;
+use pest::error::Error as ParserError;
 use pest::iterators::Pair;
 use pest::Parser;
 use std::collections::HashMap;
+use std::io::{Error as IOError, ErrorKind as IOErrorKind};
 use std::path::Path;
 use std::vec::Vec;
 
@@ -17,7 +18,7 @@ use std::println as debug;
 enum Parsed {
     Graph(Vec<Parsed>, Vec<Parsed>, HashMap<String, String>),
     Vertex(String, HashMap<String, String>),
-    Edge(String, String, HashMap<String, String>),
+    Edge(String, String, String, HashMap<String, String>),
 }
 
 /// DOT parser.
@@ -108,23 +109,27 @@ impl DOT {
         // Combine edges and attributes
         edges
             .into_iter()
-            .map(|(x, y)| Parsed::Edge(x, y, attributes.clone()))
+            .map(|(x, direction, y)| Parsed::Edge(x, direction, y, attributes.clone()))
             .collect()
     }
 
-    fn parse_path_edges(pair: Pair<Rule>) -> Vec<(String, String)> {
+    fn parse_path_edges(pair: Pair<Rule>) -> Vec<(String, String, String)> {
         // Check rule.
         assert!(matches!(pair.as_rule(), Rule::path_id));
         // Get iterator on parsed.
         pair.into_inner()
-            // Discard direction placeholder
-            .step_by(2)
             // Group by tuples of vertex
             .tuple_windows()
+            // Skip useless (path_direction, vertex_id, path_direction) intermediate results.
+            .step_by(2)
             // Map tuples to path
-            .filter_map(|(x, y)| {
-                match (x.as_rule(), y.as_rule()) {
-                    (Rule::vertex_id, Rule::vertex_id) => Some((x.as_str().into(), y.as_str().into())),
+            .filter_map(|(x, direction, y)| {
+                match (x.as_rule(), direction.as_rule(), y.as_rule()) {
+                    (Rule::vertex_id, Rule::path_direction, Rule::vertex_id) => Some((
+                        DOT::parse_vertex_id(x),
+                        direction.as_str().into(),
+                        DOT::parse_vertex_id(y),
+                    )),
                     // TODO: Handle subgraphs
                     _ => todo!(),
                 }
@@ -172,7 +177,7 @@ impl DOT {
 }
 
 impl TryFrom<String> for DOT {
-    type Error = Error<Rule>;
+    type Error = ParserError<Rule>;
 
     fn try_from(value: String) -> Result<Self, Self::Error> {
         // Parse the given dot file
@@ -193,7 +198,7 @@ impl TryInto<String> for DOT {
         // Define macro to write attributes.
         macro_rules! write_attributes {
             ($string:ident, $attributes:ident) => {
-                if $attributes.is_empty() {
+                if !$attributes.is_empty() {
                     // Write attributes.
                     write!(
                         $string,
@@ -201,7 +206,7 @@ impl TryInto<String> for DOT {
                         $attributes
                             // Format attributes as key-value pairs.
                             .into_iter()
-                            .map(|(k, v)| format!("{}={}", k, v))
+                            .map(|(k, v)| format!("{:?}={:?}", k, v))
                             .join(", ")
                     )?;
                 }
@@ -222,7 +227,7 @@ impl TryInto<String> for DOT {
                     write!(string, "{}", attributes["graph_type"])?;
                     // Write graph identifier, if any.
                     if attributes.contains_key("graph_id") {
-                        write!(string, " {}", attributes["graph_id"])?;
+                        write!(string, " {:?}", attributes["graph_id"])?;
                     }
                     // Begin graph statement.
                     writeln!(string, " {{")?;
@@ -245,10 +250,9 @@ impl TryInto<String> for DOT {
                     for edge in edges {
                         // Bind enum variant type.
                         match edge {
-                            Parsed::Edge(x, y, attributes) => {
+                            Parsed::Edge(x, direction, y, attributes) => {
                                 // Begin edge statement.
-                                // FIXME: Set edge type properly.
-                                write!(string, "\t{} -> {}", x, y)?;
+                                write!(string, "\t{:?} {} {:?}", x, direction, y)?;
                                 // If there are attributes to write.
                                 write_attributes!(string, attributes);
                                 // End edge statement.
@@ -269,11 +273,15 @@ impl TryInto<String> for DOT {
 }
 
 impl IO for DOT {
-    fn read(path: &Path) -> Result<Self, <Self as TryFrom<String>>::Error> {
-        Self::try_from(std::fs::read_to_string(path).unwrap())
+    fn read(path: &Path) -> Result<Self, IOError> {
+        let string = std::fs::read_to_string(path)?;
+        Self::try_from(string).map_err(|_| IOError::new(IOErrorKind::InvalidData, "invalid data"))
     }
 
-    fn write(self) {
-        todo!()
+    fn write(self, path: &Path) -> Result<(), IOError> {
+        match TryInto::<String>::try_into(self) {
+            Ok(string) => std::fs::write(path, string),
+            Err(_) => Err(IOError::new(IOErrorKind::InvalidData, "invalid data")),
+        }
     }
 }
