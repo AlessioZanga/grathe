@@ -190,6 +190,23 @@ impl TryInto<String> for DOT {
     fn try_into(self) -> Result<String, Self::Error> {
         // Use Write trait.
         use std::fmt::Write;
+        // Define macro to write attributes.
+        macro_rules! write_attributes {
+            ($string:ident, $attributes:ident) => {
+                if $attributes.is_empty() {
+                    // Write attributes.
+                    write!(
+                        $string,
+                        " [{}]",
+                        $attributes
+                            // Format attributes as key-value pairs.
+                            .into_iter()
+                            .map(|(k, v)| format!("{}={}", k, v))
+                            .join(", ")
+                    )?;
+                }
+            };
+        }
         // Initialize output result.
         let mut string: String = Default::default();
         // Iterate over graphs.
@@ -217,18 +234,7 @@ impl TryInto<String> for DOT {
                                 // Begin vertex statement.
                                 write!(string, "\t{:?}", x)?;
                                 // If there are attributes to write.
-                                if attributes.is_empty() {
-                                    // Write attributes.
-                                    write!(
-                                        string,
-                                        " [{}]",
-                                        attributes
-                                            // Format attributes as key-value pairs.
-                                            .into_iter()
-                                            .map(|(k, v)| format!("{}={}", k, v))
-                                            .join(", ")
-                                    )?;
-                                }
+                                write_attributes!(string, attributes);
                                 // End vertex statement.
                                 writeln!(string, ";")?;
                             }
@@ -241,20 +247,10 @@ impl TryInto<String> for DOT {
                         match edge {
                             Parsed::Edge(x, y, attributes) => {
                                 // Begin edge statement.
+                                // FIXME: Set edge type properly.
                                 write!(string, "\t{} -> {}", x, y)?;
                                 // If there are attributes to write.
-                                if attributes.is_empty() {
-                                    // Write attributes.
-                                    write!(
-                                        string,
-                                        " [{}]",
-                                        attributes
-                                            // Format attributes as key-value pairs.
-                                            .into_iter()
-                                            .map(|(k, v)| format!("{}={}", k, v))
-                                            .join(", ")
-                                    )?;
-                                }
+                                write_attributes!(string, attributes);
                                 // End edge statement.
                                 writeln!(string, ";")?;
                             }
