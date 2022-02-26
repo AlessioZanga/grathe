@@ -69,18 +69,38 @@ impl DOT {
         if matches!(statements.as_rule(), Rule::statements) {
             for statement in statements.into_inner() {
                 match statement.as_rule() {
+                    Rule::pair => {
+                        // TODO: Update to `extend_one` once stabilized.
+                        // attributes.extend_one(DOT::parse_pair(statement));
+                        let (k, v) = DOT::parse_pair(statement);
+                        attributes.insert(k, v);
+                    }
                     Rule::path => {
                         edges.extend(DOT::parse_path(statement));
                     }
                     Rule::vertex => {
                         vertices.push(DOT::parse_vertex(statement));
                     }
-                    rule => debug!("Ignore 'Rule::{:?}'", rule),
+                    rule => debug!("Ignore 'Rule::{:?}': {:?}", rule, statement.as_str()),
                 };
             }
         }
         // Return parsed values.
         Parsed::Graph(vertices, edges, attributes)
+    }
+
+    fn parse_pair(pair: Pair<Rule>) -> (String, String) {
+        // Check rule.
+        assert!(matches!(pair.as_rule(), Rule::pair));
+        // Get iterator on parsed.
+        let mut pair = pair.into_inner();
+        // Get (key, value) pair.
+        let (k, v) = (pair.next().unwrap(), pair.next().unwrap());
+        // Parse identifiers.
+        let (k, v) = (DOT::parse_id(k), DOT::parse_id(v));
+        // TODO: Consume remaining items in pair iterator.
+
+        (k, v)
     }
 
     fn parse_attributes(pair: Pair<Rule>) -> HashMap<String, String> {
@@ -150,6 +170,7 @@ impl DOT {
             Some(attributes) => Parsed::Vertex(vertex, DOT::parse_attributes(attributes)),
             None => Parsed::Vertex(vertex, Default::default()),
         }
+        // TODO: Consume remaining items in pair iterator.
     }
 
     fn parse_vertex_id(pair: Pair<Rule>) -> String {
@@ -158,21 +179,20 @@ impl DOT {
         // Get iterator on parsed.
         let mut pair = pair.into_inner();
         // Get vertex identifier
-        let vertex_id = pair.next().unwrap();
-        // Get underlying text representation
-        let vertex_id = match vertex_id.as_rule() {
+        DOT::parse_id(pair.next().unwrap())
+        // TODO: Consume remaining items in pair iterator.
+    }
+
+    fn parse_id(pair: Pair<Rule>) -> String {
+        // Check rule.
+        match pair.as_rule() {
             // Match text and number type
-            Rule::text | Rule::number => vertex_id.as_str().into(),
+            Rule::text | Rule::number => pair.as_str().into(),
             // Match quoted text type by removing quoting
-            Rule::quoted_text => vertex_id.as_str().trim_matches('"').into(),
+            Rule::quoted_text => pair.as_str().trim_matches('"').into(),
             // Match everything else
             _ => unreachable!(),
-        };
-        // TODO: Handle vertex port
-        if let Some(vertex_port) = pair.next() {
-            debug!("Vertex port '{}' ignored.", vertex_port.as_str());
         }
-        vertex_id
     }
 }
 
@@ -218,19 +238,23 @@ impl TryInto<String> for DOT {
         for graph in self.data {
             // Bind enum variant type.
             match graph {
-                Parsed::Graph(vertices, edges, attributes) => {
+                Parsed::Graph(vertices, edges, mut attributes) => {
                     // Write graph strict attribute, if any.
-                    if attributes.contains_key("strict") {
+                    if let Some(_) = attributes.remove("strict") {
                         write!(string, "strict")?;
                     }
                     // Write graph type.
-                    write!(string, "{}", attributes["graph_type"])?;
+                    write!(string, "{}", attributes.remove("graph_type").unwrap())?;
                     // Write graph identifier, if any.
-                    if attributes.contains_key("graph_id") {
-                        write!(string, " {:?}", attributes["graph_id"])?;
+                    if let Some(graph_id) = attributes.remove("graph_id") {
+                        write!(string, " {:?}", graph_id)?;
                     }
                     // Begin graph statement.
                     writeln!(string, " {{")?;
+                    // Iterate over attributes.
+                    for (k, v) in attributes {
+                        writeln!(string, "\t{:?}={:?};", k, v)?;
+                    }
                     // Iterate over vertices.
                     for vertex in vertices {
                         // Bind enum variant type.
