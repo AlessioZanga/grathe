@@ -1,9 +1,9 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::types::Error;
     use crate::graphs::DirectedAdjacencyListGraph;
     use crate::traits::Convert;
+    use crate::types::Error;
     use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
     use itertools::Itertools;
 
@@ -63,9 +63,10 @@ mod tests {
             .map(|(x, y)| (x as usize, y as usize))
             .unzip();
         let v = std::iter::repeat(true).take(g.size()).collect();
+        let order = g.order();
         assert_eq!(
             g.into_sparse_adjacency_matrix(),
-            SparseAdjacencyMatrix::from_triplets((g.order(), g.order()), x, y, v)
+            SparseAdjacencyMatrix::from_triplets((order, order), x, y, v)
         );
 
         Ok(())

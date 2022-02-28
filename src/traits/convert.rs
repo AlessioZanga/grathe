@@ -29,7 +29,7 @@ pub trait Convert: Storage {
     /// assert_eq!(g.into_edge_list(), EdgeList::from(sequence));
     /// ```
     ///
-    fn into_edge_list(&self) -> EdgeList<Self::Vertex>;
+    fn into_edge_list(self) -> EdgeList<Self::Vertex>;
 
     /// Adjacency list adapter.
     ///
@@ -39,7 +39,7 @@ pub trait Convert: Storage {
     ///
     /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
     ///
-    fn into_adjacency_list(&self) -> AdjacencyList<Self::Vertex>;
+    fn into_adjacency_list(self) -> AdjacencyList<Self::Vertex>;
 
     /// Dense adjacency matrix adapter.
     ///
@@ -49,7 +49,7 @@ pub trait Convert: Storage {
     ///
     /// $O(|V|^2)$ - Quadratic in the order of the graph.
     ///
-    fn into_dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix;
+    fn into_dense_adjacency_matrix(self) -> DenseAdjacencyMatrix;
 
     /// Sparse adjacency matrix adapter.
     ///
@@ -59,14 +59,14 @@ pub trait Convert: Storage {
     ///
     /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
     ///
-    fn into_sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix;
+    fn into_sparse_adjacency_matrix(self) -> SparseAdjacencyMatrix;
 }
 
 impl<T> Convert for T
 where
     T: Storage,
 {
-    fn into_edge_list(&self) -> EdgeList<Self::Vertex> {
+    fn into_edge_list(self) -> EdgeList<Self::Vertex> {
         let mut out = EdgeList::new();
         for (x, y) in E!(self) {
             out.insert((x.clone(), y.clone()));
@@ -74,7 +74,7 @@ where
         out
     }
 
-    fn into_adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
+    fn into_adjacency_list(self) -> AdjacencyList<Self::Vertex> {
         let mut out = AdjacencyList::new();
         for (x, y) in E!(self) {
             out.entry(x.clone()).or_default().insert(y.clone());
@@ -82,7 +82,7 @@ where
         out
     }
 
-    fn into_dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
+    fn into_dense_adjacency_matrix(self) -> DenseAdjacencyMatrix {
         let n = self.order();
         let mut idx = HashMap::new();
         let mut out = DenseAdjacencyMatrix::from_elem((n, n), false);
@@ -95,7 +95,7 @@ where
         out
     }
 
-    fn into_sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
+    fn into_sparse_adjacency_matrix(self) -> SparseAdjacencyMatrix {
         let n = self.order();
         let mut idx = HashMap::new();
         let mut out = SparseAdjacencyMatrix::new((n, n));
