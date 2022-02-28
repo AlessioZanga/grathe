@@ -4,34 +4,58 @@ mod tests {
         use crate::io::{DOT, IO};
         use tempfile::NamedTempFile;
 
-        const DATA: [(&str, &str); 7] = [
+        const DATA: [(&str, &str); 13] = [
             (
+                "graph {}",
                 "graph {\n}\n",
-                "graph {\n}\n",
             ),
             (
+                "digraph {}",
                 "digraph {\n}\n",
-                "digraph {\n}\n",
             ),
             (
+                "strict graph {}",
                 "strict graph {\n}\n",
-                "strict graph {\n}\n",
             ),
             (
+                "strict graph G {}",
                 "strict graph \"G\" {\n}\n",
+            ),
+            (
+                "strict graph \"G\" {}",
                 "strict graph \"G\" {\n}\n",
             ),
             (
-                "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+                "graph { A; B; }",
+                "graph {\n\t\"A\";\n\t\"B\";\n}\n",
+            ),
+            (
+                "graph { A -- B; }",
+                "graph {\n\t\"A\" -- \"B\";\n}\n",
+            ),
+            (
+                "graph { A; B; A -- B; }",
                 "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
             ),
             (
-                "graph {\n\t\"A\";\n\t\"B\";\n\t\"C\";\n\t\"A\" -- \"B\" -- \"C\";\n}\n",
+                "graph { \"A\"; \"B\"; \"A\" -- \"B\"; }",
+                "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+            ),
+            (
+                "graph { \"A\"; \"B\"; \"C\"; \"A\" -- \"B\" -- \"C\"; }",
                 "graph {\n\t\"A\";\n\t\"B\";\n\t\"C\";\n\t\"A\" -- \"B\";\n\t\"B\" -- \"C\";\n}\n",
             ),
             (
-                "graph {\n\t\"color\"=\"blue\";\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
-                "graph {\n\t\"color\"=\"blue\";\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+                "graph { \"color\" = \"blue\"; \"A\"; \"B\"; \"A\" -- \"B\"; }",
+                "graph {\n\t\"color\" = \"blue\";\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+            ),
+            (
+                "graph { \"A\" [\"color\" = \"blue\"]; \"B\"; \"A\" -- \"B\"; }",
+                "graph {\n\t\"A\" [\"color\" = \"blue\"];\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+            ),
+            (
+                "digraph { \"A\"; \"B\"; \"A\" -> \"B\" [\"color\" = \"blue\"]; }",
+                "digraph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -> \"B\" [\"color\" = \"blue\"];\n}\n",
             ),
         ];
 

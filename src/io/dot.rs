@@ -189,7 +189,7 @@ impl DOT {
             rule => {
                 debug!("Unreachable 'Rule::{:?}': {:?}", rule, pair.as_str());
                 unreachable!()
-            },
+            }
         }
     }
 }
@@ -224,7 +224,7 @@ impl TryInto<String> for DOT {
                         $attributes
                             // Format attributes as key-value pairs.
                             .into_iter()
-                            .map(|(k, v)| format!("{:?}={:?}", k, v))
+                            .map(|(k, v)| format!("{} = {}", k, v))
                             .join(", ")
                     )?;
                 }
@@ -251,7 +251,7 @@ impl TryInto<String> for DOT {
                     writeln!(string, "{{")?;
                     // Iterate over attributes.
                     for (k, v) in attributes {
-                        writeln!(string, "\t{:?}={:?};", k, v)?;
+                        writeln!(string, "\t{:?} = {:?};", k, v)?;
                     }
                     // Iterate over vertices.
                     for vertex in vertices {
