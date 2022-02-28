@@ -41,27 +41,22 @@ impl DOT {
         let mut pair = pair.into_inner();
         // Parse strict attribute.
         let strict = pair.next().unwrap();
-        if matches!(strict.as_rule(), Rule::strict) {
-            let strict = strict.as_str();
-            if !strict.is_empty() {
-                attributes.insert("strict".into(), strict.into());
-            }
+        assert!(matches!(strict.as_rule(), Rule::strict));
+        let strict = strict.as_str();
+        if !strict.is_empty() {
+            attributes.insert("strict".into(), strict.into());
         }
         // Parse graph type.
         let graph_type = pair.next().unwrap();
-        if matches!(graph_type.as_rule(), Rule::graph_type) {
-            let graph_type = graph_type.as_str();
-            attributes.insert("graph_type".into(), graph_type.into());
-        }
+        assert!(matches!(graph_type.as_rule(), Rule::graph_type));
+        attributes.insert("graph_type".into(), graph_type.as_str().into());
         // Parse graph identifier.
         let graph_id = pair.next().unwrap();
-        if matches!(graph_id.as_rule(), Rule::graph_id) {
-            let graph_id = graph_id.as_str();
-            if !graph_id.is_empty() {
-                attributes.insert("graph_id".into(), graph_id.into());
-            }
+        assert!(matches!(graph_id.as_rule(), Rule::graph_id));
+        if let Some(graph_id) = graph_id.into_inner().next() {
+            attributes.insert("graph_id".into(), DOT::parse_id(graph_id));
         }
-        //
+        // Initialize vertices and edges set.
         let mut vertices: Vec<Parsed> = Default::default();
         let mut edges: Vec<Parsed> = Default::default();
         // Parse graph statements.
@@ -191,7 +186,10 @@ impl DOT {
             // Match quoted text type by removing quoting
             Rule::quoted_text => pair.as_str().trim_matches('"').into(),
             // Match everything else
-            _ => unreachable!(),
+            rule => {
+                debug!("Unreachable 'Rule::{:?}': {:?}", rule, pair.as_str());
+                unreachable!()
+            },
         }
     }
 }
@@ -241,16 +239,16 @@ impl TryInto<String> for DOT {
                 Parsed::Graph(vertices, edges, mut attributes) => {
                     // Write graph strict attribute, if any.
                     if let Some(_) = attributes.remove("strict") {
-                        write!(string, "strict")?;
+                        write!(string, "strict ")?;
                     }
                     // Write graph type.
-                    write!(string, "{}", attributes.remove("graph_type").unwrap())?;
+                    write!(string, "{} ", attributes.remove("graph_type").unwrap())?;
                     // Write graph identifier, if any.
                     if let Some(graph_id) = attributes.remove("graph_id") {
-                        write!(string, " {:?}", graph_id)?;
+                        write!(string, "{:?} ", graph_id)?;
                     }
                     // Begin graph statement.
-                    writeln!(string, " {{")?;
+                    writeln!(string, "{{")?;
                     // Iterate over attributes.
                     for (k, v) in attributes {
                         writeln!(string, "\t{:?}={:?};", k, v)?;

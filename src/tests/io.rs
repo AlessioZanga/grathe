@@ -4,19 +4,52 @@ mod tests {
         use crate::io::{DOT, IO};
         use tempfile::NamedTempFile;
 
-        const DATA: &str = "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n";
+        const DATA: [(&str, &str); 7] = [
+            (
+                "graph {\n}\n",
+                "graph {\n}\n",
+            ),
+            (
+                "digraph {\n}\n",
+                "digraph {\n}\n",
+            ),
+            (
+                "strict graph {\n}\n",
+                "strict graph {\n}\n",
+            ),
+            (
+                "strict graph \"G\" {\n}\n",
+                "strict graph \"G\" {\n}\n",
+            ),
+            (
+                "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+                "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+            ),
+            (
+                "graph {\n\t\"A\";\n\t\"B\";\n\t\"C\";\n\t\"A\" -- \"B\" -- \"C\";\n}\n",
+                "graph {\n\t\"A\";\n\t\"B\";\n\t\"C\";\n\t\"A\" -- \"B\";\n\t\"B\" -- \"C\";\n}\n",
+            ),
+            (
+                "graph {\n\t\"color\"=\"blue\";\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+                "graph {\n\t\"color\"=\"blue\";\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",
+            ),
+        ];
 
         #[test]
         fn try_from() {
-            assert!(DOT::try_from(DATA.to_string()).is_ok());
+            for (k, _) in DATA {
+                assert!(DOT::try_from(k.to_string()).is_ok());
+            }
         }
 
         #[test]
         fn try_into() {
-            let dot = DOT::try_from(DATA.to_string()).unwrap();
-            let dot = TryInto::<String>::try_into(dot);
-            assert!(dot.is_ok());
-            assert_eq!(dot.unwrap(), DATA);
+            for (k, v) in DATA {
+                let dot = DOT::try_from(k.to_string()).unwrap();
+                let dot = TryInto::<String>::try_into(dot);
+                assert!(dot.is_ok());
+                assert_eq!(dot.unwrap(), v);
+            }
         }
 
         #[test]
@@ -32,13 +65,15 @@ mod tests {
 
         #[test]
         fn write() {
-            let path = NamedTempFile::new().unwrap().into_temp_path();
-            let dot = DOT::try_from(DATA.to_string()).unwrap();
-            assert!(dot.write(&path).is_ok());
-            let dot = DOT::read(&path).unwrap();
-            let dot = TryInto::<String>::try_into(dot);
-            assert!(dot.is_ok());
-            assert_eq!(dot.unwrap(), DATA);
+            for (k, v) in DATA {
+                let path = NamedTempFile::new().unwrap().into_temp_path();
+                let dot = DOT::try_from(k.to_string()).unwrap();
+                assert!(dot.write(&path).is_ok());
+                let dot = DOT::read(&path).unwrap();
+                let dot = TryInto::<String>::try_into(dot);
+                assert!(dot.is_ok());
+                assert_eq!(dot.unwrap(), v);
+            }
         }
     }
 }
