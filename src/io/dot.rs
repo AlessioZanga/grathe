@@ -1,5 +1,5 @@
 use super::IO;
-use crate::traits::Storage;
+use crate::traits::{Storage, WithAttributes};
 use itertools::Itertools;
 use pest::error::Error as ParserError;
 use pest::iterators::Pair;
@@ -300,6 +300,17 @@ impl IO for DOT {
     where
         G: Storage,
         F: FnMut(String) -> G::Vertex,
+    {
+        todo!()
+    }
+
+    fn map_with_attributes<G, F, X, Y, Z>(self, f: F, x: X, y: Y, z: Z) -> Vec<G>
+    where
+        G: Storage + WithAttributes<G::Vertex>,
+        F: FnMut(String) -> G::Vertex,
+        X: FnMut(HashMap<String, String>) -> G::GraphAttributes,
+        Y: FnMut(HashMap<String, String>) -> G::VertexAttributes,
+        Z: FnMut(HashMap<String, String>) -> G::EdgeAttributes,
     {
         todo!()
     }
