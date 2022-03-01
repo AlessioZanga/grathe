@@ -1,4 +1,5 @@
 use super::IO;
+use crate::traits::Storage;
 use itertools::Itertools;
 use pest::error::Error as ParserError;
 use pest::iterators::Pair;
@@ -295,6 +296,14 @@ impl TryInto<String> for DOT {
 }
 
 impl IO for DOT {
+    fn map<G, F>(self, f: F) -> Vec<G>
+    where
+        G: Storage,
+        F: FnMut(String) -> G::Vertex,
+    {
+        todo!()
+    }
+
     fn read(path: &Path) -> Result<Self, IOError> {
         let string = std::fs::read_to_string(path)?;
         Self::try_from(string).map_err(|_| IOError::new(IOErrorKind::InvalidData, "invalid data"))

@@ -34,13 +34,13 @@ mod tests {
         let mut g = T::new();
 
         // Test for existing vertex
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex(0)?;
         assert_eq!(An!(g, &i).count(), 0);
 
         // Test for existing ancestors
-        let j = g.add_vertex(&1)?;
-        let k = g.add_vertex(&2)?;
-        let l = g.add_vertex(&3)?;
+        let j = g.add_vertex(1)?;
+        let k = g.add_vertex(2)?;
+        let l = g.add_vertex(3)?;
         g.add_edge(&i, &j)?;
         g.add_edge(&k, &j)?;
         g.add_edge(&l, &k)?;
@@ -73,12 +73,12 @@ mod tests {
         let mut g = T::new();
 
         // Test for existing vertex
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex(0)?;
         assert_eq!(Pa!(g, &i).count(), 0);
 
         // Test for existing parents
-        let j = g.add_vertex(&1)?;
-        let k = g.add_vertex(&2)?;
+        let j = g.add_vertex(1)?;
+        let k = g.add_vertex(2)?;
         g.add_edge(&i, &j)?;
         g.add_edge(&k, &j)?;
         assert_eq!(Pa!(g, &i).count(), 0);
@@ -110,12 +110,12 @@ mod tests {
         let mut g = T::new();
 
         // Test for existing vertex
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex(0)?;
         assert_eq!(Ch!(g, &i).count(), 0);
 
         // Test for existing children
-        let j = g.add_vertex(&1)?;
-        let k = g.add_vertex(&2)?;
+        let j = g.add_vertex(1)?;
+        let k = g.add_vertex(2)?;
         g.add_edge(&j, &i)?;
         g.add_edge(&j, &k)?;
         assert_eq!(Ch!(g, &i).count(), 0);
@@ -147,13 +147,13 @@ mod tests {
         let mut g = T::new();
 
         // Test for existing vertex
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex(0)?;
         assert_eq!(De!(g, &i).count(), 0);
 
         // Test for existing descendants
-        let j = g.add_vertex(&1)?;
-        let k = g.add_vertex(&2)?;
-        let l = g.add_vertex(&3)?;
+        let j = g.add_vertex(1)?;
+        let k = g.add_vertex(2)?;
+        let l = g.add_vertex(3)?;
         g.add_edge(&j, &i)?;
         g.add_edge(&j, &k)?;
         g.add_edge(&k, &l)?;
@@ -186,8 +186,8 @@ mod tests {
         let mut g = T::new();
 
         // Test for undirected edges
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex(0)?;
+        let j = g.add_vertex(1)?;
         g.add_directed_edge(&i, &j)?;
         assert_true!(g.has_edge(&i, &j)?);
         assert_false!(g.has_edge(&j, &i)?);
@@ -204,17 +204,17 @@ mod tests {
         T: Directed<Vertex = i32>,
     {
         let mut g = T::new();
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex(0)?;
 
         assert_eq!(g.in_degree_of(&i), 0);
 
-        let j = g.add_vertex(&1)?;
+        let j = g.add_vertex(1)?;
         g.add_edge(&i, &j)?;
 
         assert_eq!(g.in_degree_of(&i), 0);
         assert_eq!(g.in_degree_of(&j), 1);
 
-        let k = g.add_vertex(&2)?;
+        let k = g.add_vertex(2)?;
         g.add_edge(&i, &k)?;
         g.add_edge(&j, &k)?;
 
@@ -241,17 +241,17 @@ mod tests {
         T: Directed<Vertex = i32>,
     {
         let mut g = T::new();
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex(0)?;
 
         assert_eq!(g.out_degree_of(&i), 0);
 
-        let j = g.add_vertex(&1)?;
+        let j = g.add_vertex(1)?;
         g.add_edge(&i, &j)?;
 
         assert_eq!(g.out_degree_of(&i), 1);
         assert_eq!(g.out_degree_of(&j), 0);
 
-        let k = g.add_vertex(&2)?;
+        let k = g.add_vertex(2)?;
         g.add_edge(&i, &k)?;
         g.add_edge(&j, &k)?;
 

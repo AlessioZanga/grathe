@@ -35,7 +35,7 @@ where
     /// use grathe::prelude::*;
     ///
     /// // Build a directed graph.
-    /// let g = DiGraph::from_edges(&[
+    /// let g = DiGraph::from_edges([
     ///     (0, 1), (0, 2), (0, 3),
     ///     (1, 2), (1, 3),
     ///     (2, 3)

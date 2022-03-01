@@ -229,12 +229,12 @@ where
         self.data.contains_key(x)
     }
 
-    fn add_vertex<U>(&mut self, x: &U) -> Result<Self::Vertex, Error<Self::Vertex>>
+    fn add_vertex<V>(&mut self, x: V) -> Result<Self::Vertex, Error<Self::Vertex>>
     where
-        U: Eq + Clone + Into<Self::Vertex>,
+        V: Into<Self::Vertex>,
     {
         // Get vertex identifier.
-        let x = x.clone().into();
+        let x = x.into();
         // TODO: Update using insert once stable.
         if self.has_vertex(&x) {
             return Err(Error::VertexAlreadyDefined(x));

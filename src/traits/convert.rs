@@ -23,7 +23,7 @@ pub trait Convert: Storage {
     /// let sequence = [(0, 1), (1, 0)];
     ///
     /// // Build a graph from a sequence of edges.
-    /// let g = Graph::from_edges(&sequence);
+    /// let g = Graph::from_edges(sequence);
     ///
     /// // Return an edge list (a.k.a. a *set* of edges) from the graph.
     /// assert_eq!(g.into_edge_list(), EdgeList::from(sequence));

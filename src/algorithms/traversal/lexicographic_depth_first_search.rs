@@ -45,7 +45,7 @@ where
     /// use grathe::algorithms::LexDFS;
     ///
     /// // Build an undirected graph.
-    /// let g = Graph::from_edges(&[
+    /// let g = Graph::from_edges([
     ///     (0, 1), (0, 2), (0, 4),
     ///     (1, 2), (1, 3),
     ///     (2, 4), (2, 3)

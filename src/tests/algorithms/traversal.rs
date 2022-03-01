@@ -18,7 +18,7 @@ mod directed {
 
                     // Build a null graph.
                     let mut g = $T::<$U>::new();
-                    let i = g.add_vertex(&0)?;
+                    let i = g.add_vertex(0)?;
                     // Execute BFS for the trivial graph.
                     let search = BFS::from((&g, &i));
 
@@ -32,7 +32,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&i), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(&1)?;
+                    let j = g.add_vertex(1)?;
                     g.add_edge(&i, &j)?;
                     // Execute BFS for the non-trivial graph.
                     let mut search = BFS::from((&g, &i));
@@ -54,7 +54,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(&2)?;
+                    let k = g.add_vertex(2)?;
                     // Execute BFS for the non-connected graph.
                     let mut search = BFS::from((&g, &i));
                     // Collect the node in pre-order.
@@ -77,7 +77,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -159,7 +159,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a disconnected graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1), (0, 2), (0, 3),
                         (1, 4), (2, 1), (3, 5),
                         (5, 4), (6, 7), (7, 8),
@@ -222,7 +222,7 @@ mod directed {
 
                     // Build a null graph.
                     let mut g = $T::<$U>::new();
-                    let i = g.add_vertex(&0)?;
+                    let i = g.add_vertex(0)?;
                     // Execute DFS for the trivial graph.
                     let mut search = DFS::from((&g, &i));
                     // Collect the node in pre-order.
@@ -243,7 +243,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&i), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(&1)?;
+                    let j = g.add_vertex(1)?;
                     g.add_edge(&i, &j)?;
                     // Execute DFS for the non-trivial graph.
                     let mut search = DFS::from((&g, &i));
@@ -268,7 +268,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(&2)?;
+                    let k = g.add_vertex(2)?;
                     // Execute DFS for the non-connected graph.
                     let mut search = DFS::from((&g, &i));
                     // Collect the node in pre-order.
@@ -295,7 +295,7 @@ mod directed {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -385,7 +385,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a disconnected graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1), (1, 2), (3, 4)
                     ]);
                     // Build a search object.
@@ -436,7 +436,7 @@ mod directed {
 
                     assert_eq!(search.next().transpose().unwrap(), None);
 
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (5, 11), (7, 11), (7, 8), (3, 8), (3, 10),
                         (11, 2), (11, 9), (11, 10), (8, 9)
                     ]);
@@ -457,7 +457,7 @@ mod directed {
                 #[should_panic]
                 fn topological_sort_should_panic()
                 {
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1), (1, 2), (2, 1)
                     ]);
                     let mut search = TopologicalSort::from(&g);
@@ -499,7 +499,7 @@ mod undirected {
 
                     // Build a null graph.
                     let mut g = $T::<$U>::new();
-                    let i = g.add_vertex(&0)?;
+                    let i = g.add_vertex(0)?;
 
                     // Execute BFS for the trivial graph.
                     let mut search = BFS::from((&g, &i));
@@ -518,7 +518,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&i), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(&1)?;
+                    let j = g.add_vertex(1)?;
                     g.add_edge(&i, &j)?;
 
                     // Execute BFS for the non-trivial graph.
@@ -541,7 +541,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(&2)?;
+                    let k = g.add_vertex(2)?;
 
                     // Execute BFS for the non-connected graph.
                     let mut search = BFS::from((&g, &i));
@@ -565,7 +565,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -644,7 +644,7 @@ mod undirected {
 
                     // Build a null graph.
                     let mut g = $T::<$U>::new();
-                    let i = g.add_vertex(&0)?;
+                    let i = g.add_vertex(0)?;
 
                     // Execute DFS for the trivial graph.
                     let mut search = DFS::from((&g, &i));
@@ -666,7 +666,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&i), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(&1)?;
+                    let j = g.add_vertex(1)?;
                     g.add_edge(&i, &j)?;
 
                     // Execute DFS for the non-trivial graph.
@@ -692,7 +692,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&j), Some(&&i));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(&2)?;
+                    let k = g.add_vertex(2)?;
 
                     // Execute DFS for the disconnected graph.
                     let mut search = DFS::from((&g, &i));
@@ -721,7 +721,7 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&k), None);
 
                     // Build non-trivial graph.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1),
                         (1, 2),
                         (0, 3),
@@ -814,7 +814,7 @@ mod undirected {
                     // with vertices (x, y, w, z, u, v, a, d, c, b)
                     // mapped to the (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
                     // sequence for an easy equality check.
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1), (0, 2), (0, 4), (0, 5),
                         (3, 1), (3, 2), (3, 4), (3, 5),
                         (6, 1), (6, 2), (6, 4), (6, 5),
@@ -925,7 +925,7 @@ mod undirected {
                     // Test from course slides
                     // with (f, g, c, d, b, a, e)
                     // as   (0, 1, 2, 3, 4, 5, 6).
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1), (0, 2), (1, 2), (1, 3),
                         (2, 3), (2, 4), (2, 5), (3, 4),
                         (3, 5), (3, 6), (4, 5)
@@ -1022,7 +1022,7 @@ mod undirected {
                     // yields no result.
                     assert_eq!(search.next(), None);
 
-                    let g = $T::<$U>::from_edges(&[
+                    let g = $T::<$U>::from_edges([
                         (0, 1), (0, 2), (0, 4),
                         (1, 2), (1, 3),
                         (2, 4), (2, 3)

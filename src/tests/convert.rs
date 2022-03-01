@@ -14,7 +14,7 @@ mod tests {
     where
         T: Convert<Vertex = i32>,
     {
-        let g = T::from_edges(&E);
+        let g = T::from_edges(E);
         assert_eq!(g.into_edge_list(), EdgeList::from(E));
 
         Ok(())
@@ -25,7 +25,7 @@ mod tests {
     where
         T: Convert<Vertex = i32>,
     {
-        let g = T::from_edges(&E);
+        let g = T::from_edges(E);
         let mut a = AdjacencyList::new();
         for (x, y) in E {
             a.entry(x).or_default().insert(y);
@@ -40,7 +40,7 @@ mod tests {
     where
         T: Convert<Vertex = i32>,
     {
-        let g = T::from_edges(&E);
+        let g = T::from_edges(E);
         let mut a = DenseAdjacencyMatrix::from_elem((8, 8), false);
         for (x, y) in E {
             a[(x as usize, y as usize)] = true;
@@ -55,7 +55,7 @@ mod tests {
     where
         T: Convert<Vertex = i32>,
     {
-        let g = T::from_edges(&E);
+        let g = T::from_edges(E);
         let (x, y): (Vec<_>, Vec<_>) = E
             .iter()
             .cloned()

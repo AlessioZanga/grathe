@@ -3,14 +3,13 @@ use sprs::TriMat;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::str::FromStr;
 use thiserror::Error;
 
 /// The base vertex trait.
-pub trait VertexTrait: Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
+pub trait VertexTrait: Eq + Ord + Clone + Default + Debug + Hash {}
 
 // Blanket implementation of vertex trait.
-impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash + FromStr {}
+impl<T> VertexTrait for T where T: Eq + Ord + Clone + Default + Debug + Hash {}
 
 /// Vertex iterator trait.
 #[rustfmt::skip]

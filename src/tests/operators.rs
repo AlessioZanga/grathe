@@ -14,7 +14,7 @@ mod tests {
         T: Storage<Vertex = i32> + Operators,
         for<'a> &'a T: Not<Output = T>,
     {
-        let g = T::from_edges(&[(0, 1), (2, 3)]);
+        let g = T::from_edges([(0, 1), (2, 3)]);
         let u = g.complement();
 
         assert_eq!(u, !&g);
@@ -43,8 +43,8 @@ mod tests {
         T: Storage<Vertex = i32> + Operators,
         for<'a> &'a T: BitOr<&'a T, Output = T>,
     {
-        let g = T::from_edges(&[(0, 1), (2, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4)]);
+        let g = T::from_edges([(0, 1), (2, 3)]);
+        let h = T::from_edges([(0, 2), (3, 4)]);
         let u = g.union(&h);
 
         assert_eq!(u, &g | &h);
@@ -58,8 +58,8 @@ mod tests {
         T: Storage<Vertex = i32> + Operators,
         for<'a> &'a T: BitAnd<&'a T, Output = T>,
     {
-        let g = T::from_edges(&[(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4), (3, 3)]);
+        let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
+        let h = T::from_edges([(0, 2), (3, 4), (3, 3)]);
         let u = g.intersection(&h);
 
         assert_eq!(u, &g & &h);
@@ -73,8 +73,8 @@ mod tests {
         T: Storage<Vertex = i32> + Operators,
         for<'a> &'a T: BitOr<&'a T, Output = T> + BitXor<&'a T, Output = T> + Sub<&'a T, Output = T>,
     {
-        let g = T::from_edges(&[(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4), (3, 3)]);
+        let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
+        let h = T::from_edges([(0, 2), (3, 4), (3, 3)]);
         let u = g.symmetric_difference(&h);
 
         assert_eq!(u, &g ^ &h);
@@ -89,8 +89,8 @@ mod tests {
         T: Storage<Vertex = i32> + Operators,
         for<'a> &'a T: Sub<&'a T, Output = T>,
     {
-        let g = T::from_edges(&[(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges(&[(0, 2), (3, 4), (3, 3)]);
+        let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
+        let h = T::from_edges([(0, 2), (3, 4), (3, 3)]);
         let u = g.difference(&h);
 
         assert_eq!(u, &g - &h);

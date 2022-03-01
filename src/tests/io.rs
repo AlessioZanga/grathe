@@ -5,34 +5,13 @@ mod tests {
         use tempfile::NamedTempFile;
 
         const DATA: [(&str, &str); 13] = [
-            (
-                "graph {}",
-                "graph {\n}\n",
-            ),
-            (
-                "digraph {}",
-                "digraph {\n}\n",
-            ),
-            (
-                "strict graph {}",
-                "strict graph {\n}\n",
-            ),
-            (
-                "strict graph G {}",
-                "strict graph \"G\" {\n}\n",
-            ),
-            (
-                "strict graph \"G\" {}",
-                "strict graph \"G\" {\n}\n",
-            ),
-            (
-                "graph { A; B; }",
-                "graph {\n\t\"A\";\n\t\"B\";\n}\n",
-            ),
-            (
-                "graph { A -- B; }",
-                "graph {\n\t\"A\" -- \"B\";\n}\n",
-            ),
+            ("graph {}", "graph {\n}\n"),
+            ("digraph {}", "digraph {\n}\n"),
+            ("strict graph {}", "strict graph {\n}\n"),
+            ("strict graph G {}", "strict graph \"G\" {\n}\n"),
+            ("strict graph \"G\" {}", "strict graph \"G\" {\n}\n"),
+            ("graph { A; B; }", "graph {\n\t\"A\";\n\t\"B\";\n}\n"),
+            ("graph { A -- B; }", "graph {\n\t\"A\" -- \"B\";\n}\n"),
             (
                 "graph { A; B; A -- B; }",
                 "graph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -- \"B\";\n}\n",

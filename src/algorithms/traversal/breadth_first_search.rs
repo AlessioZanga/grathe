@@ -50,7 +50,7 @@ where
     /// use grathe::prelude::*;
     ///
     /// // Build a directed graph.
-    /// let g = DiGraph::from_edges(&[
+    /// let g = DiGraph::from_edges([
     ///     (0, 1), (1, 2), (0, 3), (0, 4), (4, 5)
     /// ]);
     ///

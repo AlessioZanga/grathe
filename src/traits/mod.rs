@@ -8,6 +8,10 @@ pub use connectivity::Connectivity;
 mod convert;
 pub use convert::Convert;
 
+mod extend;
+pub(crate) use extend::impl_extend;
+pub use extend::Extend;
+
 /// Graph direction traits, such as Undirected.
 pub mod direction;
 pub use direction::{Directed, Undirected};

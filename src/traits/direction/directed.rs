@@ -1,10 +1,10 @@
-use crate::traits::{Capacity, Connectivity, Convert, Operators, Storage};
+use crate::traits::{Capacity, Connectivity, Convert, Extend, Operators, Storage};
 use crate::types::Error;
 use crate::types::VertexIterator;
 use std::collections::{BTreeSet, VecDeque};
 
 /// Directed graph trait.
-pub trait Directed: Capacity + Connectivity + Convert + Operators + Storage {
+pub trait Directed: Capacity + Connectivity + Convert + Extend + Operators + Storage {
     /// Ancestors iterator.
     ///
     /// Iterates over the vertex set $An(G, X)$ of a given vertex $X$.
@@ -210,6 +210,7 @@ macro_rules! impl_directed {
             }
         }
 
+        $crate::traits::impl_extend!($graph);
         $crate::traits::impl_operators!($graph);
         $crate::traits::impl_with_attributes!($graph);
 
@@ -239,7 +240,7 @@ macro_rules! impl_directed {
                     fn order(&self) -> usize;
                     fn size(&self) -> usize;
                     fn has_vertex(&self, x: &Self::Vertex) -> bool;
-                    fn add_vertex<V>(&mut self, x: &V) -> Result<Self::Vertex, $crate::types::Error<Self::Vertex>> where V: Eq + Clone + Into<Self::Vertex>;
+                    fn add_vertex<V>(&mut self, x: V) -> Result<Self::Vertex, $crate::types::Error<Self::Vertex>> where V: Into<Self::Vertex>;
                     fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>>;
                     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, $crate::types::Error<Self::Vertex>>;
                     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), $crate::types::Error<Self::Vertex>>;

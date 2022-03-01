@@ -1,9 +1,9 @@
-use crate::traits::{Capacity, Connectivity, Convert, Operators, Storage};
+use crate::traits::{Capacity, Connectivity, Convert, Extend, Operators, Storage};
 use crate::types::Error;
 use crate::types::VertexIterator;
 
 /// Undirected graph trait.
-pub trait Undirected: Capacity + Connectivity + Convert + Operators + Storage {
+pub trait Undirected: Capacity + Connectivity + Convert + Extend + Operators + Storage {
     /// Neighbor iterator.
     ///
     /// Iterates over the vertex set $Ne(G, X)$ of a given vertex $X$.
@@ -142,6 +142,7 @@ macro_rules! impl_undirected {
             }
         }
 
+        $crate::traits::impl_extend!($graph);
         $crate::traits::impl_operators!($graph);
         $crate::traits::impl_with_attributes!($graph);
 
@@ -179,9 +180,9 @@ macro_rules! impl_undirected {
                 self.edges_iter().filter(|(x, y)| x <= y).count()
             }
 
-            fn add_vertex<V>(&mut self, x: &V) -> Result<Self::Vertex, $crate::types::Error<Self::Vertex>>
+            fn add_vertex<V>(&mut self, x: V) -> Result<Self::Vertex, $crate::types::Error<Self::Vertex>>
             where
-                V: Eq + Clone + Into<Self::Vertex>
+                V: Into<Self::Vertex>
             {
                 // Add vertex into the graph.
                 let x = self.data.add_vertex(x)?;

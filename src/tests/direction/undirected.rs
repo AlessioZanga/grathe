@@ -34,8 +34,8 @@ mod tests {
         let mut g = T::new();
 
         // Test for undirected edges
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex(0)?;
+        let j = g.add_vertex(1)?;
         g.add_edge(&i, &j)?;
         assert_true!(g.has_edge(&i, &j)?);
         assert_true!(g.has_edge(&j, &i)?);
@@ -65,8 +65,8 @@ mod tests {
         let mut g = T::new();
 
         // Test for undirected edges
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex(0)?;
+        let j = g.add_vertex(1)?;
         g.add_edge(&i, &j)?;
         assert_true!(g.has_edge(&i, &j)?);
         assert_true!(g.has_edge(&j, &i)?);
@@ -88,11 +88,11 @@ mod tests {
         let mut g = T::new();
 
         // Test for existing vertex
-        let i = g.add_vertex(&0)?;
+        let i = g.add_vertex(0)?;
         assert_eq!(Ne!(g, &i).count(), 0);
 
         // Test for existing neighbors
-        let j = g.add_vertex(&1)?;
+        let j = g.add_vertex(1)?;
         g.add_edge(&i, &i)?;
         g.add_edge(&i, &j)?;
         g.add_edge(&j, &j)?;
@@ -123,8 +123,8 @@ mod tests {
         let mut g = T::new();
 
         // Test for undirected edges
-        let i = g.add_vertex(&0)?;
-        let j = g.add_vertex(&1)?;
+        let i = g.add_vertex(0)?;
+        let j = g.add_vertex(1)?;
         g.add_undirected_edge(&i, &j)?;
         assert_true!(g.has_edge(&i, &j)?);
         assert_true!(g.has_edge(&j, &i)?);
