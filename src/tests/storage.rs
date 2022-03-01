@@ -121,8 +121,72 @@ mod tests {
     where
         T: Storage<Vertex = i32>,
     {
+        let g = T::new::<_, _, i32>([], []);
+
+        assert_eq!(g.order(), 0);
+        assert_eq!(g.size(), 0);
+
+        let g = T::new(0..N, []);
+
+        assert_eq!(g.order(), N as usize);
+        assert_eq!(g.size(), 0);
+
+        let g = T::new([], (0..N).zip(0..N));
+
+        assert_eq!(g.order(), N as usize);
+        assert_eq!(g.size(), N as usize);
+
+        Ok(())
+    }
+
+    #[test]
+    fn null<T>() -> Result<(), Error<i32>>
+    where
+        T: Storage<Vertex = i32>,
+    {
         // Test null new call.
-        T::null();
+        let g = T::null();
+
+        assert_eq!(g.order(), 0);
+        assert_eq!(g.size(), 0);
+
+        Ok(())
+    }
+
+    #[test]
+    fn empty<T>() -> Result<(), Error<i32>>
+    where
+        T: Storage<Vertex = i32>,
+    {
+        let mut g = T::null();
+
+        // Test min graph vertex set.
+        assert_eq!(g.order(), 0);
+
+        // Test next graph vertex set.
+        g = T::empty([0]);
+        assert_eq!(g.order(), 1);
+
+        // Test next graph unordered vertex set.
+        g = T::empty([0, 4, 2, 3, 1]);
+        assert_eq!(g.order(), 5);
+
+        // Test next graph duplicated vertex set.
+        let g = T::empty([0, 4, 2, 3, 1, 4, 3]);
+        assert_eq!(g.order(), 5);
+
+        Ok(())
+    }
+
+    #[test]
+    fn complete<T>() -> Result<(), Error<i32>>
+    where
+        T: Storage<Vertex = i32>,
+    {
+        let g = T::complete(0..N);
+
+        assert_eq!(g.order(), N as usize);
+        assert_eq!(g.size(), (N * N) as usize);
 
         Ok(())
     }
@@ -162,32 +226,6 @@ mod tests {
 
         Ok(())
     }
-
-    #[test]
-    fn empty<T>() -> Result<(), Error<i32>>
-    where
-        T: Storage<Vertex = i32>,
-    {
-        let mut g = T::null();
-
-        // Test min graph vertex set.
-        assert_eq!(g.order(), 0);
-
-        // Test next graph vertex set.
-        g = T::empty([0]);
-        assert_eq!(g.order(), 1);
-
-        // Test next graph unordered vertex set.
-        g = T::empty([0, 4, 2, 3, 1]);
-        assert_eq!(g.order(), 5);
-
-        // Test next graph duplicated vertex set.
-        let g = T::empty([0, 4, 2, 3, 1, 4, 3]);
-        assert_eq!(g.order(), 5);
-
-        Ok(())
-    }
-
     #[test]
     fn from_edges<T>() -> Result<(), Error<i32>>
     where
