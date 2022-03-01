@@ -1,8 +1,8 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::graphs::storages::AdjacencyListStorage;
-    use crate::traits::Storage;
+    use crate::graphs::DirectedAdjacencyListGraph;
+    use crate::traits::{From, Storage};
     use crate::types::Error;
     use crate::{Adj, E, V};
     use all_asserts::*;
@@ -32,7 +32,7 @@ mod tests {
     #[test]
     fn eq<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
         let mut h = T::new();
@@ -59,7 +59,7 @@ mod tests {
     #[test]
     fn partial_cmp<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
         let mut h = T::new();
@@ -119,7 +119,7 @@ mod tests {
     #[test]
     fn new<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         // Test empty new call.
         T::new();
@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn default<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         // Test default call.
         let g = T::new();
@@ -143,7 +143,7 @@ mod tests {
     #[test]
     fn clear<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -166,7 +166,7 @@ mod tests {
     #[test]
     fn from_vertices<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::from_vertices::<_, i32>([]);
 
@@ -191,7 +191,7 @@ mod tests {
     #[test]
     fn from_edges<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::from_edges::<_, i32>([]);
 
@@ -220,7 +220,7 @@ mod tests {
     #[test]
     fn vertices_iter<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::from_vertices([0]);
         assert_eq!(V!(g).count(), 1);
@@ -243,7 +243,7 @@ mod tests {
     #[test]
     fn edges_iter<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::from_vertices([0]);
         assert_eq!(E!(g).count(), 0);
@@ -268,7 +268,7 @@ mod tests {
     #[test]
     fn adjacents_iter<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::from_vertices([0]);
         assert_eq!(Adj!(g, &0).count(), 0);
@@ -290,7 +290,7 @@ mod tests {
     #[should_panic]
     fn adjacents_iter_should_panic<T>()
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let g = T::new();
         Adj!(g, &0);
@@ -299,7 +299,7 @@ mod tests {
     #[test]
     fn order<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -324,7 +324,7 @@ mod tests {
     #[test]
     fn size<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -353,7 +353,7 @@ mod tests {
     #[test]
     fn has_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -378,7 +378,7 @@ mod tests {
     #[test]
     fn add_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         // Add min Vertex.
         let mut g = T::new();
@@ -412,7 +412,7 @@ mod tests {
     #[test]
     fn del_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -455,7 +455,7 @@ mod tests {
     #[test]
     fn has_edge<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -484,7 +484,7 @@ mod tests {
     #[test]
     fn add_edge<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -526,7 +526,7 @@ mod tests {
     #[test]
     fn del_edge<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -572,7 +572,7 @@ mod tests {
     #[test]
     fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let mut g = T::new();
 
@@ -593,7 +593,7 @@ mod tests {
     #[test]
     fn subgraph<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let g = T::from_edges([(0, 1), (0, 2), (1, 2), (2, 3), (3, 3)]);
 
@@ -615,7 +615,7 @@ mod tests {
     #[test]
     fn is_subgraph<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let g = T::from_edges([(0, 1)]);
         let h = T::from_edges([(0, 1), (0, 2)]);
@@ -629,7 +629,7 @@ mod tests {
     #[test]
     fn is_supergraph<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32>,
+        T: Storage<Vertex = i32> + From,
     {
         let g = T::from_edges([(0, 1), (0, 2)]);
         let h = T::from_edges([(0, 1)]);
@@ -640,6 +640,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<AdjacencyListStorage<i32>>)]
-    mod adjacency_list_storage {}
+    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
+    mod adjacency_list_graph {}
 }

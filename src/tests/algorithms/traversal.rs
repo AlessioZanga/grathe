@@ -472,7 +472,7 @@ mod directed {
     mod adjacency_list_graph {
         use crate::algorithms::{TopologicalSort, BFS, DFS};
         use crate::graphs::DirectedAdjacencyListGraph;
-        use crate::traits::{Directed, Storage};
+        use crate::traits::{Directed, From, Storage};
         use crate::types::*;
 
         generic_tests!(DirectedAdjacencyListGraph, i32);
@@ -1062,7 +1062,7 @@ mod undirected {
     mod adjacency_list_graph {
         use crate::algorithms::{LexBFS, LexDFS, BFS, DFS};
         use crate::graphs::UndirectedAdjacencyListGraph;
-        use crate::traits::Storage;
+        use crate::traits::{From, Storage};
         use crate::types::*;
 
         generic_tests!(UndirectedAdjacencyListGraph, i32);

@@ -67,108 +67,6 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     ///
     fn clear(&mut self);
 
-    /// From vertex constructor.
-    ///
-    /// Construct a graph from a given sequence of vertex, ignoring repeated ones.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // A sequence of unique vertex.
-    /// let sequence = [0, 3, 1, 2];
-    ///
-    /// // Build a graph given a vector of vertex.
-    /// let g = Graph::from_vertices(sequence);
-    ///
-    /// // Build a graph given any `IntoIterator`.
-    /// let h = Graph::from_vertices(0..4);
-    ///
-    /// assert_eq!(g, h);
-    ///
-    /// // A sequence of unique vertex.
-    /// let sequence = ["0", "3", "1", "2"];
-    ///
-    /// // Build a graph given a vector of vertex labels.
-    /// let g = Graphl::from_vertices(sequence);
-    /// ```
-    ///
-    fn from_vertices<I, T>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = T>,
-        T: Into<Self::Vertex>,
-    {
-        // Get vertex iterator.
-        let iter = iter.into_iter();
-        // Get lower bound size hint.
-        let (lower, _) = iter.size_hint();
-        // Build graph with initial capacity.
-        let mut g = Self::with_capacity(lower);
-        // Add vertex to the graph.
-        for x in iter {
-            g.add_vertex(x).ok();
-        }
-
-        g
-    }
-
-    /// From edges constructor.
-    ///
-    /// Construct a graph from a given sequence of edges, ignoring repeated ones.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // A sequence of unique edges.
-    /// let sequence = [(0, 1), (2, 3), (1, 2)];
-    ///
-    /// // Build a graph given a vector of edges.
-    /// let g = Graph::from_edges(sequence);
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 3);
-    ///
-    /// // A sequence of unique edge labels pairs.
-    /// let sequence = [("0", "1"), ("2", "3"), ("1", "2")];
-    ///
-    /// // Build a graph given a vector of vertex labels pairs.
-    /// let g = Graphl::from_edges(sequence);
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 3);
-    /// ```
-    ///
-    fn from_edges<I, T>(iter: I) -> Self
-    where
-        I: IntoIterator<Item = (T, T)>,
-        T: Into<Self::Vertex>,
-    {
-        // Get edges iterator.
-        let iter = iter.into_iter();
-        // Get lower bound size hint.
-        let (lower, _) = iter.size_hint();
-        // Build graph with initial capacity,
-        // assuming average frequency of new vertex.
-        let mut g = Self::with_capacity(lower);
-        // Add edges to the graph.
-        for (x, y) in iter {
-            let x = match g.add_vertex(x) {
-                Err(Error::VertexAlreadyDefined(x)) | Ok(x) => x,
-                Err(_) => unreachable!(),
-            };
-            let y = match g.add_vertex(y) {
-                Err(Error::VertexAlreadyDefined(y)) | Ok(y) => y,
-                Err(_) => unreachable!(),
-            };
-            g.add_edge(&x, &y).ok();
-        }
-
-        g
-    }
-
     /// Vertex iterator.
     ///
     /// Iterates over the vertex set $V$ ordered by identifier value.
@@ -542,12 +440,16 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     ///
     /// Panics if the vertex identifiers do not exist in the graph.
     ///
-    fn subgraph<I>(&self, iter: I) -> Self
+    fn subgraph<I, V>(&self, iter: I) -> Self
     where
-        I: IntoIterator<Item = Self::Vertex>,
+        I: IntoIterator<Item = V>,
+        V: Into<Self::Vertex>,
     {
         // Build a subgraph from the given vertices.
-        let mut subgraph = Self::from_vertices(iter);
+        let mut subgraph: Self = Default::default();
+        for x in iter {
+            subgraph.add_vertex(x).ok();
+        }
         // Check if is it a proper subgraph of self,
         // i.e. given vertices are contained in self.
         assert!(subgraph.is_subgraph(self));

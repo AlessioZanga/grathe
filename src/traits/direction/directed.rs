@@ -211,6 +211,7 @@ macro_rules! impl_directed {
         }
 
         $crate::traits::impl_extend!($graph);
+        $crate::traits::impl_from!($graph);
         $crate::traits::impl_operators!($graph);
         $crate::traits::impl_with_attributes!($graph);
 

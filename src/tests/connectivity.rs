@@ -2,14 +2,14 @@
 #[generic_tests::define]
 mod directed {
     use crate::graphs::DirectedAdjacencyListGraph;
-    use crate::traits::Connectivity;
+    use crate::traits::{Connectivity, From};
     use crate::types::Error;
     use all_asserts::*;
 
     #[test]
     fn has_path<T>() -> Result<(), Error<i32>>
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         // Test self edge graph.
         let g = T::from_edges([(0, 0)]);
@@ -56,7 +56,7 @@ mod directed {
     #[should_panic]
     fn has_path_should_panic<T>()
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         // Test null graph.
         let g = T::new();
@@ -66,7 +66,7 @@ mod directed {
     #[test]
     fn is_connected<T>() -> Result<(), Error<i32>>
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         // Test null graph.
         let g = T::new();
@@ -100,7 +100,7 @@ mod directed {
     #[test]
     fn is_acyclic<T>()
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         let g = T::new();
         assert_true!(g.is_acyclic());
@@ -126,14 +126,14 @@ mod directed {
 #[generic_tests::define]
 mod undirected {
     use crate::graphs::UndirectedAdjacencyListGraph;
-    use crate::traits::Connectivity;
+    use crate::traits::{Connectivity, From};
     use crate::types::Error;
     use all_asserts::*;
 
     #[test]
     fn has_path<T>() -> Result<(), Error<i32>>
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         // Test self edge graph.
         let g = T::from_edges([(0, 0)]);
@@ -181,7 +181,7 @@ mod undirected {
     #[should_panic]
     fn has_path_should_panic<T>()
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         // Test null path.
         let g = T::new();
@@ -191,7 +191,7 @@ mod undirected {
     #[test]
     fn is_connected<T>() -> Result<(), Error<i32>>
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         // Test null graph.
         let g = T::new();
@@ -226,7 +226,7 @@ mod undirected {
     #[ignore]
     fn is_acyclic<T>()
     where
-        T: Connectivity<Vertex = i32>,
+        T: Connectivity<Vertex = i32> + From,
     {
         let g = T::new();
         assert_true!(g.is_acyclic());

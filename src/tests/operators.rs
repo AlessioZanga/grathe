@@ -2,8 +2,7 @@
 #[generic_tests::define]
 mod tests {
     use crate::graphs::DirectedAdjacencyListGraph;
-    use crate::traits::Operators;
-    use crate::traits::Storage;
+    use crate::traits::{From, Operators, Storage};
     use crate::{E, V};
     use all_asserts::*;
     use std::ops::{BitAnd, BitOr, BitXor, Not, Sub};
@@ -11,7 +10,7 @@ mod tests {
     #[test]
     fn complement<T>()
     where
-        T: Storage<Vertex = i32> + Operators,
+        T: Storage<Vertex = i32> + From + Operators,
         for<'a> &'a T: Not<Output = T>,
     {
         let g = T::from_edges([(0, 1), (2, 3)]);
@@ -40,7 +39,7 @@ mod tests {
     #[test]
     fn union<T>()
     where
-        T: Storage<Vertex = i32> + Operators,
+        T: Storage<Vertex = i32> + From + Operators,
         for<'a> &'a T: BitOr<&'a T, Output = T>,
     {
         let g = T::from_edges([(0, 1), (2, 3)]);
@@ -55,7 +54,7 @@ mod tests {
     #[test]
     fn intersection<T>()
     where
-        T: Storage<Vertex = i32> + Operators,
+        T: Storage<Vertex = i32> + From + Operators,
         for<'a> &'a T: BitAnd<&'a T, Output = T>,
     {
         let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
@@ -70,7 +69,7 @@ mod tests {
     #[test]
     fn symmetric_difference<T>()
     where
-        T: Storage<Vertex = i32> + Operators,
+        T: Storage<Vertex = i32> + From + Operators,
         for<'a> &'a T: BitOr<&'a T, Output = T> + BitXor<&'a T, Output = T> + Sub<&'a T, Output = T>,
     {
         let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
@@ -86,7 +85,7 @@ mod tests {
     #[test]
     fn difference<T>()
     where
-        T: Storage<Vertex = i32> + Operators,
+        T: Storage<Vertex = i32> + From + Operators,
         for<'a> &'a T: Sub<&'a T, Output = T>,
     {
         let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);

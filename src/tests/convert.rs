@@ -2,7 +2,7 @@
 #[generic_tests::define]
 mod tests {
     use crate::graphs::DirectedAdjacencyListGraph;
-    use crate::traits::Convert;
+    use crate::traits::{Convert, From};
     use crate::types::Error;
     use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
     use itertools::Itertools;
@@ -12,7 +12,7 @@ mod tests {
     #[test]
     fn into_edge_list<T>() -> Result<(), Error<i32>>
     where
-        T: Convert<Vertex = i32>,
+        T: Convert<Vertex = i32> + From,
     {
         let g = T::from_edges(E);
         assert_eq!(g.into_edge_list(), EdgeList::from(E));
@@ -23,7 +23,7 @@ mod tests {
     #[test]
     fn into_adjacency_list<T>() -> Result<(), Error<i32>>
     where
-        T: Convert<Vertex = i32>,
+        T: Convert<Vertex = i32> + From,
     {
         let g = T::from_edges(E);
         let mut a = AdjacencyList::new();
@@ -38,7 +38,7 @@ mod tests {
     #[test]
     fn into_dense_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
-        T: Convert<Vertex = i32>,
+        T: Convert<Vertex = i32> + From,
     {
         let g = T::from_edges(E);
         let mut a = DenseAdjacencyMatrix::from_elem((8, 8), false);
@@ -53,7 +53,7 @@ mod tests {
     #[test]
     fn into_sparse_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
-        T: Convert<Vertex = i32>,
+        T: Convert<Vertex = i32> + From,
     {
         let g = T::from_edges(E);
         let (x, y): (Vec<_>, Vec<_>) = E

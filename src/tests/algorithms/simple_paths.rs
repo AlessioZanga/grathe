@@ -123,7 +123,7 @@ mod directed {
     mod adjacency_list_graph {
         use crate::algorithms::{AllSimpleCycles, AllSimplePaths};
         use crate::graphs::DirectedAdjacencyListGraph;
-        use crate::traits::Storage;
+        use crate::traits::{From, Storage};
 
         generic_tests!(DirectedAdjacencyListGraph, i32);
     }
@@ -191,7 +191,7 @@ mod undirected {
     mod adjacency_list_graph {
         use crate::algorithms::{AllSimpleCycles, AllSimplePaths};
         use crate::graphs::UndirectedAdjacencyListGraph;
-        use crate::traits::Storage;
+        use crate::traits::{From, Storage};
 
         generic_tests!(UndirectedAdjacencyListGraph, i32);
     }

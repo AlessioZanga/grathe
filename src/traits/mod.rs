@@ -16,6 +16,10 @@ pub use extend::Extend;
 pub mod direction;
 pub use direction::{Directed, Undirected};
 
+mod from;
+pub(crate) use from::impl_from;
+pub use from::From;
+
 mod operators;
 pub(crate) use operators::impl_operators;
 pub use operators::Operators;
