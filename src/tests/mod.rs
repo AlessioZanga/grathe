@@ -9,4 +9,4 @@ mod io;
 mod operators;
 mod readme;
 mod storage;
-// FIXME: mod with_attributes;
+mod with_attributes;

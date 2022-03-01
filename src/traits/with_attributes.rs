@@ -118,6 +118,76 @@ macro_rules! impl_with_attributes {
             type VertexAttributes = U::VertexAttributes;
             type EdgeAttributes = U::EdgeAttributes;
 
+            fn has_vertex_attrs(&self, x: &T) -> bool {
+                // Sanitize inputs.
+                assert!(self.has_vertex(x));
+                // Delegate method.
+                self.attributes.has_vertex_attrs(x)
+            }
+
+            fn get_vertex_attrs(&self, x: &T) -> Result<&Self::VertexAttributes, Error<T>> {
+                // Sanitize inputs.
+                assert!(self.has_vertex(x));
+                // Delegate method.
+                self.attributes.get_vertex_attrs(x)
+            }
+
+            fn get_mut_vertex_attrs(&mut self, x: &T) -> Result<&mut Self::VertexAttributes, Error<T>> {
+                // Sanitize inputs.
+                assert!(self.has_vertex(x));
+                // Delegate method.
+                self.attributes.get_mut_vertex_attrs(x)
+            }
+
+            fn set_vertex_attrs(&mut self, x: &T, y: Self::VertexAttributes) {
+                // Sanitize inputs.
+                assert!(self.has_vertex(x));
+                // Delegate method.
+                self.attributes.set_vertex_attrs(x, y)
+            }
+
+            fn unset_vertex_attrs(&mut self, x: &T) -> Result<Self::VertexAttributes, Error<T>> {
+                // Sanitize inputs.
+                assert!(self.has_vertex(x));
+                // Delegate method.
+                self.attributes.unset_vertex_attrs(x)
+            }
+
+            fn has_edge_attrs(&self, x: &T, y: &T) -> bool {
+                // Sanitize inputs.
+                assert!(self.has_edge(x, y).unwrap());
+                // Delegate method.
+                self.attributes.has_edge_attrs(x, y)
+            }
+
+            fn get_edge_attrs(&self, x: &T, y: &T) -> Result<&Self::EdgeAttributes, Error<T>> {
+                // Sanitize inputs.
+                assert!(self.has_edge(x, y).unwrap());
+                // Delegate method.
+                self.attributes.get_edge_attrs(x, y)
+            }
+
+            fn get_mut_edge_attrs(&mut self, x: &T, y: &T) -> Result<&mut Self::EdgeAttributes, Error<T>> {
+                // Sanitize inputs.
+                assert!(self.has_edge(x, y).unwrap());
+                // Delegate method.
+                self.attributes.get_mut_edge_attrs(x, y)
+            }
+
+            fn set_edge_attrs(&mut self, x: &T, y: &T, z: Self::EdgeAttributes) {
+                // Sanitize inputs.
+                assert!(self.has_edge(x, y).unwrap());
+                // Delegate method.
+                self.attributes.set_edge_attrs(x, y, z)
+            }
+
+            fn unset_edge_attrs(&mut self, x: &T, y: &T) -> Result<Self::EdgeAttributes, Error<T>> {
+                // Sanitize inputs.
+                assert!(self.has_edge(x, y).unwrap());
+                // Delegate method.
+                self.attributes.unset_edge_attrs(x, y)
+            }
+
             delegate::delegate! {
                 to self.attributes {
                     fn has_graph_attrs(&self) -> bool;
@@ -125,16 +195,6 @@ macro_rules! impl_with_attributes {
                     fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<T>>;
                     fn set_graph_attrs(&mut self, x: Self::GraphAttributes);
                     fn unset_graph_attrs(&mut self) -> Result<Self::GraphAttributes, Error<T>>;
-                    fn has_vertex_attrs(&self, x: &T) -> bool;
-                    fn get_vertex_attrs(&self, x: &T) -> Result<&Self::VertexAttributes, Error<T>>;
-                    fn get_mut_vertex_attrs(&mut self, x: &T) -> Result<&mut Self::VertexAttributes, Error<T>>;
-                    fn set_vertex_attrs(&mut self, x: &T, y: Self::VertexAttributes);
-                    fn unset_vertex_attrs(&mut self, x: &T) -> Result<Self::VertexAttributes, Error<T>>;
-                    fn has_edge_attrs(&self, x: &T, y: &T) -> bool;
-                    fn get_edge_attrs(&self, x: &T, y: &T) -> Result<&Self::EdgeAttributes, Error<T>>;
-                    fn get_mut_edge_attrs(&mut self, x: &T, y: &T) -> Result<&mut Self::EdgeAttributes, Error<T>>;
-                    fn set_edge_attrs(&mut self, x: &T, y: &T, z: Self::EdgeAttributes);
-                    fn unset_edge_attrs(&mut self, x: &T, y: &T) -> Result<Self::EdgeAttributes, Error<T>>;
                 }
             }
         }
