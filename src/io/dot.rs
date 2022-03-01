@@ -299,20 +299,51 @@ impl IO for DOT {
     fn map<G, F>(self, f: F) -> Vec<G>
     where
         G: Storage,
-        F: FnMut(String) -> G::Vertex,
+        F: Fn(String) -> G::Vertex,
     {
-        todo!()
+        self.data
+            .into_iter()
+            .map(|graph| match graph {
+                Parsed::Graph(vertices, edges, _) => G::new(
+                    vertices.into_iter().map(|vertex| match vertex {
+                        Parsed::Vertex(x, _) => f(x),
+                        _ => unreachable!(),
+                    }),
+                    edges.into_iter().map(|edge| match edge {
+                        Parsed::Edge(x, _, y, _) => (f(x), f(y)),
+                        _ => unreachable!(),
+                    }),
+                ),
+                _ => unreachable!(),
+            })
+            .collect()
     }
 
     fn map_with_attributes<G, F, X, Y, Z>(self, f: F, x: X, y: Y, z: Z) -> Vec<G>
     where
         G: Storage + WithAttributes<G::Vertex>,
-        F: FnMut(String) -> G::Vertex,
-        X: FnMut(HashMap<String, String>) -> G::GraphAttributes,
-        Y: FnMut(HashMap<String, String>) -> G::VertexAttributes,
-        Z: FnMut(HashMap<String, String>) -> G::EdgeAttributes,
+        F: Fn(String) -> G::Vertex,
+        X: Fn(HashMap<String, String>) -> G::GraphAttributes,
+        Y: Fn(HashMap<String, String>) -> G::VertexAttributes,
+        Z: Fn(HashMap<String, String>) -> G::EdgeAttributes,
     {
-        todo!()
+        self.data
+            .into_iter()
+            .map(|graph| match graph {
+                Parsed::Graph(vertices, edges, attributes) => G::new_with_attributes(
+                    x(attributes),
+                    vertices.into_iter().map(|vertex| match vertex {
+                        Parsed::Vertex(x, attributes) => (f(x), y(attributes)),
+                        _ => unreachable!(),
+                    }),
+                    edges.into_iter().map(|edge| match edge {
+                        Parsed::Edge(x, _, y, attributes) => ((f(x), f(y)), z(attributes)),
+                        _ => unreachable!(),
+                    }),
+                ),
+                _ => unreachable!(),
+            })
+            .collect()
     }
 
     fn read(path: &Path) -> Result<Self, IOError> {

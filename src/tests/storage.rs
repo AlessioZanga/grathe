@@ -1,8 +1,8 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::graphs::DirectedAdjacencyListGraph;
-    use crate::traits::{From, Storage};
+    use crate::graphs::storages::AdjacencyListStorage;
+    use crate::traits::Storage;
     use crate::types::Error;
     use crate::{Adj, E, V};
     use all_asserts::*;
@@ -32,10 +32,10 @@ mod tests {
     #[test]
     fn eq<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
-        let mut h = T::new();
+        let mut g = T::null();
+        let mut h = T::null();
 
         // Null graphs are equals by definition.
         assert_eq!(g, h); // G = (), H = ()
@@ -59,10 +59,10 @@ mod tests {
     #[test]
     fn partial_cmp<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
-        let mut h = T::new();
+        let mut g = T::null();
+        let mut h = T::null();
 
         // Null graphs are equals by definition.
         assert_true!(g == h);
@@ -119,10 +119,10 @@ mod tests {
     #[test]
     fn new<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        // Test empty new call.
-        T::new();
+        // Test null new call.
+        T::null();
 
         Ok(())
     }
@@ -130,10 +130,10 @@ mod tests {
     #[test]
     fn default<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
         // Test default call.
-        let g = T::new();
+        let g = T::null();
         assert_eq!(g.order(), 0_usize);
         assert_eq!(g.size(), 0_usize);
 
@@ -143,11 +143,11 @@ mod tests {
     #[test]
     fn clear<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
-        // Test empty graph
+        // Test graph
         g.clear();
         assert_eq!(g.order(), 0);
         assert_eq!(g.size(), 0);
@@ -164,25 +164,25 @@ mod tests {
     }
 
     #[test]
-    fn from_vertices<T>() -> Result<(), Error<i32>>
+    fn empty<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::from_vertices::<_, i32>([]);
+        let mut g = T::null();
 
         // Test min graph vertex set.
         assert_eq!(g.order(), 0);
 
         // Test next graph vertex set.
-        g = T::from_vertices([0]);
+        g = T::empty([0]);
         assert_eq!(g.order(), 1);
 
         // Test next graph unordered vertex set.
-        g = T::from_vertices([0, 4, 2, 3, 1]);
+        g = T::empty([0, 4, 2, 3, 1]);
         assert_eq!(g.order(), 5);
 
         // Test next graph duplicated vertex set.
-        let g = T::from_vertices([0, 4, 2, 3, 1, 4, 3]);
+        let g = T::empty([0, 4, 2, 3, 1, 4, 3]);
         assert_eq!(g.order(), 5);
 
         Ok(())
@@ -191,27 +191,27 @@ mod tests {
     #[test]
     fn from_edges<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::from_edges::<_, i32>([]);
+        let mut g = T::null();
 
         // Test min graph vertex set.
         assert_eq!(g.size(), 0);
 
         // Test next graph vertex set.
-        g = T::from_edges([(0, 0)]);
+        g = T::new([], [(0, 0)]);
         assert_eq!(g.size(), 1);
 
         // Test next graph unordered vertex set.
-        g = T::from_edges(E);
+        g = T::new([], E);
         assert_eq!(g.size(), 5);
 
         // Test high graph vertex set.
-        // g = T::from_edges((0..N).zip(0..N));
+        // g = T::new([], (0..N).zip(0..N));
         // assert_eq!(g.size(), &N);
 
         // Test next graph duplicated vertex set.
-        let g = T::from_edges(E);
+        let g = T::new([], E);
         assert_eq!(g.size(), 5);
 
         Ok(())
@@ -220,12 +220,12 @@ mod tests {
     #[test]
     fn vertices_iter<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = T::empty([0]);
         assert_eq!(V!(g).count(), 1);
 
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         assert_eq!(V!(g).count(), N as usize);
 
         assert_true!(V!(g).eq(g.vertices_iter()));
@@ -243,12 +243,12 @@ mod tests {
     #[test]
     fn edges_iter<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = T::empty([0]);
         assert_eq!(E!(g).count(), 0);
 
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         g.add_edge(&1, &1)?;
         g.add_edge(&0, &1)?;
         g.add_edge(&0, &0)?;
@@ -268,12 +268,12 @@ mod tests {
     #[test]
     fn adjacents_iter<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = T::empty([0]);
         assert_eq!(Adj!(g, &0).count(), 0);
 
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         g.add_edge(&1, &1)?;
         g.add_edge(&0, &1)?;
         g.add_edge(&0, &0)?;
@@ -290,18 +290,18 @@ mod tests {
     #[should_panic]
     fn adjacents_iter_should_panic<T>()
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         Adj!(g, &0);
     }
 
     #[test]
     fn order<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test null graph order.
         assert_eq!(g.order(), 0);
@@ -315,7 +315,7 @@ mod tests {
         assert_eq!(g.order(), 0);
 
         // Test high graph order.
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         assert_eq!(g.order(), N as usize);
 
         Ok(())
@@ -324,9 +324,9 @@ mod tests {
     #[test]
     fn size<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test null graph has no size by definition.
         assert_eq!(g.size(), 0);
@@ -342,7 +342,7 @@ mod tests {
         assert_eq!(g.size(), 0);
 
         // Test sequence size graph.
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         for i in 0..N {
             g.add_edge(&0, &i)?;
             assert_eq!(g.size(), (i + 1) as usize);
@@ -353,9 +353,9 @@ mod tests {
     #[test]
     fn has_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test null graph has no vertex by definition.
         assert_false!(g.has_vertex(&0));
@@ -369,7 +369,7 @@ mod tests {
         assert_false!(g.has_vertex(&i));
 
         // Test sequence of vertex.
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         assert_true!((0..N).all(|i| g.has_vertex(&i)));
 
         Ok(())
@@ -378,10 +378,10 @@ mod tests {
     #[test]
     fn add_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
         // Add min Vertex.
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Add min Vertex.
         let i = g.add_vertex(T::Vertex::MIN)?;
@@ -403,7 +403,7 @@ mod tests {
         assert_true!(g.has_vertex(&i));
 
         // Add contiguous Vertex.
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         assert_eq!(g.add_vertex(N)?, N);
 
         Ok(())
@@ -412,9 +412,9 @@ mod tests {
     #[test]
     fn del_vertex<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Del min Vertex.
         let i = g.add_vertex(T::Vertex::MIN)?;
@@ -455,9 +455,9 @@ mod tests {
     #[test]
     fn has_edge<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test null graph has no edge by definition.
         assert_true!(g.has_edge(&0, &0).is_err());
@@ -472,7 +472,7 @@ mod tests {
         assert_false!(g.has_edge(&i, &i)?);
 
         // Test sequence of edges.
-        g = T::from_vertices(0..N);
+        g = T::empty(0..N);
         for i in 0..N {
             g.add_edge(&0, &i)?;
         }
@@ -484,9 +484,9 @@ mod tests {
     #[test]
     fn add_edge<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test missing vertex.
         let (i, j) = (0, 0);
@@ -526,9 +526,9 @@ mod tests {
     #[test]
     fn del_edge<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test missing vertex.
         let (i, j) = (0, 0);
@@ -572,9 +572,9 @@ mod tests {
     #[test]
     fn degree_of_and_isolated_pendant<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for isolated vertex
         let i = g.add_vertex(0)?;
@@ -593,9 +593,9 @@ mod tests {
     #[test]
     fn subgraph<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let g = T::from_edges([(0, 1), (0, 2), (1, 2), (2, 3), (3, 3)]);
+        let g = T::new([], [(0, 1), (0, 2), (1, 2), (2, 3), (3, 3)]);
 
         // Build subgraph over 0, 2 and 3.
         let h = g.subgraph([0, 2, 3]);
@@ -615,10 +615,10 @@ mod tests {
     #[test]
     fn is_subgraph<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let g = T::from_edges([(0, 1)]);
-        let h = T::from_edges([(0, 1), (0, 2)]);
+        let g = T::new([], [(0, 1)]);
+        let h = T::new([], [(0, 1), (0, 2)]);
 
         assert_le!(g, h);
         assert_eq!((g <= h), g.is_subgraph(&h));
@@ -629,10 +629,10 @@ mod tests {
     #[test]
     fn is_supergraph<T>() -> Result<(), Error<i32>>
     where
-        T: Storage<Vertex = i32> + From,
+        T: Storage<Vertex = i32>,
     {
-        let g = T::from_edges([(0, 1), (0, 2)]);
-        let h = T::from_edges([(0, 1)]);
+        let g = T::new([], [(0, 1), (0, 2)]);
+        let h = T::new([], [(0, 1)]);
 
         assert_ge!(g, h);
         assert_eq!((g >= h), g.is_supergraph(&h));
@@ -640,6 +640,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
+    #[instantiate_tests(<AdjacencyListStorage<i32>>)]
     mod adjacency_list_graph {}
 }

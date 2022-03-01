@@ -8,7 +8,7 @@ mod directed {
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = BFS::from(&g);
                     // To search on a null graph
@@ -17,7 +17,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U>::null();
                     let i = g.add_vertex(0)?;
                     // Execute BFS for the trivial graph.
                     let search = BFS::from((&g, &i));
@@ -137,7 +137,7 @@ mod directed {
                 fn breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     BFS::from((&g, &0)).next();
                 }
 
@@ -145,7 +145,7 @@ mod directed {
                 fn breadth_first_search_forest() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = BFS::new(
                         &g,
@@ -212,7 +212,7 @@ mod directed {
                 fn depth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = DFS::from(&g);
                     // To search on a null graph
@@ -221,7 +221,7 @@ mod directed {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U>::null();
                     let i = g.add_vertex(0)?;
                     // Execute DFS for the trivial graph.
                     let mut search = DFS::from((&g, &i));
@@ -363,7 +363,7 @@ mod directed {
                 fn depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     DFS::from((&g, &0)).next();
                 }
 
@@ -371,7 +371,7 @@ mod directed {
                 fn depth_first_search_forest() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = DFS::new(
                         &g,
@@ -431,7 +431,7 @@ mod directed {
                 fn topological_sort()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     let mut search = TopologicalSort::from(&g);
 
                     assert_eq!(search.next().transpose().unwrap(), None);
@@ -489,7 +489,7 @@ mod undirected {
                 fn breadth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = BFS::from(&g);
                     // To search on a null graph
@@ -498,7 +498,7 @@ mod undirected {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U>::null();
                     let i = g.add_vertex(0)?;
 
                     // Execute BFS for the trivial graph.
@@ -626,7 +626,7 @@ mod undirected {
                 fn breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     BFS::from((&g, &0)).next();
                 }
 
@@ -634,7 +634,7 @@ mod undirected {
                 fn depth_first_search_tree() -> Result<(), Error<i32>>
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = DFS::from(&g);
                     // To search on a null graph
@@ -643,7 +643,7 @@ mod undirected {
                     assert_eq!(search.next(), None);
 
                     // Build a null graph.
-                    let mut g = $T::<$U>::new();
+                    let mut g = $T::<$U>::null();
                     let i = g.add_vertex(0)?;
 
                     // Execute DFS for the trivial graph.
@@ -791,7 +791,7 @@ mod undirected {
                 fn depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     DFS::from((&g, &0)).next();
                 }
 
@@ -802,7 +802,7 @@ mod undirected {
                     type Q<T> = std::collections::VecDeque<T>;
 
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = LexBFS::from(&g);
                     // To search on a null graph
@@ -1006,7 +1006,7 @@ mod undirected {
                 fn lexicographic_breadth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     LexBFS::from((&g, &0)).next();
                 }
 
@@ -1014,7 +1014,7 @@ mod undirected {
                 fn lexicographic_depth_first_search()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     // Build a search object.
                     let mut search = LexDFS::from(&g);
                     // To search on a null graph
@@ -1052,7 +1052,7 @@ mod undirected {
                 fn lexicographic_depth_first_search_tree_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     LexDFS::from((&g, &0)).next();
                 }
             }

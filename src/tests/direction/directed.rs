@@ -31,7 +31,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -61,7 +61,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         An!(g, &0);
     }
 
@@ -70,7 +70,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -98,7 +98,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         Pa!(g, &0);
     }
 
@@ -107,7 +107,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -135,7 +135,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         Ch!(g, &0);
     }
 
@@ -144,7 +144,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -174,7 +174,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         De!(g, &0);
     }
 
@@ -183,7 +183,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;
@@ -203,7 +203,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
         let i = g.add_vertex(0)?;
 
         assert_eq!(g.in_degree_of(&i), 0);
@@ -231,7 +231,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         g.in_degree_of(&0);
     }
 
@@ -240,7 +240,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
         let i = g.add_vertex(0)?;
 
         assert_eq!(g.out_degree_of(&i), 0);
@@ -268,7 +268,7 @@ mod tests {
     where
         T: Directed<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         g.out_degree_of(&0);
     }
 

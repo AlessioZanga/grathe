@@ -40,7 +40,7 @@ fn main() -> Result<()> {
     }
 
     // Define a graph with labels, equivalent to Graph::<String>.
-    let mut G = Graphl::new();
+    let mut G = Graphl::null();
 
     // Add a vertex to the graph.
     let x = G.add_vertex("A")?;

@@ -45,6 +45,18 @@ where
     type VertexAttributes = Y;
     type EdgeAttributes = Z;
 
+    fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
+    where
+        I: IntoIterator<Item = (T, Self::VertexAttributes)>,
+        J: IntoIterator<Item = ((T, T), Self::EdgeAttributes)>,
+    {
+        Self {
+            gattrs: Some(x),
+            vattrs: y.into_iter().collect(),
+            eattrs: z.into_iter().collect(),
+        }
+    }
+
     fn has_graph_attrs(&self) -> bool {
         self.gattrs.is_some()
     }

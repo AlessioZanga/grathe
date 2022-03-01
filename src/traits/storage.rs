@@ -15,10 +15,39 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// Underlying storage type.
     type Storage;
 
-    /// Base constructor.
+    /// Return immutable reference to underlying raw storage.
+    fn storage(&self) -> &Self::Storage;
+
+    /// New constructor.
     ///
-    /// Let be $\mathcal{G}$ a graph type. The base constructor of $\mathcal{G}$
-    /// returns a null graph $G$ (i.x. both $V$ and $E$ are empty).
+    /// Let be $\mathcal{G}$ a graph type. The new constructor of $\mathcal{G}$
+    /// returns a graph $G$ based on $V$ and $E$.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a new graph.
+    /// let g = Graph::new((0..3), [(0, 1), (1, 2)]);
+    ///
+    /// // The vertex set is not empty.
+    /// assert_eq!(g.order(), 3);
+    ///
+    /// // The edge set is also not empty.
+    /// assert_eq!(g.size(), 2);
+    /// ```
+    ///
+    fn new<I, J, V>(v_iter: I, e_iter: J) -> Self
+    where
+        I: IntoIterator<Item = V>,
+        J: IntoIterator<Item = (V, V)>,
+        V: Into<Self::Vertex>;
+
+    /// Null constructor.
+    ///
+    /// Let be $\mathcal{G}$ a graph type. The null constructor of $\mathcal{G}$
+    /// returns a null graph $G$ (i.e. both $V$ and $E$ are empty).
     ///
     /// # Examples
     ///
@@ -26,7 +55,7 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// use grathe::prelude::*;
     ///
     /// // Build a null graph.
-    /// let g = Graph::new();
+    /// let g = Graph::null();
     ///
     /// // The vertex set is empty.
     /// assert_eq!(g.order(), 0);
@@ -35,10 +64,57 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// assert_eq!(g.size(), 0);
     /// ```
     ///
-    fn new() -> Self;
+    fn null() -> Self;
 
-    /// Return immutable reference to underlying raw storage.
-    fn storage(&self) -> &Self::Storage;
+    /// Empty constructor.
+    ///
+    /// Let be $\mathcal{G}$ a graph type. The empty constructor of $\mathcal{G}$
+    /// returns an empty graph $G$ (i.e. $E$ is empty).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build an empty graph.
+    /// let g = Graph::empty(0..3);
+    ///
+    /// // The vertex set is not empty.
+    /// assert_eq!(g.order(), 3);
+    ///
+    /// // The edge set is also empty.
+    /// assert_eq!(g.size(), 0);
+    /// ```
+    ///
+    fn empty<I, V>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = V>,
+        V: Into<Self::Vertex>;
+
+    /// Complete constructor.
+    ///
+    /// Let be $\mathcal{G}$ a graph type. The complete constructor of $\mathcal{G}$
+    /// returns an complete graph $G$ (i.e. $E$ is $V \times V$).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use grathe::prelude::*;
+    ///
+    /// // Build a complete graph.
+    /// let g = DiGraph::complete(0..3);
+    ///
+    /// // The vertex set is not empty.
+    /// assert_eq!(g.order(), 3);
+    ///
+    /// // The edge set is also not empty.
+    /// assert_eq!(g.size(), g.order() * g.order());
+    /// ```
+    ///
+    fn complete<I, V>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = V>,
+        V: Into<Self::Vertex>;
 
     /// Clears the graph.
     ///
@@ -220,7 +296,7 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// assert_false!(g.has_vertex(&2));
     ///
     /// // Build a null graph.
-    /// let mut g = Graphl::new();
+    /// let mut g = Graphl::null();
     ///
     /// // Add a vertex given its label.
     /// let i = g.add_vertex("0")?;
@@ -249,14 +325,14 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     ///
     /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
-    /// let mut g = Graph::new();
+    /// let mut g = Graph::null();
     ///
     /// // Add a new vertex.
     /// let i = g.add_vertex(0)?;
     /// assert_true!(g.has_vertex(&i));
     ///
     /// // Build a null graph.
-    /// let mut g = Graphl::new();
+    /// let mut g = Graphl::null();
     ///
     /// // Add a vertex given its label.
     /// let i = g.add_vertex("0")?;
@@ -287,7 +363,7 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     ///
     /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
-    /// let mut g = Graph::new();
+    /// let mut g = Graph::null();
     ///
     /// // Add a new vertex.
     /// let i = g.add_vertex(0)?;
@@ -330,7 +406,7 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// assert_true!(g.has_edge(&0, &42).is_err());
     ///
     /// // Build a null graph.
-    /// let mut g = Graphl::new();
+    /// let mut g = Graphl::null();
     ///
     /// // Add a edge given its label.
     /// let x = g.add_vertex("0")?;
@@ -411,7 +487,7 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     ///
     /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
-    /// let mut g = Graph::new();
+    /// let mut g = Graph::null();
     ///
     /// // Add a new edge.
     /// let x = g.add_vertex(0)?;
@@ -472,7 +548,7 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// use grathe::prelude::*;
     ///
     /// // Build two graphs.
-    /// let g = Graph::new();
+    /// let g = Graph::null();
     /// let h = Graph::from_vertices(0..2);
     ///
     /// // The null graph is always subgraph of an other graph.
@@ -497,7 +573,7 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// use grathe::prelude::*;
     ///
     /// // Build two graphs.
-    /// let g = Graph::new();
+    /// let g = Graph::null();
     /// let h = Graph::from_vertices(0..2);
     ///
     /// // Any graph is supergraph of the null graph.

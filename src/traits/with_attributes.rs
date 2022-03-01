@@ -16,6 +16,12 @@ where
     /// Edge attributes type.
     type EdgeAttributes;
 
+    /// New constructor.
+    fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
+    where
+        I: IntoIterator<Item = (T, Self::VertexAttributes)>,
+        J: IntoIterator<Item = ((T, T), Self::EdgeAttributes)>;
+
     /// Checks graph attributes.
     ///
     /// Checks whether a graph has attributes.
@@ -117,6 +123,18 @@ macro_rules! impl_with_attributes {
             type GraphAttributes = U::GraphAttributes;
             type VertexAttributes = U::VertexAttributes;
             type EdgeAttributes = U::EdgeAttributes;
+
+            fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
+            where
+                I: IntoIterator<Item = (T, Self::VertexAttributes)>,
+                J: IntoIterator<Item = ((T, T), Self::EdgeAttributes)>,
+            {
+                Self {
+                    // FIXME: Change from Default to actual construction of storage (V, E).
+                    data: Default::default(),
+                    attributes: U::new_with_attributes(x, y, z),
+                }
+            }
 
             fn has_vertex_attrs(&self, x: &T) -> bool {
                 // Sanitize inputs.

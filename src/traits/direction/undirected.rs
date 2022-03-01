@@ -60,8 +60,8 @@ macro_rules! impl_undirected {
             /// ```
             /// use grathe::prelude::*;
             ///
-            /// let g = Graph::new();
-            /// let h = Graph::new();
+            /// let g = Graph::null();
+            /// let h = Graph::null();
             ///
             /// assert_eq!(g, h);
             /// ```
@@ -100,8 +100,8 @@ macro_rules! impl_undirected {
             /// use all_asserts::*;
             /// use grathe::prelude::*;
             ///
-            /// let g = Graph::new();
-            /// let h = Graph::new();
+            /// let g = Graph::null();
+            /// let h = Graph::null();
             ///
             /// assert_le!(g, h);
             /// ```
@@ -156,12 +156,54 @@ macro_rules! impl_undirected {
 
             type Storage = $storage<T>;
 
-            fn new() -> Self {
+            fn storage(&self) -> &Self::Storage {
+                &self.data
+            }
+
+            fn new<I, J, V>(v_iter: I, e_iter: J) -> Self
+            where
+                I: IntoIterator<Item = V>,
+                J: IntoIterator<Item = (V, V)>,
+                V: Into<Self::Vertex>
+            {
+                let mut data: Self::Storage = Storage::new(v_iter, e_iter);
+
+                let e_iter: Vec<_> = data.edges_iter().map(|(x, y)| (y.clone(), x.clone())).collect();
+
+                for (y, x) in e_iter {
+                    data.add_edge(&y, &x).ok();
+                }
+
+                Self {
+                    data: data,
+                    attributes: Default::default(),
+                }
+            }
+
+            fn null() -> Self {
                 Default::default()
             }
 
-            fn storage(&self) -> &Self::Storage {
-                &self.data
+            fn empty<I, V>(iter: I) -> Self
+            where
+                I: IntoIterator<Item = V>,
+                V: Into<Self::Vertex>,
+            {
+                Self {
+                    data: Storage::empty(iter),
+                    attributes: Default::default(),
+                }
+            }
+
+            fn complete<I, V>(iter: I) -> Self
+            where
+                I: IntoIterator<Item = V>,
+                V: Into<Self::Vertex>,
+            {
+                Self {
+                    data: Storage::complete(iter),
+                    attributes: Default::default(),
+                }
             }
 
             delegate::delegate! {

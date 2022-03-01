@@ -72,7 +72,7 @@ where
 
     fn with_capacity(_capacity: usize) -> Self {
         // INFO: BTreeMap as no `capacity` concept.
-        Self::new()
+        Self::null()
     }
 
     fn reserve(&mut self, _additional: usize) {
@@ -180,14 +180,55 @@ where
 
     type Storage = AdjacencyList<T>;
 
-    fn new() -> Self {
+    fn storage(&self) -> &Self::Storage {
+        &self.data
+    }
+
+    fn new<I, J, V>(v_iter: I, e_iter: J) -> Self
+    where
+        I: IntoIterator<Item = V>,
+        J: IntoIterator<Item = (V, V)>,
+        V: Into<Self::Vertex>,
+    {
+        // Initialize the data storage using the vertex set.
+        let mut data: Self::Storage = v_iter.into_iter().map(|x| (x.into(), Default::default())).collect();
+        // Fill the data storage using the edge set.
+        for (x, y) in e_iter.into_iter().map(|(x, y)| (x.into(), y.into())) {
+            data.entry(x).or_default().insert(y.clone());
+            data.entry(y).or_default();
+        }
+
+        Self { data: data }
+    }
+
+    fn null() -> Self {
+        Default::default()
+    }
+
+    fn empty<I, V>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = V>,
+        V: Into<Self::Vertex>,
+    {
         Self {
-            data: Self::Storage::new(),
+            data: iter.into_iter().map(|x| (x.into(), Default::default())).collect(),
         }
     }
 
-    fn storage(&self) -> &Self::Storage {
-        &self.data
+    fn complete<I, V>(iter: I) -> Self
+    where
+        I: IntoIterator<Item = V>,
+        V: Into<Self::Vertex>,
+    {
+        // Initialize the data storage using the vertex set.
+        let data: Vec<Self::Vertex> = iter.into_iter().map(Into::into).collect();
+        // Fill the data storage by copying the vertex set.
+        Self {
+            data: data
+                .iter()
+                .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
+                .collect(),
+        }
     }
 
     fn clear(&mut self) {
@@ -196,7 +237,7 @@ where
     }
 
     fn vertices_iter<'a>(&'a self) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
-        Box::new(self.data.iter().map(|x| x.0))
+        Box::new(self.data.keys())
     }
 
     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a> {

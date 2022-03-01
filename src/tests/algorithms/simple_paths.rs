@@ -113,7 +113,7 @@ mod directed {
                 fn all_simple_paths_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     AllSimplePaths::from((&g, &0, &1)).run();
                 }
             }
@@ -181,7 +181,7 @@ mod undirected {
                 fn all_simple_paths_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::new();
+                    let g = $T::<$U>::null();
                     AllSimplePaths::from((&g, &0, &1)).run();
                 }
             }

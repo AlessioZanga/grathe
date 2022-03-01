@@ -15,7 +15,7 @@ pub trait Extend: Storage {
     ///
     /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
-    /// let mut g = Graph::new();
+    /// let mut g = Graph::null();
     ///
     /// // Extend graph with vertices.
     /// g.extend_vertices([0, 3, 1, 2])?;
@@ -26,7 +26,7 @@ pub trait Extend: Storage {
     /// assert_true!(g.extend_vertices([0]).is_err());
     ///
     /// // Build a null graph.
-    /// let mut g = Graphl::new();
+    /// let mut g = Graphl::null();
     ///
     /// // Extend graph with vertices.
     /// g.extend_vertices(["0", "3", "1", "2"])?;
@@ -71,7 +71,7 @@ pub trait Extend: Storage {
     ///
     /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
-    /// let mut g = Graph::new();
+    /// let mut g = Graph::null();
     ///
     /// // Extend graph with edges.
     /// g.extend_edges([(0, 3), (1, 2)])?;
@@ -82,7 +82,7 @@ pub trait Extend: Storage {
     /// assert_true!(g.extend_edges([(0, 3)]).is_err());
     ///
     /// // Build a null graph.
-    /// let mut g = Graphl::new();
+    /// let mut g = Graphl::null();
     ///
     /// // Extend graph with edges.
     /// g.extend_edges([("0", "3"), ("1", "2")])?;

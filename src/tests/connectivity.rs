@@ -59,7 +59,7 @@ mod directed {
         T: Connectivity<Vertex = i32> + From,
     {
         // Test null graph.
-        let g = T::new();
+        let g = T::null();
         assert_false!(g.has_path(&0, &0));
     }
 
@@ -69,7 +69,7 @@ mod directed {
         T: Connectivity<Vertex = i32> + From,
     {
         // Test null graph.
-        let g = T::new();
+        let g = T::null();
         assert_true!(g.is_connected());
 
         // Test single edge graph.
@@ -102,7 +102,7 @@ mod directed {
     where
         T: Connectivity<Vertex = i32> + From,
     {
-        let g = T::new();
+        let g = T::null();
         assert_true!(g.is_acyclic());
 
         let g = T::from_vertices([0]);
@@ -184,7 +184,7 @@ mod undirected {
         T: Connectivity<Vertex = i32> + From,
     {
         // Test null path.
-        let g = T::new();
+        let g = T::null();
         assert_false!(g.has_path(&0, &0));
     }
 
@@ -194,7 +194,7 @@ mod undirected {
         T: Connectivity<Vertex = i32> + From,
     {
         // Test null graph.
-        let g = T::new();
+        let g = T::null();
         assert_true!(g.is_connected());
 
         // Test single edge graph.
@@ -228,7 +228,7 @@ mod undirected {
     where
         T: Connectivity<Vertex = i32> + From,
     {
-        let g = T::new();
+        let g = T::null();
         assert_true!(g.is_acyclic());
 
         let g = T::from_vertices([0]);

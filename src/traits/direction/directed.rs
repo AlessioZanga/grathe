@@ -224,12 +224,46 @@ macro_rules! impl_directed {
 
             type Storage = $storage<T>;
 
-            fn new() -> Self {
+            fn storage(&self) -> &Self::Storage {
+                &self.data
+            }
+
+            fn new<I, J, V>(v_iter: I, e_iter: J) -> Self
+            where
+                I: IntoIterator<Item = V>,
+                J: IntoIterator<Item = (V, V)>,
+                V: Into<Self::Vertex>
+            {
+                Self {
+                    data: Storage::new(v_iter, e_iter),
+                    attributes: Default::default(),
+                }
+            }
+
+            fn null() -> Self {
                 Default::default()
             }
 
-            fn storage(&self) -> &Self::Storage {
-                &self.data
+            fn empty<I, V>(iter: I) -> Self
+            where
+                I: IntoIterator<Item = V>,
+                V: Into<Self::Vertex>,
+            {
+                Self {
+                    data: Storage::empty(iter),
+                    attributes: Default::default(),
+                }
+            }
+
+            fn complete<I, V>(iter: I) -> Self
+            where
+                I: IntoIterator<Item = V>,
+                V: Into<Self::Vertex>,
+            {
+                Self {
+                    data: Storage::complete(iter),
+                    attributes: Default::default(),
+                }
             }
 
             delegate::delegate! {

@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::graphs::UndirectedAdjacencyListGraph;
+    use crate::graphs::DirectedAdjacencyListGraph;
     use crate::traits::Extend;
     use crate::types::Error;
     use all_asserts::*;
@@ -11,7 +11,7 @@ mod tests {
     where
         T: Extend<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Extend graph with vertices.
         g.extend_vertices([0, 3, 1, 2])?;
@@ -27,7 +27,7 @@ mod tests {
     where
         T: Extend<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Extend graph with edges.
         g.extend_edges([(0, 3), (1, 2)])?;
@@ -39,6 +39,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
+    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
     mod adjacency_list_graph {}
 }

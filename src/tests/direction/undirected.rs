@@ -31,7 +31,7 @@ mod tests {
     where
         T: Undirected<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;
@@ -62,7 +62,7 @@ mod tests {
     where
         T: Undirected<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;
@@ -85,7 +85,7 @@ mod tests {
     where
         T: Undirected<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -111,7 +111,7 @@ mod tests {
     where
         T: Undirected<Vertex = i32>,
     {
-        let g = T::new();
+        let g = T::null();
         Ne!(g, &0);
     }
 
@@ -120,7 +120,7 @@ mod tests {
     where
         T: Undirected<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;

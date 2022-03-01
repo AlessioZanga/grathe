@@ -68,7 +68,7 @@ pub trait Capacity {
     /// use grathe::prelude::*;
     ///
     /// // Build a null graph.
-    /// let mut g = Graph::new();
+    /// let mut g = Graph::null();
     ///
     /// // Reserve additional capacity.
     /// g.reserve(3);

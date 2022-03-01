@@ -12,17 +12,17 @@ pub trait IO: TryFrom<String> + TryInto<String> {
     fn map<G, F>(self, f: F) -> Vec<G>
     where
         G: Storage,
-        F: FnMut(String) -> G::Vertex;
+        F: Fn(String) -> G::Vertex;
 
     /// Map parsed data into graph with attributes.
     ///
     fn map_with_attributes<G, F, X, Y, Z>(self, f: F, x: X, y: Y, z: Z) -> Vec<G>
     where
         G: Storage + WithAttributes<G::Vertex>,
-        F: FnMut(String) -> G::Vertex,
-        X: FnMut(HashMap<String, String>) -> G::GraphAttributes,
-        Y: FnMut(HashMap<String, String>) -> G::VertexAttributes,
-        Z: FnMut(HashMap<String, String>) -> G::EdgeAttributes;
+        F: Fn(String) -> G::Vertex,
+        X: Fn(HashMap<String, String>) -> G::GraphAttributes,
+        Y: Fn(HashMap<String, String>) -> G::VertexAttributes,
+        Z: Fn(HashMap<String, String>) -> G::EdgeAttributes;
 
     /// Reads file given its path.
     ///

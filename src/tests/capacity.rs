@@ -26,7 +26,7 @@ mod tests {
     where
         T: Storage<Vertex = i32>,
     {
-        let mut g = T::new();
+        let mut g = T::null();
 
         // Reserve additional capacity.
         g.reserve(3);
