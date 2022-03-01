@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["Alessio Zanga <alessio.zanga@outlook.it>"]
 description = "A Rust implementation of a GRAph THEory library."
 readme = "README.md"
-license = "MIT OR Apache-2.0"
+license = "Apache-2.0 OR MIT"
 homepage = "https://github.com/AlessioZanga/grathe"
 repository = "https://github.com/AlessioZanga/grathe"
 documentation = "https://docs.rs/grathe"
@@ -18,7 +18,7 @@ categories = ["algorithms", "data-structures", "mathematics", "science"]
 [dependencies]
 delegate = "^0.6.1"
 itertools = "^0.10.1"
-log = {version = "^0.4.14", features = ["max_level_debug", "release_max_level_warn"]}
+log = "^0.4.14"
 ndarray = "^0.15.4"
 num-traits = "^0.2.14"
 pest = "^2.1.3"
