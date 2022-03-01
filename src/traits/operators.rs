@@ -59,7 +59,7 @@ macro_rules! impl_operators {
     ($graph:ident) => {
         impl<T, U> $crate::traits::Operators for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             fn complement(&self) -> Self {
@@ -100,7 +100,7 @@ macro_rules! impl_operators {
 
         impl<T, U> std::ops::Not for &$graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             type Output = $graph<T, U>;
@@ -120,7 +120,7 @@ macro_rules! impl_operators {
 
         impl<T, U> std::ops::BitAnd for &$graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             type Output = $graph<T, U>;
@@ -140,7 +140,7 @@ macro_rules! impl_operators {
 
         impl<T, U> std::ops::BitOr for &$graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             type Output = $graph<T, U>;
@@ -160,7 +160,7 @@ macro_rules! impl_operators {
 
         impl<T, U> std::ops::BitXor for &$graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             type Output = $graph<T, U>;
@@ -184,7 +184,7 @@ macro_rules! impl_operators {
 
         impl<T, U> std::ops::Sub for &$graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             type Output = $graph<T, U>;

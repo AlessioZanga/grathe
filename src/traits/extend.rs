@@ -130,7 +130,7 @@ macro_rules! impl_extend {
     ($graph:ident) => {
         impl<T, U> $crate::traits::Extend for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
         }

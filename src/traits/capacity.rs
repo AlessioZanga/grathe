@@ -138,7 +138,7 @@ macro_rules! impl_capacity {
     ($graph:ident) => {
         impl<T, U> $crate::traits::Capacity for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             fn with_capacity(capacity: usize) -> Self {

@@ -1,6 +1,6 @@
 use crate::traits::{Capacity, Operators, Storage};
 use crate::types::Error;
-use crate::types::{AdjacencyList, EdgeIterator, ExactSizeIter, VertexIterator, VertexTrait};
+use crate::types::{AdjacencyList, EdgeIterator, ExactSizeIter, VertexIterator, Vertex};
 use std::cmp::Ordering;
 use std::collections::{BTreeSet, HashSet};
 
@@ -8,14 +8,14 @@ use std::collections::{BTreeSet, HashSet};
 #[derive(PartialEq, Eq, Default, Debug)]
 pub struct AdjacencyListStorage<T>
 where
-    T: VertexTrait,
+    T: Vertex,
 {
     data: AdjacencyList<T>,
 }
 
 impl<T> PartialOrd for AdjacencyListStorage<T>
 where
-    T: VertexTrait,
+    T: Vertex,
 {
     // TODO: That's a generic implementation of PartialOrd,
     // which is fine, but here we would like to have an
@@ -63,7 +63,7 @@ where
 
 impl<T> Capacity for AdjacencyListStorage<T>
 where
-    T: VertexTrait,
+    T: Vertex,
 {
     fn capacity(&self) -> usize {
         // INFO: BTreeMap as no `capacity` concept.
@@ -90,7 +90,7 @@ where
 
 impl<T> Operators for AdjacencyListStorage<T>
 where
-    T: VertexTrait,
+    T: Vertex,
 {
     fn complement(&self) -> Self {
         // Copy the vertex set.
@@ -174,7 +174,7 @@ where
 
 impl<T> Storage for AdjacencyListStorage<T>
 where
-    T: VertexTrait,
+    T: Vertex,
 {
     type Vertex = T;
 

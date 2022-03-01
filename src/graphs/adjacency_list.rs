@@ -2,13 +2,13 @@ use super::attributes::AttributesMap;
 use super::storages::AdjacencyListStorage;
 use crate::traits::{Directed, Operators, Storage, Undirected, WithAttributes};
 use crate::types::Error;
-use crate::types::{VertexIterator, VertexTrait};
+use crate::types::{VertexIterator, Vertex};
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
 pub struct UndirectedAdjacencyListGraph<T, U = AttributesMap<T, (), (), ()>>
 where
-    T: VertexTrait,
+    T: Vertex,
     U: WithAttributes<T>,
 {
     data: AdjacencyListStorage<T>,
@@ -20,7 +20,7 @@ crate::traits::direction::impl_undirected!(UndirectedAdjacencyListGraph, Adjacen
 
 impl<T, U> Undirected for UndirectedAdjacencyListGraph<T, U>
 where
-    T: VertexTrait,
+    T: Vertex,
     U: WithAttributes<T>,
 {
     fn neighbors_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
@@ -36,7 +36,7 @@ where
 #[derive(Default, Debug)]
 pub struct DirectedAdjacencyListGraph<T, U = AttributesMap<T, (), (), ()>>
 where
-    T: VertexTrait,
+    T: Vertex,
     U: WithAttributes<T>,
 {
     data: AdjacencyListStorage<T>,
@@ -48,7 +48,7 @@ crate::traits::direction::impl_directed!(DirectedAdjacencyListGraph, AdjacencyLi
 
 impl<T, U> Directed for DirectedAdjacencyListGraph<T, U>
 where
-    T: VertexTrait,
+    T: Vertex,
     U: WithAttributes<T>,
 {
     fn parents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {

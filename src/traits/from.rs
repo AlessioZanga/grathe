@@ -110,7 +110,7 @@ macro_rules! impl_from {
     ($graph:ident) => {
         impl<T, U> $crate::traits::From for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
         }

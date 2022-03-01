@@ -41,7 +41,7 @@ macro_rules! impl_undirected {
     ($graph:ident, $storage:ident) => {
         impl<T, U> PartialEq for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Equality operator.
@@ -73,13 +73,13 @@ macro_rules! impl_undirected {
 
         impl<T, U> Eq for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {}
 
         impl<T, U> PartialOrd for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Comparable operator.
@@ -115,7 +115,7 @@ macro_rules! impl_undirected {
 
         impl<T, U> $crate::traits::Connectivity for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
@@ -149,7 +149,7 @@ macro_rules! impl_undirected {
 
         impl<T, U> $crate::traits::Storage for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             type Vertex = T;

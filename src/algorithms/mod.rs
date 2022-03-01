@@ -10,7 +10,7 @@ macro_rules! impl_algorithms_directed {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<(&'a $graph<T, U>, &'a T, &'a T)> for $crate::algorithms::AllSimplePaths<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             fn from((g, x, y): (&'a $graph<T, U>, &'a T, &'a T)) -> Self {
@@ -22,7 +22,7 @@ macro_rules! impl_algorithms_directed {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::AllSimpleCycles<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             fn from(g: &'a $graph<T, U>) -> Self {
@@ -34,7 +34,7 @@ macro_rules! impl_algorithms_directed {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
@@ -55,7 +55,7 @@ macro_rules! impl_algorithms_directed {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.
@@ -78,7 +78,7 @@ macro_rules! impl_algorithms_directed {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
@@ -99,7 +99,7 @@ macro_rules! impl_algorithms_directed {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.
@@ -126,7 +126,7 @@ macro_rules! impl_algorithms_undirected {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<(&'a $graph<T, U>, &'a T, &'a T)> for $crate::algorithms::AllSimplePaths<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             fn from((g, x, y): (&'a $graph<T, U>, &'a T, &'a T)) -> Self {
@@ -138,7 +138,7 @@ macro_rules! impl_algorithms_undirected {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::AllSimpleCycles<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             fn from(g: &'a $graph<T, U>) -> Self {
@@ -150,7 +150,7 @@ macro_rules! impl_algorithms_undirected {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
@@ -171,7 +171,7 @@ macro_rules! impl_algorithms_undirected {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::BreadthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.
@@ -194,7 +194,7 @@ macro_rules! impl_algorithms_undirected {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<&'a $graph<T, U>> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, without a source vertex.
@@ -215,7 +215,7 @@ macro_rules! impl_algorithms_undirected {
         // replace this with blanket `From` implementation.
         impl<'a, T, U> From<(&'a $graph<T, U>, &'a T)> for $crate::algorithms::DepthFirstSearch<'a, $graph<T, U>>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             /// Builds a search object from a given graph, with a source vertex.

@@ -1,6 +1,6 @@
 use crate::traits::WithAttributes;
 use crate::types::Error;
-use crate::types::VertexTrait;
+use crate::types::Vertex;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
@@ -8,7 +8,7 @@ use std::fmt::Debug;
 #[derive(Debug)]
 pub struct AttributesMap<T, X, Y, Z>
 where
-    T: VertexTrait,
+    T: Vertex,
     X: Debug,
     Y: Debug,
     Z: Debug,
@@ -20,7 +20,7 @@ where
 
 impl<T, X, Y, Z> Default for AttributesMap<T, X, Y, Z>
 where
-    T: VertexTrait,
+    T: Vertex,
     X: Debug,
     Y: Debug,
     Z: Debug,
@@ -36,7 +36,7 @@ where
 
 impl<T, X, Y, Z> WithAttributes<T> for AttributesMap<T, X, Y, Z>
 where
-    T: VertexTrait,
+    T: Vertex,
     X: Debug,
     Y: Debug,
     Z: Debug,

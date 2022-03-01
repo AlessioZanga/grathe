@@ -1,12 +1,12 @@
 use super::{Capacity, Operators};
 use crate::types::Error;
-use crate::types::{EdgeIterator, VertexIterator, VertexTrait};
+use crate::types::{EdgeIterator, VertexIterator, Vertex};
 use std::fmt::Debug;
 
 /// The graph storage trait.
 pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// Vertex identifier type.
-    type Vertex: VertexTrait;
+    type Vertex: Vertex;
 
     // TODO: Uncomment once associated type defaults are stable.
     // Edge identifier type.

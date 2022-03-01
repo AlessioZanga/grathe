@@ -1,11 +1,11 @@
 use crate::types::Error;
-use crate::types::VertexTrait;
+use crate::types::Vertex;
 use std::fmt::Debug;
 
 /// The graph attribute trait.
 pub trait WithAttributes<T>: Default + Debug
 where
-    T: VertexTrait,
+    T: Vertex,
 {
     /// Graph attributes type.
     type GraphAttributes;
@@ -117,7 +117,7 @@ macro_rules! impl_with_attributes {
     ($graph:ident) => {
         impl<T, U> $crate::traits::WithAttributes<T> for $graph<T, U>
         where
-            T: $crate::types::VertexTrait,
+            T: $crate::types::Vertex,
             U: $crate::traits::WithAttributes<T>,
         {
             type GraphAttributes = U::GraphAttributes;
