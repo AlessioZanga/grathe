@@ -129,9 +129,14 @@ macro_rules! impl_with_attributes {
                 I: IntoIterator<Item = (T, Self::VertexAttributes)>,
                 J: IntoIterator<Item = ((T, T), Self::EdgeAttributes)>,
             {
+                let y: Vec<_> = y.into_iter().collect();
+                let z: Vec<_> = z.into_iter().collect();
+
                 Self {
-                    // FIXME: Change from Default to actual construction of storage (V, E).
-                    data: Default::default(),
+                    data: Storage::new(
+                        y.iter().map(|(y, _)| y.clone()),
+                        z.iter().map(|(z, _)| z.clone()),
+                    ),
                     attributes: U::new_with_attributes(x, y, z),
                 }
             }

@@ -1,7 +1,11 @@
 #[cfg(test)]
 mod tests {
     mod dot {
+        use crate::graphs::attributes::AttributesMap;
+        use crate::graphs::UndirectedAdjacencyListGraph;
         use crate::io::{DOT, IO};
+        use crate::traits::{Storage, WithAttributes};
+        use all_asserts::*;
         use tempfile::NamedTempFile;
 
         const DATA: [(&str, &str); 13] = [
@@ -37,6 +41,46 @@ mod tests {
                 "digraph {\n\t\"A\";\n\t\"B\";\n\t\"A\" -> \"B\" [\"color\" = \"blue\"];\n}\n",
             ),
         ];
+
+        #[test]
+        fn map() -> Result<(), std::io::Error> {
+            let g = "graph G { 1 -- 2; }";
+            let g = DOT::try_from(g.to_string()).unwrap();
+            let g = g.map::<UndirectedAdjacencyListGraph<i32>, _>(|x| x.parse::<i32>().unwrap());
+            let g = &g[0];
+
+            assert_eq!(g.order(), 2);
+            assert_eq!(g.size(), 1);
+            assert_true!(g.vertices_iter().eq(&[1, 2]));
+
+            Ok(())
+        }
+
+        #[test]
+        fn map_with_attributes() -> Result<(), std::io::Error> {
+            let g = "graph G { 1 -- 2; }";
+            let g = DOT::try_from(g.to_string()).unwrap();
+            let g = g.map_with_attributes::<
+                UndirectedAdjacencyListGraph<i32, AttributesMap<i32, String, (), ()>>,
+                _,
+                _,
+                _,
+                _,
+            >(
+                |t| t.parse::<i32>().unwrap(),
+                |mut x| x.remove("graph_id").unwrap(),
+                |_| (),
+                |_| (),
+            );
+            let g = &g[0];
+
+            assert_eq!(g.order(), 2);
+            assert_eq!(g.size(), 1);
+            assert_true!(g.vertices_iter().eq(&[1, 2]));
+            assert_true!(g.has_graph_attrs());
+
+            Ok(())
+        }
 
         #[test]
         fn try_from() {
