@@ -12,6 +12,15 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         env: ["stable", "beta", "nightly"]
     steps:
+      - name: Cache
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-dependencies
+        with:
+          path: |
+            ~/.cargo
+            target
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}
       - uses: actions/checkout@v3
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -23,17 +32,6 @@ jobs:
         run: |
           cargo install cargo-vcpkg
           cargo vcpkg build
-      - name: Cache
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-dependencies
-        with:
-          path: |
-            ~/.cargo
-            target
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}
-      - name: Check
-        run: cargo check --package grathe
       - name: Build
         run: cargo build
       - name: Test
