@@ -21,10 +21,10 @@ jobs:
         run: brew install openblas
       - name: Setup Windows
         if: ${{ runner.os == 'Windows' }}
-        uses: lukka/run-vcpkg@v10.1
+        uses: msys2/setup-msys2@v2
         with:
-          vcpkgGitCommitId: b86c0c35b88e2bf3557ff49dc831689c2f085090
-          runVcpkgInstall: true
+          msystem: MINGW64
+          install: mingw-w64-x86_64-openblas
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
