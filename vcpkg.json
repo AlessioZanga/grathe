@@ -1,8 +1,0 @@
-{
-    "name": "grathe",
-    "version-string": "0.1.0-dev",
-    "dependencies": [
-        "lapack",
-        "openblas"
-    ]
-}

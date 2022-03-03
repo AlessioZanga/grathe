@@ -19,17 +19,17 @@ jobs:
       - name: Setup MacOS
         if: ${{ runner.os == 'macOS' }}
         run: brew install openblas
-      - name: Setup Windows - MINGW64
-        if: ${{ runner.os == 'Windows' }}
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          install: mingw-w64-x86_64-openblas
       - name: Setup Windows - VCPKG
-        if: ${{ runner.os == 'Windows' }}
-        uses: lukka/run-vcpkg@v10.1
+        uses: actions/checkout@v3
         with:
-          vcpkgGitCommitId: b86c0c35b88e2bf3557ff49dc831689c2f085090
+          repository: microsoft/vcpkg
+          path: vcpkg
+      - name: Setup Windows - LAPACK/OPENBLAS
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          .\vcpkg\bootstrap-vcpkg.bat
+          vcpkg integrate install
+          vcpkg install lapack openblas
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
