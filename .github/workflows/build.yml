@@ -28,6 +28,8 @@ jobs:
       - name: Setup Windows - VCPKG
         if: ${{ runner.os == 'Windows' }}
         uses: lukka/run-vcpkg@v10.1
+        with:
+          vcpkgGitCommitId: b86c0c35b88e2bf3557ff49dc831689c2f085090
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
