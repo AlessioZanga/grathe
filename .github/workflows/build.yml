@@ -18,16 +18,12 @@ jobs:
       - name: Setup MacOS
         if: ${{ runner.os == 'macOS' }}
         run: brew install openblas
-      - name: Setup Windows - MINGW64
+      - name: Setup Windows
         if: ${{ runner.os == 'Windows' }}
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          install: mingw-w64-x86_64-openblas
-      - name: Setup Windows - VCPKG
-        if: ${{ runner.os == 'Windows' }}
-        uses: friendlyanon/setup-vcpkg@v1
-        run: vcpkg integrate install
+        run: |
+          git clone https://github.com/Microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+          .\vcpkg install openblas
       - uses: actions/checkout@v2
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
