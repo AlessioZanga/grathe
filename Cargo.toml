@@ -35,9 +35,6 @@ tempfile = "^3.2.0"
 ndarray = { version = "^0.15.4", features = ["blas"] }
 ndarray-linalg = { version = "^0.14.1", features = ["openblas-system"] }
 
-[target.'cfg(windows)'.dev-dependencies]
-cblas-sys = { git = "https://github.com/steabert/cblas-sys.git", branch = "ilp64", features = ["ilp64"] }
-
 [package.metadata.vcpkg]
 git = "https://github.com/microsoft/vcpkg"
 rev = "b86c0c3" # Release: 2022.02.23
