@@ -28,7 +28,14 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.env }}
           components: rustfmt, clippy
-      - name: Setup VCPKG
+      - name: Setup Linux
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get install -y libopenblas-dev
+      - name: Setup MacOS
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install openblas
+      - name: Setup Windows
+        if: ${{ runner.os == 'Windows' }}
         run: |
           cargo install cargo-vcpkg
           cargo vcpkg build
