@@ -19,12 +19,15 @@ jobs:
       - name: Setup MacOS
         if: ${{ runner.os == 'macOS' }}
         run: brew install openblas
-      - name: Setup Windows
+      - name: Setup Windows - MINGW64
         if: ${{ runner.os == 'Windows' }}
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           install: mingw-w64-x86_64-openblas
+      - name: Setup Windows - VCPKG
+        if: ${{ runner.os == 'Windows' }}
+        uses: lukka/run-vcpkg@v10.1
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
