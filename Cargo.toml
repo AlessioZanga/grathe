@@ -35,5 +35,10 @@ tempfile = "^3.2.0"
 ndarray = { version = "^0.15.4", features = ["blas"] }
 ndarray-linalg = { version = "^0.14.1", features = ["openblas-system"] }
 
+[package.metadata.vcpkg]
+git = "https://github.com/microsoft/vcpkg"
+rev = "b86c0c3"
+dev-dependencies = ["openblas"]
+
 [package.metadata.docs.rs]
 rustdoc-args = [ "--html-in-header", "./src/docs-header.html" ]

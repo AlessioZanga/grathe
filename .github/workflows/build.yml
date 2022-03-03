@@ -13,29 +13,16 @@ jobs:
         env: ["stable", "beta", "nightly"]
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Linux
-        if: ${{ runner.os == 'Linux' }}
-        run: sudo apt-get install -y libopenblas-dev
-      - name: Setup MacOS
-        if: ${{ runner.os == 'macOS' }}
-        run: brew install openblas
-      - name: Setup Windows - VCPKG
-        uses: actions/checkout@v3
-        with:
-          repository: microsoft/vcpkg
-          path: vcpkg
-      - name: Setup Windows - LAPACK/OPENBLAS
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          .\vcpkg\bootstrap-vcpkg.bat
-          vcpkg integrate install
-          vcpkg install lapack openblas
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: ${{ matrix.env }}
           components: rustfmt, clippy
+      - name: Setup VCPKG
+        run: |
+          cargo install cargo-vcpkg
+          cargo vcpkg build
       - name: Cache
         uses: actions/cache@v2
         env:
