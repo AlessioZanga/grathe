@@ -9,21 +9,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: ["stable", "beta", "nightly"]
         os: [ubuntu-latest, macos-latest, windows-latest]
+        env: ["stable", "beta", "nightly"]
     steps:
       - name: Setup Linux
         if: ${{ runner.os == 'Linux' }}
-        run: apt-get install -y libopenblas-dev
+        run: sudo apt-get install -y libopenblas-dev
       - name: Setup MacOS
         if: ${{ runner.os == 'macOS' }}
         run: brew install openblas
-      - name: Setup Windows
+      - name: Setup Windows - MINGW64
         if: ${{ runner.os == 'Windows' }}
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
           install: mingw-w64-x86_64-openblas
+      - name: Setup Windows - VCPKG
+        if: ${{ runner.os == 'Windows' }}
+        uses: friendlyanon/setup-vcpkg@v1
+        run: vcpkg integrate install
       - uses: actions/checkout@v2
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
