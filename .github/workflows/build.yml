@@ -19,6 +19,7 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: brew install openblas
       - name: Setup Windows - VCPKG
+        if: ${{ runner.os == 'Windows' }}
         uses: actions/checkout@v3
         with:
           repository: Microsoft/vcpkg
