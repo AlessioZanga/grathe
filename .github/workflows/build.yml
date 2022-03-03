@@ -12,25 +12,18 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
         env: ["stable", "beta", "nightly"]
     steps:
+      - uses: actions/checkout@v3
       - name: Setup Linux
         if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install -y libopenblas-dev
       - name: Setup MacOS
         if: ${{ runner.os == 'macOS' }}
         run: brew install openblas
-      - name: Setup Windows - VCPKG
+      - name: Setup Windows
         if: ${{ runner.os == 'Windows' }}
-        uses: actions/checkout@v3
+        uses: lukka/run-vcpkg@v10.1
         with:
-          repository: Microsoft/vcpkg
-          path: vcpkg
-      - name: Setup Windows - OPENBLAS
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          .\vcpkg\bootstrap-vcpkg.bat
-          vcpkg integrate install
-          vcpkg install openblas
-      - uses: actions/checkout@v2
+          runVcpkgInstall: true
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
