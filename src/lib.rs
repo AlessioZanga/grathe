@@ -12,6 +12,9 @@ pub mod graphs;
 /// I/O operations.
 pub mod io;
 
+/// Linear algebra over graphs.
+pub mod linalg;
+
 /// Frequently used items.
 pub mod prelude;
 

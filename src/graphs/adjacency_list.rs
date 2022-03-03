@@ -2,7 +2,7 @@ use super::attributes::AttributesMap;
 use super::storages::AdjacencyListStorage;
 use crate::traits::{Directed, Operators, Storage, Undirected, WithAttributes};
 use crate::types::Error;
-use crate::types::{VertexIterator, Vertex};
+use crate::types::{Vertex, VertexIterator};
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
