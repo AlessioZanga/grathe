@@ -78,7 +78,6 @@ brew install openblas
 ### Windows
 
 ```{.bash}
-set VCPKG_ROOT=%cd%\target\vcpkg
 cargo install cargo-vcpkg
 cargo vcpkg build
 ```

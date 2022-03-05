@@ -2,9 +2,6 @@ on: [push]
 
 name: build
 
-env:
-  VCPKG_ROOT: ${{ github.workspace }}\target\vcpkg
-
 jobs:
   build:
     name: grathe
