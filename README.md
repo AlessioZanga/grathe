@@ -79,7 +79,8 @@ brew install openblas
 
 ```{.bash}
 cargo install cargo-vcpkg
-cargo vcpkg build
+cargo vcpkg -v build
+cp target/vcpkg/installed/x64-windows/lib/libopenblas.lib target/vcpkg/installed/x64-windows/lib/openblas.lib
 ```
 
 Finally run the tests as usual:

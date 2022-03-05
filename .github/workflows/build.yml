@@ -38,7 +38,8 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         run: |
           cargo install cargo-vcpkg
-          cargo vcpkg build
+          cargo vcpkg -v build
+          cp target/vcpkg/installed/x64-windows/lib/libopenblas.lib target/vcpkg/installed/x64-windows/lib/openblas.lib
       - name: Build
         run: cargo build
       - name: Test
