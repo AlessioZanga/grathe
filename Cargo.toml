@@ -32,7 +32,6 @@ anyhow = "^1.0.51"
 generic-tests = "^0.1.2"
 paste = "^1.0.6"
 tempfile = "^3.2.0"
-ndarray = { version = "^0.15.4", features = ["blas"] }
 ndarray-linalg = { version = "^0.14.1", features = ["openblas-system"] }
 
 [package.metadata.vcpkg]
