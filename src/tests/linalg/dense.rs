@@ -27,6 +27,12 @@ mod tests {
         );
 
         close_l2(
+            &linalg::degree_matrix(&g).diag(),
+            &linalg::degree_vector(&g),
+            f32::EPSILON
+        );
+
+        close_l2(
             &linalg::adjacency_matrix(&g),
             &arr2(&[
                 [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
