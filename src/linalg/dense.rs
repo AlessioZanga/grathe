@@ -244,8 +244,6 @@ where
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
 ///
-/// # extern crate openblas_src;
-/// # #[allow(non_snake_case)]
 /// # fn main() {
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -292,8 +290,6 @@ where
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
 ///
-/// # extern crate openblas_src;
-/// # #[allow(non_snake_case)]
 /// # fn main() {
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
