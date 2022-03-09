@@ -5,7 +5,6 @@ mod tests {
     use crate::linalg::dense as linalg;
     use crate::traits::{From, Storage};
     use ndarray::{arr1, arr2};
-    use ndarray_linalg::assert::close_l2;
 
     #[test]
     fn degree_vector_matrix_adjacency_matrix<T>()
@@ -14,26 +13,18 @@ mod tests {
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
-        close_l2(
-            &linalg::degree_vector(&g),
-            &arr1(&[2.0, 3.0, 2.0, 3.0, 3.0, 1.0]),
-            f32::EPSILON,
-        );
+        assert!(linalg::degree_vector(&g).abs_diff_eq(&arr1(&[2.0, 3.0, 2.0, 3.0, 3.0, 1.0]), f32::EPSILON));
 
-        close_l2(
-            &linalg::degree_matrix(&g),
+        assert!(linalg::degree_matrix(&g).abs_diff_eq(
             &ndarray::Array2::from_diag(&arr1(&[2.0, 3.0, 2.0, 3.0, 3.0, 1.0])),
             f32::EPSILON,
-        );
+        ));
 
-        close_l2(
-            &linalg::degree_matrix(&g).diag(),
-            &linalg::degree_vector(&g),
-            f32::EPSILON
-        );
+        assert!(linalg::degree_matrix(&g)
+            .diag()
+            .abs_diff_eq(&linalg::degree_vector(&g), f32::EPSILON));
 
-        close_l2(
-            &linalg::adjacency_matrix(&g),
+        assert!(linalg::adjacency_matrix(&g).abs_diff_eq(
             &arr2(&[
                 [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
                 [1.0, 0.0, 1.0, 0.0, 1.0, 0.0],
@@ -43,7 +34,7 @@ mod tests {
                 [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
             ]),
             f32::EPSILON,
-        );
+        ));
     }
 
     #[test]
@@ -60,8 +51,7 @@ mod tests {
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
-        close_l2(
-            &linalg::laplacian_matrix(&g),
+        assert!(linalg::laplacian_matrix(&g).abs_diff_eq(
             &arr2(&[
                 [2.0, -1.0, 0.0, 0.0, -1.0, 0.0],
                 [-1.0, 3.0, -1.0, 0.0, -1.0, 0.0],
@@ -71,7 +61,7 @@ mod tests {
                 [0.0, 0.0, 0.0, -1.0, 0.0, 1.0],
             ]),
             f32::EPSILON,
-        );
+        ));
     }
 
     #[test]
@@ -81,27 +71,24 @@ mod tests {
     {
         let g = T::from_edges([(1, 2), (2, 3)]);
 
-        close_l2(
-            &linalg::adjacency_matrix(&g),
+        assert!(linalg::adjacency_matrix(&g).abs_diff_eq(
             &arr2(&[[0.0, 1.0, 0.0], [1.0, 0.0, 1.0], [0.0, 1.0, 0.0]]),
             f32::EPSILON,
-        );
+        ));
 
-        close_l2(
-            &linalg::degree_matrix(&g),
+        assert!(linalg::degree_matrix(&g).abs_diff_eq(
             &arr2(&[[1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 1.0]]),
             f32::EPSILON,
-        );
+        ));
 
-        close_l2(
-            &linalg::normalized_laplacian_matrix(&g),
+        assert!(linalg::normalized_laplacian_matrix(&g).abs_diff_eq(
             &arr2(&[
                 [1.0, -f32::sqrt(1.0 / 2.0), 0.0],
                 [-f32::sqrt(1.0 / 2.0), 1.0, -f32::sqrt(1.0 / 2.0)],
                 [0.0, -f32::sqrt(1.0 / 2.0), 1.0],
             ]),
             f32::EPSILON,
-        );
+        ));
     }
 
     #[test]
