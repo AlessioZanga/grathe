@@ -223,15 +223,16 @@ where
 /// use ndarray::arr2;
 ///
 /// # extern crate openblas_src;
+/// # #[allow(non_snake_case)]
 /// # fn main() {
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
 ///
 /// // Get normalized adjacency matrix for given graph.
-/// let L_norm = linalg::normalized_adjacency_matrix(&g);
+/// let A_norm = linalg::normalized_adjacency_matrix(&g);
 ///
 /// // Check normalized adjacency matrix using tolerance.
-/// assert!(linalg::normalized_adjacency_matrix(&g).abs_diff_eq(
+/// assert!(A_norm.abs_diff_eq(
 ///     &arr2(&[
 ///         [                 0.0, f32::sqrt(1.0 / 2.0),                  0.0],
 ///         [f32::sqrt(1.0 / 2.0),                  0.0, f32::sqrt(1.0 / 2.0)],
@@ -270,6 +271,7 @@ where
 /// use ndarray::arr2;
 ///
 /// # extern crate openblas_src;
+/// # #[allow(non_snake_case)]
 /// # fn main() {
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -278,7 +280,7 @@ where
 /// let L_norm = linalg::normalized_laplacian_matrix(&g);
 ///
 /// // Check normalized Laplacian matrix using tolerance.
-/// assert!(linalg::normalized_laplacian_matrix(&g).abs_diff_eq(
+/// assert!(L_norm.abs_diff_eq(
 ///     &arr2(&[
 ///         [                  1.0, -f32::sqrt(1.0 / 2.0),                   0.0],
 ///         [-f32::sqrt(1.0 / 2.0),                   1.0, -f32::sqrt(1.0 / 2.0)],
