@@ -197,26 +197,24 @@ where
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
 ///
+/// # extern crate openblas_src;
+/// # fn main() {
 /// // Build an undirected graph.
-/// let g = Graph::from_edges([
-///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
-/// ]);
+/// let g = Graph::from_edges([(0, 1), (1, 2)]);
 ///
 /// // Get normalized Laplacian matrix for given graph.
 /// let L_norm = linalg::normalized_laplacian_matrix(&g);
 ///
 /// // Check normalized Laplacian matrix using tolerance.
-/// assert!(L_norm.abs_diff_eq(
+/// assert!(linalg::normalized_laplacian_matrix(&g).abs_diff_eq(
 ///     &arr2(&[
-///         [ 2.0, -1.0,  0.0,  0.0, -1.0,  0.0],
-///         [-1.0,  3.0, -1.0,  0.0, -1.0,  0.0],
-///         [ 0.0, -1.0,  2.0, -1.0,  0.0,  0.0],
-///         [ 0.0,  0.0, -1.0,  3.0, -1.0, -1.0],
-///         [-1.0, -1.0,  0.0, -1.0,  3.0,  0.0],
-///         [ 0.0,  0.0,  0.0, -1.0,  0.0,  1.0],
+///         [                  1.0, -f32::sqrt(1.0 / 2.0),                   0.0],
+///         [-f32::sqrt(1.0 / 2.0),                   1.0, -f32::sqrt(1.0 / 2.0)],
+///         [                  0.0, -f32::sqrt(1.0 / 2.0),                   1.0],
 ///     ]),
 ///     f32::EPSILON,
 /// ));
+/// # }
 /// ```
 ///
 pub fn normalized_laplacian_matrix<T>(g: &T) -> Array2<f32>
@@ -224,7 +222,7 @@ where
     T: Storage,
 {
     let L = laplacian_matrix(g);
-    let D = degree_matrix(g).mapv(|x| x.powf(-1.0 / 2.0));
+    let D = Array::from_diag(&degree_vector(g).mapv(|x| 1.0 / x.sqrt()));
 
     D.dot(&L).dot(&D)
 }

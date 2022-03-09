@@ -83,9 +83,9 @@ mod tests {
 
         assert!(linalg::normalized_laplacian_matrix(&g).abs_diff_eq(
             &arr2(&[
-                [1.0, -f32::sqrt(1.0 / 2.0), 0.0],
-                [-f32::sqrt(1.0 / 2.0), 1.0, -f32::sqrt(1.0 / 2.0)],
-                [0.0, -f32::sqrt(1.0 / 2.0), 1.0],
+                [                  1.0, -f32::sqrt(1.0 / 2.0),                   0.0],
+                [-f32::sqrt(1.0 / 2.0),                   1.0, -f32::sqrt(1.0 / 2.0)],
+                [                  0.0, -f32::sqrt(1.0 / 2.0),                   1.0],
             ]),
             f32::EPSILON,
         ));

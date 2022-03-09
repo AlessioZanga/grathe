@@ -24,11 +24,17 @@ pub mod traits;
 /// Crate-wide types.
 pub mod types;
 
-/// Tools, macros, etc.
+// Tools, macros, etc.
 mod utils;
 
+// Tests.
 mod tests;
 
+// Include Pest dependencies.
 extern crate pest;
 #[macro_use]
 extern crate pest_derive;
+
+// Include OpenBLAS dev-dependencies.
+#[cfg(any(test, doctest))]
+extern crate openblas_src;
