@@ -1,6 +1,7 @@
 use crate::traits::Storage;
 use ndarray::{Array, Array1, Array2, Axis};
-use ndarray_linalg::into_col;
+use ndarray_linalg::{into_col, EigVals, EigValshInto, UPLO};
+use num_complex::Complex;
 use std::collections::HashMap;
 
 /// Adjacency matrix of a graph.
@@ -54,6 +55,13 @@ where
     A
 }
 
+pub fn adjacency_spectrum<T>(g: &T) -> Array1<Complex<f32>>
+where
+    T: Storage,
+{
+    adjacency_matrix(g).eigvals().unwrap()
+}
+
 pub fn average_adjacency_matrix<T>(g: &T) -> Array2<f32>
 where
     T: Storage,
@@ -76,6 +84,13 @@ where
     let A_avg = average_adjacency_matrix(g);
 
     A - A_avg
+}
+
+pub fn modularity_spectrum<T>(g: &T) -> Array1<Complex<f32>>
+where
+    T: Storage,
+{
+    modularity_matrix(g).eigvals().unwrap()
 }
 
 pub fn incidence_matrix<T>(g: &T) -> Array2<f32>
@@ -205,6 +220,13 @@ where
     D - A
 }
 
+pub fn laplacian_spectrum<T>(g: &T) -> Array1<f32>
+where
+    T: Storage,
+{
+    laplacian_matrix(g).eigvalsh_into(UPLO::Lower).unwrap()
+}
+
 /// Normalized adjacency matrix of a graph.
 ///
 /// The (symmetrically) normalized adjacency matrix $\tilde{A}$ of a graph $G$ is defined as:
@@ -301,6 +323,13 @@ where
     I - A
 }
 
+pub fn normalized_laplacian_spectrum<T>(g: &T) -> Array1<f32>
+where
+    T: Storage,
+{
+    normalized_laplacian_matrix(g).eigvalsh_into(UPLO::Lower).unwrap()
+}
+
 pub fn deformed_laplacian_matrix<T>(g: &T, r: f32) -> Array2<f32>
 where
     T: Storage,
@@ -310,4 +339,11 @@ where
     let I = Array::eye(A.raw_dim()[0]);
 
     (r.powf(2.0) - 1.0) * I - r * A + D
+}
+
+pub fn deformed_laplacian_spectrum<T>(g: &T, r: f32) -> Array1<f32>
+where
+    T: Storage,
+{
+    deformed_laplacian_matrix(g, r).eigvalsh_into(UPLO::Lower).unwrap()
 }
