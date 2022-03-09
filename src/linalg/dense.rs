@@ -1,81 +1,7 @@
 use crate::traits::Storage;
-use ndarray::{Array, Array1, Array2};
+use ndarray::{Array, Array1, Array2, Axis};
+use ndarray_linalg::into_col;
 use std::collections::HashMap;
-
-/// Degree vector of a graph.
-///
-/// The degree vector $d$ of a graph $G$ is the vector of the degrees of the vertices in $G$.
-///
-/// # Examples
-///
-/// ```
-/// use grathe::prelude::*;
-/// use grathe::linalg::dense as linalg;
-/// use ndarray::arr1;
-///
-/// // Build an undirected graph.
-/// let g = Graph::from_edges([
-///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
-/// ]);
-///
-/// // Get degree vector for given graph.
-/// let d = linalg::degree_vector(&g);
-///
-/// // Check degree vector is [2, 3, 2, 3, 3, 1] using tolerance.
-/// assert!(d.abs_diff_eq(&arr1(&[2.0, 3.0, 2.0, 3.0, 3.0, 1.0]), f32::EPSILON));
-/// ```
-///
-pub fn degree_vector<T>(g: &T) -> Array1<f32>
-where
-    T: Storage,
-{
-    Array::from_iter(g.vertices_iter().map(|x| g.degree_of(x) as f32))
-}
-
-/// Degree matrix of a graph.
-///
-/// The degree matrix $D$ of a graph $G$ is the square matrix that has the degree vector $d$ as diagonal and zeros elsewhere:
-///
-/// $$ D_{i,j} = \begin{cases} d\[i\], & \text{if } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
-///
-/// # Examples
-///
-/// ```
-/// use grathe::prelude::*;
-/// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-///
-/// // Build an undirected graph.
-/// let g = Graph::from_edges([
-///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
-/// ]);
-///
-/// // Get degree matrix for given graph.
-/// let D = linalg::degree_matrix(&g);
-///
-/// // Check degree matrix has [2, 3, 2, 3, 3, 1] as diagonal using tolerance.
-/// assert!(D.abs_diff_eq(
-///     &arr2(&[
-///         [2.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-///         [0.0, 3.0, 0.0, 0.0, 0.0, 0.0],
-///         [0.0, 0.0, 2.0, 0.0, 0.0, 0.0],
-///         [0.0, 0.0, 0.0, 3.0, 0.0, 0.0],
-///         [0.0, 0.0, 0.0, 0.0, 3.0, 0.0],
-///         [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
-///     ]),
-///     f32::EPSILON,
-/// ));
-///
-/// // Check degree matrix has the degree vector as diagonal using tolerance.
-/// assert!(D.diag().abs_diff_eq(&linalg::degree_vector(&g), f32::EPSILON));
-/// ```
-///
-pub fn degree_matrix<T>(g: &T) -> Array2<f32>
-where
-    T: Storage,
-{
-    Array::from_diag(&degree_vector(g))
-}
 
 /// Adjacency matrix of a graph.
 ///
@@ -128,11 +54,110 @@ where
     A
 }
 
+pub fn average_adjacency_matrix<T>(g: &T) -> Array2<f32>
+where
+    T: Storage,
+{
+    let d = into_col(degree_vector(g));
+
+    // m := sum(d) / 2;
+    // d := (d * d^t) / (2 * m)
+    // d := (d * d^t) / (2 * (sum(d) / 2))
+    // d := (d * d^t) / sum(d)
+
+    d.dot(&d.t()) / d.sum()
+}
+
+pub fn modularity_matrix<T>(g: &T) -> Array2<f32>
+where
+    T: Storage,
+{
+    let A = adjacency_matrix(g);
+    let A_avg = average_adjacency_matrix(g);
+
+    A - A_avg
+}
+
 pub fn incidence_matrix<T>(g: &T) -> Array2<f32>
 where
     T: Storage,
 {
     todo!()
+}
+
+/// Degree vector of a graph.
+///
+/// The degree vector $d$ of a graph $G$ is the vector of the degrees of the vertices in $G$.
+///
+/// # Examples
+///
+/// ```
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+/// use ndarray::arr1;
+///
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([
+///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
+/// ]);
+///
+/// // Get degree vector for given graph.
+/// let d = linalg::degree_vector(&g);
+///
+/// // Check degree vector is [2, 3, 2, 3, 3, 1] using tolerance.
+/// assert!(d.abs_diff_eq(&arr1(&[2.0, 3.0, 2.0, 3.0, 3.0, 1.0]), f32::EPSILON));
+/// ```
+///
+pub fn degree_vector<T>(g: &T) -> Array1<f32>
+where
+    T: Storage,
+{
+    adjacency_matrix(g).sum_axis(Axis(1))
+}
+
+/// Degree matrix of a graph.
+///
+/// The degree matrix $D$ of a graph $G$ is the square matrix that has the degree vector $d$ as diagonal and zeros elsewhere:
+///
+/// $$ D_{i,j} = \begin{cases} d_i, & \text{if } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
+///
+/// # Examples
+///
+/// ```
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+/// use ndarray::arr2;
+///
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([
+///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
+/// ]);
+///
+/// // Get degree matrix for given graph.
+/// let D = linalg::degree_matrix(&g);
+///
+/// // Check degree matrix has [2, 3, 2, 3, 3, 1] as diagonal using tolerance.
+/// assert!(D.abs_diff_eq(
+///     &arr2(&[
+///         [2.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+///         [0.0, 3.0, 0.0, 0.0, 0.0, 0.0],
+///         [0.0, 0.0, 2.0, 0.0, 0.0, 0.0],
+///         [0.0, 0.0, 0.0, 3.0, 0.0, 0.0],
+///         [0.0, 0.0, 0.0, 0.0, 3.0, 0.0],
+///         [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+///     ]),
+///     f32::EPSILON,
+/// ));
+///
+/// // Check degree matrix has the degree vector as diagonal using tolerance.
+/// assert!(D.diag().abs_diff_eq(&linalg::degree_vector(&g), f32::EPSILON));
+/// ```
+///
+pub fn degree_matrix<T>(g: &T) -> Array2<f32>
+where
+    T: Storage,
+{
+    Array::from_diag(&degree_vector(g))
 }
 
 /// Laplacian matrix of a graph.
@@ -184,7 +209,7 @@ where
 ///
 /// The (symmetrically) normalized adjacency matrix $\tilde{A}$ of a graph $G$ is defined as:
 ///
-/// $$ \tilde{A}_{i,j} = \begin{cases} 0, & \text{if } i = j \wedge d\[i\] \neq 0, \newline \frac{1}{\sqrt{d\[i\]d\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \tilde{A}_{i,j} = \begin{cases} 0, & \text{if } i = j \wedge d_i \neq 0, \newline \frac{1}{\sqrt{d_id\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
 /// and can be derived from the degree matrix $D$ and the adjacency matrix $A$ as:
 ///
@@ -231,7 +256,7 @@ where
 ///
 /// The (symmetrically) normalized Laplacian matrix $\tilde{L}$ of a graph $G$ is defined as:
 ///
-/// $$ \tilde{L}_{i,j} = \begin{cases} 1, & \text{if } i = j \wedge d\[i\] \neq 0, \newline -\frac{1}{\sqrt{d\[i\]d\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \tilde{L}_{i,j} = \begin{cases} 1, & \text{if } i = j \wedge d_i \neq 0, \newline -\frac{1}{\sqrt{d_id\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
 /// and can be derived from the identity matrix $I$ and the normalized adjacency matrix $\tilde{A}$ as:
 ///
@@ -274,9 +299,13 @@ where
     I - A
 }
 
-pub fn deformed_laplacian_matrix<T>(g: &T) -> Array2<f32>
+pub fn deformed_laplacian_matrix<T>(g: &T, r: f32) -> Array2<f32>
 where
     T: Storage,
 {
-    todo!()
+    let A = adjacency_matrix(g);
+    let D = degree_matrix(g);
+    let I = Array::eye(A.raw_dim()[0]);
+
+    (r.powf(2.0) - 1.0) * I - r * A + D
 }
