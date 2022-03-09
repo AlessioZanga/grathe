@@ -36,7 +36,7 @@ where
 ///
 /// The degree matrix $D$ of a graph $G$ is the square matrix that has the degree vector $d$ as diagonal and zeros elsewhere:
 ///
-/// $$ D_{i,j} = \\begin{cases} d\[i\], & \\text{if } i = j, \\\\ 0, & \\text{Otherwise.} \\end{cases} $$
+/// $$ D_{i,j} = \begin{cases} d\[i\], & \text{if } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
 /// # Examples
 ///
@@ -81,7 +81,7 @@ where
 ///
 /// The adjacency matrix $A$ of a graph $G$ is the square matrix defined as:
 ///
-/// $$ A_{i,j} = \\begin{cases} 1, & \\text{if } i \in Adj(G, j), \\\\ 0, & \\text{Otherwise.} \\end{cases} $$
+/// $$ A_{i,j} = \begin{cases} 1, & \text{if } i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
 /// # Examples
 ///
@@ -180,15 +180,62 @@ where
     D - A
 }
 
+/// Normalized adjacency matrix of a graph.
+///
+/// The (symmetrically) normalized adjacency matrix $\tilde{A}$ of a graph $G$ is defined as:
+///
+/// $$ \tilde{A}_{i,j} = \begin{cases} 0, & \text{if } i = j \wedge d\[i\] \neq 0, \newline \frac{1}{\sqrt{d\[i\]d\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
+///
+/// and can be derived from the degree matrix $D$ and the adjacency matrix $A$ as:
+///
+/// $$ \tilde{A} = D^{-\frac{1}{2}}AD^{-\frac{1}{2}} $$
+///
+/// # Examples
+///
+/// ```
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+/// use ndarray::arr2;
+///
+/// # extern crate openblas_src;
+/// # fn main() {
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([(0, 1), (1, 2)]);
+///
+/// // Get normalized adjacency matrix for given graph.
+/// let L_norm = linalg::normalized_adjacency_matrix(&g);
+///
+/// // Check normalized adjacency matrix using tolerance.
+/// assert!(linalg::normalized_adjacency_matrix(&g).abs_diff_eq(
+///     &arr2(&[
+///         [                 0.0, f32::sqrt(1.0 / 2.0),                  0.0],
+///         [f32::sqrt(1.0 / 2.0),                  0.0, f32::sqrt(1.0 / 2.0)],
+///         [                 0.0, f32::sqrt(1.0 / 2.0),                  0.0],
+///     ]),
+///     f32::EPSILON,
+/// ));
+/// # }
+/// ```
+///
+pub fn normalized_adjacency_matrix<T>(g: &T) -> Array2<f32>
+where
+    T: Storage,
+{
+    let A = adjacency_matrix(g);
+    let D = Array::from_diag(&degree_vector(g).mapv(|x| 1.0 / x.sqrt()));
+
+    D.dot(&A).dot(&D)
+}
+
 /// Normalized Laplacian matrix of a graph.
 ///
 /// The (symmetrically) normalized Laplacian matrix $\tilde{L}$ of a graph $G$ is defined as:
 ///
-/// $$ \\tilde{L}_{i,j} = \\begin{cases} 1, & \\text{if } i = j \wedge d\[i\] \neq 0, \\\\ -\frac{1}{\sqrt{d\[i\]d\[j\]}}, & \\text{if } i \neq j \wedge i \in Adj(G, j), \\\\ 0, & \\text{Otherwise.} \\end{cases} $$
+/// $$ \tilde{L}_{i,j} = \begin{cases} 1, & \text{if } i = j \wedge d\[i\] \neq 0, \newline -\frac{1}{\sqrt{d\[i\]d\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
-/// and can be derived from the degree matrix $D$ and the laplacian matrix $L$ as:
+/// and can be derived from the identity matrix $I$ and the normalized adjacency matrix $\tilde{A}$ as:
 ///
-/// $$ \\tilde{L} = D^{-\frac{1}{2}}LD^{-\frac{1}{2}} $$
+/// $$ \tilde{L} = I - \tilde{A} $$
 ///
 /// # Examples
 ///
@@ -221,10 +268,10 @@ pub fn normalized_laplacian_matrix<T>(g: &T) -> Array2<f32>
 where
     T: Storage,
 {
-    let L = laplacian_matrix(g);
-    let D = Array::from_diag(&degree_vector(g).mapv(|x| 1.0 / x.sqrt()));
+    let A = normalized_adjacency_matrix(g);
+    let I = Array::eye(A.raw_dim()[0]);
 
-    D.dot(&L).dot(&D)
+    I - A
 }
 
 pub fn deformed_laplacian_matrix<T>(g: &T) -> Array2<f32>

@@ -65,7 +65,7 @@ mod tests {
     }
 
     #[test]
-    fn normalized_laplacian_matrix<T>()
+    fn normalized_adjacency_laplacian_matrix<T>()
     where
         T: Storage + From<Vertex = i32>,
     {
@@ -78,6 +78,15 @@ mod tests {
 
         assert!(linalg::degree_matrix(&g).abs_diff_eq(
             &arr2(&[[1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 1.0]]),
+            f32::EPSILON,
+        ));
+
+        assert!(linalg::normalized_adjacency_matrix(&g).abs_diff_eq(
+            &arr2(&[
+                [                 0.0, f32::sqrt(1.0 / 2.0),                  0.0],
+                [f32::sqrt(1.0 / 2.0),                  0.0, f32::sqrt(1.0 / 2.0)],
+                [                 0.0, f32::sqrt(1.0 / 2.0),                  0.0],
+            ]),
             f32::EPSILON,
         ));
 
