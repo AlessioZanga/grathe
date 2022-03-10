@@ -7,7 +7,51 @@ mod tests {
     use ndarray::{arr1, arr2};
 
     #[test]
-    fn degree_vector_matrix_adjacency_matrix<T>()
+    fn average_adjacency_modularity_matrix<T>()
+    where
+        T: Storage + From<Vertex = i32>,
+    {
+        let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
+
+        assert!(linalg::adjacency_matrix(&g).abs_diff_eq(
+            &arr2(&[
+                [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+                [1.0, 0.0, 1.0, 0.0, 1.0, 0.0],
+                [0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 1.0, 0.0, 1.0, 1.0],
+                [1.0, 1.0, 0.0, 1.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+            ]),
+            f32::EPSILON,
+        ));
+
+        assert!(linalg::average_adjacency_matrix(&g).abs_diff_eq(
+            &(arr2(&[
+                [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
+                [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+                [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
+                [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+                [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+                [2.0, 3.0, 2.0, 3.0, 3.0, 1.0],
+            ]) / linalg::degree_vector(&g).sum()),
+            f32::EPSILON,
+        ));
+
+        assert!(linalg::modularity_matrix(&g).abs_diff_eq(
+            &(linalg::adjacency_matrix(&g) - arr2(&[
+                [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
+                [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+                [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
+                [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+                [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+                [2.0, 3.0, 2.0, 3.0, 3.0, 1.0],
+            ]) / linalg::degree_vector(&g).sum()),
+            f32::EPSILON,
+        ));
+    }
+
+    #[test]
+    fn degree_vector_matrix_matrix<T>()
     where
         T: Storage + From<Vertex = i32>,
     {
@@ -23,18 +67,6 @@ mod tests {
         assert!(linalg::degree_matrix(&g)
             .diag()
             .abs_diff_eq(&linalg::degree_vector(&g), f32::EPSILON));
-
-        assert!(linalg::adjacency_matrix(&g).abs_diff_eq(
-            &arr2(&[
-                [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
-                [1.0, 0.0, 1.0, 0.0, 1.0, 0.0],
-                [0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0, 1.0, 1.0],
-                [1.0, 1.0, 0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-            ]),
-            f32::EPSILON,
-        ));
     }
 
     #[test]

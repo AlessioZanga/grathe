@@ -6,7 +6,7 @@ use std::collections::HashMap;
 
 /// Adjacency matrix of a graph.
 ///
-/// The adjacency matrix $A$ of a graph $G$ is the square matrix defined as:
+/// The adjacency matrix $A$ of a graph $G$ is defined as:
 ///
 /// $$ A_{i,j} = \begin{cases} 1, & \text{if } i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
@@ -62,6 +62,41 @@ where
     adjacency_matrix(g).eigvals().unwrap()
 }
 
+/// Average adjacency matrix of a graph.
+///
+/// The average adjacency matrix $\bar{A}$ of a graph $G$ is defined as:
+///
+/// $$ \bar{A}_{i,j} = (d \cdot d^T) / \sum d $$
+///
+/// # Examples
+///
+/// ```
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+/// use ndarray::arr2;
+///
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([
+///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
+/// ]);
+///
+/// // Get average adjacency matrix for given graph.
+/// let A_avg = linalg::average_adjacency_matrix(&g);
+///
+/// // Check average adjacency matrix using tolerance.
+/// assert!(A_avg.abs_diff_eq(
+///     &(arr2(&[
+///         [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
+///         [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+///         [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
+///         [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+///         [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
+///         [2.0, 3.0, 2.0, 3.0, 3.0, 1.0],
+///     ]) / linalg::degree_vector(&g).sum()),
+///     f32::EPSILON,
+/// ));
+/// ```
+///
 pub fn average_adjacency_matrix<T>(g: &T) -> Array2<f32>
 where
     T: Storage,
@@ -76,6 +111,39 @@ where
     d.dot(&d.t()) / d.sum()
 }
 
+/// Modularity matrix of a graph.
+///
+/// The modularity matrix $B$ of a graph $G$ is defined as
+/// the difference between the adjacency matrix $A$ and
+/// the average adjacency matrix $\bar{A}$:
+///
+/// $$ B = A - \bar{A} $$
+///
+/// # Examples
+///
+/// ```
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+/// use ndarray::arr2;
+///
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([
+///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
+/// ]);
+///
+/// // Get modularity matrix for given graph.
+/// let B = linalg::modularity_matrix(&g);
+///
+/// // Check modularity matrix using tolerance.
+/// assert!(B.abs_diff_eq(
+///     &(
+///         linalg::adjacency_matrix(&g) -
+///         linalg::average_adjacency_matrix(&g)
+///     ),
+///     f32::EPSILON,
+/// ));
+/// ```
+///
 pub fn modularity_matrix<T>(g: &T) -> Array2<f32>
 where
     T: Storage,
@@ -132,7 +200,8 @@ where
 
 /// Degree matrix of a graph.
 ///
-/// The degree matrix $D$ of a graph $G$ is the square matrix that has the degree vector $d$ as diagonal and zeros elsewhere:
+/// The degree matrix $D$ of a graph $G$ is defined as
+/// the matrix with the degree vector $d$ as diagonal and zeros elsewhere:
 ///
 /// $$ D_{i,j} = \begin{cases} d_i, & \text{if } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
@@ -177,7 +246,8 @@ where
 
 /// Laplacian matrix of a graph.
 ///
-/// The Laplacian matrix $L$ of a graph $G$ is defined as the difference between the degree matrix $D$ and the adjacency matrix $A$:
+/// The Laplacian matrix $L$ of a graph $G$ is defined as
+/// the difference between the degree matrix $D$ and the adjacency matrix $A$:
 ///
 /// $$ L = D - A $$
 ///
