@@ -124,7 +124,6 @@ where
 /// ```
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
