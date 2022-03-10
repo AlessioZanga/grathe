@@ -1,6 +1,7 @@
 use crate::traits::Storage;
 use ndarray::{Array, Array1, Array2, Axis};
-use ndarray_linalg::{into_col, EigVals, EigValshInto, UPLO};
+use ndarray_linalg::{into_col, EigVals, EigValshInto, UPLO, Norm};
+use ndarray_rand::{RandomExt, rand_distr::Uniform};
 use num_complex::Complex;
 use std::collections::HashMap;
 
@@ -28,12 +29,12 @@ use std::collections::HashMap;
 /// // Check adjacency matrix using tolerance.
 /// assert!(A.abs_diff_eq(
 ///     &arr2(&[
-///         [0.0, 1.0, 0.0, 0.0, 1.0, 0.0],
-///         [1.0, 0.0, 1.0, 0.0, 1.0, 0.0],
-///         [0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
-///         [0.0, 0.0, 1.0, 0.0, 1.0, 1.0],
-///         [1.0, 1.0, 0.0, 1.0, 0.0, 0.0],
-///         [0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+///         [0., 1., 0., 0., 1., 0.],
+///         [1., 0., 1., 0., 1., 0.],
+///         [0., 1., 0., 1., 0., 0.],
+///         [0., 0., 1., 0., 1., 1.],
+///         [1., 1., 0., 1., 0., 0.],
+///         [0., 0., 0., 1., 0., 0.],
 ///     ]),
 ///     f32::EPSILON,
 /// ));
@@ -49,7 +50,7 @@ where
     let idx: HashMap<_, _> = g.vertices_iter().enumerate().map(|(i, x)| (x, i)).collect();
 
     for (x, y) in g.edges_iter() {
-        A[(idx[x], idx[y])] = 1.0;
+        A[(idx[x], idx[y])] = 1.;
     }
 
     A
@@ -86,12 +87,12 @@ where
 /// // Check average adjacency matrix using tolerance.
 /// assert!(A_avg.abs_diff_eq(
 ///     &(arr2(&[
-///         [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
-///         [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
-///         [4.0, 6.0, 4.0, 6.0, 6.0, 2.0],
-///         [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
-///         [6.0, 9.0, 6.0, 9.0, 9.0, 3.0],
-///         [2.0, 3.0, 2.0, 3.0, 3.0, 1.0],
+///         [4., 6., 4., 6., 6., 2.],
+///         [6., 9., 6., 9., 9., 3.],
+///         [4., 6., 4., 6., 6., 2.],
+///         [6., 9., 6., 9., 9., 3.],
+///         [6., 9., 6., 9., 9., 3.],
+///         [2., 3., 2., 3., 3., 1.],
 ///     ]) / linalg::degree_vector(&g).sum()),
 ///     f32::EPSILON,
 /// ));
@@ -187,7 +188,7 @@ where
 /// let d = linalg::degree_vector(&g);
 ///
 /// // Check degree vector is [2, 3, 2, 3, 3, 1] using tolerance.
-/// assert!(d.abs_diff_eq(&arr1(&[2.0, 3.0, 2.0, 3.0, 3.0, 1.0]), f32::EPSILON));
+/// assert!(d.abs_diff_eq(&arr1(&[2., 3., 2., 3., 3., 1.]), f32::EPSILON));
 /// ```
 ///
 pub fn degree_vector<T>(g: &T) -> Array1<f32>
@@ -222,12 +223,12 @@ where
 /// // Check degree matrix has [2, 3, 2, 3, 3, 1] as diagonal using tolerance.
 /// assert!(D.abs_diff_eq(
 ///     &arr2(&[
-///         [2.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-///         [0.0, 3.0, 0.0, 0.0, 0.0, 0.0],
-///         [0.0, 0.0, 2.0, 0.0, 0.0, 0.0],
-///         [0.0, 0.0, 0.0, 3.0, 0.0, 0.0],
-///         [0.0, 0.0, 0.0, 0.0, 3.0, 0.0],
-///         [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+///         [2., 0., 0., 0., 0., 0.],
+///         [0., 3., 0., 0., 0., 0.],
+///         [0., 0., 2., 0., 0., 0.],
+///         [0., 0., 0., 3., 0., 0.],
+///         [0., 0., 0., 0., 3., 0.],
+///         [0., 0., 0., 0., 0., 1.],
 ///     ]),
 ///     f32::EPSILON,
 /// ));
@@ -268,12 +269,12 @@ where
 /// // Check Laplacian matrix using tolerance.
 /// assert!(L.abs_diff_eq(
 ///     &arr2(&[
-///         [ 2.0, -1.0,  0.0,  0.0, -1.0,  0.0],
-///         [-1.0,  3.0, -1.0,  0.0, -1.0,  0.0],
-///         [ 0.0, -1.0,  2.0, -1.0,  0.0,  0.0],
-///         [ 0.0,  0.0, -1.0,  3.0, -1.0, -1.0],
-///         [-1.0, -1.0,  0.0, -1.0,  3.0,  0.0],
-///         [ 0.0,  0.0,  0.0, -1.0,  0.0,  1.0],
+///         [ 2., -1.,  0.,  0., -1.,  0.],
+///         [-1.,  3., -1.,  0., -1.,  0.],
+///         [ 0., -1.,  2., -1.,  0.,  0.],
+///         [ 0.,  0., -1.,  3., -1., -1.],
+///         [-1., -1.,  0., -1.,  3.,  0.],
+///         [ 0.,  0.,  0., -1.,  0.,  1.],
 ///     ]),
 ///     f32::EPSILON,
 /// ));
@@ -323,9 +324,9 @@ where
 /// // Check normalized adjacency matrix using tolerance.
 /// assert!(A_norm.abs_diff_eq(
 ///     &arr2(&[
-///         [                 0.0, f32::sqrt(1.0 / 2.0),                  0.0],
-///         [f32::sqrt(1.0 / 2.0),                  0.0, f32::sqrt(1.0 / 2.0)],
-///         [                 0.0, f32::sqrt(1.0 / 2.0),                  0.0],
+///         [                0., f32::sqrt(1. / 2.),                 0.],
+///         [f32::sqrt(1. / 2.),                 0., f32::sqrt(1. / 2.)],
+///         [                0., f32::sqrt(1. / 2.),                 0.],
 ///     ]),
 ///     f32::EPSILON,
 /// ));
@@ -337,7 +338,7 @@ where
     T: Storage,
 {
     let A = adjacency_matrix(g);
-    let D = Array::from_diag(&degree_vector(g).mapv(|x| 1.0 / x.sqrt()));
+    let D = Array::from_diag(&degree_vector(g).mapv(|x| 1. / x.sqrt()));
 
     D.dot(&A).dot(&D)
 }
@@ -369,9 +370,9 @@ where
 /// // Check normalized Laplacian matrix using tolerance.
 /// assert!(L_norm.abs_diff_eq(
 ///     &arr2(&[
-///         [                  1.0, -f32::sqrt(1.0 / 2.0),                   0.0],
-///         [-f32::sqrt(1.0 / 2.0),                   1.0, -f32::sqrt(1.0 / 2.0)],
-///         [                  0.0, -f32::sqrt(1.0 / 2.0),                   1.0],
+///         [                 1., -f32::sqrt(1. / 2.),                  0.],
+///         [-f32::sqrt(1. / 2.),                  1., -f32::sqrt(1. / 2.)],
+///         [                 0., -f32::sqrt(1. / 2.),                  1.],
 ///     ]),
 ///     f32::EPSILON,
 /// ));
@@ -403,7 +404,7 @@ where
     let D = degree_matrix(g);
     let I = Array::eye(A.raw_dim()[0]);
 
-    (r.powf(2.0) - 1.0) * I - r * A + D
+    (r.powf(2.) - 1.) * I - r * A + D
 }
 
 pub fn deformed_laplacian_spectrum<T>(g: &T, r: f32) -> Array1<f32>
