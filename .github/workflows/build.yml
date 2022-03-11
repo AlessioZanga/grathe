@@ -21,7 +21,7 @@ jobs:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}-${{ hashFiles('.github/workflows/build.yml') }}
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -43,7 +43,9 @@ jobs:
       - name: Build
         run: cargo build
       - name: Test
-        run: cargo test
+        run: cargo test --tests
+      - name: Doctest
+        run: cargo test --doc
       - name: Coverage
         if: ${{ runner.os == 'Linux' && matrix.env == 'stable' }}
         run: |
