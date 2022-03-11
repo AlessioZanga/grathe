@@ -45,6 +45,7 @@ jobs:
       - name: Test
         run: cargo test --tests
       - name: Doctest
+        if: ${{ runner.os == 'Linux' && matrix.env == 'stable' }}
         run: cargo test --doc
       - name: Coverage
         if: ${{ runner.os == 'Linux' && matrix.env == 'stable' }}
