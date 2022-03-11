@@ -7,9 +7,9 @@ use std::collections::HashMap;
 
 /// Adjacency matrix of a graph.
 ///
-/// The adjacency matrix $A$ of a graph $G$ is defined as:
+/// The adjacency matrix $\textbf{A}$ of a graph $G$ is defined as:
 ///
-/// $$ A_{i,j} = \begin{cases} 1, & \text{if } i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \textbf{A}_{i,j} = \begin{cases} 1, & \text{if } (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
 /// # Examples
 ///
@@ -65,9 +65,11 @@ where
 
 /// Average adjacency matrix of a graph.
 ///
-/// The average adjacency matrix $\bar{A}$ of a graph $G$ is defined as:
+/// The average adjacency matrix $\bar{\textbf{A}}$ of a graph $G$ is defined as:
 ///
-/// $$ \bar{A}_{i,j} = (d \cdot d^T) / \sum d $$
+/// $$ \bar{\textbf{A}} = (\textbf{d} \cdot \textbf{d}^T) / \sum \textbf{d} $$
+///
+/// with $\textbf{d}$ the degree vector.
 ///
 /// # Examples
 ///
@@ -114,11 +116,11 @@ where
 
 /// Modularity matrix of a graph.
 ///
-/// The modularity matrix $B$ of a graph $G$ is defined as
-/// the difference between the adjacency matrix $A$ and
-/// the average adjacency matrix $\bar{A}$:
+/// The modularity matrix $\textbf{B}$ of a graph $G$ is defined as:
 ///
-/// $$ B = A - \bar{A} $$
+/// $$ \textbf{B} = \textbf{A} - \bar{\textbf{A}} $$
+///
+/// with $\textbf{A}$ the adjacency matrix and $\bar{\textbf{A}}$ the average adjacency matrix.
 ///
 /// # Examples
 ///
@@ -170,7 +172,7 @@ where
 
 /// Degree vector of a graph.
 ///
-/// The degree vector $d$ of a graph $G$ is the vector of the degrees of the vertices in $G$.
+/// The degree vector $\textbf{d}$ of a graph $G$ is the vector of the degrees of the vertices in $G$.
 ///
 /// # Examples
 ///
@@ -200,10 +202,11 @@ where
 
 /// Degree matrix of a graph.
 ///
-/// The degree matrix $D$ of a graph $G$ is defined as
-/// the matrix with the degree vector $d$ as diagonal and zeros elsewhere:
+/// The degree matrix $\textbf{D}$ of a graph $G$ is defined as:
 ///
-/// $$ D_{i,j} = \begin{cases} d_i, & \text{if } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \textbf{D}_{i,j} = \begin{cases} \textbf{d}_i, & \text{if } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
+///
+/// with $\textbf{d}$ the degree vector.
 ///
 /// # Examples
 ///
@@ -246,10 +249,11 @@ where
 
 /// Laplacian matrix of a graph.
 ///
-/// The Laplacian matrix $L$ of a graph $G$ is defined as
-/// the difference between the degree matrix $D$ and the adjacency matrix $A$:
+/// The Laplacian matrix $\textbf{L}$ of a graph $G$ is defined as:
 ///
-/// $$ L = D - A $$
+/// $$ \textbf{L} = \textbf{D} - \textbf{A} $$
+///
+/// with $\textbf{D}$ the degree matrix and $\textbf{A}$ the adjacency matrix.
 ///
 /// # Examples
 ///
@@ -299,13 +303,11 @@ where
 
 /// Normalized adjacency matrix of a graph.
 ///
-/// The (symmetrically) normalized adjacency matrix $\tilde{A}$ of a graph $G$ is defined as:
+/// The (symmetrically) normalized adjacency matrix $\tilde{\textbf{A}}$ of a graph $G$ is defined as:
 ///
-/// $$ \tilde{A}_{i,j} = \begin{cases} 0, & \text{if } i = j \wedge d_i \neq 0, \newline \frac{1}{\sqrt{d_id\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \tilde{\textbf{A}} = \textbf{D}^{-\frac{1}{2}}\textbf{A}\textbf{D}^{-\frac{1}{2}} $$
 ///
-/// and can be derived from the degree matrix $D$ and the adjacency matrix $A$ as:
-///
-/// $$ \tilde{A} = D^{-\frac{1}{2}}AD^{-\frac{1}{2}} $$
+/// with $\textbf{D}$ the degree matrix and $\textbf{A}$ the adjacency matrix.
 ///
 /// # Examples
 ///
@@ -314,7 +316,6 @@ where
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
 ///
-/// # fn main() {
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
 ///
@@ -330,7 +331,6 @@ where
 ///     ]),
 ///     f32::EPSILON,
 /// ));
-/// # }
 /// ```
 ///
 pub fn normalized_adjacency_matrix<T>(g: &T) -> Array2<f32>
@@ -345,13 +345,13 @@ where
 
 /// Normalized Laplacian matrix of a graph.
 ///
-/// The (symmetrically) normalized Laplacian matrix $\tilde{L}$ of a graph $G$ is defined as:
+/// The (symmetrically) normalized Laplacian matrix $\tilde{\textbf{L}}$ of a graph $G$ is defined as:
 ///
-/// $$ \tilde{L}_{i,j} = \begin{cases} 1, & \text{if } i = j \wedge d_i \neq 0, \newline -\frac{1}{\sqrt{d_id\[j\]}}, & \text{if } i \neq j \wedge i \in Adj(G, j), \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \tilde{\textbf{L}}_{i,j} = \begin{cases} 1, & \text{if } i = j \wedge \textbf{d}_i \neq 0, \newline -\frac{1}{\sqrt{\textbf{d}_i \textbf{d}_j}}, & \text{if } i \neq j \wedge (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
-/// and can be derived from the identity matrix $I$ and the normalized adjacency matrix $\tilde{A}$ as:
+/// and can be derived from the identity matrix $\textbf{I}$ and the normalized adjacency matrix $\tilde{\textbf{A}}$ as:
 ///
-/// $$ \tilde{L} = I - \tilde{A} $$
+/// $$ \tilde{\textbf{L}} = \textbf{I} - \tilde{\textbf{A}} $$
 ///
 /// # Examples
 ///
@@ -360,7 +360,6 @@ where
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
 ///
-/// # fn main() {
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
 ///
@@ -376,7 +375,6 @@ where
 ///     ]),
 ///     f32::EPSILON,
 /// ));
-/// # }
 /// ```
 ///
 pub fn normalized_laplacian_matrix<T>(g: &T) -> Array2<f32>
@@ -396,6 +394,37 @@ where
     normalized_laplacian_matrix(g).eigvalsh_into(UPLO::Lower).unwrap()
 }
 
+/// Deformed Laplacian matrix of a graph.
+///
+/// The deformed Laplacian matrix, also called Bethe-Hessian matrix, $\textbf{H}(r)$ of a graph $G$ is defined as:
+///
+/// $$ \textbf{H}(r) = (r^2 - 1) \textbf{I} - r \textbf{A} + \textbf{D} $$
+///
+/// with $r$ the regularization factor, $\textbf{I}$ the identity matrix, $\textbf{A}$ the adjacency matrix and $\textbf{D}$ the degree matrix.
+///
+/// If $r$ is equal to one, then $\textbf{H}(1)$ is equal to the Laplacian matrix $\textbf{L}$.
+///
+/// If $r$ is not provided, then it is defined as:
+///
+/// $$ r = \bigg( \sum \textbf{d} \bigg)^{-1} \bigg( \sum \textbf{d}^2 \bigg) - 1 $$
+///
+/// # Examples
+///
+/// ```
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+/// use ndarray::arr2;
+///
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([(0, 1), (1, 2)]);
+///
+/// // Get deformed Laplacian matrix for given graph.
+/// let H = linalg::deformed_laplacian_matrix(&g, Some(1.));
+///
+/// // Check deformed Laplacian matrix using tolerance.
+/// assert!(H.abs_diff_eq(&linalg::laplacian_matrix(&g), f32::EPSILON));
+/// ```
+///
 pub fn deformed_laplacian_matrix<T>(g: &T, r: Option<f32>) -> Array2<f32>
 where
     T: Storage,
@@ -406,7 +435,7 @@ where
 
     // Check if r is None.
     let r = match r {
-        // If r is None, the compute the optimal regularization factor:
+        // If r is None, then compute the optimal regularization factor:
         // r := sum(d)^-1 * sum(d^2) - 1
         // r := sum(d^2) / sum(d) - 1
         // r := sum(D[i,i]^2) / sum(D[i,i]) - 1
@@ -425,11 +454,47 @@ where
     deformed_laplacian_matrix(g, r).eigvalsh_into(UPLO::Lower).unwrap()
 }
 
+/// Fiedler value and vector of a graph.
+/// 
+/// Let $\textbf{L}$ be the Laplacian matrix of $G$. Then, the eigenvalue $\lambda$ and
+/// eigenvector $\textbf{x}$ of $\textbf{L}$ is defined as:
+/// 
+/// $$ \textbf{L}\textbf{x} = \lambda\textbf{x} $$
+///
+/// The Fiedler value, also called algebraic connectivity $\alpha$, is the second smallest eigenvalue
+/// $\lambda_{n-1}$ where the associated eigenvector $\textbf{x}$ is known as the Fiedler vector.
+///
+/// # Examples
+///
+/// ```
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+/// use ndarray::arr1;
+///
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([
+///     (0, 1), (0, 4), (1, 2), (1, 4), (2, 3), (3, 4), (3, 5)
+/// ]);
+///
+/// // Get Fiedler value and vector with relative tolerance of 1e-8.
+/// let F = linalg::fiedler(&g, 1e-8);
+/// 
+/// // Check Fiedler value ...
+/// assert!((F.0 - 0.7215863905035553).abs() < f32::EPSILON);
+/// // ... and Fiedler vector using tolerance.
+/// assert!(F.1.abs_diff_eq(
+///     &arr1(&[
+///         0.41486979, 0.30944167, 0.0692328, -0.22093352, 0.22093352, -0.79354426
+///     ]),
+///     f32::EPSILON,
+/// ));
+/// ```
+///
 pub fn fiedler<T>(g: &T, rtol: f32) -> (f32, Array1<f32>)
 where
     T: Storage,
 {
-    // Get Laplacian matrix.
+    // Get Laplacian matrix L.
     let L = laplacian_matrix(g);
     // Initialize n.
     let n = L.raw_dim()[0];
@@ -441,8 +506,8 @@ where
     let Y = into_col(Array::ones((n,)));
     // Initialize D.
     let D = Array::from_diag(&L.diag());
-    // Compute eigendecomposition.
-    let V = lobpcg(
+    // Compute eigendecomposition A.
+    let A = lobpcg(
         |x| L.dot(&x),
         X,
         |mut x| x.assign(&D.dot(&x)),
@@ -452,8 +517,8 @@ where
         TruncatedOrder::Smallest,
     );
 
-    match V {
-        LobpcgResult::Ok(v, V, _) => (v[0], flatten(V)),
+    match A {
+        LobpcgResult::Ok(a, A, _) => (a[0], flatten(A)),
         _ => unreachable!(),
     }
 }
