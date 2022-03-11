@@ -396,7 +396,7 @@ where
     normalized_laplacian_matrix(g).eigvalsh_into(UPLO::Lower).unwrap()
 }
 
-pub fn deformed_laplacian_matrix<T>(g: &T, r: f32) -> Array2<f32>
+pub fn deformed_laplacian_matrix<T>(g: &T, r: Option<f32>) -> Array2<f32>
 where
     T: Storage,
 {
@@ -404,10 +404,21 @@ where
     let D = degree_matrix(g);
     let I = Array::eye(A.raw_dim()[0]);
 
+    // Check if r is None.
+    let r = match r {
+        // If r is None, the compute the optimal regularization factor:
+        // r := sum(d)^-1 * sum(d^2) - 1
+        // r := sum(d^2) / sum(d) - 1
+        // r := sum(D[i,i]^2) / sum(D[i,i]) - 1
+        None => D.diag().mapv(|x| x.powf(2.)).sum() / D.diag().sum() - 1.,
+        // Otherwise, return r.
+        Some(r) => r,
+    };
+
     (r.powf(2.) - 1.) * I - r * A + D
 }
 
-pub fn deformed_laplacian_spectrum<T>(g: &T, r: f32) -> Array1<f32>
+pub fn deformed_laplacian_spectrum<T>(g: &T, r: Option<f32>) -> Array1<f32>
 where
     T: Storage,
 {
@@ -418,7 +429,7 @@ pub fn fiedler<T>(g: &T, rtol: f32) -> (f32, Array1<f32>)
 where
     T: Storage,
 {
-    // Get laplacian matrix.
+    // Get Laplacian matrix.
     let L = laplacian_matrix(g);
     // Initialize n.
     let n = L.raw_dim()[0];
@@ -431,7 +442,7 @@ where
     // Initialize D.
     let D = Array::from_diag(&L.diag());
     // Compute eigendecomposition.
-    let X = lobpcg(
+    let V = lobpcg(
         |x| L.dot(&x),
         X,
         |mut x| x.assign(&D.dot(&x)),
@@ -441,7 +452,7 @@ where
         TruncatedOrder::Smallest,
     );
 
-    match X {
+    match V {
         LobpcgResult::Ok(v, V, _) => (v[0], flatten(V)),
         _ => unreachable!(),
     }
