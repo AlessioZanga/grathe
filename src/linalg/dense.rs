@@ -1,7 +1,7 @@
 use crate::traits::Storage;
 use ndarray::{Array, Array1, Array2, Axis};
-use ndarray_linalg::{into_col, EigVals, EigValshInto, UPLO, Norm};
-use ndarray_rand::{RandomExt, rand_distr::Uniform};
+use ndarray_linalg::lobpcg::{lobpcg, LobpcgResult, TruncatedOrder};
+use ndarray_linalg::{flatten, into_col, EigVals, EigValshInto, UPLO};
 use num_complex::Complex;
 use std::collections::HashMap;
 
@@ -412,4 +412,37 @@ where
     T: Storage,
 {
     deformed_laplacian_matrix(g, r).eigvalsh_into(UPLO::Lower).unwrap()
+}
+
+pub fn fiedler<T>(g: &T, rtol: f32) -> (f32, Array1<f32>)
+where
+    T: Storage,
+{
+    // Get laplacian matrix.
+    let L = laplacian_matrix(g);
+    // Initialize n.
+    let n = L.raw_dim()[0];
+    // Initialize m.
+    let m = n as f32;
+    // Initialize X.
+    let X = into_col(Array::linspace(0., m, n) - ((m - 1.) / 2.));
+    // Initialize Y.
+    let Y = into_col(Array::ones((n,)));
+    // Initialize D.
+    let D = Array::from_diag(&L.diag());
+    // Compute eigendecomposition.
+    let X = lobpcg(
+        |x| L.dot(&x),
+        X,
+        |mut x| x.assign(&D.dot(&x)),
+        Some(Y),
+        rtol,
+        2 * n,
+        TruncatedOrder::Smallest,
+    );
+
+    match X {
+        LobpcgResult::Ok(v, V, _) => (v[0], flatten(V)),
+        _ => unreachable!(),
+    }
 }
