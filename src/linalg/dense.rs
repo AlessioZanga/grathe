@@ -17,6 +17,7 @@ use std::collections::HashMap;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -27,17 +28,17 @@ use std::collections::HashMap;
 /// let A = linalg::adjacency_matrix(&g);
 ///
 /// // Check adjacency matrix using tolerance.
-/// assert!(A.abs_diff_eq(
-///     &arr2(&[
+/// assert_relative_eq!(
+///     A,
+///     arr2(&[
 ///         [0., 1., 0., 0., 1., 0.],
 ///         [1., 0., 1., 0., 1., 0.],
 ///         [0., 1., 0., 1., 0., 0.],
 ///         [0., 0., 1., 0., 1., 1.],
 ///         [1., 1., 0., 1., 0., 0.],
 ///         [0., 0., 0., 1., 0., 0.],
-///     ]),
-///     f32::EPSILON,
-/// ));
+///     ])
+/// );
 /// ```
 ///
 pub fn adjacency_matrix<T>(g: &T) -> Array2<f32>
@@ -77,6 +78,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -87,17 +89,17 @@ where
 /// let A_avg = linalg::average_adjacency_matrix(&g);
 ///
 /// // Check average adjacency matrix using tolerance.
-/// assert!(A_avg.abs_diff_eq(
-///     &(arr2(&[
+/// assert_relative_eq!(
+///     A_avg,
+///     (arr2(&[
 ///         [4., 6., 4., 6., 6., 2.],
 ///         [6., 9., 6., 9., 9., 3.],
 ///         [4., 6., 4., 6., 6., 2.],
 ///         [6., 9., 6., 9., 9., 3.],
 ///         [6., 9., 6., 9., 9., 3.],
 ///         [2., 3., 2., 3., 3., 1.],
-///     ]) / linalg::degree_vector(&g).sum()),
-///     f32::EPSILON,
-/// ));
+///     ]) / linalg::degree_vector(&g).sum())
+/// );
 /// ```
 ///
 pub fn average_adjacency_matrix<T>(g: &T) -> Array2<f32>
@@ -127,6 +129,7 @@ where
 /// ```
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -137,13 +140,13 @@ where
 /// let B = linalg::modularity_matrix(&g);
 ///
 /// // Check modularity matrix using tolerance.
-/// assert!(B.abs_diff_eq(
-///     &(
+/// assert_relative_eq!(
+///     B,
+///     (
 ///         linalg::adjacency_matrix(&g) -
 ///         linalg::average_adjacency_matrix(&g)
-///     ),
-///     f32::EPSILON,
-/// ));
+///     )
+/// );
 /// ```
 ///
 pub fn modularity_matrix<T>(g: &T) -> Array2<f32>
@@ -180,6 +183,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr1;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -190,7 +194,7 @@ where
 /// let d = linalg::degree_vector(&g);
 ///
 /// // Check degree vector is [2, 3, 2, 3, 3, 1] using tolerance.
-/// assert!(d.abs_diff_eq(&arr1(&[2., 3., 2., 3., 3., 1.]), f32::EPSILON));
+/// assert_relative_eq!(d, arr1(&[2., 3., 2., 3., 3., 1.]));
 /// ```
 ///
 pub fn degree_vector<T>(g: &T) -> Array1<f32>
@@ -214,6 +218,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -224,20 +229,20 @@ where
 /// let D = linalg::degree_matrix(&g);
 ///
 /// // Check degree matrix has [2, 3, 2, 3, 3, 1] as diagonal using tolerance.
-/// assert!(D.abs_diff_eq(
-///     &arr2(&[
+/// assert_relative_eq!(
+///     D,
+///     arr2(&[
 ///         [2., 0., 0., 0., 0., 0.],
 ///         [0., 3., 0., 0., 0., 0.],
 ///         [0., 0., 2., 0., 0., 0.],
 ///         [0., 0., 0., 3., 0., 0.],
 ///         [0., 0., 0., 0., 3., 0.],
 ///         [0., 0., 0., 0., 0., 1.],
-///     ]),
-///     f32::EPSILON,
-/// ));
+///     ])
+/// );
 ///
 /// // Check degree matrix has the degree vector as diagonal using tolerance.
-/// assert!(D.diag().abs_diff_eq(&linalg::degree_vector(&g), f32::EPSILON));
+/// assert_relative_eq!(D.diag(), linalg::degree_vector(&g));
 /// ```
 ///
 pub fn degree_matrix<T>(g: &T) -> Array2<f32>
@@ -261,6 +266,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -271,17 +277,17 @@ where
 /// let L = linalg::laplacian_matrix(&g);
 ///
 /// // Check Laplacian matrix using tolerance.
-/// assert!(L.abs_diff_eq(
-///     &arr2(&[
+/// assert_relative_eq!(
+///     L,
+///     arr2(&[
 ///         [ 2., -1.,  0.,  0., -1.,  0.],
 ///         [-1.,  3., -1.,  0., -1.,  0.],
 ///         [ 0., -1.,  2., -1.,  0.,  0.],
 ///         [ 0.,  0., -1.,  3., -1., -1.],
 ///         [-1., -1.,  0., -1.,  3.,  0.],
 ///         [ 0.,  0.,  0., -1.,  0.,  1.],
-///     ]),
-///     f32::EPSILON,
-/// ));
+///     ])
+/// );
 /// ```
 ///
 pub fn laplacian_matrix<T>(g: &T) -> Array2<f32>
@@ -315,6 +321,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -323,14 +330,14 @@ where
 /// let A_norm = linalg::normalized_adjacency_matrix(&g);
 ///
 /// // Check normalized adjacency matrix using tolerance.
-/// assert!(A_norm.abs_diff_eq(
-///     &arr2(&[
+/// assert_relative_eq!(
+///     A_norm,
+///     arr2(&[
 ///         [                0., f32::sqrt(1. / 2.),                 0.],
 ///         [f32::sqrt(1. / 2.),                 0., f32::sqrt(1. / 2.)],
 ///         [                0., f32::sqrt(1. / 2.),                 0.],
-///     ]),
-///     f32::EPSILON,
-/// ));
+///     ])
+/// );
 /// ```
 ///
 pub fn normalized_adjacency_matrix<T>(g: &T) -> Array2<f32>
@@ -359,6 +366,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -367,14 +375,14 @@ where
 /// let L_norm = linalg::normalized_laplacian_matrix(&g);
 ///
 /// // Check normalized Laplacian matrix using tolerance.
-/// assert!(L_norm.abs_diff_eq(
-///     &arr2(&[
+/// assert_relative_eq!(
+///     L_norm,
+///     arr2(&[
 ///         [                 1., -f32::sqrt(1. / 2.),                  0.],
 ///         [-f32::sqrt(1. / 2.),                  1., -f32::sqrt(1. / 2.)],
 ///         [                 0., -f32::sqrt(1. / 2.),                  1.],
-///     ]),
-///     f32::EPSILON,
-/// ));
+///     ])
+/// );
 /// ```
 ///
 pub fn normalized_laplacian_matrix<T>(g: &T) -> Array2<f32>
@@ -414,6 +422,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr2;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -422,7 +431,7 @@ where
 /// let H = linalg::deformed_laplacian_matrix(&g, Some(1.));
 ///
 /// // Check deformed Laplacian matrix using tolerance.
-/// assert!(H.abs_diff_eq(&linalg::laplacian_matrix(&g), f32::EPSILON));
+/// assert_relative_eq!(H, linalg::laplacian_matrix(&g));
 /// ```
 ///
 pub fn deformed_laplacian_matrix<T>(g: &T, r: Option<f32>) -> Array2<f32>
@@ -455,10 +464,10 @@ where
 }
 
 /// Fiedler value and vector of a graph.
-/// 
+///
 /// Let $\textbf{L}$ be the Laplacian matrix of $G$. Then, the eigenvalue $\lambda$ and
 /// eigenvector $\textbf{x}$ of $\textbf{L}$ is defined as:
-/// 
+///
 /// $$ \textbf{L}\textbf{x} = \lambda\textbf{x} $$
 ///
 /// The Fiedler value, also called algebraic connectivity $\alpha$, is the second smallest eigenvalue
@@ -470,6 +479,7 @@ where
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 /// use ndarray::arr1;
+/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -477,17 +487,15 @@ where
 /// ]);
 ///
 /// // Get Fiedler value and vector with relative tolerance of 1e-8.
-/// let F = linalg::fiedler(&g, 1e-8);
-/// 
+/// let (a, A) = linalg::fiedler(&g, 1e-8);
+///
 /// // Check Fiedler value ...
-/// assert!((F.0 - 0.7215863905035553).abs() < f32::EPSILON);
+/// assert_relative_eq!(a, 0.7215863905035553);
 /// // ... and Fiedler vector using tolerance.
-/// assert!(F.1.abs_diff_eq(
-///     &arr1(&[
-///         0.41486979, 0.30944167, 0.0692328, -0.22093352, 0.22093352, -0.79354426
-///     ]),
-///     f32::EPSILON,
-/// ));
+/// assert_relative_eq!(
+///     A,
+///     arr1(&[0.41486979, 0.30944167, 0.0692328, -0.22093352, 0.22093352, -0.79354426])
+/// );
 /// ```
 ///
 pub fn fiedler<T>(g: &T, rtol: f32) -> (f32, Array1<f32>)
