@@ -28,7 +28,8 @@ mod tests {
 
         assert_relative_eq!(
             linalg::adjacency_spectrum(&g).mapv(|x| { assert_relative_eq!(x.im, 0.); x.re }),
-            arr1(&[2.5394835, 1.0824733, 0.2611437, -0.5406323, -1.2060757, -2.1363928])
+            arr1(&[2.5394835, 1.0824733, 0.2611437, -0.5406323, -1.2060757, -2.1363928]),
+            epsilon = 1e-5
         );
     }
 
@@ -85,7 +86,8 @@ mod tests {
 
         assert_relative_eq!(
             linalg::modularity_spectrum(&g).mapv(|x| { assert_relative_eq!(x.im, 0.); x.re }),
-            arr1(&[-2.1619372, 1.1060615, -1.2125827, -0.5647072, 0.26173767, 1.2830718e-7])
+            arr1(&[-2.1619372, 1.1060615, -1.2125827, -0.5647072, 0.26173767, 1.2830718e-7]),
+            epsilon = 1e-5
         );
     }
 
@@ -126,7 +128,7 @@ mod tests {
         assert_relative_eq!(
             linalg::laplacian_spectrum(&g),
             arr1(&[-1.6597257e-7, 0.7215864, 1.6825694, 2.9999993, 3.7046244, 4.8912177]),
-            epsilon = 50. * f32::EPSILON // Increase tolerance for code coverage tests.
+            epsilon = 1e-5
         );
     }
 
@@ -184,7 +186,7 @@ mod tests {
         assert_relative_eq!(
             linalg::normalized_laplacian_spectrum(&g),
             arr1(&[-1.1920929e-7, 0.4462974, 0.87130904, 1.2842253, 1.5214964, 1.87667197]),
-            epsilon = 50. * f32::EPSILON // Increase tolerance for code coverage tests.
+            epsilon = 1e-5
         );
     }
 
@@ -259,7 +261,7 @@ mod tests {
         assert_relative_eq!(
             linalg::deformed_laplacian_spectrum(&g, None),
             arr1(&[0.07567807, 1.69076098, 2.99481795, 4.68157698, 5.82267482, 7.55081773]),
-            epsilon = 50. * f32::EPSILON // Increase tolerance for code coverage tests.
+            epsilon = 1e-5
         );
     }
 
