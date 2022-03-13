@@ -14,10 +14,10 @@ use std::collections::HashMap;
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr2;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -57,6 +57,7 @@ where
     A
 }
 
+/// Spectral decomposition of the adjacency matrix.
 pub fn adjacency_spectrum<T>(g: &T) -> Array1<Complex<f32>>
 where
     T: Storage,
@@ -75,10 +76,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr2;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -127,9 +128,9 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -159,6 +160,7 @@ where
     A - A_avg
 }
 
+/// Spectral decomposition of the modularity matrix.
 pub fn modularity_spectrum<T>(g: &T) -> Array1<Complex<f32>>
 where
     T: Storage,
@@ -180,10 +182,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr1;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr1;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -215,10 +217,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr2;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -263,10 +265,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr2;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
@@ -300,6 +302,7 @@ where
     D - A
 }
 
+/// Spectral decomposition of the Laplacian matrix.
 pub fn laplacian_spectrum<T>(g: &T) -> Array1<f32>
 where
     T: Storage,
@@ -318,10 +321,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr2;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -363,10 +366,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr2;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -395,6 +398,7 @@ where
     I - A
 }
 
+/// Spectral decomposition of the normalized Laplacian matrix.
 pub fn normalized_laplacian_spectrum<T>(g: &T) -> Array1<f32>
 where
     T: Storage,
@@ -419,10 +423,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr2;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr2;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([(0, 1), (1, 2)]);
@@ -456,6 +460,7 @@ where
     (r.powf(2.) - 1.) * I - r * A + D
 }
 
+/// Spectral decomposition of the deformed Laplacian matrix.
 pub fn deformed_laplacian_spectrum<T>(g: &T, r: Option<f32>) -> Array1<f32>
 where
     T: Storage,
@@ -476,10 +481,10 @@ where
 /// # Examples
 ///
 /// ```
+/// use approx::*;
+/// use ndarray::arr1;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
-/// use ndarray::arr1;
-/// use approx::*;
 ///
 /// // Build an undirected graph.
 /// let g = Graph::from_edges([
