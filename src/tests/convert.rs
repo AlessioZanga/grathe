@@ -10,18 +10,18 @@ mod tests {
     const E: [(i32, i32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
 
     #[test]
-    fn into_edge_list<T>() -> Result<(), Error<i32>>
+    fn edge_list<T>() -> Result<(), Error<i32>>
     where
         T: Convert<Vertex = i32> + From,
     {
         let g = T::from_edges(E);
-        assert_eq!(g.into_edge_list(), EdgeList::from(E));
+        assert_eq!(g.edge_list(), EdgeList::from(E));
 
         Ok(())
     }
 
     #[test]
-    fn into_adjacency_list<T>() -> Result<(), Error<i32>>
+    fn adjacency_list<T>() -> Result<(), Error<i32>>
     where
         T: Convert<Vertex = i32> + From,
     {
@@ -30,13 +30,13 @@ mod tests {
         for (x, y) in E {
             a.entry(x).or_default().insert(y);
         }
-        assert_eq!(g.into_adjacency_list(), a);
+        assert_eq!(g.adjacency_list(), a);
 
         Ok(())
     }
 
     #[test]
-    fn into_dense_adjacency_matrix<T>() -> Result<(), Error<i32>>
+    fn dense_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
         T: Convert<Vertex = i32> + From,
     {
@@ -45,13 +45,13 @@ mod tests {
         for (x, y) in E {
             a[(x as usize, y as usize)] = true;
         }
-        assert_eq!(g.into_dense_adjacency_matrix(), a);
+        assert_eq!(g.dense_adjacency_matrix(), a);
 
         Ok(())
     }
 
     #[test]
-    fn into_sparse_adjacency_matrix<T>() -> Result<(), Error<i32>>
+    fn sparse_adjacency_matrix<T>() -> Result<(), Error<i32>>
     where
         T: Convert<Vertex = i32> + From,
     {
@@ -65,7 +65,7 @@ mod tests {
         let v = std::iter::repeat(true).take(g.size()).collect();
         let order = g.order();
         assert_eq!(
-            g.into_sparse_adjacency_matrix(),
+            g.sparse_adjacency_matrix(),
             SparseAdjacencyMatrix::from_triplets((order, order), x, y, v)
         );
 

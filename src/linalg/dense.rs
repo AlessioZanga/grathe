@@ -1,9 +1,8 @@
-use crate::traits::Storage;
+use crate::traits::{Convert, Storage};
 use ndarray::{Array, Array1, Array2, Axis};
 use ndarray_linalg::lobpcg::{lobpcg, LobpcgResult, TruncatedOrder};
 use ndarray_linalg::{flatten, into_col, EigVals, EigValshInto, UPLO};
 use num_complex::Complex;
-use std::collections::HashMap;
 
 /// Adjacency matrix of a graph.
 ///
@@ -43,24 +42,16 @@ use std::collections::HashMap;
 ///
 pub fn adjacency_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
-    let A = g.order();
-    let mut A = Array::zeros((A, A));
-
-    let idx: HashMap<_, _> = g.vertices_iter().enumerate().map(|(i, x)| (x, i)).collect();
-
-    for (x, y) in g.edges_iter() {
-        A[(idx[x], idx[y])] = 1.;
-    }
-
-    A
+    // TODO: Check if cast (bool -> u8 -> f32) is efficient.
+    g.dense_adjacency_matrix().mapv(|x| x as u8 as f32)
 }
 
 /// Spectral decomposition of the adjacency matrix.
 pub fn adjacency_spectrum<T>(g: &T) -> Array1<Complex<f32>>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     adjacency_matrix(g).eigvals().unwrap()
 }
@@ -105,7 +96,7 @@ where
 ///
 pub fn average_adjacency_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     let d = into_col(degree_vector(g));
 
@@ -152,7 +143,7 @@ where
 ///
 pub fn modularity_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     let A = adjacency_matrix(g);
     let A_avg = average_adjacency_matrix(g);
@@ -163,14 +154,14 @@ where
 /// Spectral decomposition of the modularity matrix.
 pub fn modularity_spectrum<T>(g: &T) -> Array1<Complex<f32>>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     modularity_matrix(g).eigvals().unwrap()
 }
 
 pub fn incidence_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     todo!()
 }
@@ -201,7 +192,7 @@ where
 ///
 pub fn degree_vector<T>(g: &T) -> Array1<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     adjacency_matrix(g).sum_axis(Axis(1))
 }
@@ -249,7 +240,7 @@ where
 ///
 pub fn degree_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     Array::from_diag(&degree_vector(g))
 }
@@ -294,7 +285,7 @@ where
 ///
 pub fn laplacian_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     let D = degree_matrix(g);
     let A = adjacency_matrix(g);
@@ -305,7 +296,7 @@ where
 /// Spectral decomposition of the Laplacian matrix.
 pub fn laplacian_spectrum<T>(g: &T) -> Array1<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     laplacian_matrix(g).eigvalsh_into(UPLO::Lower).unwrap()
 }
@@ -345,7 +336,7 @@ where
 ///
 pub fn normalized_adjacency_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     let A = adjacency_matrix(g);
     let D = Array::from_diag(&degree_vector(g).mapv(|x| 1. / x.sqrt()));
@@ -390,7 +381,7 @@ where
 ///
 pub fn normalized_laplacian_matrix<T>(g: &T) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     let A = normalized_adjacency_matrix(g);
     let I = Array::eye(A.raw_dim()[0]);
@@ -401,7 +392,7 @@ where
 /// Spectral decomposition of the normalized Laplacian matrix.
 pub fn normalized_laplacian_spectrum<T>(g: &T) -> Array1<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     normalized_laplacian_matrix(g).eigvalsh_into(UPLO::Lower).unwrap()
 }
@@ -440,7 +431,7 @@ where
 ///
 pub fn deformed_laplacian_matrix<T>(g: &T, r: Option<f32>) -> Array2<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     let A = adjacency_matrix(g);
     let D = degree_matrix(g);
@@ -463,7 +454,7 @@ where
 /// Spectral decomposition of the deformed Laplacian matrix.
 pub fn deformed_laplacian_spectrum<T>(g: &T, r: Option<f32>) -> Array1<f32>
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     deformed_laplacian_matrix(g, r).eigvalsh_into(UPLO::Lower).unwrap()
 }
@@ -505,7 +496,7 @@ where
 ///
 pub fn fiedler<T>(g: &T, rtol: f32) -> (f32, Array1<f32>)
 where
-    T: Storage,
+    T: Convert + Storage,
 {
     // Get Laplacian matrix L.
     let L = laplacian_matrix(g);
