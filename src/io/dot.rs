@@ -202,7 +202,7 @@ impl TryFrom<String> for DOT {
         // Parse the given dot file
         let pairs = DOT::parse(Rule::graphs, value.trim())?;
         // Match each graph in dot file
-        let pairs = pairs.map(|pair| DOT::parse_graph(pair)).collect();
+        let pairs = pairs.map(DOT::parse_graph).collect();
 
         Ok(Self { data: pairs })
     }
@@ -239,7 +239,7 @@ impl TryInto<String> for DOT {
             match graph {
                 Parsed::Graph(vertices, edges, mut attributes) => {
                     // Write graph strict attribute, if any.
-                    if let Some(_) = attributes.remove("strict") {
+                    if attributes.remove("strict").is_some() {
                         write!(string, "strict ")?;
                     }
                     // Write graph type.
