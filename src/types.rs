@@ -1,5 +1,3 @@
-use ndarray::Array2;
-use sprs::TriMat;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -77,12 +75,6 @@ pub type EdgeList<T> = BTreeSet<(T, T)>;
 
 /// Adjacency list type.
 pub type AdjacencyList<T> = BTreeMap<T, BTreeSet<T>>;
-
-/// Dense adjacency matrix type.
-pub type DenseAdjacencyMatrix = Array2<bool>;
-
-/// Sparse adjacency matrix type.
-pub type SparseAdjacencyMatrix = TriMat<bool>;
 
 /// Error enumerator.
 #[derive(Error, PartialEq, Debug)]

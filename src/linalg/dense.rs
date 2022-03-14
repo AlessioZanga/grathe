@@ -163,7 +163,8 @@ pub fn incidence_matrix<T>(g: &T) -> Array2<f32>
 where
     T: Convert + Storage,
 {
-    todo!()
+    // TODO: Check if cast (bool -> u8 -> f32) is efficient.
+    g.dense_incidence_matrix().mapv(|x| x as u8 as f32)
 }
 
 /// Degree vector of a graph.

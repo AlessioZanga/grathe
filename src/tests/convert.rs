@@ -4,8 +4,10 @@ mod tests {
     use crate::graphs::DirectedAdjacencyListGraph;
     use crate::traits::{Convert, From};
     use crate::types::Error;
-    use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
+    use crate::types::{AdjacencyList, EdgeList};
     use itertools::Itertools;
+    use ndarray::Array2;
+    use sprs::TriMat;
 
     const E: [(i32, i32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
 
@@ -41,7 +43,7 @@ mod tests {
         T: Convert<Vertex = i32> + From,
     {
         let g = T::from_edges(E);
-        let mut a = DenseAdjacencyMatrix::from_elem((8, 8), false);
+        let mut a = Array2::from_elem((8, 8), false);
         for (x, y) in E {
             a[(x as usize, y as usize)] = true;
         }
@@ -66,7 +68,7 @@ mod tests {
         let order = g.order();
         assert_eq!(
             g.sparse_adjacency_matrix(),
-            SparseAdjacencyMatrix::from_triplets((order, order), x, y, v)
+            TriMat::from_triplets((order, order), x, y, v)
         );
 
         Ok(())
