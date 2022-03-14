@@ -1,6 +1,6 @@
 use super::{Capacity, Operators};
 use crate::types::Error;
-use crate::types::{EdgeIterator, VertexIterator, Vertex};
+use crate::types::{EdgeIterator, Vertex, VertexIterator};
 use std::fmt::Debug;
 
 /// The graph storage trait.

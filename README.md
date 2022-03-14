@@ -11,11 +11,7 @@ A Rust implementation of a GRAph THEory library.
 
 Grathe is a graph theory library that provides a coherent programming experience. Its main goal is to reduce the effort of translating theoretical aspect into practical computation.
 
-## Installation
-
-Include `grathe` into `Cargo.toml` as dependency.
-
-## Usage
+## How to Usage
 
 Here is a brief example:
 
@@ -57,6 +53,40 @@ fn main() -> Result<()> {
     // Exit with no error.
     Ok(())
 }
+```
+
+## How to Install
+
+Include `grathe` into `Cargo.toml` as dependency.
+
+## How to Test
+
+The `openblas` library is needed. Clone the repository and run the following commands inside of it.
+
+### Linux
+
+```{.bash}
+sudo apt-get install libopenblas-dev
+```
+
+### MacOS
+
+```{.bash}
+brew install openblas
+```
+
+### Windows
+
+```{.bash}
+cargo install cargo-vcpkg
+cargo vcpkg -v build
+cp target/vcpkg/installed/x64-windows/lib/libopenblas.lib target/vcpkg/installed/x64-windows/lib/openblas.lib
+```
+
+Finally run the tests as usual:
+
+```{.bash}
+cargo test
 ```
 
 ## References

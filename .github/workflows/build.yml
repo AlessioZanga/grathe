@@ -9,16 +9,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: ["stable", "beta", "nightly"]
         os: [ubuntu-latest, macos-latest, windows-latest]
+        env: ["stable", "beta", "nightly"]
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: ${{ matrix.env }}
-          components: rustfmt, clippy
+      - uses: actions/checkout@v3
       - name: Cache
         uses: actions/cache@v2
         env:
@@ -27,21 +21,40 @@ jobs:
           path: |
             ~/.cargo
             target
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}
-      - name: Check
-        run: cargo check --package grathe
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('Cargo.toml') }}-${{ hashFiles('.github/workflows/build.yml') }}
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.env }}
+          components: rustfmt, clippy
+      - name: Setup Linux
+        if: ${{ runner.os == 'Linux' }}
+        run: sudo apt-get install -y libopenblas-dev
+      - name: Setup MacOS
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install openblas
+      - name: Setup Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          cargo install cargo-vcpkg
+          cargo vcpkg -v build
+          cp target/vcpkg/installed/x64-windows/lib/libopenblas.lib target/vcpkg/installed/x64-windows/lib/openblas.lib
       - name: Build
         run: cargo build
       - name: Test
-        run: cargo test
+        run: cargo test --tests
+      - name: Doctest
+        if: ${{ runner.os == 'Linux' && matrix.env == 'stable' }}
+        run: cargo test --doc
       - name: Coverage
         if: ${{ runner.os == 'Linux' && matrix.env == 'stable' }}
         run: |
           cargo install cargo-tarpaulin
           cargo tarpaulin --out Lcov --exclude-files tests/*
       - name: CodeCov
-        uses: codecov/codecov-action@v2
         if: ${{ runner.os == 'Linux' && matrix.env == 'stable' }}
+        uses: codecov/codecov-action@v2
         with:
           files: ./lcov.info
           flags: unittests

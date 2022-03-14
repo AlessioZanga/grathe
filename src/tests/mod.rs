@@ -6,6 +6,7 @@ mod direction;
 mod extend;
 mod from;
 mod io;
+mod linalg;
 mod operators;
 mod readme;
 mod storage;

@@ -133,10 +133,7 @@ macro_rules! impl_with_attributes {
                 let z: Vec<_> = z.into_iter().collect();
 
                 Self {
-                    data: Storage::new(
-                        y.iter().map(|(y, _)| y.clone()),
-                        z.iter().map(|(z, _)| z.clone()),
-                    ),
+                    data: Storage::new(y.iter().map(|(y, _)| y.clone()), z.iter().map(|(z, _)| z.clone())),
                     attributes: U::new_with_attributes(x, y, z),
                 }
             }
