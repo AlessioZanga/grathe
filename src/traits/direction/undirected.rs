@@ -142,6 +142,92 @@ macro_rules! impl_undirected {
             }
         }
 
+        impl<T, U> $crate::traits::Convert for $graph<T, U>
+        where
+            T: $crate::types::Vertex,
+            U: $crate::traits::WithAttributes<T>,
+        {
+            fn edge_list(&self) -> $crate::types::EdgeList<Self::Vertex> {
+                let mut out = $crate::types::EdgeList::new();
+                for (x, y) in self.edges_iter() {
+                    out.insert((x.clone(), y.clone()));
+                }
+
+                out
+            }
+
+            fn adjacency_list(&self) -> $crate::types::AdjacencyList<Self::Vertex> {
+                let mut out = $crate::types::AdjacencyList::new();
+                for (x, y) in self.edges_iter() {
+                    out.entry(x.clone()).or_default().insert(y.clone());
+                }
+
+                out
+            }
+
+            fn dense_adjacency_matrix(&self) -> ndarray::Array2<bool> {
+                let n = self.order();
+                let mut idx = std::collections::HashMap::with_capacity(n);
+                let mut out = ndarray::Array2::from_elem((n, n), false);
+                // Build vid-to-index mapping.
+                idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+                // Fill the output matrix.
+                for (x, y) in self.edges_iter() {
+                    out[(idx[&x], idx[&y])] = true;
+                }
+
+                out
+            }
+
+            fn sparse_adjacency_matrix(&self) -> sprs::TriMat<bool> {
+                let n = self.order();
+                let mut idx = std::collections::HashMap::with_capacity(n);
+                let mut out = sprs::TriMat::new((n, n));
+                // Reserve capacity for sparse matrix.
+                out.reserve(self.size());
+                // Build vid-to-index mapping.
+                idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+                // Fill the output matrix.
+                for (x, y) in self.edges_iter() {
+                    out.add_triplet(idx[&x], idx[&y], true);
+                }
+
+                out
+            }
+
+            fn dense_incidence_matrix(&self) -> ndarray::Array2<i8> {
+                let (n, m) = (self.order(), self.size());
+                let mut idx = std::collections::HashMap::with_capacity(n);
+                let mut out = ndarray::Array2::from_elem((n, m), 0);
+                // Build vid-to-index mapping.
+                idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+                // Fill the output matrix.
+                for (i, (x, y)) in self.edges_iter().filter(|(x, y)| x <= y).enumerate() {
+                    out[(idx[&x], i)] = 1;
+                    out[(idx[&y], i)] = -1;
+                }
+
+                out
+            }
+
+            fn sparse_incidence_matrix(&self) -> sprs::TriMat<i8> {
+                let (n, m) = (self.order(), self.size());
+                let mut idx = std::collections::HashMap::with_capacity(n);
+                let mut out = sprs::TriMat::new((n, m));
+                // Reserve capacity for sparse matrix.
+                out.reserve(2 * m);
+                // Build vid-to-index mapping.
+                idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+                // Fill the output matrix.
+                for (i, (x, y)) in self.edges_iter().filter(|(x, y)| x <= y).enumerate() {
+                    out.add_triplet(idx[&x], i, 1);
+                    out.add_triplet(idx[&y], i, -1);
+                }
+
+                out
+            }
+        }
+
         $crate::traits::impl_extend!($graph);
         $crate::traits::impl_from!($graph);
         $crate::traits::impl_operators!($graph);

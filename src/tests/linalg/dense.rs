@@ -3,14 +3,14 @@
 mod tests {
     use crate::graphs::UndirectedAdjacencyListGraph;
     use crate::linalg::dense as linalg;
-    use crate::traits::{From, Storage};
+    use crate::traits::{Convert, From, Storage};
     use ndarray::{Array, arr1, arr2};
     use approx::*;
 
     #[test]
     fn degree_vector_matrix_matrix<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -22,7 +22,7 @@ mod tests {
     #[test]
     fn adjacency_spectrum<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -36,7 +36,7 @@ mod tests {
     #[test]
     fn modularity_matrix<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -80,7 +80,7 @@ mod tests {
     #[test]
     fn modularity_spectrum<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -94,14 +94,15 @@ mod tests {
     #[test]
     fn incidence_matrix<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
     }
 
     #[test]
+    #[allow(non_snake_case)]
     fn laplacian_matrix<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -116,12 +117,18 @@ mod tests {
                 [ 0.,  0.,  0., -1.,  0.,  1.],
             ])
         );
+
+        let B = linalg::incidence_matrix(&g);
+        assert_relative_eq!(
+            linalg::laplacian_matrix(&g),
+            B.dot(&B.t())
+        );
     }
 
     #[test]
     fn laplacian_spectrum<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -135,7 +142,7 @@ mod tests {
     #[test]
     fn normalized_adjacency_laplacian_matrix<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (2, 3)]);
 
@@ -179,7 +186,7 @@ mod tests {
     #[test]
     fn normalized_laplacian_spectrum<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -193,7 +200,7 @@ mod tests {
     #[test]
     fn deformed_laplacian_matrix<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -254,7 +261,7 @@ mod tests {
     #[test]
     fn deformed_laplacian_spectrum<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 
@@ -268,7 +275,7 @@ mod tests {
     #[test]
     fn fiedler<T>()
     where
-        T: Storage + From<Vertex = i32>,
+        T: Storage<Vertex = i32> + Convert + From,
     {
         let g = T::from_edges([(1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)]);
 

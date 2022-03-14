@@ -8,7 +8,7 @@ use num_complex::Complex;
 ///
 /// The adjacency matrix $\textbf{A}$ of a graph $G$ is defined as:
 ///
-/// $$ \textbf{A}_{i,j} = \begin{cases} 1, & \text{if } (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \textbf{A}_{i,j} = \begin{cases} 1, & \text{If } (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
 /// # Examples
 ///
@@ -62,7 +62,7 @@ where
 ///
 /// $$ \bar{\textbf{A}} = (\textbf{d} \cdot \textbf{d}^T) / \sum \textbf{d} $$
 ///
-/// with $\textbf{d}$ the degree vector.
+/// with $\textbf{d}$ the [degree vector][`degree_vector`].
 ///
 /// # Examples
 ///
@@ -110,11 +110,12 @@ where
 
 /// Modularity matrix of a graph.
 ///
-/// The modularity matrix $\textbf{B}$ of a graph $G$ is defined as:
+/// The modularity matrix $\textbf{Q}$ of a graph $G$ is defined as:
 ///
-/// $$ \textbf{B} = \textbf{A} - \bar{\textbf{A}} $$
+/// $$ \textbf{Q} = \textbf{A} - \bar{\textbf{A}} $$
 ///
-/// with $\textbf{A}$ the adjacency matrix and $\bar{\textbf{A}}$ the average adjacency matrix.
+/// with $\textbf{A}$ the [adjacency matrix][`adjacency_matrix`] and
+/// $\bar{\textbf{A}}$ the [average adjacency matrix][`average_adjacency_matrix`].
 ///
 /// # Examples
 ///
@@ -129,11 +130,11 @@ where
 /// ]);
 ///
 /// // Get modularity matrix for given graph.
-/// let B = linalg::modularity_matrix(&g);
+/// let Q = linalg::modularity_matrix(&g);
 ///
 /// // Check modularity matrix using tolerance.
 /// assert_relative_eq!(
-///     B,
+///     Q,
 ///     (
 ///         linalg::adjacency_matrix(&g) -
 ///         linalg::average_adjacency_matrix(&g)
@@ -159,12 +160,43 @@ where
     modularity_matrix(g).eigvals().unwrap()
 }
 
+/// Incidence matrix of a graph.
+///
+/// The incidence matrix $\textbf{B}$ of a graph $G$ is defined as:
+///
+/// $$ \textbf{B}_{i,j} = \begin{cases} +1, & \text{If } (i, \cdot) \text{ so that } \exists e_j \in \textbf{E} \newline -1, & \text{If } (\cdot, i) \text{ so that } \exists e_j \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
+///
+/// # Examples
+///
+/// ```
+/// use approx::*;
+/// use ndarray::arr2;
+/// use grathe::prelude::*;
+/// use grathe::linalg::dense as linalg;
+///
+/// // Build an undirected graph.
+/// let g = Graph::from_edges([(1, 2), (1, 3), (1, 4), (3, 4)]);
+///
+/// // Get incidence matrix for given graph.
+/// let B = linalg::incidence_matrix(&g);
+///
+/// // Check incidence matrix using tolerance.
+/// assert_relative_eq!(
+///     B,
+///     arr2(&[
+///         [ 1.,  1.,  1.,  0.],
+///         [-1.,  0.,  0.,  0.],
+///         [ 0., -1.,  0.,  1.],
+///         [ 0.,  0., -1., -1.],
+///     ])
+/// );
+/// ```
+///
 pub fn incidence_matrix<T>(g: &T) -> Array2<f32>
 where
     T: Convert + Storage,
 {
-    // TODO: Check if cast (bool -> u8 -> f32) is efficient.
-    g.dense_incidence_matrix().mapv(|x| x as u8 as f32)
+    g.dense_incidence_matrix().mapv(|x| x as f32)
 }
 
 /// Degree vector of a graph.
@@ -202,9 +234,9 @@ where
 ///
 /// The degree matrix $\textbf{D}$ of a graph $G$ is defined as:
 ///
-/// $$ \textbf{D}_{i,j} = \begin{cases} \textbf{d}_i, & \text{if } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \textbf{D}_{i,j} = \begin{cases} \textbf{d}_i, & \text{If } i = j, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
-/// with $\textbf{d}$ the degree vector.
+/// with $\textbf{d}$ the [degree vector][`degree_vector`].
 ///
 /// # Examples
 ///
@@ -252,7 +284,11 @@ where
 ///
 /// $$ \textbf{L} = \textbf{D} - \textbf{A} $$
 ///
-/// with $\textbf{D}$ the degree matrix and $\textbf{A}$ the adjacency matrix.
+/// with $\textbf{D}$ the [degree matrix][`degree_matrix`] and
+/// $\textbf{A}$ the [adjacency matrix][`adjacency_matrix`],
+/// and can also be derived from the [incidence matrix][`incidence_matrix`] $\textbf{B}$ as:
+///
+/// $$ \textbf{L} = \textbf{B}\textbf{B}^T $$
 ///
 /// # Examples
 ///
@@ -282,6 +318,13 @@ where
 ///         [ 0.,  0.,  0., -1.,  0.,  1.],
 ///     ])
 /// );
+///
+/// // Check Laplacian matrix from incidence matrix.
+/// let B = linalg::incidence_matrix(&g);
+/// assert_relative_eq!(
+///     linalg::laplacian_matrix(&g),
+///     B.dot(&B.t())
+/// );
 /// ```
 ///
 pub fn laplacian_matrix<T>(g: &T) -> Array2<f32>
@@ -308,7 +351,7 @@ where
 ///
 /// $$ \tilde{\textbf{A}} = \textbf{D}^{-\frac{1}{2}}\textbf{A}\textbf{D}^{-\frac{1}{2}} $$
 ///
-/// with $\textbf{D}$ the degree matrix and $\textbf{A}$ the adjacency matrix.
+/// with $\textbf{D}$ the [degree matrix][`degree_matrix`] and $\textbf{A}$ the [adjacency matrix][`adjacency_matrix`].
 ///
 /// # Examples
 ///
@@ -349,9 +392,10 @@ where
 ///
 /// The (symmetrically) normalized Laplacian matrix $\tilde{\textbf{L}}$ of a graph $G$ is defined as:
 ///
-/// $$ \tilde{\textbf{L}}_{i,j} = \begin{cases} 1, & \text{if } i = j \wedge \textbf{d}_i \neq 0, \newline -\frac{1}{\sqrt{\textbf{d}_i \textbf{d}_j}}, & \text{if } i \neq j \wedge (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \tilde{\textbf{L}}_{i,j} = \begin{cases} 1, & \text{If } i = j \wedge \textbf{d}_i \neq 0, \newline -\frac{1}{\sqrt{\textbf{d}_i \textbf{d}_j}}, & \text{If } i \neq j \wedge (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
-/// and can be derived from the identity matrix $\textbf{I}$ and the normalized adjacency matrix $\tilde{\textbf{A}}$ as:
+/// and can be derived from the identity matrix $\textbf{I}$ and
+/// the [normalized adjacency matrix][`normalized_adjacency_matrix`] $\tilde{\textbf{A}}$ as:
 ///
 /// $$ \tilde{\textbf{L}} = \textbf{I} - \tilde{\textbf{A}} $$
 ///
@@ -404,13 +448,16 @@ where
 ///
 /// $$ \textbf{H}(r) = (r^2 - 1) \textbf{I} - r \textbf{A} + \textbf{D} $$
 ///
-/// with $r$ the regularization factor, $\textbf{I}$ the identity matrix, $\textbf{A}$ the adjacency matrix and $\textbf{D}$ the degree matrix.
+/// with $r$ the regularization factor, $\textbf{I}$ the identity matrix,
+/// $\textbf{A}$ the [adjacency matrix][`adjacency_matrix`] and $\textbf{D}$ the [degree matrix][`degree_matrix`].
 ///
-/// If $r$ is equal to one, then $\textbf{H}(1)$ is equal to the Laplacian matrix $\textbf{L}$.
+/// If $r$ is equal to one, then $\textbf{H}(1)$ is equal to the [Laplacian matrix][`laplacian_matrix`] $\textbf{L}$.
 ///
 /// If $r$ is not provided, then it is defined as:
 ///
 /// $$ r = \bigg( \sum \textbf{d} \bigg)^{-1} \bigg( \sum \textbf{d}^2 \bigg) - 1 $$
+/// 
+/// with $\textbf{d}$ the [degree vector][`degree_vector`].
 ///
 /// # Examples
 ///

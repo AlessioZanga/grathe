@@ -1,19 +1,13 @@
 use crate::traits::Storage;
 use crate::types::{AdjacencyList, EdgeList};
-use crate::{E, V};
 use ndarray::Array2;
 use sprs::TriMat;
-use std::collections::HashMap;
 
 /// The graph conversion trait.
 pub trait Convert: Storage {
     /// Edge list adapter.
     ///
     /// Return the edge list representing the graph.
-    ///
-    /// # Complexity
-    ///
-    /// $O(|E|)$ - Linear in the size of the graph.
     ///
     /// # Examples
     ///
@@ -37,118 +31,33 @@ pub trait Convert: Storage {
     ///
     /// Return the adjacency list representing the graph.
     ///
-    /// # Complexity
-    ///
-    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
-    ///
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex>;
 
-    /// Dense adjacency matrix adapter.
+    /// Dense adjacency matrix of a graph.
     ///
-    /// Return the (dense) adjacency matrix representing the graph.
+    /// The adjacency matrix $\textbf{A}$ of a graph $G$ is defined as:
     ///
-    /// # Complexity
-    ///
-    /// $O(|V|^2)$ - Quadratic in the order of the graph.
+    /// $$ \textbf{A}_{i,j} = \begin{cases} 1, & \text{if } (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
     ///
     fn dense_adjacency_matrix(&self) -> Array2<bool>;
 
-    /// Sparse adjacency matrix adapter.
+    /// Sparse adjacency matrix of a graph.
     ///
-    /// Return the (sparse) adjacency matrix representing the graph.
-    ///
-    /// # Complexity
-    ///
-    /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
+    /// Defined as its [dense variant][`Convert::dense_adjacency_matrix`].
     ///
     fn sparse_adjacency_matrix(&self) -> TriMat<bool>;
 
-    fn dense_incidence_matrix(&self) -> Array2<bool>;
+    /// Dense incidence matrix of a graph.
+    ///
+    /// The incidence matrix $\textbf{B}$ of a graph $G$ is defined as:
+    ///
+    /// $$ \textbf{B}_{i,j} = \begin{cases} +1, & \text{if } (i, \cdot) \equiv e_j \in \textbf{E}, \newline -1, & \text{if } (\cdot, i) \equiv e_j \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
+    ///
+    fn dense_incidence_matrix(&self) -> Array2<i8>;
 
-    fn sparse_incidence_matrix(&self) -> TriMat<bool>;
-}
-
-impl<T> Convert for T
-where
-    T: Storage,
-{
-    fn edge_list(&self) -> EdgeList<Self::Vertex> {
-        let mut out = EdgeList::new();
-        for (x, y) in E!(&self) {
-            out.insert((x.clone(), y.clone()));
-        }
-
-        out
-    }
-
-    fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
-        let mut out = AdjacencyList::new();
-        for (x, y) in E!(&self) {
-            out.entry(x.clone()).or_default().insert(y.clone());
-        }
-
-        out
-    }
-
-    fn dense_adjacency_matrix(&self) -> Array2<bool> {
-        let n = self.order();
-        let mut idx = HashMap::with_capacity(n);
-        let mut out = Array2::from_elem((n, n), false);
-        // Build vid-to-index mapping.
-        idx.extend(V!(&self).enumerate().map(|(i, x)| (x, i)));
-        // Fill the output matrix.
-        for (x, y) in E!(&self) {
-            out[(idx[&x], idx[&y])] = true;
-        }
-
-        out
-    }
-
-    fn sparse_adjacency_matrix(&self) -> TriMat<bool> {
-        let n = self.order();
-        let mut idx = HashMap::with_capacity(n);
-        let mut out = TriMat::new((n, n));
-        // Reserve capacity for sparse matrix.
-        out.reserve(self.size());
-        // Build vid-to-index mapping.
-        idx.extend(V!(&self).enumerate().map(|(i, x)| (x, i)));
-        // Fill the output matrix.
-        for (x, y) in E!(&self) {
-            out.add_triplet(idx[&x], idx[&y], true);
-        }
-
-        out
-    }
-
-    fn dense_incidence_matrix(&self) -> Array2<bool> {
-        let (n, m) = (self.order(), self.size());
-        let mut idx = HashMap::with_capacity(n);
-        let mut out = Array2::from_elem((n, m), false);
-        // Build vid-to-index mapping.
-        idx.extend(V!(&self).enumerate().map(|(i, x)| (x, i)));
-        // Fill the output matrix.
-        for (i, (x, y)) in E!(&self).enumerate() {
-            out[(idx[&x], i)] = true;
-            out[(idx[&y], i)] = true;
-        }
-
-        out
-    }
-
-    fn sparse_incidence_matrix(&self) -> TriMat<bool> {
-        let (n, m) = (self.order(), self.size());
-        let mut idx = HashMap::with_capacity(n);
-        let mut out = TriMat::new((n, m));
-        // Reserve capacity for sparse matrix.
-        out.reserve(2 * m);
-        // Build vid-to-index mapping.
-        idx.extend(V!(&self).enumerate().map(|(i, x)| (x, i)));
-        // Fill the output matrix.
-        for (i, (x, y)) in E!(&self).enumerate() {
-            out.add_triplet(idx[&x], i, true);
-            out.add_triplet(idx[&y], i, true);
-        }
-
-        out
-    }
+    /// Sparse incidence matrix of a graph.
+    ///
+    /// Defined as its [dense variant][`Convert::dense_incidence_matrix`].
+    ///
+    fn sparse_incidence_matrix(&self) -> TriMat<i8>;
 }
