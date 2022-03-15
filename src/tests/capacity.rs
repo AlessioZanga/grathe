@@ -3,6 +3,7 @@
 mod tests {
     use crate::graphs::storages::AdjacencyListStorage;
     use crate::traits::Storage;
+    use crate::types::Direction;
     use all_asserts::*;
 
     #[test]
@@ -38,6 +39,6 @@ mod tests {
         assert_eq!(g.size(), 0);
     }
 
-    #[instantiate_tests(<AdjacencyListStorage<i32>>)]
+    #[instantiate_tests(<AdjacencyListStorage<i32, { Direction::UNDIRECTED }>>)]
     mod adjacency_list_storage {}
 }

@@ -240,7 +240,9 @@ macro_rules! impl_undirected {
         {
             type Vertex = T;
 
-            type Storage = $storage<T>;
+            const DIRECTION: usize = $crate::types::Direction::UNDIRECTED;
+
+            type Storage = $storage<T, { $crate::types::Direction::UNDIRECTED }>;
 
             fn storage(&self) -> &Self::Storage {
                 &self.data

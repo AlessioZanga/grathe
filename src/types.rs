@@ -76,6 +76,13 @@ pub type EdgeList<T> = BTreeSet<(T, T)>;
 /// Adjacency list type.
 pub type AdjacencyList<T> = BTreeMap<T, BTreeSet<T>>;
 
+pub struct Direction {}
+
+impl Direction {
+    pub const UNDIRECTED: usize = 0;
+    pub const DIRECTED: usize = 1;
+}
+
 /// Error enumerator.
 #[derive(Error, PartialEq, Debug)]
 pub enum Error<T> {

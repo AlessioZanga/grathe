@@ -12,6 +12,8 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     // Edge identifier type.
     // type Edge = (&Self::Vertex, &Self::Vertex);
 
+    const DIRECTION: usize;
+
     /// Underlying storage type.
     type Storage;
 

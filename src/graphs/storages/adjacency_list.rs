@@ -6,14 +6,14 @@ use std::collections::{BTreeSet, HashSet};
 
 /// Graph structure based on adjacency list storage.
 #[derive(PartialEq, Eq, Default, Debug)]
-pub struct AdjacencyListStorage<T>
+pub struct AdjacencyListStorage<T, const D: usize>
 where
     T: Vertex,
 {
     data: AdjacencyList<T>,
 }
 
-impl<T> PartialOrd for AdjacencyListStorage<T>
+impl<T, const D: usize> PartialOrd for AdjacencyListStorage<T, D>
 where
     T: Vertex,
 {
@@ -61,7 +61,7 @@ where
     }
 }
 
-impl<T> Capacity for AdjacencyListStorage<T>
+impl<T, const D: usize> Capacity for AdjacencyListStorage<T, D>
 where
     T: Vertex,
 {
@@ -88,7 +88,7 @@ where
     }
 }
 
-impl<T> Operators for AdjacencyListStorage<T>
+impl<T, const D: usize> Operators for AdjacencyListStorage<T, D>
 where
     T: Vertex,
 {
@@ -172,11 +172,13 @@ where
     }
 }
 
-impl<T> Storage for AdjacencyListStorage<T>
+impl<T, const D: usize> Storage for AdjacencyListStorage<T, D>
 where
     T: Vertex,
 {
     type Vertex = T;
+
+    const DIRECTION: usize = D;
 
     type Storage = AdjacencyList<T>;
 

@@ -308,7 +308,9 @@ macro_rules! impl_directed {
         {
             type Vertex = T;
 
-            type Storage = $storage<T>;
+            const DIRECTION: usize = $crate::types::Direction::DIRECTED;
+
+            type Storage = $storage<T, { $crate::types::Direction::DIRECTED }>;
 
             fn storage(&self) -> &Self::Storage {
                 &self.data

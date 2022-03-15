@@ -3,7 +3,7 @@
 mod tests {
     use crate::graphs::storages::AdjacencyListStorage;
     use crate::traits::Storage;
-    use crate::types::Error;
+    use crate::types::{Direction, Error};
     use crate::{Adj, E, V};
     use all_asserts::*;
 
@@ -678,6 +678,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<AdjacencyListStorage<i32>>)]
+    #[instantiate_tests(<AdjacencyListStorage<i32, { Direction::UNDIRECTED }>>)]
     mod adjacency_list_graph {}
 }

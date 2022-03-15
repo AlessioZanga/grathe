@@ -1,8 +1,7 @@
 use super::attributes::AttributesMap;
 use super::storages::AdjacencyListStorage;
 use crate::traits::{Directed, Operators, Storage, Undirected, WithAttributes};
-use crate::types::Error;
-use crate::types::{Vertex, VertexIterator};
+use crate::types::{Direction, Error, Vertex, VertexIterator};
 
 /// Undirected graph based on adjacency list storage.
 #[derive(Default, Debug)]
@@ -11,7 +10,7 @@ where
     T: Vertex,
     U: WithAttributes<T>,
 {
-    data: AdjacencyListStorage<T>,
+    data: AdjacencyListStorage<T, { Direction::UNDIRECTED }>,
     attributes: U,
 }
 
@@ -39,7 +38,7 @@ where
     T: Vertex,
     U: WithAttributes<T>,
 {
-    data: AdjacencyListStorage<T>,
+    data: AdjacencyListStorage<T, { Direction::DIRECTED }>,
     attributes: U,
 }
 
