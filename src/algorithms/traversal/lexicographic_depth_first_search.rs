@@ -8,23 +8,23 @@ use std::iter::FusedIterator;
 ///
 /// This structure contains the `predecessor` map.
 ///
-pub struct LexicographicDepthFirstSearch<'a, T>
+pub struct LexicographicDepthFirstSearch<'a, G>
 where
-    T: Undirected,
+    G: Undirected,
 {
     /// Given graph reference.
-    graph: &'a T,
+    graph: &'a G,
     /// Current index.
     index: usize,
     /// To-be-visited queue.
-    queue: HashMap<&'a T::Vertex, VecDeque<usize>>,
+    queue: HashMap<&'a G::Vertex, VecDeque<usize>>,
     /// Predecessor of each discovered vertex (except the source vertex).
-    pub predecessor: HashMap<&'a T::Vertex, &'a T::Vertex>,
+    pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
 }
 
-impl<'a, T> LexicographicDepthFirstSearch<'a, T>
+impl<'a, G> LexicographicDepthFirstSearch<'a, G>
 where
-    T: Undirected,
+    G: Undirected,
 {
     /// Build a LexDFS iterator.
     ///
@@ -70,7 +70,7 @@ where
     /// assert_eq!(search.predecessor[&4], &2);
     /// ```
     ///
-    pub fn new(g: &'a T, x: Option<&'a T::Vertex>) -> Self {
+    pub fn new(g: &'a G, x: Option<&'a G::Vertex>) -> Self {
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
@@ -110,11 +110,11 @@ where
     }
 }
 
-impl<'a, T> Iterator for LexicographicDepthFirstSearch<'a, T>
+impl<'a, G> Iterator for LexicographicDepthFirstSearch<'a, G>
 where
-    T: Undirected,
+    G: Undirected,
 {
-    type Item = &'a T::Vertex;
+    type Item = &'a G::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
         // While the queue is non-empty.
@@ -154,24 +154,24 @@ where
     }
 }
 
-impl<'a, T> FusedIterator for LexicographicDepthFirstSearch<'a, T> where T: Undirected {}
+impl<'a, G> FusedIterator for LexicographicDepthFirstSearch<'a, G> where G: Undirected {}
 
-impl<'a, T> From<&'a T> for LexicographicDepthFirstSearch<'a, T>
+impl<'a, G> From<&'a G> for LexicographicDepthFirstSearch<'a, G>
 where
-    T: Undirected,
+    G: Undirected,
 {
     /// Builds a search object from a given graph, without a source vertex.
     ///
     /// The first vertex of the vertex set is chosen as source vertex.
     ///
-    fn from(g: &'a T) -> Self {
+    fn from(g: &'a G) -> Self {
         Self::new(g, None)
     }
 }
 
-impl<'a, T> From<(&'a T, &'a T::Vertex)> for LexicographicDepthFirstSearch<'a, T>
+impl<'a, G> From<(&'a G, &'a G::Vertex)> for LexicographicDepthFirstSearch<'a, G>
 where
-    T: Undirected,
+    G: Undirected,
 {
     /// Builds a search object from a given graph, with a source vertex.
     ///
@@ -179,7 +179,7 @@ where
     ///
     /// Panics if the source vertex is not in the graph.
     ///
-    fn from((g, x): (&'a T, &'a T::Vertex)) -> Self {
+    fn from((g, x): (&'a G, &'a G::Vertex)) -> Self {
         Self::new(g, Some(x))
     }
 }

@@ -4,17 +4,14 @@ pub mod attributes;
 /// Backend graph storage implementations.
 pub mod storages;
 
-mod adjacency_list;
-pub use adjacency_list::{DirectedAdjacencyListGraph, UndirectedAdjacencyListGraph};
-
 /// Default undirected graph implementation based on adjacency list.
-pub type Graph = UndirectedAdjacencyListGraph<i32>;
+pub type Graph = storages::UndirectedAdjacencyList<i32>;
 
 /// Default undirected graph with labels implementation based on adjacency list.
-pub type Graphl = UndirectedAdjacencyListGraph<String>;
+pub type Graphl = storages::UndirectedAdjacencyList<String>;
 
 /// Default directed graph implementation based on adjacency list.
-pub type DiGraph = DirectedAdjacencyListGraph<i32>;
+pub type DiGraph = storages::DirectedAdjacencyList<i32>;
 
 /// Default directed graph with labels implementation based on adjacency list.
-pub type DiGraphl = DirectedAdjacencyListGraph<String>;
+pub type DiGraphl = storages::DirectedAdjacencyList<String>;

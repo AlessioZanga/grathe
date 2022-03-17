@@ -10,29 +10,29 @@ use std::vec::Vec;
 ///
 /// This structure contains the `discovery_time`, `finish_time` and `predecessor` maps.
 ///
-pub struct DepthFirstSearch<'a, T>
+pub struct DepthFirstSearch<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Given graph reference.
-    graph: &'a T,
+    graph: &'a G,
     /// Reachable vertices of distance one from given vertex.
-    reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    reachable: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
     /// The visit stack.
-    stack: Vec<&'a T::Vertex>,
+    stack: Vec<&'a G::Vertex>,
     /// Global time counter.
     pub time: usize,
     /// Discovery time of each discovered vertex.
-    pub discovery_time: HashMap<&'a T::Vertex, usize>,
+    pub discovery_time: HashMap<&'a G::Vertex, usize>,
     /// Finish time of each discovered vertex.
-    pub finish_time: HashMap<&'a T::Vertex, usize>,
+    pub finish_time: HashMap<&'a G::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
-    pub predecessor: HashMap<&'a T::Vertex, &'a T::Vertex>,
+    pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
 }
 
-impl<'a, T> DepthFirstSearch<'a, T>
+impl<'a, G> DepthFirstSearch<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Build a DFS iterator.
     ///
@@ -77,9 +77,9 @@ where
     /// ```
     ///
     pub fn new(
-        g: &'a T,
-        x: Option<&'a T::Vertex>,
-        f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+        g: &'a G,
+        x: Option<&'a G::Vertex>,
+        f: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
         m: Traversal,
     ) -> Self {
         // Initialize default search object.
@@ -132,11 +132,11 @@ where
     }
 }
 
-impl<'a, T> Iterator for DepthFirstSearch<'a, T>
+impl<'a, G> Iterator for DepthFirstSearch<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
-    type Item = &'a T::Vertex;
+    type Item = &'a G::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
         // If there are still vertices to be visited.
@@ -182,4 +182,4 @@ where
     }
 }
 
-impl<'a, T> FusedIterator for DepthFirstSearch<'a, T> where T: Storage {}
+impl<'a, G> FusedIterator for DepthFirstSearch<'a, G> where G: Storage {}

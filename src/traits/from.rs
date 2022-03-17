@@ -108,10 +108,10 @@ pub trait From: Storage {
 
 macro_rules! impl_from {
     ($graph:ident) => {
-        impl<T, U> $crate::traits::From for $graph<T, U>
+        impl<V, A> $crate::traits::From for $graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
         }
     };

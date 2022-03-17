@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::graphs::DirectedAdjacencyListGraph;
+    use crate::graphs::storages::DirectedAdjacencyList;
     use crate::traits::Directed;
     use crate::types::Error;
     use crate::{An, Ch, De, Pa};
@@ -27,11 +27,11 @@ mod tests {
     }
 
     #[test]
-    fn ancestors_iter<T>() -> Result<(), Error<i32>>
+    fn ancestors_iter<G>() -> Result<(), Error<i32>>
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -57,20 +57,20 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn ancestors_iter_should_panic<T>()
+    fn ancestors_iter_should_panic<G>()
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let g = T::null();
+        let g = G::null();
         An!(g, &0);
     }
 
     #[test]
-    fn parents_iter<T>() -> Result<(), Error<i32>>
+    fn parents_iter<G>() -> Result<(), Error<i32>>
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -94,20 +94,20 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn parents_iter_should_panic<T>()
+    fn parents_iter_should_panic<G>()
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let g = T::null();
+        let g = G::null();
         Pa!(g, &0);
     }
 
     #[test]
-    fn children_iter<T>() -> Result<(), Error<i32>>
+    fn children_iter<G>() -> Result<(), Error<i32>>
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -131,20 +131,20 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn children_iter_should_panic<T>()
+    fn children_iter_should_panic<G>()
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let g = T::null();
+        let g = G::null();
         Ch!(g, &0);
     }
 
     #[test]
-    fn descendants_iter<T>() -> Result<(), Error<i32>>
+    fn descendants_iter<G>() -> Result<(), Error<i32>>
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -170,20 +170,20 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn descendants_iter_should_panic<T>()
+    fn descendants_iter_should_panic<G>()
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let g = T::null();
+        let g = G::null();
         De!(g, &0);
     }
 
     #[test]
-    fn add_directed_edge<T>() -> Result<(), Error<i32>>
+    fn add_directed_edge<G>() -> Result<(), Error<i32>>
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;
@@ -199,11 +199,11 @@ mod tests {
     }
 
     #[test]
-    fn in_degree_of<T>() -> Result<(), Error<i32>>
+    fn in_degree_of<G>() -> Result<(), Error<i32>>
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
         let i = g.add_vertex(0)?;
 
         assert_eq!(g.in_degree_of(&i), 0);
@@ -227,20 +227,20 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn in_degree_of_should_panic<T>()
+    fn in_degree_of_should_panic<G>()
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let g = T::null();
+        let g = G::null();
         g.in_degree_of(&0);
     }
 
     #[test]
-    fn out_degree_of<T>() -> Result<(), Error<i32>>
+    fn out_degree_of<G>() -> Result<(), Error<i32>>
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
         let i = g.add_vertex(0)?;
 
         assert_eq!(g.out_degree_of(&i), 0);
@@ -264,14 +264,14 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn out_degree_of_should_panic<T>()
+    fn out_degree_of_should_panic<G>()
     where
-        T: Directed<Vertex = i32>,
+        G: Directed<Vertex = i32>,
     {
-        let g = T::null();
+        let g = G::null();
         g.out_degree_of(&0);
     }
 
-    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
-    mod adjacency_list_graph {}
+    #[instantiate_tests(<DirectedAdjacencyList<i32>>)]
+    mod adjacency_list {}
 }

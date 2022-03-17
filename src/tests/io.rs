@@ -2,7 +2,7 @@
 mod tests {
     mod dot {
         use crate::graphs::attributes::AttributesMap;
-        use crate::graphs::UndirectedAdjacencyListGraph;
+        use crate::graphs::storages::UndirectedAdjacencyList;
         use crate::io::{DOT, IO};
         use crate::traits::{Storage, WithAttributes};
         use all_asserts::*;
@@ -46,7 +46,7 @@ mod tests {
         fn map() -> Result<(), std::io::Error> {
             let g = "graph G { 1 -- 2; }";
             let g = DOT::try_from(g.to_string()).unwrap();
-            let g = g.map::<UndirectedAdjacencyListGraph<i32>, _>(|x| x.parse::<i32>().unwrap());
+            let g = g.map::<UndirectedAdjacencyList<i32>, _>(|x| x.parse::<i32>().unwrap());
             let g = &g[0];
 
             assert_eq!(g.order(), 2);
@@ -60,18 +60,13 @@ mod tests {
         fn map_with_attributes() -> Result<(), std::io::Error> {
             let g = "graph G { 1 -- 2; }";
             let g = DOT::try_from(g.to_string()).unwrap();
-            let g = g.map_with_attributes::<
-                UndirectedAdjacencyListGraph<i32, AttributesMap<i32, String, (), ()>>,
-                _,
-                _,
-                _,
-                _,
-            >(
-                |t| t.parse::<i32>().unwrap(),
-                |mut x| x.remove("graph_id").unwrap(),
-                |_| (),
-                |_| (),
-            );
+            let g = g
+                .map_with_attributes::<UndirectedAdjacencyList<i32, AttributesMap<i32, String, (), ()>>, _, _, _, _>(
+                    |t| t.parse::<i32>().unwrap(),
+                    |mut x| x.remove("graph_id").unwrap(),
+                    |_| (),
+                    |_| (),
+                );
             let g = &g[0];
 
             assert_eq!(g.order(), 2);

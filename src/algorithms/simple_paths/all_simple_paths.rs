@@ -4,25 +4,25 @@ use std::collections::HashSet;
 use std::vec::Vec;
 
 /// Find all simple paths in a graph for given source and target vertices.
-pub struct AllSimplePaths<'a, T>
+pub struct AllSimplePaths<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Given graph reference.
-    graph: &'a T,
+    graph: &'a G,
     /// Reachable vertices of distance one from given vertex.
-    reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    reachable: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
     /// To-be-visited stack.
-    stack: Vec<&'a T::Vertex>,
+    stack: Vec<&'a G::Vertex>,
     /// Already visited set.
-    visited: HashSet<&'a T::Vertex>,
+    visited: HashSet<&'a G::Vertex>,
     /// Vector of found simple paths.
-    pub simple_paths: Vec<Vec<&'a T::Vertex>>,
+    pub simple_paths: Vec<Vec<&'a G::Vertex>>,
 }
 
-impl<'a, T> AllSimplePaths<'a, T>
+impl<'a, G> AllSimplePaths<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Build an *all simple paths* search structure.
     ///
@@ -61,10 +61,10 @@ where
     /// ```
     ///
     pub fn new(
-        g: &'a T,
-        x: &'a T::Vertex,
-        y: &'a T::Vertex,
-        f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+        g: &'a G,
+        x: &'a G::Vertex,
+        y: &'a G::Vertex,
+        f: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
     ) -> Self {
         // Assert that source and target vertices are in graph.
         assert!(g.has_vertex(x) && g.has_vertex(y));
@@ -83,7 +83,7 @@ where
         }
     }
 
-    fn visit(&mut self, x: &'a T::Vertex, y: &'a T::Vertex) {
+    fn visit(&mut self, x: &'a G::Vertex, y: &'a G::Vertex) {
         // Push current vertex onto stack.
         self.stack.push(x);
         // Set current vertex as visited.

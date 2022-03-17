@@ -2,18 +2,18 @@
 #[generic_tests::define]
 mod tests {
     use crate::graphs::attributes::AttributesMap;
-    use crate::graphs::UndirectedAdjacencyListGraph;
+    use crate::graphs::storages::UndirectedAdjacencyList;
     use crate::traits::{From, WithAttributes};
     use all_asserts::*;
 
     #[test]
-    fn has_graph_attrs<T>()
+    fn has_graph_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         assert_false!(g.has_graph_attrs());
 
         g.set_graph_attrs((false,));
@@ -21,13 +21,13 @@ mod tests {
     }
 
     #[test]
-    fn get_graph_attrs<T>()
+    fn get_graph_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         assert_true!(g.get_graph_attrs().is_err());
 
         g.set_graph_attrs((false,));
@@ -35,13 +35,13 @@ mod tests {
     }
 
     #[test]
-    fn get_mut_graph_attrs<T>()
+    fn get_mut_graph_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         assert_true!(g.get_mut_graph_attrs().is_err());
 
         g.set_graph_attrs((false,));
@@ -52,13 +52,13 @@ mod tests {
     }
 
     #[test]
-    fn set_graph_attrs<T>()
+    fn set_graph_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         assert_false!(g.has_graph_attrs());
 
         g.set_graph_attrs((false,));
@@ -67,13 +67,13 @@ mod tests {
     }
 
     #[test]
-    fn unset_graph_attrs<T>()
+    fn unset_graph_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         assert_true!(g.unset_graph_attrs().is_err());
         assert_false!(g.has_graph_attrs());
 
@@ -83,13 +83,13 @@ mod tests {
     }
 
     #[test]
-    fn has_vertex_attrs<T>()
+    fn has_vertex_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = G::from_vertices([0]);
         assert_false!(g.has_vertex_attrs(&0));
 
         g.set_vertex_attrs(&0, (42,));
@@ -98,24 +98,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn has_vertex_attrs_should_panic<T>()
+    fn has_vertex_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let g: T = Default::default();
+        let g: G = Default::default();
         g.has_vertex_attrs(&0);
     }
 
     #[test]
-    fn get_vertex_attrs<T>()
+    fn get_vertex_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = G::from_vertices([0]);
         assert_true!(g.get_vertex_attrs(&0).is_err());
 
         g.set_vertex_attrs(&0, (42,));
@@ -124,24 +124,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn get_vertex_attrs_should_panic<T>()
+    fn get_vertex_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let g: T = Default::default();
+        let g: G = Default::default();
         g.get_vertex_attrs(&0).ok();
     }
 
     #[test]
-    fn get_mut_vertex_attrs<T>()
+    fn get_mut_vertex_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = G::from_vertices([0]);
         assert_true!(g.get_mut_vertex_attrs(&0).is_err());
 
         g.set_vertex_attrs(&0, (42,));
@@ -153,24 +153,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn get_mut_vertex_attrs_should_panic<T>()
+    fn get_mut_vertex_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         g.get_mut_vertex_attrs(&0).ok();
     }
 
     #[test]
-    fn set_vertex_attrs<T>()
+    fn set_vertex_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = G::from_vertices([0]);
         assert_false!(g.has_vertex_attrs(&0));
 
         g.set_vertex_attrs(&0, (42,));
@@ -180,24 +180,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn set_vertex_attrs_should_panic<T>()
+    fn set_vertex_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         g.set_vertex_attrs(&0, (42,));
     }
 
     #[test]
-    fn unset_vertex_attrs<T>()
+    fn unset_vertex_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_vertices([0]);
+        let mut g = G::from_vertices([0]);
         assert_true!(g.unset_vertex_attrs(&0).is_err());
         assert_false!(g.has_vertex_attrs(&0));
 
@@ -208,24 +208,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn unset_vertex_attrs_should_panic<T>()
+    fn unset_vertex_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         g.unset_vertex_attrs(&0).ok();
     }
 
     #[test]
-    fn has_edge_attrs<T>()
+    fn has_edge_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_edges([(0, 1)]);
+        let mut g = G::from_edges([(0, 1)]);
         assert_false!(g.has_edge_attrs(&0, &1));
 
         g.set_edge_attrs(&0, &1, (42.0,));
@@ -234,24 +234,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn has_edge_attrs_should_panic<T>()
+    fn has_edge_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let g: T = Default::default();
+        let g: G = Default::default();
         g.has_edge_attrs(&0, &1);
     }
 
     #[test]
-    fn get_edge_attrs<T>()
+    fn get_edge_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_edges([(0, 1)]);
+        let mut g = G::from_edges([(0, 1)]);
         assert_true!(g.get_edge_attrs(&0, &1).is_err());
 
         g.set_edge_attrs(&0, &1, (42.0,));
@@ -260,24 +260,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn get_edge_attrs_should_panic<T>()
+    fn get_edge_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let g: T = Default::default();
+        let g: G = Default::default();
         g.get_edge_attrs(&0, &1).ok();
     }
 
     #[test]
-    fn get_mut_edge_attrs<T>()
+    fn get_mut_edge_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_edges([(0, 1)]);
+        let mut g = G::from_edges([(0, 1)]);
         assert_true!(g.get_mut_edge_attrs(&0, &1).is_err());
 
         g.set_edge_attrs(&0, &1, (42.0,));
@@ -289,24 +289,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn get_mut_edge_attrs_should_panic<T>()
+    fn get_mut_edge_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         g.get_mut_edge_attrs(&0, &1).ok();
     }
 
     #[test]
-    fn set_edge_attrs<T>()
+    fn set_edge_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_edges([(0, 1)]);
+        let mut g = G::from_edges([(0, 1)]);
         assert_false!(g.has_edge_attrs(&0, &1));
 
         g.set_edge_attrs(&0, &1, (42.0,));
@@ -316,24 +316,24 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn set_edge_attrs_should_panic<T>()
+    fn set_edge_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         g.set_edge_attrs(&0, &1, (42.0,));
     }
 
     #[test]
-    fn unset_edge_attrs<T>()
+    fn unset_edge_attrs<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g = T::from_edges([(0, 1)]);
+        let mut g = G::from_edges([(0, 1)]);
         assert_true!(g.unset_edge_attrs(&0, &1).is_err());
         assert_false!(g.has_edge_attrs(&0, &1));
 
@@ -344,16 +344,16 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn unset_edge_attrs_should_panic<T>()
+    fn unset_edge_attrs_should_panic<G>()
     where
-        T: Default
+        G: Default
             + From<Vertex = i32>
             + WithAttributes<i32, GraphAttributes = (bool,), VertexAttributes = (usize,), EdgeAttributes = (f64,)>,
     {
-        let mut g: T = Default::default();
+        let mut g: G = Default::default();
         g.unset_edge_attrs(&0, &1).ok();
     }
 
-    #[instantiate_tests(<UndirectedAdjacencyListGraph<i32, AttributesMap<i32, (bool, ), (usize, ), (f64, )>>>)]
+    #[instantiate_tests(<UndirectedAdjacencyList<i32, AttributesMap<i32, (bool, ), (usize, ), (f64, )>>>)]
     mod attribute_map {}
 }

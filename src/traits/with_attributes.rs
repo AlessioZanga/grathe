@@ -1,11 +1,10 @@
-use crate::types::Error;
-use crate::types::Vertex;
+use crate::types::{Error, Vertex};
 use std::fmt::Debug;
 
 /// The graph attribute trait.
-pub trait WithAttributes<T>: Default + Debug
+pub trait WithAttributes<V>: Default + Debug
 where
-    T: Vertex,
+    V: Vertex,
 {
     /// Graph attributes type.
     type GraphAttributes;
@@ -19,8 +18,8 @@ where
     /// New constructor.
     fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
     where
-        I: IntoIterator<Item = (T, Self::VertexAttributes)>,
-        J: IntoIterator<Item = ((T, T), Self::EdgeAttributes)>;
+        I: IntoIterator<Item = (V, Self::VertexAttributes)>,
+        J: IntoIterator<Item = ((V, V), Self::EdgeAttributes)>;
 
     /// Checks graph attributes.
     ///
@@ -32,13 +31,13 @@ where
     ///
     /// Returns a reference to graph attributes.
     ///
-    fn get_graph_attrs(&self) -> Result<&Self::GraphAttributes, Error<T>>;
+    fn get_graph_attrs(&self) -> Result<&Self::GraphAttributes, Error<V>>;
 
     /// Gets mutable graph attributes.
     ///
     /// Returns a mutable reference to graph attributes.
     ///
-    fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<T>>;
+    fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<V>>;
 
     /// Sets graph attributes.
     ///
@@ -50,158 +49,159 @@ where
     ///
     /// Removes the graph attributes from the graph.
     ///
-    fn unset_graph_attrs(&mut self) -> Result<Self::GraphAttributes, Error<T>>;
+    fn unset_graph_attrs(&mut self) -> Result<Self::GraphAttributes, Error<V>>;
 
     /// Checks vertex attributes.
     ///
     /// Checks whether a vertex has attributes.
     ///
-    fn has_vertex_attrs(&self, x: &T) -> bool;
+    fn has_vertex_attrs(&self, x: &V) -> bool;
 
     /// Gets vertex attributes.
     ///
     /// Returns a reference to vertex attributes.
     ///
-    fn get_vertex_attrs(&self, x: &T) -> Result<&Self::VertexAttributes, Error<T>>;
+    fn get_vertex_attrs(&self, x: &V) -> Result<&Self::VertexAttributes, Error<V>>;
 
     /// Gets mutable vertex attributes.
     ///
     /// Returns a mutable reference to vertex attributes.
     ///
-    fn get_mut_vertex_attrs(&mut self, x: &T) -> Result<&mut Self::VertexAttributes, Error<T>>;
+    fn get_mut_vertex_attrs(&mut self, x: &V) -> Result<&mut Self::VertexAttributes, Error<V>>;
 
     /// Sets vertex attributes.
     ///
     /// Inserts the vertex attributes into the graph, overwriting previous assignment.
     ///
-    fn set_vertex_attrs(&mut self, x: &T, y: Self::VertexAttributes);
+    fn set_vertex_attrs(&mut self, x: &V, y: Self::VertexAttributes);
 
     /// Un-sets vertex attributes and returns their value.
     ///
     /// Removes the vertex attributes from the graph.
     ///
-    fn unset_vertex_attrs(&mut self, x: &T) -> Result<Self::VertexAttributes, Error<T>>;
+    fn unset_vertex_attrs(&mut self, x: &V) -> Result<Self::VertexAttributes, Error<V>>;
 
     /// Checks edge attributes.
     ///
     /// Checks whether an edge has attributes.
     ///
-    fn has_edge_attrs(&self, x: &T, y: &T) -> bool;
+    fn has_edge_attrs(&self, x: &V, y: &V) -> bool;
 
     /// Gets edge attributes.
     ///
     /// Returns a reference to edge attributes.
     ///
-    fn get_edge_attrs(&self, x: &T, y: &T) -> Result<&Self::EdgeAttributes, Error<T>>;
+    fn get_edge_attrs(&self, x: &V, y: &V) -> Result<&Self::EdgeAttributes, Error<V>>;
 
     /// Gets mutable edge attributes.
     ///
     /// Returns a mutable reference to edge attributes.
     ///
-    fn get_mut_edge_attrs(&mut self, x: &T, y: &T) -> Result<&mut Self::EdgeAttributes, Error<T>>;
+    fn get_mut_edge_attrs(&mut self, x: &V, y: &V) -> Result<&mut Self::EdgeAttributes, Error<V>>;
 
     /// Sets edge attributes.
     ///
     /// Inserts the edge attributes into the graph, overwriting previous assignment.
     ///
-    fn set_edge_attrs(&mut self, x: &T, y: &T, z: Self::EdgeAttributes);
+    fn set_edge_attrs(&mut self, x: &V, y: &V, z: Self::EdgeAttributes);
 
     /// Un-sets edge attributes and returns their value.
     ///
     /// Removes the edge attributes from the graph.
     ///
-    fn unset_edge_attrs(&mut self, x: &T, y: &T) -> Result<Self::EdgeAttributes, Error<T>>;
+    fn unset_edge_attrs(&mut self, x: &V, y: &V) -> Result<Self::EdgeAttributes, Error<V>>;
 }
 
 macro_rules! impl_with_attributes {
     ($graph:ident) => {
-        impl<T, U> $crate::traits::WithAttributes<T> for $graph<T, U>
+        impl<V, A> $crate::traits::WithAttributes<V> for $graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
-            type GraphAttributes = U::GraphAttributes;
-            type VertexAttributes = U::VertexAttributes;
-            type EdgeAttributes = U::EdgeAttributes;
+            type GraphAttributes = A::GraphAttributes;
+            type VertexAttributes = A::VertexAttributes;
+            type EdgeAttributes = A::EdgeAttributes;
 
             fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
             where
-                I: IntoIterator<Item = (T, Self::VertexAttributes)>,
-                J: IntoIterator<Item = ((T, T), Self::EdgeAttributes)>,
+                I: IntoIterator<Item = (V, Self::VertexAttributes)>,
+                J: IntoIterator<Item = ((V, V), Self::EdgeAttributes)>,
             {
                 let y: Vec<_> = y.into_iter().collect();
                 let z: Vec<_> = z.into_iter().collect();
 
-                Self {
-                    data: Storage::new(y.iter().map(|(y, _)| y.clone()), z.iter().map(|(z, _)| z.clone())),
-                    attributes: U::new_with_attributes(x, y, z),
-                }
+                let mut out = Self::new(y.iter().map(|(y, _)| y.clone()), z.iter().map(|(z, _)| z.clone()));
+
+                out.attributes = A::new_with_attributes(x, y, z);
+
+                out
             }
 
-            fn has_vertex_attrs(&self, x: &T) -> bool {
+            fn has_vertex_attrs(&self, x: &V) -> bool {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
                 self.attributes.has_vertex_attrs(x)
             }
 
-            fn get_vertex_attrs(&self, x: &T) -> Result<&Self::VertexAttributes, Error<T>> {
+            fn get_vertex_attrs(&self, x: &V) -> Result<&Self::VertexAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
                 self.attributes.get_vertex_attrs(x)
             }
 
-            fn get_mut_vertex_attrs(&mut self, x: &T) -> Result<&mut Self::VertexAttributes, Error<T>> {
+            fn get_mut_vertex_attrs(&mut self, x: &V) -> Result<&mut Self::VertexAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
                 self.attributes.get_mut_vertex_attrs(x)
             }
 
-            fn set_vertex_attrs(&mut self, x: &T, y: Self::VertexAttributes) {
+            fn set_vertex_attrs(&mut self, x: &V, y: Self::VertexAttributes) {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
                 self.attributes.set_vertex_attrs(x, y)
             }
 
-            fn unset_vertex_attrs(&mut self, x: &T) -> Result<Self::VertexAttributes, Error<T>> {
+            fn unset_vertex_attrs(&mut self, x: &V) -> Result<Self::VertexAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
                 self.attributes.unset_vertex_attrs(x)
             }
 
-            fn has_edge_attrs(&self, x: &T, y: &T) -> bool {
+            fn has_edge_attrs(&self, x: &V, y: &V) -> bool {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
                 self.attributes.has_edge_attrs(x, y)
             }
 
-            fn get_edge_attrs(&self, x: &T, y: &T) -> Result<&Self::EdgeAttributes, Error<T>> {
+            fn get_edge_attrs(&self, x: &V, y: &V) -> Result<&Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
                 self.attributes.get_edge_attrs(x, y)
             }
 
-            fn get_mut_edge_attrs(&mut self, x: &T, y: &T) -> Result<&mut Self::EdgeAttributes, Error<T>> {
+            fn get_mut_edge_attrs(&mut self, x: &V, y: &V) -> Result<&mut Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
                 self.attributes.get_mut_edge_attrs(x, y)
             }
 
-            fn set_edge_attrs(&mut self, x: &T, y: &T, z: Self::EdgeAttributes) {
+            fn set_edge_attrs(&mut self, x: &V, y: &V, z: Self::EdgeAttributes) {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
                 self.attributes.set_edge_attrs(x, y, z)
             }
 
-            fn unset_edge_attrs(&mut self, x: &T, y: &T) -> Result<Self::EdgeAttributes, Error<T>> {
+            fn unset_edge_attrs(&mut self, x: &V, y: &V) -> Result<Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
@@ -211,10 +211,10 @@ macro_rules! impl_with_attributes {
             delegate::delegate! {
                 to self.attributes {
                     fn has_graph_attrs(&self) -> bool;
-                    fn get_graph_attrs(&self) -> Result<&Self::GraphAttributes, Error<T>>;
-                    fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<T>>;
+                    fn get_graph_attrs(&self) -> Result<&Self::GraphAttributes, Error<V>>;
+                    fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<V>>;
                     fn set_graph_attrs(&mut self, x: Self::GraphAttributes);
-                    fn unset_graph_attrs(&mut self) -> Result<Self::GraphAttributes, Error<T>>;
+                    fn unset_graph_attrs(&mut self) -> Result<Self::GraphAttributes, Error<V>>;
                 }
             }
         }

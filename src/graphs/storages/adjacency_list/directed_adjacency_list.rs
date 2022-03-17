@@ -1,96 +1,44 @@
-use crate::traits::{Capacity, Operators, Storage};
-use crate::types::Error;
-use crate::types::{AdjacencyList, EdgeIterator, ExactSizeIter, Vertex, VertexIterator};
+use crate::graphs::attributes::AttributesMap;
+use crate::traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes};
+use crate::types::{directions, EdgeIterator, Error, ExactSizeIter, Vertex, VertexIterator};
+use ndarray::Array2;
+use sprs::TriMat;
 use std::cmp::Ordering;
-use std::collections::{BTreeSet, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-/// Graph structure based on adjacency list storage.
-#[derive(PartialEq, Eq, Default, Debug)]
-pub struct AdjacencyListStorage<T, const D: usize>
+#[derive(Debug, Default)]
+pub struct DirectedAdjacencyList<V, A = AttributesMap<V, (), (), ()>>
 where
-    T: Vertex,
+    V: Vertex,
+    A: WithAttributes<V>,
 {
-    data: AdjacencyList<T>,
+    data: BTreeMap<V, BTreeSet<V>>,
+    attributes: A,
 }
 
-impl<T, const D: usize> PartialOrd for AdjacencyListStorage<T, D>
+impl<V, A> PartialEq for DirectedAdjacencyList<V, A>
 where
-    T: Vertex,
+    V: Vertex,
+    A: WithAttributes<V>,
 {
-    // TODO: That's a generic implementation of PartialOrd,
-    // which is fine, but here we would like to have an
-    // optimized implementation to boost performances...
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        // Collect vertex sets for comparison.
-        let a: HashSet<_> = self.vertices_iter().collect();
-        let b: HashSet<_> = other.vertices_iter().collect();
-
-        // Partial ordering of vertex sets.
-        let vertices: Option<Ordering> = crate::utils::partial_cmp_sets!(a, b);
-
-        // If vertices are comparable.
-        if let Some(vertices) = vertices {
-            // Collect edge sets for comparison.
-            let a: HashSet<_> = self.edges_iter().collect();
-            let b: HashSet<_> = other.edges_iter().collect();
-
-            // Partial ordering of edge sets.
-            let edges: Option<Ordering> = crate::utils::partial_cmp_sets!(a, b);
-
-            // If edges are comparable.
-            if let Some(edges) = edges {
-                // If vertices are equal,
-                // then order is determined by edges.
-                if matches!(vertices, Ordering::Equal) {
-                    return Some(edges);
-                }
-                // If vertices are different but edges are equal,
-                // then order is determined by vertices.
-                if matches!(edges, Ordering::Equal) {
-                    return Some(vertices);
-                }
-                // If orders are coherent, then return the order.
-                if vertices == edges {
-                    return Some(vertices);
-                }
-            }
-        }
-
-        // Otherwise, self and other are not comparable.
-        None
+    fn eq(&self, other: &Self) -> bool {
+        self.data.eq(&other.data)
     }
 }
 
-impl<T, const D: usize> Capacity for AdjacencyListStorage<T, D>
+impl<V, A> Eq for DirectedAdjacencyList<V, A>
 where
-    T: Vertex,
+    V: Vertex,
+    A: WithAttributes<V>,
 {
-    fn capacity(&self) -> usize {
-        // INFO: BTreeMap as no `capacity` concept.
-        0
-    }
-
-    fn with_capacity(_capacity: usize) -> Self {
-        // INFO: BTreeMap as no `capacity` concept.
-        Self::null()
-    }
-
-    fn reserve(&mut self, _additional: usize) {
-        // INFO: BTreeMap as no `capacity` concept.
-    }
-
-    fn shrink_to(&mut self, _min_capacity: usize) {
-        // INFO: BTreeMap as no `capacity` concept.
-    }
-
-    fn shrink_to_fit(&mut self) {
-        // INFO: BTreeMap as no `capacity` concept.
-    }
 }
 
-impl<T, const D: usize> Operators for AdjacencyListStorage<T, D>
+crate::traits::impl_partial_ord!(DirectedAdjacencyList);
+
+impl<V, A> Operators for DirectedAdjacencyList<V, A>
 where
-    T: Vertex,
+    V: Vertex,
+    A: WithAttributes<V>,
 {
     fn complement(&self) -> Self {
         // Copy the vertex set.
@@ -102,6 +50,7 @@ where
                 .iter()
                 .map(|x| (x.clone(), vertices.difference(&self.data[x]).cloned().collect()))
                 .collect(),
+            attributes: Default::default(),
         }
     }
 
@@ -118,7 +67,10 @@ where
         }
 
         // Return the union graph.
-        Self { data: union }
+        Self {
+            data: union,
+            attributes: Default::default(),
+        }
     }
 
     fn intersection(&self, other: &Self) -> Self {
@@ -134,6 +86,7 @@ where
                     })
                 })
                 .collect(),
+            attributes: Default::default(),
         }
     }
 
@@ -152,6 +105,7 @@ where
         // Return the symmetric difference graph.
         Self {
             data: symmetric_difference,
+            attributes: Default::default(),
         }
     }
 
@@ -168,59 +122,61 @@ where
                     None => (x.clone(), ys.clone()),
                 })
                 .collect(),
+            attributes: Default::default(),
         }
     }
 }
 
-impl<T, const D: usize> Storage for AdjacencyListStorage<T, D>
+crate::traits::impl_operators_extension!(DirectedAdjacencyList);
+
+impl<V, A> Storage for DirectedAdjacencyList<V, A>
 where
-    T: Vertex,
+    V: Vertex,
+    A: WithAttributes<V>,
 {
-    type Vertex = T;
+    type Vertex = V;
 
-    const DIRECTION: usize = D;
+    type Direction = directions::Directed;
 
-    type Storage = AdjacencyList<T>;
-
-    fn storage(&self) -> &Self::Storage {
-        &self.data
-    }
-
-    fn new<I, J, V>(v_iter: I, e_iter: J) -> Self
+    fn new<I, J, K>(v_iter: I, e_iter: J) -> Self
     where
-        I: IntoIterator<Item = V>,
-        J: IntoIterator<Item = (V, V)>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = K>,
+        J: IntoIterator<Item = (K, K)>,
+        K: Into<Self::Vertex>,
     {
         // Initialize the data storage using the vertex set.
-        let mut data: Self::Storage = v_iter.into_iter().map(|x| (x.into(), Default::default())).collect();
+        let mut data: BTreeMap<V, BTreeSet<V>> = v_iter.into_iter().map(|x| (x.into(), Default::default())).collect();
         // Fill the data storage using the edge set.
         for (x, y) in e_iter.into_iter().map(|(x, y)| (x.into(), y.into())) {
             data.entry(x).or_default().insert(y.clone());
             data.entry(y).or_default();
         }
 
-        Self { data: data }
+        Self {
+            data: data,
+            attributes: Default::default(),
+        }
     }
 
     fn null() -> Self {
         Default::default()
     }
 
-    fn empty<I, V>(iter: I) -> Self
+    fn empty<I, K>(iter: I) -> Self
     where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = K>,
+        K: Into<Self::Vertex>,
     {
         Self {
             data: iter.into_iter().map(|x| (x.into(), Default::default())).collect(),
+            attributes: Default::default(),
         }
     }
 
-    fn complete<I, V>(iter: I) -> Self
+    fn complete<I, K>(iter: I) -> Self
     where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = K>,
+        K: Into<Self::Vertex>,
     {
         // Initialize the data storage using the vertex set.
         let data: Vec<Self::Vertex> = iter.into_iter().map(Into::into).collect();
@@ -230,6 +186,7 @@ where
                 .iter()
                 .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
                 .collect(),
+            attributes: Default::default(),
         }
     }
 
@@ -256,11 +213,13 @@ where
     }
 
     fn order(&self) -> usize {
+        // FIXME: Use constant.
         // Get map size.
         self.data.len()
     }
 
     fn size(&self) -> usize {
+        // FIXME: Use constant.
         self.data
             .iter() // Iterate over the adjacency lists.
             .map(|(_, adj)| adj.len())
@@ -272,9 +231,9 @@ where
         self.data.contains_key(x)
     }
 
-    fn add_vertex<V>(&mut self, x: V) -> Result<Self::Vertex, Error<Self::Vertex>>
+    fn add_vertex<K>(&mut self, x: K) -> Result<Self::Vertex, Error<Self::Vertex>>
     where
-        V: Into<Self::Vertex>,
+        K: Into<Self::Vertex>,
     {
         // Get vertex identifier.
         let x = x.into();
@@ -357,5 +316,144 @@ where
                 },
             },
         }
+    }
+}
+
+crate::traits::impl_capacity!(DirectedAdjacencyList);
+
+impl<V, A> Connectivity for DirectedAdjacencyList<V, A>
+where
+    V: Vertex,
+    A: WithAttributes<V>,
+{
+    fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
+        // FIXME:
+        todo!()
+    }
+
+    fn is_connected(&self) -> bool {
+        // FIXME:
+        todo!()
+    }
+
+    fn is_acyclic(&self) -> bool {
+        // FIXME:
+        todo!()
+    }
+}
+
+impl<V, A> Convert for DirectedAdjacencyList<V, A>
+where
+    V: Vertex,
+    A: WithAttributes<V>,
+{
+    fn edge_list(&self) -> BTreeSet<(Self::Vertex, Self::Vertex)> {
+        let mut out = BTreeSet::<(Self::Vertex, Self::Vertex)>::new();
+        for (x, y) in self.edges_iter() {
+            out.insert((x.clone(), y.clone()));
+        }
+
+        out
+    }
+
+    fn adjacency_list(&self) -> BTreeMap<Self::Vertex, BTreeSet<Self::Vertex>> {
+        let mut out = BTreeMap::<Self::Vertex, BTreeSet<Self::Vertex>>::new();
+        for (x, y) in self.edges_iter() {
+            out.entry(x.clone()).or_default().insert(y.clone());
+        }
+
+        out
+    }
+
+    fn dense_adjacency_matrix(&self) -> Array2<bool> {
+        let n = self.order();
+        let mut idx = HashMap::with_capacity(n);
+        let mut out = Array2::from_elem((n, n), false);
+        // Build vid-to-index mapping.
+        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        // Fill the output matrix.
+        for (x, y) in self.edges_iter() {
+            out[(idx[&x], idx[&y])] = true;
+        }
+
+        out
+    }
+
+    fn sparse_adjacency_matrix(&self) -> TriMat<bool> {
+        let n = self.order();
+        let mut idx = HashMap::with_capacity(n);
+        let mut out = TriMat::new((n, n));
+        // Reserve capacity for sparse matrix.
+        out.reserve(self.size());
+        // Build vid-to-index mapping.
+        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        // Fill the output matrix.
+        for (x, y) in self.edges_iter() {
+            out.add_triplet(idx[&x], idx[&y], true);
+        }
+
+        out
+    }
+
+    fn dense_incidence_matrix(&self) -> Array2<i8> {
+        let (n, m) = (self.order(), self.size());
+        let mut idx = HashMap::with_capacity(n);
+        let mut out = Array2::from_elem((n, m), 0);
+        // Build vid-to-index mapping.
+        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        // Fill the output matrix.
+        for (i, (x, y)) in self.edges_iter().enumerate() {
+            out[(idx[&x], i)] = 1;
+            out[(idx[&y], i)] = -1;
+        }
+
+        out
+    }
+
+    fn sparse_incidence_matrix(&self) -> TriMat<i8> {
+        let (n, m) = (self.order(), self.size());
+        let mut idx = HashMap::with_capacity(n);
+        let mut out = TriMat::new((n, m));
+        // Reserve capacity for sparse matrix.
+        out.reserve(2 * m);
+        // Build vid-to-index mapping.
+        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        // Fill the output matrix.
+        for (i, (x, y)) in self.edges_iter().enumerate() {
+            out.add_triplet(idx[&x], i, 1);
+            out.add_triplet(idx[&y], i, -1);
+        }
+
+        out
+    }
+}
+
+crate::traits::impl_extend!(DirectedAdjacencyList);
+
+crate::traits::impl_from!(DirectedAdjacencyList);
+
+crate::traits::impl_subgraph!(DirectedAdjacencyList);
+
+crate::traits::impl_with_attributes!(DirectedAdjacencyList);
+
+impl<V, A> Directed for DirectedAdjacencyList<V, A>
+where
+    V: Vertex,
+    A: WithAttributes<V>,
+{
+    fn parents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+        assert!(self.has_vertex(x));
+        Box::new(self.data.iter().filter_map(|(y, z)| match z.contains(x) {
+            false => None,
+            true => Some(y),
+        }))
+    }
+
+    fn children_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+        Box::new(self.data[x].iter())
+    }
+
+    fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+        self.add_edge(x, y)
     }
 }

@@ -13,27 +13,27 @@ use std::iter::FusedIterator;
 /// [`usize::MAX`] means that such vertex is not reachable from the given
 /// source vertex (i.e. the graph is disconnected).
 ///
-pub struct BreadthFirstSearch<'a, T>
+pub struct BreadthFirstSearch<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Given graph reference.
-    graph: &'a T,
+    graph: &'a G,
     /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
-    vertices: VecDeque<&'a T::Vertex>,
+    vertices: VecDeque<&'a G::Vertex>,
     /// Reachable vertices of distance one from given vertex.
-    reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    reachable: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
     /// To-be-visited queue with the source vertex.
-    queue: VecDeque<&'a T::Vertex>,
+    queue: VecDeque<&'a G::Vertex>,
     /// Distance from the source vertex.
-    pub distance: HashMap<&'a T::Vertex, usize>,
+    pub distance: HashMap<&'a G::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
-    pub predecessor: HashMap<&'a T::Vertex, &'a T::Vertex>,
+    pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
 }
 
-impl<'a, T> BreadthFirstSearch<'a, T>
+impl<'a, G> BreadthFirstSearch<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Build a BFS iterator.
     ///
@@ -74,9 +74,9 @@ where
     /// ```
     ///
     pub fn new(
-        g: &'a T,
-        x: Option<&'a T::Vertex>,
-        f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+        g: &'a G,
+        x: Option<&'a G::Vertex>,
+        f: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
         m: Traversal,
     ) -> Self {
         // Initialize default search object.
@@ -127,11 +127,11 @@ where
     }
 }
 
-impl<'a, T> Iterator for BreadthFirstSearch<'a, T>
+impl<'a, G> Iterator for BreadthFirstSearch<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
-    type Item = &'a T::Vertex;
+    type Item = &'a G::Vertex;
 
     fn next(&mut self) -> Option<Self::Item> {
         // If the current algorithm is set to Forest
@@ -177,4 +177,4 @@ where
     }
 }
 
-impl<'a, T> FusedIterator for BreadthFirstSearch<'a, T> where T: Storage {}
+impl<'a, G> FusedIterator for BreadthFirstSearch<'a, G> where G: Storage {}

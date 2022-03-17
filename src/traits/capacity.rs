@@ -136,26 +136,24 @@ pub trait Capacity {
 
 macro_rules! impl_capacity {
     ($graph:ident) => {
-        impl<T, U> $crate::traits::Capacity for $graph<T, U>
+        impl<V, A> $crate::traits::Capacity for $graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
-            fn with_capacity(capacity: usize) -> Self {
-                Self {
-                    data: $crate::traits::Capacity::with_capacity(capacity),
-                    attributes: Default::default(),
-                }
+            fn capacity(&self) -> usize {
+                0
             }
 
-            delegate::delegate! {
-                to self.data {
-                    fn capacity(&self) -> usize;
-                    fn reserve(&mut self, additional: usize);
-                    fn shrink_to(&mut self, min_capacity: usize);
-                    fn shrink_to_fit(&mut self);
-                }
+            fn with_capacity(_capacity: usize) -> Self {
+                Default::default()
             }
+
+            fn reserve(&mut self, _additional: usize) {}
+
+            fn shrink_to(&mut self, _min_capacity: usize) {}
+
+            fn shrink_to_fit(&mut self) {}
         }
     };
 }

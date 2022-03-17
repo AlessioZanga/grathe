@@ -15,28 +15,28 @@ use std::vec::Vec;
 ///
 /// [^2]: [Hawick, K. A., & James, H. A. (2008). Enumerating Circuits and Loops in Graphs with Self-Arcs and Multiple-Arcs.](https://scholar.google.com/scholar?q=Enumerating+Circuits+and+Loops+in+Graphs+with+Self-Arcs+and+Multiple-Arcs)
 ///
-pub struct AllSimpleCycles<'a, T>
+pub struct AllSimpleCycles<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Given graph reference.
-    graph: &'a T,
+    graph: &'a G,
     /// Reachable vertices of distance one from given vertex.
-    reachable: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>,
+    reachable: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
     /// The currently visited stack.
-    stack: Vec<&'a T::Vertex>,
+    stack: Vec<&'a G::Vertex>,
     /// Map of *blocked* vertices in order to avoid double counting.
     // TODO: Replace HashSet with a Vec to account for multi-graphs once supported.
-    blocked: HashMap<&'a T::Vertex, HashSet<&'a T::Vertex>>,
+    blocked: HashMap<&'a G::Vertex, HashSet<&'a G::Vertex>>,
     /// Vector of found simple cycles.
-    pub simple_cycles: Vec<Vec<&'a T::Vertex>>,
+    pub simple_cycles: Vec<Vec<&'a G::Vertex>>,
     /// Map of vertices popularity (i.e. how many cycles a vertex appears in).
-    pub popularity: HashMap<&'a T::Vertex, usize>,
+    pub popularity: HashMap<&'a G::Vertex, usize>,
 }
 
-impl<'a, T> AllSimpleCycles<'a, T>
+impl<'a, G> AllSimpleCycles<'a, G>
 where
-    T: Storage,
+    G: Storage,
 {
     /// Build an *all cycles* search structure.
     ///
@@ -80,7 +80,7 @@ where
     /// assert_eq!(search.popularity[&4], 2);
     /// ```
     ///
-    pub fn new(g: &'a T, f: fn(&'a T, &'a T::Vertex) -> Box<dyn VertexIterator<'a, T::Vertex> + 'a>) -> Self {
+    pub fn new(g: &'a G, f: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>) -> Self {
         Self {
             // Set target graph.
             graph: g,
@@ -97,7 +97,7 @@ where
         }
     }
 
-    fn block(&mut self, x: &'a T::Vertex) {
+    fn block(&mut self, x: &'a G::Vertex) {
         for y in (self.reachable)(self.graph, x) {
             if y < self.stack[0] {
                 continue;
@@ -106,13 +106,13 @@ where
         }
     }
 
-    fn unblock(&mut self, x: &'a T::Vertex) {
+    fn unblock(&mut self, x: &'a G::Vertex) {
         if let Some(y) = self.blocked.remove(x) {
             y.iter().for_each(|y| self.unblock(y));
         }
     }
 
-    fn circuit(&mut self, x: &'a T::Vertex) -> bool {
+    fn circuit(&mut self, x: &'a G::Vertex) -> bool {
         // Initialize found flag.
         let mut found = false;
         // Update the call stack.

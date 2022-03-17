@@ -1,7 +1,7 @@
 use crate::traits::Storage;
-use crate::types::{AdjacencyList, EdgeList};
 use ndarray::Array2;
 use sprs::TriMat;
+use std::collections::{BTreeMap, BTreeSet};
 
 /// The graph conversion trait.
 pub trait Convert: Storage {
@@ -25,13 +25,13 @@ pub trait Convert: Storage {
     /// assert_eq!(g.edge_list(), EdgeList::from(sequence));
     /// ```
     ///
-    fn edge_list(&self) -> EdgeList<Self::Vertex>;
+    fn edge_list(&self) -> BTreeSet<(Self::Vertex, Self::Vertex)>;
 
     /// Adjacency list adapter.
     ///
     /// Return the adjacency list representing the graph.
     ///
-    fn adjacency_list(&self) -> AdjacencyList<Self::Vertex>;
+    fn adjacency_list(&self) -> BTreeMap<Self::Vertex, BTreeSet<Self::Vertex>>;
 
     /// Dense adjacency matrix of a graph.
     ///

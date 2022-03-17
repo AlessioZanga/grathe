@@ -1,10 +1,9 @@
 use super::{Capacity, Operators};
-use crate::types::Error;
-use crate::types::{EdgeIterator, Vertex, VertexIterator};
+use crate::types::{EdgeIterator, Error, Vertex, VertexIterator};
 use std::fmt::Debug;
 
 /// The graph storage trait.
-pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
+pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// Vertex identifier type.
     type Vertex: Vertex;
 
@@ -12,13 +11,8 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     // Edge identifier type.
     // type Edge = (&Self::Vertex, &Self::Vertex);
 
-    const DIRECTION: usize;
-
-    /// Underlying storage type.
-    type Storage;
-
-    /// Return immutable reference to underlying raw storage.
-    fn storage(&self) -> &Self::Storage;
+    /// Direction identifier type.
+    type Direction;
 
     /// New constructor.
     ///
@@ -508,86 +502,6 @@ pub trait Storage: Eq + PartialOrd + Default + Debug + Capacity + Operators {
     /// ```
     ///
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
-
-    /// Builds subgraph from given vertices.
-    ///
-    /// Builds a subgraph, preserving edges between given vertices.
-    /// Ignores additional attributes (for now).
-    ///
-    /// # Panics
-    ///
-    /// Panics if the vertex identifiers do not exist in the graph.
-    ///
-    fn subgraph<I, V>(&self, iter: I) -> Self
-    where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>,
-    {
-        // Build a subgraph from the given vertices.
-        let mut subgraph: Self = Default::default();
-        for x in iter {
-            subgraph.add_vertex(x).ok();
-        }
-        // Check if is it a proper subgraph of self,
-        // i.e. given vertices are contained in self.
-        assert!(subgraph.is_subgraph(self));
-        // Copy edges into subgraph.
-        for (x, y) in self.edges_iter() {
-            subgraph.add_edge(x, y).ok();
-        }
-
-        subgraph
-    }
-
-    /// Is subgraph of another graph.
-    ///
-    /// Checks if this graph is subgraph of given graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build two graphs.
-    /// let g = Graph::null();
-    /// let h = Graph::from_vertices(0..2);
-    ///
-    /// // The null graph is always subgraph of an other graph.
-    /// assert_true!(g.is_subgraph(&h));
-    ///
-    /// // Use the associated `<=` operator.
-    /// assert_true!(g <= h);
-    /// ```
-    ///
-    fn is_subgraph(&self, other: &Self) -> bool {
-        self <= other
-    }
-
-    /// Is supergraph of another graph.
-    ///
-    /// Checks if this graph is supergraph of given graph.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // Build two graphs.
-    /// let g = Graph::null();
-    /// let h = Graph::from_vertices(0..2);
-    ///
-    /// // Any graph is supergraph of the null graph.
-    /// assert_true!(h.is_supergraph(&g));
-    ///
-    /// // Use the associated `>=` operator.
-    /// assert_true!(h >= g);
-    /// ```
-    ///
-    fn is_supergraph(&self, other: &Self) -> bool {
-        self >= other
-    }
 
     /// Degree of vertex.
     ///

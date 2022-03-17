@@ -128,10 +128,10 @@ pub trait Extend: Storage {
 
 macro_rules! impl_extend {
     ($graph:ident) => {
-        impl<T, U> $crate::traits::Extend for $graph<T, U>
+        impl<V, A> $crate::traits::Extend for $graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
         }
     };

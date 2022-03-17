@@ -1,29 +1,28 @@
-use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 use thiserror::Error;
 
 /// The base vertex trait.
-pub trait Vertex: Eq + Ord + Clone + Default + Debug + Hash {}
+pub trait Vertex: Clone + Debug + Default + Eq + Hash + Ord {}
 
 // Blanket implementation of vertex trait.
-impl<T> Vertex for T where T: Eq + Ord + Clone + Default + Debug + Hash {}
+impl<V> Vertex for V where V: Clone + Debug + Default + Eq + Hash + Ord {}
 
 /// Vertex iterator trait.
 #[rustfmt::skip]
-pub trait VertexIterator<'a, T: 'a>: Iterator<Item = &'a T> + Debug {}
+pub trait VertexIterator<'a, V: 'a>: Debug + Iterator<Item = &'a V> {}
 
 // Blanket implementation of vertex iterator trait.
 #[rustfmt::skip]
-impl<'a, T, U> VertexIterator<'a, U> for T where T: Iterator<Item = &'a U> + Debug, U: 'a {}
+impl<'a, I, V> VertexIterator<'a, V> for I where I: Debug + Iterator<Item = &'a V>, V: 'a {}
 
 /// Edge iterator trait.
 #[rustfmt::skip]
-pub trait EdgeIterator<'a, T: 'a>: Iterator<Item = (&'a T, &'a T)> + ExactSizeIterator + Debug {}
+pub trait EdgeIterator<'a, V: 'a>: Debug + ExactSizeIterator + Iterator<Item = (&'a V, &'a V)> {}
 
 // Blanket implementation of edge iterator trait.
 #[rustfmt::skip]
-impl<'a, T, U> EdgeIterator<'a, U> for T where T: Iterator<Item = (&'a U, &'a U)> + ExactSizeIterator + Debug, U: 'a {}
+impl<'a, I, V> EdgeIterator<'a, V> for I where I: Debug + ExactSizeIterator + Iterator<Item = (&'a V, &'a V)>, V: 'a {}
 
 /// Iterator with exact size.
 #[derive(Debug)]
@@ -70,44 +69,36 @@ where
 // Implement ExactSizeIter for ExactSizeIterator.
 impl<I> ExactSizeIterator for ExactSizeIter<I> where I: Iterator {}
 
-/// Edge list type.
-pub type EdgeList<T> = BTreeSet<(T, T)>;
-
-/// Adjacency list type.
-pub type AdjacencyList<T> = BTreeMap<T, BTreeSet<T>>;
-
-pub struct Direction {}
-
-impl Direction {
-    pub const UNDIRECTED: usize = 0;
-    pub const DIRECTED: usize = 1;
-}
-
 /// Error enumerator.
-#[derive(Error, PartialEq, Debug)]
-pub enum Error<T> {
+#[derive(Debug, Error, PartialEq)]
+pub enum Error<V> {
     /// Vertex not defined error type.
     #[error("vertex identifier `{0:?}` not defined")]
-    VertexNotDefined(T),
+    VertexNotDefined(V),
     /// Vertex already defined error type.
     #[error("vertex identifier `{0:?}` already defined")]
-    VertexAlreadyDefined(T),
+    VertexAlreadyDefined(V),
     /// Edge not defined error type.
     #[error("edge identifier `({0:?}, {1:?})` not defined")]
-    EdgeNotDefined(T, T),
+    EdgeNotDefined(V, V),
     /// Edge already defined error type.
     #[error("edge identifier `({0:?}, {1:?})` already defined")]
-    EdgeAlreadyDefined(T, T),
+    EdgeAlreadyDefined(V, V),
     /// Graph attributes not defined error type.
     #[error("graph has no attribute defined")]
     GraphAttributesNotDefined(),
     /// Vertex attribute not defined error type.
     #[error("vertex `{0:?}` has no attribute defined")]
-    VertexAttributesNotDefined(T),
+    VertexAttributesNotDefined(V),
     /// Edge attribute not defined error type.
     #[error("edge `({0:?}, {1:?})` has no attribute defined")]
-    EdgeAttributesNotDefined(T, T),
+    EdgeAttributesNotDefined(V, V),
     /// Parsing error type.
     #[error("failed to parse graph")]
     ParseFailed(String),
+}
+
+pub mod directions {
+    pub struct Undirected {}
+    pub struct Directed {}
 }

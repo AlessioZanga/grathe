@@ -1,7 +1,7 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::graphs::UndirectedAdjacencyListGraph;
+    use crate::graphs::storages::UndirectedAdjacencyList;
     use crate::traits::Undirected;
     use crate::types::Error;
     use crate::Ne;
@@ -27,11 +27,11 @@ mod tests {
     }
 
     #[test]
-    fn add_edge<T>() -> Result<(), Error<i32>>
+    fn add_edge<G>() -> Result<(), Error<i32>>
     where
-        T: Undirected<Vertex = i32>,
+        G: Undirected<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;
@@ -58,11 +58,11 @@ mod tests {
     }
 
     #[test]
-    fn del_edge<T>() -> Result<(), Error<i32>>
+    fn del_edge<G>() -> Result<(), Error<i32>>
     where
-        T: Undirected<Vertex = i32>,
+        G: Undirected<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;
@@ -81,11 +81,11 @@ mod tests {
     }
 
     #[test]
-    fn neighbors_iter<T>() -> Result<(), Error<i32>>
+    fn neighbors_iter<G>() -> Result<(), Error<i32>>
     where
-        T: Undirected<Vertex = i32>,
+        G: Undirected<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for existing vertex
         let i = g.add_vertex(0)?;
@@ -107,20 +107,20 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn neighbors_iter_should_panic<T>()
+    fn neighbors_iter_should_panic<G>()
     where
-        T: Undirected<Vertex = i32>,
+        G: Undirected<Vertex = i32>,
     {
-        let g = T::null();
+        let g = G::null();
         Ne!(g, &0);
     }
 
     #[test]
-    fn add_undirected_edge<T>() -> Result<(), Error<i32>>
+    fn add_undirected_edge<G>() -> Result<(), Error<i32>>
     where
-        T: Undirected<Vertex = i32>,
+        G: Undirected<Vertex = i32>,
     {
-        let mut g = T::null();
+        let mut g = G::null();
 
         // Test for undirected edges
         let i = g.add_vertex(0)?;
@@ -135,6 +135,6 @@ mod tests {
         Ok(())
     }
 
-    #[instantiate_tests(<UndirectedAdjacencyListGraph<i32>>)]
-    mod adjacency_list_graph {}
+    #[instantiate_tests(<UndirectedAdjacencyList<i32>>)]
+    mod adjacency_list {}
 }

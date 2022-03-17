@@ -1,19 +1,19 @@
 #[cfg(test)]
 #[generic_tests::define]
 mod tests {
-    use crate::graphs::DirectedAdjacencyListGraph;
+    use crate::graphs::storages::DirectedAdjacencyList;
     use crate::traits::{From, Operators, Storage};
     use crate::{E, V};
     use all_asserts::*;
     use std::ops::{BitAnd, BitOr, BitXor, Not, Sub};
 
     #[test]
-    fn complement<T>()
+    fn complement<G>()
     where
-        T: Storage<Vertex = i32> + From + Operators,
-        for<'a> &'a T: Not<Output = T>,
+        G: Storage<Vertex = i32> + From + Operators,
+        for<'a> &'a G: Not<Output = G>,
     {
-        let g = T::from_edges([(0, 1), (2, 3)]);
+        let g = G::from_edges([(0, 1), (2, 3)]);
         let u = g.complement();
 
         assert_eq!(u, !&g);
@@ -37,13 +37,13 @@ mod tests {
     }
 
     #[test]
-    fn union<T>()
+    fn union<G>()
     where
-        T: Storage<Vertex = i32> + From + Operators,
-        for<'a> &'a T: BitOr<&'a T, Output = T>,
+        G: Storage<Vertex = i32> + From + Operators,
+        for<'a> &'a G: BitOr<&'a G, Output = G>,
     {
-        let g = T::from_edges([(0, 1), (2, 3)]);
-        let h = T::from_edges([(0, 2), (3, 4)]);
+        let g = G::from_edges([(0, 1), (2, 3)]);
+        let h = G::from_edges([(0, 2), (3, 4)]);
         let u = g.union(&h);
 
         assert_eq!(u, &g | &h);
@@ -52,13 +52,13 @@ mod tests {
     }
 
     #[test]
-    fn intersection<T>()
+    fn intersection<G>()
     where
-        T: Storage<Vertex = i32> + From + Operators,
-        for<'a> &'a T: BitAnd<&'a T, Output = T>,
+        G: Storage<Vertex = i32> + From + Operators,
+        for<'a> &'a G: BitAnd<&'a G, Output = G>,
     {
-        let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges([(0, 2), (3, 4), (3, 3)]);
+        let g = G::from_edges([(0, 1), (2, 3), (3, 3)]);
+        let h = G::from_edges([(0, 2), (3, 4), (3, 3)]);
         let u = g.intersection(&h);
 
         assert_eq!(u, &g & &h);
@@ -67,13 +67,13 @@ mod tests {
     }
 
     #[test]
-    fn symmetric_difference<T>()
+    fn symmetric_difference<G>()
     where
-        T: Storage<Vertex = i32> + From + Operators,
-        for<'a> &'a T: BitOr<&'a T, Output = T> + BitXor<&'a T, Output = T> + Sub<&'a T, Output = T>,
+        G: Storage<Vertex = i32> + From + Operators,
+        for<'a> &'a G: BitOr<&'a G, Output = G> + BitXor<&'a G, Output = G> + Sub<&'a G, Output = G>,
     {
-        let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges([(0, 2), (3, 4), (3, 3)]);
+        let g = G::from_edges([(0, 1), (2, 3), (3, 3)]);
+        let h = G::from_edges([(0, 2), (3, 4), (3, 3)]);
         let u = g.symmetric_difference(&h);
 
         assert_eq!(u, &g ^ &h);
@@ -83,13 +83,13 @@ mod tests {
     }
 
     #[test]
-    fn difference<T>()
+    fn difference<G>()
     where
-        T: Storage<Vertex = i32> + From + Operators,
-        for<'a> &'a T: Sub<&'a T, Output = T>,
+        G: Storage<Vertex = i32> + From + Operators,
+        for<'a> &'a G: Sub<&'a G, Output = G>,
     {
-        let g = T::from_edges([(0, 1), (2, 3), (3, 3)]);
-        let h = T::from_edges([(0, 2), (3, 4), (3, 3)]);
+        let g = G::from_edges([(0, 1), (2, 3), (3, 3)]);
+        let h = G::from_edges([(0, 2), (3, 4), (3, 3)]);
         let u = g.difference(&h);
 
         assert_eq!(u, &g - &h);
@@ -97,6 +97,6 @@ mod tests {
         assert_true!(E!(u).eq([(&0, &1), (&2, &3)]));
     }
 
-    #[instantiate_tests(<DirectedAdjacencyListGraph<i32>>)]
-    mod adjacency_list_graph {}
+    #[instantiate_tests(<DirectedAdjacencyList<i32>>)]
+    mod directed_adjacency_list {}
 }

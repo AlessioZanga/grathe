@@ -3,21 +3,21 @@ use std::collections::{HashMap, VecDeque};
 use std::iter::FusedIterator;
 
 /// Topological sort search structure.
-pub struct TopologicalSort<'a, T>
+pub struct TopologicalSort<'a, G>
 where
-    T: Directed,
+    G: Directed,
 {
     /// Given graph reference.
-    graph: &'a T,
+    graph: &'a G,
     // To-be-visited queue.
-    queue: VecDeque<&'a T::Vertex>,
+    queue: VecDeque<&'a G::Vertex>,
     // Visit map with vertices in-degrees.
-    visit: HashMap<&'a T::Vertex, usize>,
+    visit: HashMap<&'a G::Vertex, usize>,
 }
 
-impl<'a, T> TopologicalSort<'a, T>
+impl<'a, G> TopologicalSort<'a, G>
 where
-    T: Directed,
+    G: Directed,
 {
     /// Build a TopologicalSort iterator.
     ///
@@ -27,7 +27,7 @@ where
     ///
     /// [^1]: [Kahn, A. B. (1962). Topological sorting of large networks. Communications of the ACM, 5(11), 558-562.](https://scholar.google.com/scholar?q=Topological+sorting+of+large+networks)
     ///
-    pub fn new(g: &'a T) -> Self {
+    pub fn new(g: &'a G) -> Self {
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
@@ -54,11 +54,11 @@ where
     }
 }
 
-impl<'a, T> Iterator for TopologicalSort<'a, T>
+impl<'a, G> Iterator for TopologicalSort<'a, G>
 where
-    T: Directed,
+    G: Directed,
 {
-    type Item = Result<&'a T::Vertex, ()>;
+    type Item = Result<&'a G::Vertex, ()>;
 
     fn next(&mut self) -> Option<Self::Item> {
         // While there are still vertices with zero in-degree.
@@ -97,15 +97,15 @@ where
     }
 }
 
-impl<'a, T> FusedIterator for TopologicalSort<'a, T> where T: Directed {}
+impl<'a, G> FusedIterator for TopologicalSort<'a, G> where G: Directed {}
 
-impl<'a, T> From<&'a T> for TopologicalSort<'a, T>
+impl<'a, G> From<&'a G> for TopologicalSort<'a, G>
 where
-    T: Directed,
+    G: Directed,
 {
     /// Builds a search object from a given graph.
     ///
-    fn from(g: &'a T) -> Self {
+    fn from(g: &'a G) -> Self {
         Self::new(g)
     }
 }

@@ -57,10 +57,10 @@ pub trait Operators {
 
 macro_rules! impl_operators {
     ($graph:ident) => {
-        impl<T, U> $crate::traits::Operators for $graph<T, U>
+        impl<V, A> $crate::traits::Operators for $graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
             fn complement(&self) -> Self {
                 Self {
@@ -98,12 +98,20 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, U> std::ops::Not for &$graph<T, U>
+        crate::traits::impl_operators_extension!($graph);
+    };
+}
+
+pub(crate) use impl_operators;
+
+macro_rules! impl_operators_extension {
+    ($graph:ident) => {
+        impl<V, A> std::ops::Not for &$graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
-            type Output = $graph<T, U>;
+            type Output = $graph<V, A>;
 
             /// Complement of a graph.
             ///
@@ -118,12 +126,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, U> std::ops::BitAnd for &$graph<T, U>
+        impl<V, A> std::ops::BitAnd for &$graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
-            type Output = $graph<T, U>;
+            type Output = $graph<V, A>;
 
             /// Intersection of two graphs.
             ///
@@ -138,12 +146,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, U> std::ops::BitOr for &$graph<T, U>
+        impl<V, A> std::ops::BitOr for &$graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
-            type Output = $graph<T, U>;
+            type Output = $graph<V, A>;
 
             /// Union of two graphs.
             ///
@@ -158,12 +166,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, U> std::ops::BitXor for &$graph<T, U>
+        impl<V, A> std::ops::BitXor for &$graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
-            type Output = $graph<T, U>;
+            type Output = $graph<V, A>;
 
             /// Symmetric difference of two graphs.
             ///
@@ -182,12 +190,12 @@ macro_rules! impl_operators {
             }
         }
 
-        impl<T, U> std::ops::Sub for &$graph<T, U>
+        impl<V, A> std::ops::Sub for &$graph<V, A>
         where
-            T: $crate::types::Vertex,
-            U: $crate::traits::WithAttributes<T>,
+            V: $crate::types::Vertex,
+            A: $crate::traits::WithAttributes<V>,
         {
-            type Output = $graph<T, U>;
+            type Output = $graph<V, A>;
 
             /// Difference of two graphs.
             ///
@@ -204,4 +212,4 @@ macro_rules! impl_operators {
     };
 }
 
-pub(crate) use impl_operators;
+pub(crate) use impl_operators_extension;

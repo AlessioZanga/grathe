@@ -2,12 +2,12 @@
 mod directed {
 
     macro_rules! generic_tests {
-        ($T:ident, $U:ident) => {
+        ($G:ident, $U:ident) => {
             paste::item! {
                 #[test]
                 fn all_cycles() {
                     // Test from Figure 1 of reference paper.
-                    let g = $T::<$U>::from_edges([
+                    let g = $G::<$U>::from_edges([
                         (0, 1), (1, 2), (2, 3), (2, 4), (3, 4), (4, 1)
                     ]);
                     let mut search = AllSimpleCycles::from(&g);
@@ -28,7 +28,7 @@ mod directed {
                     assert_eq!(search.popularity[&4], 2);
 
                     // Test from Figure 9 of reference paper, removed multi-edges.
-                    let g = $T::<$U>::from_edges([
+                    let g = $G::<$U>::from_edges([
                         (0, 2),
                         (0, 10),
                         (0, 14),
@@ -90,7 +90,7 @@ mod directed {
 
                 #[test]
                 fn all_simple_paths() {
-                    let g = $T::<$U>::from_edges([
+                    let g = $G::<$U>::from_edges([
                         (0, 1), (0, 2), (0, 3),
                         (1, 2), (1, 3),
                         (2, 3)
@@ -113,7 +113,7 @@ mod directed {
                 fn all_simple_paths_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::null();
+                    let g = $G::<$U>::null();
                     AllSimplePaths::from((&g, &0, &1)).run();
                 }
             }
@@ -122,10 +122,10 @@ mod directed {
 
     mod adjacency_list_graph {
         use crate::algorithms::{AllSimpleCycles, AllSimplePaths};
-        use crate::graphs::DirectedAdjacencyListGraph;
+        use crate::graphs::DirectedAdjacencyList;
         use crate::traits::{From, Storage};
 
-        generic_tests!(DirectedAdjacencyListGraph, i32);
+        generic_tests!(DirectedAdjacencyList, i32);
     }
 }
 
@@ -133,12 +133,12 @@ mod directed {
 mod undirected {
 
     macro_rules! generic_tests {
-        ($T:ident, $U:ident) => {
+        ($G:ident, $U:ident) => {
             paste::item! {
                 #[test]
                 #[ignore]
                 fn all_simple_cycles() {
-                    let g = $T::<$U>::from_edges([
+                    let g = $G::<$U>::from_edges([
                         (1, 2), (2, 3), (3, 4), (3, 5),
                         (4, 6), (4, 6), (5, 6), (5, 9),
                         (6, 10), (4, 7), (7, 8), (10, 11),
@@ -157,7 +157,7 @@ mod undirected {
 
                 #[test]
                 fn all_simple_paths() {
-                    let g = $T::<$U>::from_edges([
+                    let g = $G::<$U>::from_edges([
                         (0, 1), (0, 2), (0, 3),
                         (1, 2), (1, 3),
                         (2, 3)
@@ -181,7 +181,7 @@ mod undirected {
                 fn all_simple_paths_should_panic()
                 {
                     // Build a null graph.
-                    let g = $T::<$U>::null();
+                    let g = $G::<$U>::null();
                     AllSimplePaths::from((&g, &0, &1)).run();
                 }
             }
@@ -190,9 +190,9 @@ mod undirected {
 
     mod adjacency_list_graph {
         use crate::algorithms::{AllSimpleCycles, AllSimplePaths};
-        use crate::graphs::UndirectedAdjacencyListGraph;
+        use crate::graphs::UndirectedAdjacencyList;
         use crate::traits::{From, Storage};
 
-        generic_tests!(UndirectedAdjacencyListGraph, i32);
+        generic_tests!(UndirectedAdjacencyList, i32);
     }
 }
