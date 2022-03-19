@@ -27,6 +27,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn add_edge<G>() -> Result<(), Error<i32>>
     where
         G: Undirected<Vertex = i32>,
@@ -58,6 +59,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn del_edge<G>() -> Result<(), Error<i32>>
     where
         G: Undirected<Vertex = i32>,
@@ -81,6 +83,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn neighbors_iter<G>() -> Result<(), Error<i32>>
     where
         G: Undirected<Vertex = i32>,
@@ -116,6 +119,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn add_undirected_edge<G>() -> Result<(), Error<i32>>
     where
         G: Undirected<Vertex = i32>,

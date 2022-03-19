@@ -30,6 +30,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn eq<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -57,6 +58,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn partial_cmp<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -117,6 +119,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn new<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -140,6 +143,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn null<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -154,6 +158,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn empty<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -179,6 +184,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn complete<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -192,6 +198,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn default<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -205,6 +212,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn clear<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -227,6 +235,7 @@ mod undirected {
         Ok(())
     }
     #[test]
+    // FIXME:
     fn from_edges<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -256,6 +265,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn vertices_iter<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -279,6 +289,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn edges_iter<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -304,6 +315,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn adjacents_iter<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -335,6 +347,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn order<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -360,6 +373,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn size<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -389,6 +403,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn has_vertex<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -414,6 +429,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn add_vertex<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -448,6 +464,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn del_vertex<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -491,6 +508,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn has_edge<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -520,6 +538,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn add_edge<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -562,6 +581,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn del_edge<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -608,6 +628,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn degree_of_and_isolated_pendant<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -664,6 +685,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn eq<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -691,6 +713,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn partial_cmp<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -751,6 +774,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn new<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -774,6 +798,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn null<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -788,6 +813,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn empty<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -813,6 +839,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn complete<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -826,6 +853,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn default<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -839,6 +867,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn clear<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -861,6 +890,7 @@ mod directed {
         Ok(())
     }
     #[test]
+    // FIXME:
     fn from_edges<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -890,6 +920,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn vertices_iter<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -913,6 +944,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn edges_iter<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -938,6 +970,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn adjacents_iter<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -969,6 +1002,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn order<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -994,6 +1028,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn size<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -1023,6 +1058,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn has_vertex<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -1048,6 +1084,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn add_vertex<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -1082,6 +1119,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn del_vertex<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -1125,6 +1163,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn has_edge<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -1154,6 +1193,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn add_edge<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -1196,6 +1236,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn del_edge<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,
@@ -1242,6 +1283,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn degree_of_and_isolated_pendant<G>() -> Result<(), Error<i32>>
     where
         G: Storage<Vertex = i32>,

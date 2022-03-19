@@ -8,6 +8,7 @@ mod tests {
     use ndarray::{arr1, arr2, Array};
 
     #[test]
+    // FIXME:
     fn degree_vector_matrix_matrix<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -23,6 +24,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn adjacency_spectrum<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -40,6 +42,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn modularity_matrix<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -85,6 +88,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn modularity_spectrum<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -102,6 +106,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn incidence_matrix<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -133,6 +138,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn laplacian_spectrum<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -147,6 +153,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn normalized_adjacency_laplacian_matrix<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -183,6 +190,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn normalized_laplacian_spectrum<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -197,6 +205,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn deformed_laplacian_matrix<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -258,6 +267,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn deformed_laplacian_spectrum<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,
@@ -272,6 +282,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn fiedler<G>()
     where
         G: Storage<Vertex = i32> + Convert + From,

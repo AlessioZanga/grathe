@@ -8,6 +8,7 @@ mod tests {
     use std::ops::{BitAnd, BitOr, BitXor, Not, Sub};
 
     #[test]
+    // FIXME:
     fn complement<G>()
     where
         G: Storage<Vertex = i32> + From + Operators,
@@ -37,6 +38,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn union<G>()
     where
         G: Storage<Vertex = i32> + From + Operators,
@@ -52,6 +54,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn intersection<G>()
     where
         G: Storage<Vertex = i32> + From + Operators,
@@ -67,6 +70,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn symmetric_difference<G>()
     where
         G: Storage<Vertex = i32> + From + Operators,
@@ -83,6 +87,7 @@ mod tests {
     }
 
     #[test]
+    // FIXME:
     fn difference<G>()
     where
         G: Storage<Vertex = i32> + From + Operators,

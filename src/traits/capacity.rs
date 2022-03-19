@@ -14,7 +14,7 @@ pub trait Capacity {
     /// // Build a graph with a specific capacity.
     /// let g = Graph::with_capacity(3);
     ///
-    /// // Capacity constraits is soft-enforced.
+    /// // Capacity constraints is soft-enforced.
     /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
@@ -40,7 +40,7 @@ pub trait Capacity {
     /// // Build a graph with a specific capacity.
     /// let g = Graph::with_capacity(3);
     ///
-    /// // Capacity constraits is soft-enforced.
+    /// // Capacity constraints is soft-enforced.
     /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
@@ -73,7 +73,7 @@ pub trait Capacity {
     /// // Reserve additional capacity.
     /// g.reserve(3);
     ///
-    /// // Capacity constraits is soft-enforced.
+    /// // Capacity constraints is soft-enforced.
     /// assert_le!(g.capacity(), 3);
     ///
     /// // The order is still zero.
@@ -98,7 +98,7 @@ pub trait Capacity {
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
     ///
-    /// // Capacity constraits is soft-enforced.
+    /// // Capacity constraints is soft-enforced.
     /// assert_le!(g.capacity(), 100);
     ///
     /// // Shrink capacity to given minimum.
@@ -122,7 +122,7 @@ pub trait Capacity {
     /// // Build graph with given capacity.
     /// let mut g = Graph::with_capacity(100);
     ///
-    /// // Capacity constraits is soft-enforced.
+    /// // Capacity constraints is soft-enforced.
     /// assert_le!(g.capacity(), 100);
     ///
     /// // Shrink capacity as much as possible.

@@ -7,6 +7,7 @@ mod undirected {
     use all_asserts::*;
 
     #[test]
+    // FIXME:
     fn extend_vertices<G>() -> Result<(), Error<i32>>
     where
         G: Extend<Vertex = i32>,
@@ -23,6 +24,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn extend_edges<G>() -> Result<(), Error<i32>>
     where
         G: Extend<Vertex = i32>,
@@ -52,6 +54,7 @@ mod directed {
     use all_asserts::*;
 
     #[test]
+    // FIXME:
     fn extend_vertices<G>() -> Result<(), Error<i32>>
     where
         G: Extend<Vertex = i32>,
@@ -68,6 +71,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn extend_edges<G>() -> Result<(), Error<i32>>
     where
         G: Extend<Vertex = i32>,

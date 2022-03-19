@@ -133,7 +133,7 @@ macro_rules! impl_with_attributes {
 
                 let mut out = Self::new(y.iter().map(|(y, _)| y.clone()), z.iter().map(|(z, _)| z.clone()));
 
-                out.attributes = A::new_with_attributes(x, y, z);
+                out._attributes = A::new_with_attributes(x, y, z);
 
                 out
             }
@@ -142,74 +142,74 @@ macro_rules! impl_with_attributes {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
-                self.attributes.has_vertex_attrs(x)
+                self._attributes.has_vertex_attrs(x)
             }
 
             fn get_vertex_attrs(&self, x: &V) -> Result<&Self::VertexAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
-                self.attributes.get_vertex_attrs(x)
+                self._attributes.get_vertex_attrs(x)
             }
 
             fn get_mut_vertex_attrs(&mut self, x: &V) -> Result<&mut Self::VertexAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
-                self.attributes.get_mut_vertex_attrs(x)
+                self._attributes.get_mut_vertex_attrs(x)
             }
 
             fn set_vertex_attrs(&mut self, x: &V, y: Self::VertexAttributes) {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
-                self.attributes.set_vertex_attrs(x, y)
+                self._attributes.set_vertex_attrs(x, y)
             }
 
             fn unset_vertex_attrs(&mut self, x: &V) -> Result<Self::VertexAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_vertex(x));
                 // Delegate method.
-                self.attributes.unset_vertex_attrs(x)
+                self._attributes.unset_vertex_attrs(x)
             }
 
             fn has_edge_attrs(&self, x: &V, y: &V) -> bool {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
-                self.attributes.has_edge_attrs(x, y)
+                self._attributes.has_edge_attrs(x, y)
             }
 
             fn get_edge_attrs(&self, x: &V, y: &V) -> Result<&Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
-                self.attributes.get_edge_attrs(x, y)
+                self._attributes.get_edge_attrs(x, y)
             }
 
             fn get_mut_edge_attrs(&mut self, x: &V, y: &V) -> Result<&mut Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
-                self.attributes.get_mut_edge_attrs(x, y)
+                self._attributes.get_mut_edge_attrs(x, y)
             }
 
             fn set_edge_attrs(&mut self, x: &V, y: &V, z: Self::EdgeAttributes) {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
-                self.attributes.set_edge_attrs(x, y, z)
+                self._attributes.set_edge_attrs(x, y, z)
             }
 
             fn unset_edge_attrs(&mut self, x: &V, y: &V) -> Result<Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
                 assert!(self.has_edge(x, y).unwrap());
                 // Delegate method.
-                self.attributes.unset_edge_attrs(x, y)
+                self._attributes.unset_edge_attrs(x, y)
             }
 
             delegate::delegate! {
-                to self.attributes {
+                to self._attributes {
                     fn has_graph_attrs(&self) -> bool;
                     fn get_graph_attrs(&self) -> Result<&Self::GraphAttributes, Error<V>>;
                     fn get_mut_graph_attrs(&mut self) -> Result<&mut Self::GraphAttributes, Error<V>>;

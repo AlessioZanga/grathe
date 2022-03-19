@@ -8,6 +8,7 @@ mod undirected {
     const E: [(i32, i32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
 
     #[test]
+    // FIXME:
     fn from_vertices<G>() -> Result<(), Error<i32>>
     where
         G: From<Vertex = i32>,
@@ -33,6 +34,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn from_edges<G>() -> Result<(), Error<i32>>
     where
         G: From<Vertex = i32>,
@@ -75,6 +77,7 @@ mod directed {
     const E: [(i32, i32); 5] = [(4, 3), (0, 1), (2, 3), (5, 6), (7, 2)];
 
     #[test]
+    // FIXME:
     fn from_vertices<G>() -> Result<(), Error<i32>>
     where
         G: From<Vertex = i32>,
@@ -100,6 +103,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn from_edges<G>() -> Result<(), Error<i32>>
     where
         G: From<Vertex = i32>,

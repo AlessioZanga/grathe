@@ -1,3 +1,4 @@
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
 use thiserror::Error;
@@ -68,6 +69,12 @@ where
 
 // Implement ExactSizeIter for ExactSizeIterator.
 impl<I> ExactSizeIterator for ExactSizeIter<I> where I: Iterator {}
+
+/// Edge list type.
+pub type EdgeList<V> = BTreeSet<(V, V)>;
+
+/// Adjacency list type.
+pub type AdjacencyList<V> = BTreeMap<V, BTreeSet<V>>;
 
 /// Error enumerator.
 #[derive(Debug, Error, PartialEq)]

@@ -6,35 +6,106 @@ mod tests {
     use all_asserts::*;
 
     #[test]
+    fn capacity<G>()
+    where
+        G: Storage,
+    {
+        // Test `G::capacity()`.
+
+        // Test for default.
+        let g = G::default();
+        assert_le!(g.capacity(), 0);
+        assert_eq!(g.order(), 0);
+        assert_eq!(g.size(), 0);
+    }
+
+    #[test]
     fn with_capacity<G>()
     where
-        G: Storage<Vertex = i32>,
+        G: Storage,
     {
-        let g = G::with_capacity(3);
-        // FIXME: capacity constraits is soft-enforced.
-        assert_le!(g.capacity(), 3);
+        // Test `G::with_capacity(usize)`.
 
-        // The order is still zero.
-        assert_eq!(g.order(), 0);
+        // Test for ...
+        let data = [
+            0,          // ... zero,
+            1,          // ... one,
+            31,         // ... random value.
+            usize::MAX, // ... upper bound,
+        ];
 
-        // The size is still zero.
-        assert_eq!(g.size(), 0);
+        // Test for each scenario.
+        for i in data {
+            let g = G::with_capacity(i);
+            assert_le!(g.capacity(), i);
+            assert_eq!(g.order(), 0);
+            assert_eq!(g.size(), 0);
+        }
     }
 
     #[test]
     fn reserve<G>()
     where
-        G: Storage<Vertex = i32>,
+        G: Storage,
     {
-        let mut g = G::null();
+        // Test `G::reserve(usize)`.
 
-        // Reserve additional capacity.
-        g.reserve(3);
+        // Test for ...
+        let data = [
+            0,          // ... zero,
+            1,          // ... one,
+            31,         // ... random value.
+            usize::MAX, // ... upper bound,
+        ];
 
-        // The order is still zero.
+        // Test for each scenario.
+        for i in data {
+            let mut g = G::default();
+            g.reserve(i);
+            assert_le!(g.capacity(), i);
+            assert_eq!(g.order(), 0);
+            assert_eq!(g.size(), 0);
+        }
+    }
+
+    #[test]
+    fn shrink_to<G>()
+    where
+        G: Storage,
+    {
+        // Test `G::shrink_to(usize)`.
+
+        // Test for ...
+        let data = [
+            0,          // ... zero,
+            1,          // ... one,
+            31,         // ... random value.
+            usize::MAX, // ... upper bound,
+        ];
+
+        // Test for each scenario.
+        for i in data {
+            let mut g = G::default();
+            g.shrink_to(i);
+            assert_le!(g.capacity(), i);
+            assert_eq!(g.order(), 0);
+            assert_eq!(g.size(), 0);
+        }
+    }
+
+    #[test]
+    fn shrink_to_fit<G>()
+    where
+        G: Storage,
+    {
+        // Test `G::shrink_to_fit()`.
+
+        // Test for default.
+        let mut g = G::default();
+        g.shrink_to_fit();
+        assert_eq!(g, Default::default());
+        assert_le!(g.capacity(), 0);
         assert_eq!(g.order(), 0);
-
-        // The size is still zero.
         assert_eq!(g.size(), 0);
     }
 

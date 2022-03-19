@@ -7,6 +7,7 @@ mod undirected {
     use all_asserts::*;
 
     #[test]
+    // FIXME:
     fn has_path<G>() -> Result<(), Error<i32>>
     where
         G: Connectivity<Vertex = i32> + From,
@@ -55,6 +56,7 @@ mod undirected {
 
     #[test]
     #[should_panic]
+    // FIXME:
     fn has_path_should_panic<G>()
     where
         G: Connectivity<Vertex = i32> + From,
@@ -65,6 +67,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn is_connected<G>() -> Result<(), Error<i32>>
     where
         G: Connectivity<Vertex = i32> + From,
@@ -99,7 +102,7 @@ mod undirected {
     }
 
     #[test]
-    #[ignore]
+    // FIXME:
     fn is_acyclic<G>()
     where
         G: Connectivity<Vertex = i32> + From,
@@ -133,6 +136,7 @@ mod directed {
     use all_asserts::*;
 
     #[test]
+    // FIXME:
     fn has_path<G>() -> Result<(), Error<i32>>
     where
         G: Connectivity<Vertex = i32> + From,
@@ -180,6 +184,7 @@ mod directed {
 
     #[test]
     #[should_panic]
+    // FIXME:
     fn has_path_should_panic<G>()
     where
         G: Connectivity<Vertex = i32> + From,
@@ -190,6 +195,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn is_connected<G>() -> Result<(), Error<i32>>
     where
         G: Connectivity<Vertex = i32> + From,
@@ -224,6 +230,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn is_acyclic<G>()
     where
         G: Connectivity<Vertex = i32> + From,

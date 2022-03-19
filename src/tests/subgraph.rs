@@ -8,6 +8,7 @@ mod undirected {
     use all_asserts::*;
 
     #[test]
+    // FIXME:
     fn subgraph<G>() -> Result<(), Error<i32>>
     where
         G: Subgraph<Vertex = i32>,
@@ -30,6 +31,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn is_subgraph<G>() -> Result<(), Error<i32>>
     where
         G: Subgraph<Vertex = i32>,
@@ -44,6 +46,7 @@ mod undirected {
     }
 
     #[test]
+    // FIXME:
     fn is_supergraph<G>() -> Result<(), Error<i32>>
     where
         G: Subgraph<Vertex = i32>,
@@ -71,6 +74,7 @@ mod directed {
     use all_asserts::*;
 
     #[test]
+    // FIXME:
     fn subgraph<G>() -> Result<(), Error<i32>>
     where
         G: Subgraph<Vertex = i32>,
@@ -93,6 +97,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn is_subgraph<G>() -> Result<(), Error<i32>>
     where
         G: Subgraph<Vertex = i32>,
@@ -107,6 +112,7 @@ mod directed {
     }
 
     #[test]
+    // FIXME:
     fn is_supergraph<G>() -> Result<(), Error<i32>>
     where
         G: Subgraph<Vertex = i32>,
