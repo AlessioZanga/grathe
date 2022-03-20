@@ -231,7 +231,39 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        todo!()
+        // Test `G::dense_incidence_matrix()`.
+
+        // Test for ...
+        let data = [
+            // ... zero nodes and zero edges,
+            (vec![], vec![], Array2::from_elem((0, 0), 0)),
+            // ... one node and zero edges,
+            (vec![0], vec![], Array2::from_elem((1, 0), 0)),
+            // ... one node and one edge,
+            (vec![0], vec![(0, 0)], arr2(&[[2]])),
+            // ... multiple nodes and zero edges,
+            (vec![0, 1, 2, 3], vec![], Array2::from_elem((4, 0), 0)),
+            // ... multiple nodes and one edge,
+            (vec![0, 1, 2, 3], vec![(0, 1)], arr2(&[[1], [1], [0], [0]])),
+            // ... multiple nodes and multiple edges,
+            (
+                vec![0, 1, 2, 3],
+                vec![(0, 1), (1, 2), (2, 3)],
+                arr2(&[[1, 0, 0], [1, 1, 0], [0, 1, 1], [0, 0, 1]]),
+            ),
+            // ... random nodes and random edges,
+            (
+                vec![71, 1, 58, 3, 75],
+                vec![(71, 1), (1, 58), (58, 3), (3, 75)],
+                arr2(&[[1, 1, 0, 0], [0, 0, 1, 1], [1, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]),
+            ),
+        ];
+
+        // Test for each scenario.
+        for (i, j, k) in data {
+            let g = G::new(i, j);
+            assert_eq!(g.dense_incidence_matrix(), k);
+        }
     }
 
     #[test]
@@ -239,7 +271,54 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        todo!()
+        // Test `G::sparse_incidence_matrix()`.
+
+        // Test for ...
+        let data = [
+            // ... zero nodes and zero edges,
+            (vec![], vec![], ((0, 0), vec![], vec![], vec![])),
+            // ... one node and zero edges,
+            (vec![0], vec![], ((1, 0), vec![], vec![], vec![])),
+            // ... one node and one edge,
+            (vec![0], vec![(0, 0)], ((1, 1), vec![0], vec![0], vec![2])),
+            // ... multiple nodes and zero edges,
+            (vec![0, 1, 2, 3], vec![], ((4, 0), vec![], vec![], vec![])),
+            // ... multiple nodes and one edge,
+            (
+                vec![0, 1, 2, 3],
+                vec![(0, 1)],
+                ((4, 1), vec![0, 1], vec![0, 0], vec![1, 1]),
+            ),
+            // ... multiple nodes and multiple edges,
+            (
+                vec![0, 1, 2, 3],
+                vec![(0, 1), (1, 2), (2, 3)],
+                (
+                    (4, 3),
+                    vec![0, 1, 1, 2, 2, 3],
+                    vec![0, 0, 1, 1, 2, 2],
+                    vec![1, 1, 1, 1, 1, 1],
+                ),
+            ),
+            // ... random nodes and random edges,
+            (
+                vec![71, 1, 58, 3, 75],
+                vec![(71, 1), (1, 58), (58, 3), (3, 75)],
+                (
+                    (5, 4),
+                    vec![0, 2, 0, 3, 1, 2, 1, 4],
+                    vec![0, 0, 1, 1, 2, 2, 3, 3],
+                    vec![1, 1, 1, 1, 1, 1, 1, 1],
+                ),
+            ),
+        ];
+
+        // Test for each scenario.
+        for (i, j, k) in data {
+            let g = G::new(i, j);
+            let (s, x, y, z) = k;
+            assert_eq!(g.sparse_incidence_matrix(), TriMat::from_triplets(s, x, y, z));
+        }
     }
 
     #[instantiate_tests(<UndirectedAdjacencyList<i32>>)]
@@ -459,7 +538,39 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        todo!()
+        // Test `G::dense_incidence_matrix()`.
+
+        // Test for ...
+        let data = [
+            // ... zero nodes and zero edges,
+            (vec![], vec![], Array2::from_elem((0, 0), 0)),
+            // ... one node and zero edges,
+            (vec![0], vec![], Array2::from_elem((1, 0), 0)),
+            // ... one node and one edge,
+            (vec![0], vec![(0, 0)], arr2(&[[0]])),
+            // ... multiple nodes and zero edges,
+            (vec![0, 1, 2, 3], vec![], Array2::from_elem((4, 0), 0)),
+            // ... multiple nodes and one edge,
+            (vec![0, 1, 2, 3], vec![(0, 1)], arr2(&[[-1], [1], [0], [0]])),
+            // ... multiple nodes and multiple edges,
+            (
+                vec![0, 1, 2, 3],
+                vec![(0, 1), (1, 2), (2, 3)],
+                arr2(&[[-1, 0, 0], [1, -1, 0], [0, 1, -1], [0, 0, 1]]),
+            ),
+            // ... random nodes and random edges,
+            (
+                vec![71, 1, 58, 3, 75],
+                vec![(71, 1), (1, 58), (58, 3), (3, 75)],
+                arr2(&[[-1, 0, 0, 1], [0, -1, 1, 0], [1, 0, -1, 0], [0, 0, 0, -1], [0, 1, 0, 0]]),
+            ),
+        ];
+
+        // Test for each scenario.
+        for (i, j, k) in data {
+            let g = G::new(i, j);
+            assert_eq!(g.dense_incidence_matrix(), k);
+        }
     }
 
     #[test]
@@ -467,7 +578,54 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        todo!()
+        // Test `G::sparse_incidence_matrix()`.
+
+        // Test for ...
+        let data = [
+            // ... zero nodes and zero edges,
+            (vec![], vec![], ((0, 0), vec![], vec![], vec![])),
+            // ... one node and zero edges,
+            (vec![0], vec![], ((1, 0), vec![], vec![], vec![])),
+            // ... one node and one edge,
+            (vec![0], vec![(0, 0)], ((1, 1), vec![0], vec![0], vec![0])),
+            // ... multiple nodes and zero edges,
+            (vec![0, 1, 2, 3], vec![], ((4, 0), vec![], vec![], vec![])),
+            // ... multiple nodes and one edge,
+            (
+                vec![0, 1, 2, 3],
+                vec![(0, 1)],
+                ((4, 1), vec![0, 1], vec![0, 0], vec![-1, 1]),
+            ),
+            // ... multiple nodes and multiple edges,
+            (
+                vec![0, 1, 2, 3],
+                vec![(0, 1), (1, 2), (2, 3)],
+                (
+                    (4, 3),
+                    vec![0, 1, 1, 2, 2, 3],
+                    vec![0, 0, 1, 1, 2, 2],
+                    vec![-1, 1, -1, 1, -1, 1],
+                ),
+            ),
+            // ... random nodes and random edges,
+            (
+                vec![71, 1, 58, 3, 75],
+                vec![(71, 1), (1, 58), (58, 3), (3, 75)],
+                (
+                    (5, 4),
+                    vec![0, 2, 1, 4, 2, 1, 3, 0],
+                    vec![0, 0, 1, 1, 2, 2, 3, 3],
+                    vec![-1, 1, -1, 1, -1, 1, -1, 1],
+                ),
+            ),
+        ];
+
+        // Test for each scenario.
+        for (i, j, k) in data {
+            let g = G::new(i, j);
+            let (s, x, y, z) = k;
+            assert_eq!(g.sparse_incidence_matrix(), TriMat::from_triplets(s, x, y, z));
+        }
     }
 
     #[instantiate_tests(<DirectedAdjacencyList<i32>>)]

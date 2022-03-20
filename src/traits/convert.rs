@@ -51,7 +51,7 @@ pub trait Convert: Storage {
     ///
     /// The incidence matrix $\textbf{B}$ of a graph $G$ is defined as:
     ///
-    /// $$ \textbf{B}_{i,j} = \begin{cases} +1, & \text{if } (i, \cdot) \equiv e_j \in \textbf{E}, \newline -1, & \text{if } (\cdot, i) \equiv e_j \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
+    /// $$ \textbf{B}_{i,j} = \begin{cases} -1, & \text{if } (i, \cdot) \equiv e_j \in \textbf{E}, \newline +1, & \text{if } (\cdot, i) \equiv e_j \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
     ///
     fn dense_incidence_matrix(&self) -> Array2<i8>;
 

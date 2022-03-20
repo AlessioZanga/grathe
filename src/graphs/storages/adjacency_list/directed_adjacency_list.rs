@@ -173,16 +173,12 @@ where
         I: IntoIterator<Item = K>,
         K: Into<Self::Vertex>,
     {
-        // Initialize the data storage using the vertex set.
-        let data: Vec<Self::Vertex> = iter.into_iter().map(Into::into).collect();
-        // Fill the data storage by copying the vertex set.
-        let data: AdjacencyList<V> = data.into_iter().map(|x| (x.into(), Default::default())).collect();
+        let data: AdjacencyList<Self::Vertex> = iter.into_iter().map(|x| (x.into(), Default::default())).collect();
         let order = data.len();
 
         Self {
             _data: data,
             _order: order,
-            _size: 0,
             ..Default::default()
         }
     }
@@ -437,8 +433,8 @@ where
         idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
         for (i, (x, y)) in self.edges_iter().enumerate() {
-            out[(idx[&x], i)] = 1;
-            out[(idx[&y], i)] = -1;
+            out[(idx[&x], i)] -= 1;
+            out[(idx[&y], i)] += 1;
         }
 
         out
@@ -454,8 +450,12 @@ where
         idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
         for (i, (x, y)) in self.edges_iter().enumerate() {
-            out.add_triplet(idx[&x], i, 1);
-            out.add_triplet(idx[&y], i, -1);
+            if x != y {
+                out.add_triplet(idx[&x], i, -1);
+                out.add_triplet(idx[&y], i, 1);
+            } else {
+                out.add_triplet(idx[&x], i, 0);
+            }
         }
 
         out

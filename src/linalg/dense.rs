@@ -164,7 +164,7 @@ where
 ///
 /// The incidence matrix $\textbf{B}$ of a graph $G$ is defined as:
 ///
-/// $$ \textbf{B}_{i,j} = \begin{cases} +1, & \text{If } (i, \cdot) \text{ so that } \exists e_j \in \textbf{E} \newline -1, & \text{If } (\cdot, i) \text{ so that } \exists e_j \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
+/// $$ \textbf{B}_{i,j} = \begin{cases} -1, & \text{If } (i, \cdot) \text{ so that } \exists e_j \in \textbf{E} \newline +1, & \text{If } (\cdot, i) \text{ so that } \exists e_j \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
 ///
 /// # Examples
 ///
@@ -184,10 +184,10 @@ where
 /// assert_relative_eq!(
 ///     B,
 ///     arr2(&[
-///         [ 1.,  1.,  1.,  0.],
-///         [-1.,  0.,  0.,  0.],
-///         [ 0., -1.,  0.,  1.],
-///         [ 0.,  0., -1., -1.],
+///         [1., 1., 1., 0.],
+///         [1., 0., 0., 0.],
+///         [0., 1., 0., 1.],
+///         [0., 0., 1., 1.],
 ///     ])
 /// );
 /// ```
