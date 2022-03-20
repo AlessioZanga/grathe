@@ -19,7 +19,7 @@ where
 {
     /// Given graph reference.
     graph: &'a G,
-    ///
+    /// Generic placeholder for direction.
     _direction: std::marker::PhantomData<D>,
     /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
     vertices: VecDeque<&'a G::Vertex>,
@@ -78,7 +78,7 @@ where
         let mut search = Self {
             // Set target graph.
             graph: g,
-            //
+            // Generic placeholder for direction.
             _direction: Default::default(),
             // Initialize the [`Forest`] to-be-visited queue.
             vertices: Default::default(),

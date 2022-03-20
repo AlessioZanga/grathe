@@ -10,7 +10,7 @@ where
 {
     /// Given graph reference.
     graph: &'a G,
-    ///
+    /// Generic placeholder for direction.
     _direction: std::marker::PhantomData<D>,
     /// To-be-visited stack.
     stack: Vec<&'a G::Vertex>,
@@ -67,7 +67,7 @@ where
         Self {
             // Set target graph.
             graph: g,
-            //
+            // Generic placeholder for direction.
             _direction: Default::default(),
             // Initialize the to-be-visited queue with source and target vertices.
             stack: From::from([x, y]),

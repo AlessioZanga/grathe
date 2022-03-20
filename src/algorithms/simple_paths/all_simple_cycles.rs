@@ -18,7 +18,7 @@ where
 {
     /// Given graph reference.
     graph: &'a G,
-    ///
+    /// Generic placeholder for direction.
     _direction: std::marker::PhantomData<D>,
     /// The currently visited stack.
     stack: Vec<&'a G::Vertex>,
@@ -80,7 +80,7 @@ where
         Self {
             // Set target graph.
             graph: g,
-            //
+            // Generic placeholder for direction.
             _direction: Default::default(),
             // Initialize the currently visited stack.
             stack: Default::default(),
