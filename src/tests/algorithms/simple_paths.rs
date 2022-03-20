@@ -122,7 +122,7 @@ mod directed {
 
     mod adjacency_list_graph {
         use crate::algorithms::{AllSimpleCycles, AllSimplePaths};
-        use crate::graphs::DirectedAdjacencyList;
+        use crate::graphs::storages::DirectedAdjacencyList;
         use crate::traits::{From, Storage};
 
         generic_tests!(DirectedAdjacencyList, i32);
@@ -136,7 +136,7 @@ mod undirected {
         ($G:ident, $U:ident) => {
             paste::item! {
                 #[test]
-                #[ignore]
+                // FIXME:
                 fn all_simple_cycles() {
                     let g = $G::<$U>::from_edges([
                         (1, 2), (2, 3), (3, 4), (3, 5),
@@ -190,7 +190,7 @@ mod undirected {
 
     mod adjacency_list_graph {
         use crate::algorithms::{AllSimpleCycles, AllSimplePaths};
-        use crate::graphs::UndirectedAdjacencyList;
+        use crate::graphs::storages::UndirectedAdjacencyList;
         use crate::traits::{From, Storage};
 
         generic_tests!(UndirectedAdjacencyList, i32);

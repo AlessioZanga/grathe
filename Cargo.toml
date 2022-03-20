@@ -38,6 +38,7 @@ tempfile = "^3.2"
 ndarray = { version = "^0.15", features = ["approx-0_5"] }
 ndarray-linalg = { version = "^0.14", features = ["openblas-system"] }
 openblas-src = { version = "^0.10", features = ["system"] }
+rand = "^0.8"
 
 [package.metadata.vcpkg]
 git = "https://github.com/AlessioZanga/vcpkg"

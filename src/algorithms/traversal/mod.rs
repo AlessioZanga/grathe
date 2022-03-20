@@ -10,13 +10,13 @@ mod breadth_first_search;
 pub use breadth_first_search::BreadthFirstSearch;
 
 /// Alias for breadth-first search.
-pub type BFS<'a, G> = BreadthFirstSearch<'a, G>;
+pub type BFS<'a, G, D> = BreadthFirstSearch<'a, G, D>;
 
 mod depth_first_search;
 pub use depth_first_search::DepthFirstSearch;
 
 /// Alias for depth-first search.
-pub type DFS<'a, G> = DepthFirstSearch<'a, G>;
+pub type DFS<'a, G, D> = DepthFirstSearch<'a, G, D>;
 
 mod lexicographic_breadth_first_search;
 pub use lexicographic_breadth_first_search::LexicographicBreadthFirstSearch;

@@ -1,6 +1,6 @@
 use super::Traversal;
-use crate::traits::Storage;
-use crate::types::VertexIterator;
+use crate::traits::{Directed, Storage, Undirected};
+use crate::types::directions;
 use crate::V;
 use std::collections::{HashMap, VecDeque};
 use std::iter::FusedIterator;
@@ -10,14 +10,14 @@ use std::vec::Vec;
 ///
 /// This structure contains the `discovery_time`, `finish_time` and `predecessor` maps.
 ///
-pub struct DepthFirstSearch<'a, G>
+pub struct DepthFirstSearch<'a, G, D>
 where
     G: Storage,
 {
     /// Given graph reference.
     graph: &'a G,
-    /// Reachable vertices of distance one from given vertex.
-    reachable: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
+    ///
+    _direction: std::marker::PhantomData<D>,
     /// The visit stack.
     stack: Vec<&'a G::Vertex>,
     /// Global time counter.
@@ -30,9 +30,9 @@ where
     pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
 }
 
-impl<'a, G> DepthFirstSearch<'a, G>
+impl<'a, G, D> DepthFirstSearch<'a, G, D>
 where
-    G: Storage,
+    G: Storage<Direction = D>,
 {
     /// Build a DFS iterator.
     ///
@@ -76,18 +76,13 @@ where
     /// assert_eq!(search.predecessor[&5], &4);
     /// ```
     ///
-    pub fn new(
-        g: &'a G,
-        x: Option<&'a G::Vertex>,
-        f: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
-        m: Traversal,
-    ) -> Self {
+    pub fn new(g: &'a G, x: Option<&'a G::Vertex>, m: Traversal) -> Self {
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
             graph: g,
-            // Set reachability function.
-            reachable: f,
+            //
+            _direction: Default::default(),
             // Initialize the to-be-visited queue with the source vertex.
             stack: Default::default(),
             // Initialize the global clock.
@@ -132,9 +127,9 @@ where
     }
 }
 
-impl<'a, G> Iterator for DepthFirstSearch<'a, G>
+impl<'a, G> Iterator for DepthFirstSearch<'a, G, directions::Undirected>
 where
-    G: Storage,
+    G: Storage + Undirected,
 {
     type Item = &'a G::Vertex;
 
@@ -150,7 +145,7 @@ where
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for y in (self.reachable)(self.graph, x) {
+                for y in self.graph.neighbors_iter(x) {
                     // Filter already visited vertices (as GRAY).
                     if !self.discovery_time.contains_key(y) {
                         // Set predecessor.
@@ -182,4 +177,74 @@ where
     }
 }
 
-impl<'a, G> FusedIterator for DepthFirstSearch<'a, G> where G: Storage {}
+impl<'a, G> FusedIterator for DepthFirstSearch<'a, G, directions::Undirected> where G: Storage + Undirected {}
+
+impl<'a, G> Iterator for DepthFirstSearch<'a, G, directions::Directed>
+where
+    G: Storage + Directed,
+{
+    type Item = &'a G::Vertex;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // If there are still vertices to be visited.
+        while let Some(&x) = self.stack.last() {
+            // Check if vertex is WHITE (i.e. was not seen before).
+            if !self.discovery_time.contains_key(x) {
+                // Set its discover time (as GRAY).
+                self.discovery_time.insert(x, self.time);
+                // Increment time.
+                self.time += 1;
+                // Initialize visiting queue.
+                let mut queue = VecDeque::new();
+                // Iterate over reachable vertices.
+                for y in self.graph.children_iter(x) {
+                    // Filter already visited vertices (as GRAY).
+                    if !self.discovery_time.contains_key(y) {
+                        // Set predecessor.
+                        self.predecessor.insert(y, x);
+                        // Add to queue.
+                        queue.push_front(y);
+                    }
+                }
+                // Push vertices onto the stack in reverse order, this makes
+                // traversal order and neighborhood order the same.
+                self.stack.extend(queue);
+                // Return vertex in pre-order.
+                return Some(x);
+            // If the vertex is NOT WHITE.
+            } else {
+                // Remove it from stack.
+                self.stack.pop();
+                // Check if it is GRAY (not BLACK).
+                if !self.finish_time.contains_key(x) {
+                    // Set its finish time (as BLACK).
+                    self.finish_time.insert(x, self.time);
+                    // Increment time.
+                    self.time += 1;
+                }
+            }
+        }
+
+        None
+    }
+}
+
+impl<'a, G> FusedIterator for DepthFirstSearch<'a, G, directions::Directed> where G: Storage + Directed {}
+
+impl<'a, G, D> From<&'a G> for DepthFirstSearch<'a, G, D>
+where
+    G: Storage<Direction = D>,
+{
+    fn from(g: &'a G) -> Self {
+        Self::new(g, None, Traversal::Tree)
+    }
+}
+
+impl<'a, G, D> From<(&'a G, &'a G::Vertex)> for DepthFirstSearch<'a, G, D>
+where
+    G: Storage<Direction = D>,
+{
+    fn from((g, x): (&'a G, &'a G::Vertex)) -> Self {
+        Self::new(g, Some(x), Traversal::Tree)
+    }
+}

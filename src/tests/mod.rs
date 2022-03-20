@@ -1,6 +1,6 @@
-// mod algorithms;
+mod algorithms;
 mod capacity;
-// mod connectivity;
+// FIXME: mod connectivity;
 mod convert;
 // FIXME: mod directions;
 // FIXME: mod extend;

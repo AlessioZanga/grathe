@@ -1,17 +1,17 @@
-use crate::traits::Storage;
-use crate::types::VertexIterator;
+use crate::traits::{Directed, Storage, Undirected};
+use crate::types::directions;
 use std::collections::HashSet;
 use std::vec::Vec;
 
 /// Find all simple paths in a graph for given source and target vertices.
-pub struct AllSimplePaths<'a, G>
+pub struct AllSimplePaths<'a, G, D>
 where
     G: Storage,
 {
     /// Given graph reference.
     graph: &'a G,
-    /// Reachable vertices of distance one from given vertex.
-    reachable: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
+    ///
+    _direction: std::marker::PhantomData<D>,
     /// To-be-visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Already visited set.
@@ -20,9 +20,9 @@ where
     pub simple_paths: Vec<Vec<&'a G::Vertex>>,
 }
 
-impl<'a, G> AllSimplePaths<'a, G>
+impl<'a, G, D> AllSimplePaths<'a, G, D>
 where
-    G: Storage,
+    G: Storage<Direction = D>,
 {
     /// Build an *all simple paths* search structure.
     ///
@@ -60,20 +60,15 @@ where
     /// );
     /// ```
     ///
-    pub fn new(
-        g: &'a G,
-        x: &'a G::Vertex,
-        y: &'a G::Vertex,
-        f: fn(&'a G, &'a G::Vertex) -> Box<dyn VertexIterator<'a, G::Vertex> + 'a>,
-    ) -> Self {
+    pub fn new(g: &'a G, x: &'a G::Vertex, y: &'a G::Vertex) -> Self {
         // Assert that source and target vertices are in graph.
         assert!(g.has_vertex(x) && g.has_vertex(y));
 
         Self {
             // Set target graph.
             graph: g,
-            // Set reachability function.
-            reachable: f,
+            //
+            _direction: Default::default(),
             // Initialize the to-be-visited queue with source and target vertices.
             stack: From::from([x, y]),
             // Initialize the already visited set.
@@ -82,14 +77,19 @@ where
             simple_paths: Default::default(),
         }
     }
+}
 
+impl<'a, G> AllSimplePaths<'a, G, directions::Undirected>
+where
+    G: Storage + Undirected,
+{
     fn visit(&mut self, x: &'a G::Vertex, y: &'a G::Vertex) {
         // Push current vertex onto stack.
         self.stack.push(x);
         // Set current vertex as visited.
         self.visited.insert(x);
         // For each vertex reachable from the current vertex.
-        for z in (self.reachable)(self.graph, x) {
+        for z in self.graph.neighbors_iter(x) {
             // If the next vertex is the target.
             if z == y {
                 // Then clones the stack into the results.
@@ -123,5 +123,61 @@ where
         self.visit(x, y);
 
         self
+    }
+}
+
+impl<'a, G> AllSimplePaths<'a, G, directions::Directed>
+where
+    G: Storage + Directed,
+{
+    fn visit(&mut self, x: &'a G::Vertex, y: &'a G::Vertex) {
+        // Push current vertex onto stack.
+        self.stack.push(x);
+        // Set current vertex as visited.
+        self.visited.insert(x);
+        // For each vertex reachable from the current vertex.
+        for z in self.graph.children_iter(x) {
+            // If the next vertex is the target.
+            if z == y {
+                // Then clones the stack into the results.
+                self.simple_paths.push({
+                    let mut p = self.stack.clone();
+                    p.push(z);
+                    p
+                });
+            // Else if the next vertex has not been visited yet...
+            } else if !self.visited.contains(z) {
+                // ...call the visit procedure recursively.
+                self.visit(z, y);
+            }
+        }
+        // Set current vertex as not visited.
+        self.visited.remove(x);
+        // Pop current vertex from the stack.
+        self.stack.pop();
+    }
+
+    /// Execute the procedure.
+    ///
+    /// Execute the procedure and store the results for later queries.
+    ///
+    pub fn run(&mut self) -> &Self {
+        // Get target vertex.
+        let y = self.stack.pop().unwrap();
+        // Get source vertex.
+        let x = self.stack.pop().unwrap();
+        // Visit given graph.
+        self.visit(x, y);
+
+        self
+    }
+}
+
+impl<'a, G, D> From<(&'a G, &'a G::Vertex, &'a G::Vertex)> for AllSimplePaths<'a, G, D>
+where
+    G: Storage<Direction = D>,
+{
+    fn from((g, x, y): (&'a G, &'a G::Vertex, &'a G::Vertex)) -> Self {
+        Self::new(g, x, y)
     }
 }

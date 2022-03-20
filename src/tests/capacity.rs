@@ -10,7 +10,7 @@ mod tests {
     where
         G: Storage,
     {
-        // Test `G::capacity()`.
+        // Test `G::capacity() -> usize`.
 
         // Test for default.
         let g = G::default();
@@ -24,7 +24,7 @@ mod tests {
     where
         G: Storage,
     {
-        // Test `G::with_capacity(usize)`.
+        // Test `G::with_capacity(usize) -> G`.
 
         // Test for ...
         let data = [
@@ -48,7 +48,7 @@ mod tests {
     where
         G: Storage,
     {
-        // Test `G::reserve(usize)`.
+        // Test `G::reserve(usize) -> ()`.
 
         // Test for ...
         let data = [
@@ -73,7 +73,7 @@ mod tests {
     where
         G: Storage,
     {
-        // Test `G::shrink_to(usize)`.
+        // Test `G::shrink_to(usize) -> ()`.
 
         // Test for ...
         let data = [
@@ -98,7 +98,7 @@ mod tests {
     where
         G: Storage,
     {
-        // Test `G::shrink_to_fit()`.
+        // Test `G::shrink_to_fit() -> ()`.
 
         // Test for default.
         let mut g = G::default();

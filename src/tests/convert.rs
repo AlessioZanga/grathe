@@ -11,27 +11,27 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::edge_list()`.
+        // Test `G::edge_list() -> EdgeList`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], vec![]),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], vec![]),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], vec![(0, 0)]),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], vec![]),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (vec![0, 1, 2, 3], vec![(0, 1)], vec![(0, 1), (1, 0)]),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, 1), (1, 0), (1, 2), (2, 1), (2, 3), (3, 2)],
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -52,35 +52,35 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::adjacency_list()`.
+        // Test `G::adjacency_list() -> AdjacencyList`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], vec![]),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], vec![(0, vec![])]),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], vec![(0, vec![0])]),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (
                 vec![0, 1, 2, 3],
                 vec![],
                 vec![(0, vec![]), (1, vec![]), (2, vec![]), (3, vec![])],
             ),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1)],
                 vec![(0, vec![1]), (1, vec![0]), (2, vec![]), (3, vec![])],
             ),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, vec![1]), (1, vec![0, 2]), (2, vec![1, 3]), (3, vec![2])],
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -107,17 +107,17 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::dense_adjacency_matrix()`.
+        // Test `G::dense_adjacency_matrix() -> Array2<bool>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], Array2::from_elem((0, 0), false)),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], arr2(&[[false]])),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], arr2(&[[true]])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (
                 vec![0, 1, 2, 3],
                 vec![],
@@ -128,7 +128,7 @@ mod undirected {
                     [false, false, false, false],
                 ]),
             ),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1)],
@@ -139,7 +139,7 @@ mod undirected {
                     [false, false, false, false],
                 ]),
             ),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
@@ -150,7 +150,7 @@ mod undirected {
                     [false, false, true, false],
                 ]),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -176,25 +176,25 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::sparse_adjacency_matrix()`.
+        // Test `G::sparse_adjacency_matrix() -> TriMat<bool>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], ((0, 0), vec![], vec![], vec![])),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], ((1, 1), vec![], vec![], vec![])),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], ((1, 1), vec![0], vec![0], vec![true])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], ((4, 4), vec![], vec![], vec![])),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1)],
                 ((4, 4), vec![0, 1], vec![1, 0], vec![true, true]),
             ),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
@@ -205,7 +205,7 @@ mod undirected {
                     vec![true, true, true, true, true, true],
                 ),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -231,27 +231,27 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::dense_incidence_matrix()`.
+        // Test `G::dense_incidence_matrix() -> Array2<i8>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], Array2::from_elem((0, 0), 0)),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], Array2::from_elem((1, 0), 0)),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], arr2(&[[2]])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], Array2::from_elem((4, 0), 0)),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (vec![0, 1, 2, 3], vec![(0, 1)], arr2(&[[1], [1], [0], [0]])),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
                 arr2(&[[1, 0, 0], [1, 1, 0], [0, 1, 1], [0, 0, 1]]),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -271,25 +271,25 @@ mod undirected {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::sparse_incidence_matrix()`.
+        // Test `G::sparse_incidence_matrix() -> TriMat<i8>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], ((0, 0), vec![], vec![], vec![])),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], ((1, 0), vec![], vec![], vec![])),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], ((1, 1), vec![0], vec![0], vec![2])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], ((4, 0), vec![], vec![], vec![])),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1)],
                 ((4, 1), vec![0, 1], vec![0, 0], vec![1, 1]),
             ),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
@@ -300,7 +300,7 @@ mod undirected {
                     vec![1, 1, 1, 1, 1, 1],
                 ),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -338,27 +338,27 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::edge_list()`.
+        // Test `G::edge_list() -> EdgeList`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], vec![]),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], vec![]),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], vec![(0, 0)]),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], vec![]),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (vec![0, 1, 2, 3], vec![(0, 1)], vec![(0, 1)]),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, 1), (1, 2), (2, 3)],
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -379,35 +379,35 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::adjacency_list()`.
+        // Test `G::adjacency_list() -> AdjacencyList`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], vec![]),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], vec![(0, vec![])]),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], vec![(0, vec![0])]),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (
                 vec![0, 1, 2, 3],
                 vec![],
                 vec![(0, vec![]), (1, vec![]), (2, vec![]), (3, vec![])],
             ),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1)],
                 vec![(0, vec![1]), (1, vec![]), (2, vec![]), (3, vec![])],
             ),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, vec![1]), (1, vec![2]), (2, vec![3]), (3, vec![])],
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -428,17 +428,17 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::dense_adjacency_matrix()`.
+        // Test `G::dense_adjacency_matrix() -> Array2<bool>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], Array2::from_elem((0, 0), false)),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], arr2(&[[false]])),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], arr2(&[[true]])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (
                 vec![0, 1, 2, 3],
                 vec![],
@@ -449,7 +449,7 @@ mod directed {
                     [false, false, false, false],
                 ]),
             ),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1)],
@@ -460,7 +460,7 @@ mod directed {
                     [false, false, false, false],
                 ]),
             ),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
@@ -471,7 +471,7 @@ mod directed {
                     [false, false, false, false],
                 ]),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -497,27 +497,27 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::sparse_adjacency_matrix()`.
+        // Test `G::sparse_adjacency_matrix() -> TriMat<bool>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], ((0, 0), vec![], vec![], vec![])),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], ((1, 1), vec![], vec![], vec![])),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], ((1, 1), vec![0], vec![0], vec![true])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], ((4, 4), vec![], vec![], vec![])),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (vec![0, 1, 2, 3], vec![(0, 1)], ((4, 4), vec![0], vec![1], vec![true])),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
                 ((4, 4), vec![0, 1, 2], vec![1, 2, 3], vec![true, true, true]),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -538,27 +538,27 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::dense_incidence_matrix()`.
+        // Test `G::dense_incidence_matrix() -> Array2<i8>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], Array2::from_elem((0, 0), 0)),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], Array2::from_elem((1, 0), 0)),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], arr2(&[[0]])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], Array2::from_elem((4, 0), 0)),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (vec![0, 1, 2, 3], vec![(0, 1)], arr2(&[[-1], [1], [0], [0]])),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
                 arr2(&[[-1, 0, 0], [1, -1, 0], [0, 1, -1], [0, 0, 1]]),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -578,25 +578,25 @@ mod directed {
     where
         G: Convert<Vertex = i32>,
     {
-        // Test `G::sparse_incidence_matrix()`.
+        // Test `G::sparse_incidence_matrix() -> TriMat<i8>`.
 
         // Test for ...
         let data = [
-            // ... zero nodes and zero edges,
+            // ... zero vertices and zero edges,
             (vec![], vec![], ((0, 0), vec![], vec![], vec![])),
-            // ... one node and zero edges,
+            // ... one vertex and zero edges,
             (vec![0], vec![], ((1, 0), vec![], vec![], vec![])),
-            // ... one node and one edge,
+            // ... one vertex and one edge,
             (vec![0], vec![(0, 0)], ((1, 1), vec![0], vec![0], vec![0])),
-            // ... multiple nodes and zero edges,
+            // ... multiple vertices and zero edges,
             (vec![0, 1, 2, 3], vec![], ((4, 0), vec![], vec![], vec![])),
-            // ... multiple nodes and one edge,
+            // ... multiple vertices and one edge,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1)],
                 ((4, 1), vec![0, 1], vec![0, 0], vec![-1, 1]),
             ),
-            // ... multiple nodes and multiple edges,
+            // ... multiple vertices and multiple edges,
             (
                 vec![0, 1, 2, 3],
                 vec![(0, 1), (1, 2), (2, 3)],
@@ -607,7 +607,7 @@ mod directed {
                     vec![-1, 1, -1, 1, -1, 1],
                 ),
             ),
-            // ... random nodes and random edges,
+            // ... random vertices and random edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
