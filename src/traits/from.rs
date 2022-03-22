@@ -1,5 +1,4 @@
 use super::Storage;
-use crate::types::Error;
 
 /// The graph from trait.
 pub trait From: Storage {
@@ -31,10 +30,9 @@ pub trait From: Storage {
     /// let g = Graphl::from_vertices(sequence);
     /// ```
     ///
-    fn from_vertices<I, V>(iter: I) -> Self
+    fn from_vertices<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = Self::Vertex>,
     {
         // Get vertex iterator.
         let iter = iter.into_iter();
@@ -43,9 +41,9 @@ pub trait From: Storage {
         // Build graph with initial capacity.
         let mut g = Self::with_capacity(lower);
         // Add vertex to the graph.
-        for x in iter {
-            g.add_vertex(x).ok();
-        }
+        iter.for_each(|x| {
+            g.add_vertex(x);
+        });
 
         g
     }
@@ -77,30 +75,20 @@ pub trait From: Storage {
     /// assert_eq!(g.size(), 3);
     /// ```
     ///
-    fn from_edges<I, V>(iter: I) -> Self
+    fn from_edges<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = (V, V)>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Get edges iterator.
         let iter = iter.into_iter();
         // Get lower bound size hint.
         let (lower, _) = iter.size_hint();
-        // Build graph with initial capacity,
-        // assuming average frequency of new vertex.
+        // Build graph with initial capacity.
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
-        for (x, y) in iter {
-            let x = match g.add_vertex(x) {
-                Err(Error::VertexAlreadyDefined(x)) | Ok(x) => x,
-                Err(_) => unreachable!(),
-            };
-            let y = match g.add_vertex(y) {
-                Err(Error::VertexAlreadyDefined(y)) | Ok(y) => y,
-                Err(_) => unreachable!(),
-            };
-            g.add_edge(&x, &y).ok();
-        }
+        iter.for_each(|(x, y)| {
+            g.add_edge(&x, &y);
+        });
 
         g
     }

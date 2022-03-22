@@ -1,5 +1,4 @@
 use super::Storage;
-use crate::types::Error;
 
 /// The graph extend trait.
 pub trait Extend: Storage {
@@ -39,10 +38,9 @@ pub trait Extend: Storage {
     /// # }
     /// ```
     ///
-    fn extend_vertices<I, V>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    fn extend_vertices<I>(&mut self, iter: I) -> bool
     where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = Self::Vertex>,
     {
         // Get vertex iterator.
         let iter = iter.into_iter();
@@ -51,11 +49,7 @@ pub trait Extend: Storage {
         // Reserve additional capacity.
         self.reserve(lower);
         // Add vertex to the graph.
-        for x in iter {
-            self.add_vertex(x)?;
-        }
-
-        Ok(())
+        iter.map(|x| self.add_vertex(x)).fold(false, |acc, x| acc || x)
     }
 
     /// Extends graph with given edges.
@@ -95,10 +89,9 @@ pub trait Extend: Storage {
     /// # }
     /// ```
     ///
-    fn extend_edges<I, V>(&mut self, iter: I) -> Result<(), Error<Self::Vertex>>
+    fn extend_edges<I>(&mut self, iter: I) -> bool
     where
-        I: IntoIterator<Item = (V, V)>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Get edge iterator.
         let iter = iter.into_iter();
@@ -107,22 +100,7 @@ pub trait Extend: Storage {
         // Reserve additional capacity.
         self.reserve(lower);
         // Add edge to the graph.
-        for (x, y) in iter {
-            // Try to add vertex, ignore error if vertex already defined.
-            let x = match self.add_vertex(x) {
-                Err(Error::VertexAlreadyDefined(x)) | Ok(x) => x,
-                Err(_) => unreachable!(),
-            };
-            // Try to add vertex, ignore error if vertex already defined.
-            let y = match self.add_vertex(y) {
-                Err(Error::VertexAlreadyDefined(y)) | Ok(y) => y,
-                Err(_) => unreachable!(),
-            };
-            // Add vertex given new vertices.
-            self.add_edge(&x, &y)?;
-        }
-
-        Ok(())
+        iter.map(|(x, y)| self.add_edge(&x, &y)).fold(false, |acc, x| acc || x)
     }
 }
 

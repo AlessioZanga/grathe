@@ -1,5 +1,5 @@
 use crate::traits::Storage;
-use crate::types::{Error, VertexIterator};
+use crate::types::VertexIterator;
 
 /// Undirected graph trait.
 pub trait Undirected: Storage {
@@ -22,7 +22,7 @@ pub trait Undirected: Storage {
     /// At least one of the vertex identifiers does not exist in the graph,
     /// or the undirected edge identifier already exists in the graph.
     ///
-    fn add_undirected_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+    fn add_undirected_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
 }
 
 /// Neighborhood iterator.

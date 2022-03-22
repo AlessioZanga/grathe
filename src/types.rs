@@ -79,18 +79,6 @@ pub type AdjacencyList<V> = BTreeMap<V, BTreeSet<V>>;
 /// Error enumerator.
 #[derive(Debug, Error, PartialEq)]
 pub enum Error<V> {
-    /// Vertex not defined error type.
-    #[error("vertex identifier `{0:?}` not defined")]
-    VertexNotDefined(V),
-    /// Vertex already defined error type.
-    #[error("vertex identifier `{0:?}` already defined")]
-    VertexAlreadyDefined(V),
-    /// Edge not defined error type.
-    #[error("edge identifier `({0:?}, {1:?})` not defined")]
-    EdgeNotDefined(V, V),
-    /// Edge already defined error type.
-    #[error("edge identifier `({0:?}, {1:?})` already defined")]
-    EdgeAlreadyDefined(V, V),
     /// Graph attributes not defined error type.
     #[error("graph has no attribute defined")]
     GraphAttributesNotDefined(),

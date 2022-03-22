@@ -4,7 +4,7 @@ use crate::types::{directions, AdjacencyList, EdgeIterator, EdgeList, Error, Exa
 use ndarray::Array2;
 use sprs::TriMat;
 use std::cmp::Ordering;
-use std::collections::{BTreeSet, HashMap};
+use std::collections::{btree_map::Entry, BTreeSet, HashMap};
 
 #[derive(Debug, Default)]
 pub struct DirectedAdjacencyList<V, A = AttributesMap<V, (), (), ()>>
@@ -13,7 +13,6 @@ where
     A: WithAttributes<V>,
 {
     _data: AdjacencyList<V>,
-    _order: usize,
     _size: usize,
     _attributes: A,
 }
@@ -140,25 +139,22 @@ where
 
     type Direction = directions::Directed;
 
-    fn new<I, J, K>(v_iter: I, e_iter: J) -> Self
+    fn new<I, J>(v_iter: I, e_iter: J) -> Self
     where
-        I: IntoIterator<Item = K>,
-        J: IntoIterator<Item = (K, K)>,
-        K: Into<Self::Vertex>,
+        I: IntoIterator<Item = Self::Vertex>,
+        J: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Initialize the data storage using the vertex set.
-        let mut data: AdjacencyList<V> = v_iter.into_iter().map(|x| (x.into(), Default::default())).collect();
         let mut size: usize = 0;
+        let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
         for (x, y) in e_iter.into_iter() {
-            data.entry(x.into()).or_default().insert(y.into());
+            data.entry(x).or_default().insert(y.into());
             size += 1;
         }
-        let order = data.len();
 
         Self {
             _data: data,
-            _order: order,
             _size: size,
             ..Default::default()
         }
@@ -168,49 +164,41 @@ where
         Default::default()
     }
 
-    fn empty<I, K>(iter: I) -> Self
+    fn empty<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = K>,
-        K: Into<Self::Vertex>,
+        I: IntoIterator<Item = Self::Vertex>,
     {
-        let data: AdjacencyList<Self::Vertex> = iter.into_iter().map(|x| (x.into(), Default::default())).collect();
-        let order = data.len();
+        let data = iter.into_iter().map(|x| (x, Default::default())).collect();
 
         Self {
             _data: data,
-            _order: order,
             ..Default::default()
         }
     }
 
-    fn complete<I, K>(iter: I) -> Self
+    fn complete<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = K>,
-        K: Into<Self::Vertex>,
+        I: IntoIterator<Item = Self::Vertex>,
     {
         // Initialize the data storage using the vertex set.
-        let data: Vec<Self::Vertex> = iter.into_iter().map(Into::into).collect();
-        let order = data.len();
-        let size = order * order;
+        let data: Vec<_> = iter.into_iter().collect();
         // Fill the data storage by copying the vertex set.
-        let data = data
+        let data: AdjacencyList<Self::Vertex> = data
             .iter()
             .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
             .collect();
+        let size: usize = data.len() * data.len();
 
         Self {
             _data: data,
-            _order: order,
             _size: size,
             ..Default::default()
         }
     }
 
     fn clear(&mut self) {
-        // Clear the data structures
+        // Clear the data structure.
         self._data.clear();
-        // Clear order.
-        self._order = 0;
         // Clear size.
         self._size = 0;
     }
@@ -227,13 +215,11 @@ where
     }
 
     fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
-        assert!(self.has_vertex(x));
-        // Get iterator over adjacent vertices.
         Box::new(self._data[x].iter())
     }
 
     fn order(&self) -> usize {
-        self._order
+        self._data.len()
     }
 
     fn size(&self) -> usize {
@@ -245,104 +231,79 @@ where
         self._data.contains_key(x)
     }
 
-    fn add_vertex<K>(&mut self, x: K) -> Result<Self::Vertex, Error<Self::Vertex>>
-    where
-        K: Into<Self::Vertex>,
-    {
-        // Get vertex identifier.
-        let x = x.into();
-        // TODO: Update using insert once stable.
-        if self.has_vertex(&x) {
-            return Err(Error::VertexAlreadyDefined(x));
+    fn add_vertex(&mut self, x: Self::Vertex) -> bool {
+        // If the entry is vacant ...
+        if let Entry::Vacant(entry) = self._data.entry(x) {
+            // ... insert the default value.
+            entry.insert(Default::default());
+
+            return true;
         }
-        self._data.insert(x.clone(), Default::default());
-        self._order += 1;
-        Ok(x)
+
+        false
     }
 
-    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+    fn del_vertex(&mut self, x: &Self::Vertex) -> bool {
         // Remove vertex from map.
-        match self._data.remove(x) {
-            // If no vertex found return error.
-            None => Err(Error::VertexNotDefined(x.clone())),
-            // Otherwise
-            Some(_) => {
-                // Remove remaining identifiers if any
-                for (_, y) in self._data.iter_mut() {
-                    y.remove(x);
-                }
-                // Update order.
-                self._order -= 1;
-                // Return success
-                Ok(())
+        if self._data.remove(x).is_some() {
+            // Remove remaining identifiers, if any.
+            self._data.iter_mut().for_each(|(_, y)| {
+                y.remove(x);
+            });
+
+            return true;
+        }
+
+        false
+    }
+
+    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
+        // If no vertex found, return false.
+        if let Some(adjacent) = self._data.get(x) {
+            // Otherwise check second vertex.
+            if self._data.contains_key(y) {
+                // Otherwise check if it is in the adjacency list.
+                return adjacent.contains(y);
             }
         }
+
+        false
     }
 
-    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>> {
-        // Get vertex adjacency list.
-        match self._data.get(x) {
-            // If no vertex found return error.
-            None => Err(Error::VertexNotDefined(x.clone())),
-            // Otherwise check second vertex.
-            Some(adj) => match self._data.contains_key(y) {
-                // If no vertex found return error.
-                false => Err(Error::VertexNotDefined(y.clone())),
-                // Otherwise check if it is in the adjacency list.
-                true => Ok(adj.contains(y)),
-            },
-        }
-    }
-
-    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
-        // Check if second vertex exists. NOTE: Check second vertex before first
-        // in order to avoid contemporaneous immutable and mutable refs to data.
-        match self._data.contains_key(y) {
-            // If no vertex found return error.
-            false => Err(Error::VertexNotDefined(y.clone())),
-            // Otherwise get mutable vertex adjacency list.
-            true => match self._data.get_mut(x) {
-                // If no vertex exists return error.
-                None => Err(Error::VertexNotDefined(x.clone())),
-                // Otherwise try to insert vertex into adjacency list.
-                Some(adj) => match adj.insert(y.clone()) {
-                    // If edge already defined return error.
-                    false => Err(Error::EdgeAlreadyDefined(x.clone(), y.clone())),
-                    // Otherwise ...
-                    true => {
-                        // ... update size.
-                        self._size += 1;
-                        // Return successful.
-                        Ok(())
-                    }
-                },
-            },
-        }
-    }
-
-    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Check if second vertex exists.
-        match self._data.contains_key(y) {
-            // If no vertex found return error.
-            false => Err(Error::VertexNotDefined(y.clone())),
-            // Otherwise get mutable vertex adjacency list.
-            true => match self._data.get_mut(x) {
-                // If no vertex exists return error.
-                None => Err(Error::VertexNotDefined(x.clone())),
-                // Otherwise try to remove vertex from adjacency list.
-                Some(adj) => match adj.remove(y) {
-                    // If no edge defined return error.
-                    false => Err(Error::EdgeNotDefined(x.clone(), y.clone())),
-                    // Otherwise ...
-                    true => {
-                        // ... update size.
-                        self._size -= 1;
-                        // Return successful.
-                        Ok(())
-                    }
-                },
-            },
+        if self._data.contains_key(y) {
+            // Get mutable vertex adjacency list.
+            if let Some(adjacent) = self._data.get_mut(x) {
+                // Try to insert vertex into adjacency list.
+                if adjacent.insert(y.clone()) {
+                    // Update size.
+                    self._size += 1;
+
+                    return true;
+                }
+            }
         }
+
+        false
+    }
+
+    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
+        // Check if second vertex exists.
+        if self._data.contains_key(y) {
+            // Get mutable vertex adjacency list.
+            if let Some(adjacent) = self._data.get_mut(x) {
+                // Try to remove vertex from adjacency list.
+                if adjacent.remove(y) {
+                    // Update size.
+                    self._size -= 1;
+
+                    return true;
+                }
+            }
+        }
+
+        false
     }
 }
 
@@ -487,7 +448,7 @@ where
         Box::new(self._data[x].iter())
     }
 
-    fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>> {
+    fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         self.add_edge(x, y)
     }
 }

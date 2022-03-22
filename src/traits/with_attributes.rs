@@ -175,35 +175,35 @@ macro_rules! impl_with_attributes {
 
             fn has_edge_attrs(&self, x: &V, y: &V) -> bool {
                 // Sanitize inputs.
-                assert!(self.has_edge(x, y).unwrap());
+                assert!(self.has_edge(x, y));
                 // Delegate method.
                 self._attributes.has_edge_attrs(x, y)
             }
 
             fn get_edge_attrs(&self, x: &V, y: &V) -> Result<&Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
-                assert!(self.has_edge(x, y).unwrap());
+                assert!(self.has_edge(x, y));
                 // Delegate method.
                 self._attributes.get_edge_attrs(x, y)
             }
 
             fn get_mut_edge_attrs(&mut self, x: &V, y: &V) -> Result<&mut Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
-                assert!(self.has_edge(x, y).unwrap());
+                assert!(self.has_edge(x, y));
                 // Delegate method.
                 self._attributes.get_mut_edge_attrs(x, y)
             }
 
             fn set_edge_attrs(&mut self, x: &V, y: &V, z: Self::EdgeAttributes) {
                 // Sanitize inputs.
-                assert!(self.has_edge(x, y).unwrap());
+                assert!(self.has_edge(x, y));
                 // Delegate method.
                 self._attributes.set_edge_attrs(x, y, z)
             }
 
             fn unset_edge_attrs(&mut self, x: &V, y: &V) -> Result<Self::EdgeAttributes, Error<V>> {
                 // Sanitize inputs.
-                assert!(self.has_edge(x, y).unwrap());
+                assert!(self.has_edge(x, y));
                 // Delegate method.
                 self._attributes.unset_edge_attrs(x, y)
             }

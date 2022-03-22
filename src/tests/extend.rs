@@ -4,22 +4,66 @@ mod undirected {
     use crate::graphs::storages::UndirectedAdjacencyList;
     use crate::traits::Extend;
     use crate::types::Error;
-    use all_asserts::*;
+    use rand::seq::SliceRandom;
+    use rand::thread_rng;
 
     #[test]
-    // FIXME:
     fn extend_vertices<G>() -> Result<(), Error<i32>>
     where
         G: Extend<Vertex = i32>,
     {
-        let mut g = G::null();
+        // Test `G::extend_vertices(I: IntoIter<Item = i32>) -> Result<()>`.
 
-        // Extend graph with vertices.
-        g.extend_vertices([0, 3, 1, 2])?;
-        assert_eq!(g.order(), 4);
-        assert_eq!(g.size(), 0);
-        // Extending with existing vertices yields an error.
-        assert_true!(g.extend_vertices([0]).is_err());
+        // Test for ...
+        let data = [
+            // ... zero vertices and empty sequence with no errors,
+            (vec![], (vec![], true, 0)),
+            // ... zero vertices and non-empty unique sequence with no errors,
+            (vec![], (vec![0], true, 1)),
+            // ... one vertex and non-empty unique sequence with no errors,
+            (vec![0], (vec![1], true, 2)),
+            // ... one vertex and long consecutive unique sequence with no errors,
+            (vec![0], (Vec::from_iter(1..100), true, 100)),
+            // ... one vertex and very-long consecutive unique sequence with no errors,
+            (vec![0], (Vec::from_iter(1..10_000), true, 10_000)),
+            // ... one vertex and very-long non-consecutive unique sequence with no errors,
+            (
+                vec![0],
+                (
+                    {
+                        let mut x = Vec::from_iter(1..10_000);
+                        x.shuffle(&mut thread_rng());
+                        x
+                    },
+                    true,
+                    10_000,
+                ),
+            ),
+            // ... one vertex and very-long non-consecutive repeated sequence with no errors,
+            (
+                vec![0],
+                (
+                    {
+                        let mut x = Vec::from_iter((1..10_000).chain(1..10_000));
+                        x.shuffle(&mut thread_rng());
+                        x
+                    },
+                    false,
+                    1,
+                ),
+            ),
+            // ... one vertex and a duplicated,
+            (vec![0], (vec![0], false, 1)),
+        ];
+
+        // Test for each scenario.
+        for (i, j) in data {
+            let mut g = G::new(i, []);
+            let (v, f, o) = j;
+            assert_eq!(g.extend_vertices(v), f);
+            assert_eq!(g.order(), o);
+        }
+
         Ok(())
     }
 
@@ -29,16 +73,7 @@ mod undirected {
     where
         G: Extend<Vertex = i32>,
     {
-        let mut g = G::null();
-
-        // Extend graph with edges.
-        g.extend_edges([(0, 3), (1, 2)])?;
-        assert_eq!(g.order(), 4);
-        assert_eq!(g.size(), 2);
-
-        // Extending with existing edges yields an error.
-        assert_true!(g.extend_edges([(0, 3)]).is_err());
-        Ok(())
+        todo!()
     }
 
     #[instantiate_tests(<UndirectedAdjacencyList<i32>>)]
@@ -51,22 +86,66 @@ mod directed {
     use crate::graphs::storages::DirectedAdjacencyList;
     use crate::traits::Extend;
     use crate::types::Error;
-    use all_asserts::*;
+    use rand::seq::SliceRandom;
+    use rand::thread_rng;
 
     #[test]
-    // FIXME:
     fn extend_vertices<G>() -> Result<(), Error<i32>>
     where
         G: Extend<Vertex = i32>,
     {
-        let mut g = G::null();
+        // Test `G::extend_vertices(I: IntoIter<Item = i32>) -> Result<()>`.
 
-        // Extend graph with vertices.
-        g.extend_vertices([0, 3, 1, 2])?;
-        assert_eq!(g.order(), 4);
-        assert_eq!(g.size(), 0);
-        // Extending with existing vertices yields an error.
-        assert_true!(g.extend_vertices([0]).is_err());
+        // Test for ...
+        let data = [
+            // ... zero vertices and empty sequence with no errors,
+            (vec![], (vec![], true, 0)),
+            // ... zero vertices and non-empty unique sequence with no errors,
+            (vec![], (vec![0], true, 1)),
+            // ... one vertex and non-empty unique sequence with no errors,
+            (vec![0], (vec![1], true, 2)),
+            // ... one vertex and long consecutive unique sequence with no errors,
+            (vec![0], (Vec::from_iter(1..100), true, 100)),
+            // ... one vertex and very-long consecutive unique sequence with no errors,
+            (vec![0], (Vec::from_iter(1..10_000), true, 10_000)),
+            // ... one vertex and very-long non-consecutive unique sequence with no errors,
+            (
+                vec![0],
+                (
+                    {
+                        let mut x = Vec::from_iter(1..10_000);
+                        x.shuffle(&mut thread_rng());
+                        x
+                    },
+                    true,
+                    10_000,
+                ),
+            ),
+            // ... one vertex and very-long non-consecutive repeated sequence with no errors,
+            (
+                vec![0],
+                (
+                    {
+                        let mut x = Vec::from_iter((1..10_000).chain(1..10_000));
+                        x.shuffle(&mut thread_rng());
+                        x
+                    },
+                    false,
+                    1,
+                ),
+            ),
+            // ... one vertex and a duplicated,
+            (vec![0], (vec![0], false, 1)),
+        ];
+
+        // Test for each scenario.
+        for (i, j) in data {
+            let mut g = G::new(i, []);
+            let (v, f, o) = j;
+            assert_eq!(g.extend_vertices(v), f);
+            assert_eq!(g.order(), o);
+        }
+
         Ok(())
     }
 
@@ -76,16 +155,7 @@ mod directed {
     where
         G: Extend<Vertex = i32>,
     {
-        let mut g = G::null();
-
-        // Extend graph with edges.
-        g.extend_edges([(0, 3), (1, 2)])?;
-        assert_eq!(g.order(), 4);
-        assert_eq!(g.size(), 2);
-
-        // Extending with existing edges yields an error.
-        assert_true!(g.extend_edges([(0, 3)]).is_err());
-        Ok(())
+        todo!()
     }
 
     #[instantiate_tests(<DirectedAdjacencyList<i32>>)]

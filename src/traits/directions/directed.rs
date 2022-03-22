@@ -1,5 +1,5 @@
 use crate::traits::Storage;
-use crate::types::{Error, VertexIterator};
+use crate::types::VertexIterator;
 use std::collections::{BTreeSet, VecDeque};
 
 /// Directed graph trait.
@@ -87,7 +87,7 @@ pub trait Directed: Storage {
     /// At least one of the vertex identifiers does not exist in the graph,
     /// or the directed edge identifier already exists in the graph.
     ///
-    fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+    fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
 
     /// In-degree of a given vertex.
     ///

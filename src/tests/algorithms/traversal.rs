@@ -5,7 +5,7 @@ mod undirected {
         ($G:ident, $V:ident) => {
             paste::item! {
                 #[test]
-                fn breadth_first_search_tree() -> Result<(), Error<i32>>
+                fn breadth_first_search_tree()
                 {
                     // Build a null graph.
                     let g = $G::<$V>::null();
@@ -18,10 +18,10 @@ mod undirected {
 
                     // Build a null graph.
                     let mut g = $G::<$V>::null();
-                    let i = g.add_vertex(0)?;
+                    assert!(g.add_vertex(0));
 
                     // Execute BFS for the trivial graph.
-                    let mut search = BFS::from((&g, &i));
+                    let mut search = BFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -32,16 +32,16 @@ mod undirected {
                     // ... and no predecessors by definition.
                     assert_eq!(search.predecessor.len(), 0);
                     // The root has distance zero ...
-                    assert_eq!(search.distance.get(&i), Some(&0));
+                    assert_eq!(search.distance.get(&0), Some(&0));
                     // ... and no predecessors by definition.
-                    assert_eq!(search.predecessor.get(&i), None);
+                    assert_eq!(search.predecessor.get(&0), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(1)?;
-                    g.add_edge(&i, &j)?;
+                    assert!(g.add_vertex(1));
+                    assert!(g.add_edge(&0, &1));
 
                     // Execute BFS for the non-trivial graph.
-                    let mut search = BFS::from((&g, &i));
+                    let mut search = BFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -52,18 +52,18 @@ mod undirected {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.distance.get(&i), Some(&0));
-                    assert_eq!(search.distance.get(&j), Some(&1));
+                    assert_eq!(search.distance.get(&0), Some(&0));
+                    assert_eq!(search.distance.get(&1), Some(&1));
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(2)?;
+                    assert!(g.add_vertex(2));
 
                     // Execute BFS for the non-connected graph.
-                    let mut search = BFS::from((&g, &i));
+                    let mut search = BFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -74,14 +74,14 @@ mod undirected {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.distance.get(&i), Some(&0));
-                    assert_eq!(search.distance.get(&j), Some(&1));
-                    assert_eq!(search.distance.get(&k), None);
+                    assert_eq!(search.distance.get(&0), Some(&0));
+                    assert_eq!(search.distance.get(&1), Some(&1));
+                    assert_eq!(search.distance.get(&2), None);
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
-                    assert_eq!(search.predecessor.get(&k), None);
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&1));
+                    assert_eq!(search.predecessor.get(&2), None);
 
                     // Build non-trivial graph.
                     let g = $G::<$V>::from_edges([
@@ -136,8 +136,6 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&5), Some(&&3));
                     assert_eq!(search.predecessor.get(&6), Some(&&4));
                     assert_eq!(search.predecessor.get(&7), Some(&&5));
-
-                    Ok(())
                 }
 
                 #[test]
@@ -150,7 +148,7 @@ mod undirected {
                 }
 
                 #[test]
-                fn depth_first_search_tree() -> Result<(), Error<i32>>
+                fn depth_first_search_tree()
                 {
                     // Build a null graph.
                     let g = $G::<$V>::null();
@@ -163,10 +161,10 @@ mod undirected {
 
                     // Build a null graph.
                     let mut g = $G::<$V>::null();
-                    let i = g.add_vertex(0)?;
+                    assert!(g.add_vertex(0));
 
                     // Execute DFS for the trivial graph.
-                    let mut search = DFS::from((&g, &i));
+                    let mut search = DFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -178,18 +176,18 @@ mod undirected {
                     // ... and no predecessors by definition.
                     assert_eq!(search.predecessor.len(), 0);
                     // The root has discovery time zero ...
-                    assert_eq!(search.discovery_time.get(&i), Some(&0));
+                    assert_eq!(search.discovery_time.get(&0), Some(&0));
                     // ... and finish time one ...
-                    assert_eq!(search.finish_time.get(&i), Some(&1));
+                    assert_eq!(search.finish_time.get(&0), Some(&1));
                     // ... and no predecessors by definition.
-                    assert_eq!(search.predecessor.get(&i), None);
+                    assert_eq!(search.predecessor.get(&0), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(1)?;
-                    g.add_edge(&i, &j)?;
+                    assert!(g.add_vertex(1));
+                    assert!(g.add_edge(&0, &1));
 
                     // Execute DFS for the non-trivial graph.
-                    let mut search = DFS::from((&g, &i));
+                    let mut search = DFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -201,20 +199,20 @@ mod undirected {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.discovery_time.get(&i), Some(&0));
-                    assert_eq!(search.discovery_time.get(&j), Some(&1));
-                    assert_eq!(search.finish_time.get(&j), Some(&2));
-                    assert_eq!(search.finish_time.get(&i), Some(&3));
+                    assert_eq!(search.discovery_time.get(&0), Some(&0));
+                    assert_eq!(search.discovery_time.get(&1), Some(&1));
+                    assert_eq!(search.finish_time.get(&1), Some(&2));
+                    assert_eq!(search.finish_time.get(&0), Some(&3));
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(2)?;
+                    assert!(g.add_vertex(2));
 
                     // Execute DFS for the disconnected graph.
-                    let mut search = DFS::from((&g, &i));
+                    let mut search = DFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -226,18 +224,18 @@ mod undirected {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.discovery_time.get(&i), Some(&0));
-                    assert_eq!(search.discovery_time.get(&j), Some(&1));
-                    assert_eq!(search.finish_time.get(&j), Some(&2));
-                    assert_eq!(search.finish_time.get(&i), Some(&3));
+                    assert_eq!(search.discovery_time.get(&0), Some(&0));
+                    assert_eq!(search.discovery_time.get(&1), Some(&1));
+                    assert_eq!(search.finish_time.get(&1), Some(&2));
+                    assert_eq!(search.finish_time.get(&0), Some(&3));
 
-                    assert_eq!(search.discovery_time.get(&k), None);
-                    assert_eq!(search.finish_time.get(&k), None);
+                    assert_eq!(search.discovery_time.get(&2), None);
+                    assert_eq!(search.finish_time.get(&2), None);
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
-                    assert_eq!(search.predecessor.get(&k), None);
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
+                    assert_eq!(search.predecessor.get(&2), None);
 
                     // Build non-trivial graph.
                     let g = $G::<$V>::from_edges([
@@ -301,8 +299,6 @@ mod undirected {
                     assert_eq!(search.predecessor.get(&5), Some(&&4));
                     assert_eq!(search.predecessor.get(&6), Some(&&5));
                     assert_eq!(search.predecessor.get(&7), Some(&&6));
-
-                    Ok(())
                 }
 
                 #[test]
@@ -582,7 +578,6 @@ mod undirected {
         use crate::algorithms::{LexBFS, LexDFS, BFS, DFS};
         use crate::graphs::storages::UndirectedAdjacencyList;
         use crate::traits::{From, Storage};
-        use crate::types::*;
 
         generic_tests!(UndirectedAdjacencyList, i32);
     }
@@ -595,7 +590,7 @@ mod directed {
         ($G:ident, $V:ident) => {
             paste::item! {
                 #[test]
-                fn breadth_first_search_tree() -> Result<(), Error<i32>>
+                fn breadth_first_search_tree()
                 {
                     // Build a null graph.
                     let g = $G::<$V>::null();
@@ -608,24 +603,24 @@ mod directed {
 
                     // Build a null graph.
                     let mut g = $G::<$V>::null();
-                    let i = g.add_vertex(0)?;
+                    assert!(g.add_vertex(0));
                     // Execute BFS for the trivial graph.
-                    let search = BFS::from((&g, &i));
+                    let search = BFS::from((&g, &0));
 
                     // The BFS on a trivial graph contains only the root ...
                     assert_eq!(search.distance.len(), 1);
                     // ... and no predecessors by definition.
                     assert_eq!(search.predecessor.len(), 0);
                     // The root has distance zero ...
-                    assert_eq!(search.distance.get(&i), Some(&0));
+                    assert_eq!(search.distance.get(&0), Some(&0));
                     // ... and no predecessors by definition.
-                    assert_eq!(search.predecessor.get(&i), None);
+                    assert_eq!(search.predecessor.get(&0), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(1)?;
-                    g.add_edge(&i, &j)?;
+                    assert!(g.add_vertex(1));
+                    g.add_edge(&0, &1);
                     // Execute BFS for the non-trivial graph.
-                    let mut search = BFS::from((&g, &i));
+                    let mut search = BFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -636,17 +631,17 @@ mod directed {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.distance.get(&i), Some(&0));
-                    assert_eq!(search.distance.get(&j), Some(&1));
+                    assert_eq!(search.distance.get(&0), Some(&0));
+                    assert_eq!(search.distance.get(&1), Some(&1));
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(2)?;
+                    assert!(g.add_vertex(2));
                     // Execute BFS for the non-connected graph.
-                    let mut search = BFS::from((&g, &i));
+                    let mut search = BFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -657,14 +652,14 @@ mod directed {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.distance.get(&i), Some(&0));
-                    assert_eq!(search.distance.get(&j), Some(&1));
-                    assert_eq!(search.distance.get(&k), None);
+                    assert_eq!(search.distance.get(&0), Some(&0));
+                    assert_eq!(search.distance.get(&1), Some(&1));
+                    assert_eq!(search.distance.get(&2), None);
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
-                    assert_eq!(search.predecessor.get(&k), None);
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
+                    assert_eq!(search.predecessor.get(&2), None);
 
                     // Build non-trivial graph.
                     let g = $G::<$V>::from_edges([
@@ -718,8 +713,6 @@ mod directed {
                     assert_eq!(search.predecessor.get(&5), Some(&&3));
                     assert_eq!(search.predecessor.get(&6), Some(&&4));
                     assert_eq!(search.predecessor.get(&7), Some(&&5));
-
-                    Ok(())
                 }
 
                 #[test]
@@ -732,7 +725,7 @@ mod directed {
                 }
 
                 #[test]
-                fn breadth_first_search_forest() -> Result<(), Error<i32>>
+                fn breadth_first_search_forest()
                 {
                     // Build a null graph.
                     let g = $G::<$V>::null();
@@ -792,12 +785,10 @@ mod directed {
                     assert_eq!(search.predecessor.get(&7), Some(&&6));
                     assert_eq!(search.predecessor.get(&8), Some(&&7));
                     assert_eq!(search.predecessor.get(&9), Some(&&6));
-
-                    Ok(())
                 }
 
                 #[test]
-                fn depth_first_search_tree() -> Result<(), Error<i32>>
+                fn depth_first_search_tree()
                 {
                     // Build a null graph.
                     let g = $G::<$V>::null();
@@ -810,9 +801,9 @@ mod directed {
 
                     // Build a null graph.
                     let mut g = $G::<$V>::null();
-                    let i = g.add_vertex(0)?;
+                    assert!(g.add_vertex(0));
                     // Execute DFS for the trivial graph.
-                    let mut search = DFS::from((&g, &i));
+                    let mut search = DFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -824,17 +815,17 @@ mod directed {
                     // ... and no predecessors by definition.
                     assert_eq!(search.predecessor.len(), 0);
                     // The root has discovery time zero ...
-                    assert_eq!(search.discovery_time.get(&i), Some(&0));
+                    assert_eq!(search.discovery_time.get(&0), Some(&0));
                     // ... and finish time one ...
-                    assert_eq!(search.finish_time.get(&i), Some(&1));
+                    assert_eq!(search.finish_time.get(&0), Some(&1));
                     // ... and no predecessors by definition.
-                    assert_eq!(search.predecessor.get(&i), None);
+                    assert_eq!(search.predecessor.get(&0), None);
 
                     // Add an edge.
-                    let j = g.add_vertex(1)?;
-                    g.add_edge(&i, &j)?;
+                    assert!(g.add_vertex(1));
+                    assert!(g.add_edge(&0, &1));
                     // Execute DFS for the non-trivial graph.
-                    let mut search = DFS::from((&g, &i));
+                    let mut search = DFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -846,19 +837,19 @@ mod directed {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.discovery_time.get(&i), Some(&0));
-                    assert_eq!(search.discovery_time.get(&j), Some(&1));
-                    assert_eq!(search.finish_time.get(&j), Some(&2));
-                    assert_eq!(search.finish_time.get(&i), Some(&3));
+                    assert_eq!(search.discovery_time.get(&0), Some(&0));
+                    assert_eq!(search.discovery_time.get(&1), Some(&1));
+                    assert_eq!(search.finish_time.get(&1), Some(&2));
+                    assert_eq!(search.finish_time.get(&0), Some(&3));
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
 
                     // Add a disconnected vertex.
-                    let k = g.add_vertex(2)?;
+                    assert!(g.add_vertex(2));
                     // Execute DFS for the non-connected graph.
-                    let mut search = DFS::from((&g, &i));
+                    let mut search = DFS::from((&g, &0));
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
                     // Check visit order.
@@ -870,17 +861,17 @@ mod directed {
                     assert_eq!(search.predecessor.len(), 1);
 
                     // Check distances.
-                    assert_eq!(search.discovery_time.get(&i), Some(&0));
-                    assert_eq!(search.discovery_time.get(&j), Some(&1));
-                    assert_eq!(search.finish_time.get(&j), Some(&2));
-                    assert_eq!(search.finish_time.get(&i), Some(&3));
-                    assert_eq!(search.discovery_time.get(&k), None);
-                    assert_eq!(search.finish_time.get(&k), None);
+                    assert_eq!(search.discovery_time.get(&0), Some(&0));
+                    assert_eq!(search.discovery_time.get(&1), Some(&1));
+                    assert_eq!(search.finish_time.get(&1), Some(&2));
+                    assert_eq!(search.finish_time.get(&0), Some(&3));
+                    assert_eq!(search.discovery_time.get(&2), None);
+                    assert_eq!(search.finish_time.get(&2), None);
 
                     // Check predecessors.
-                    assert_eq!(search.predecessor.get(&i), None);
-                    assert_eq!(search.predecessor.get(&j), Some(&&i));
-                    assert_eq!(search.predecessor.get(&k), None);
+                    assert_eq!(search.predecessor.get(&0), None);
+                    assert_eq!(search.predecessor.get(&1), Some(&&0));
+                    assert_eq!(search.predecessor.get(&2), None);
 
                     // Build non-trivial graph.
                     let g = $G::<$V>::from_edges([
@@ -943,7 +934,6 @@ mod directed {
                     assert_eq!(search.predecessor.get(&5), Some(&&4));
                     assert_eq!(search.predecessor.get(&6), Some(&&5));
                     assert_eq!(search.predecessor.get(&7), Some(&&6));
-                    Ok(())
                 }
 
                 #[test]
@@ -956,7 +946,7 @@ mod directed {
                 }
 
                 #[test]
-                fn depth_first_search_forest() -> Result<(), Error<i32>>
+                fn depth_first_search_forest()
                 {
                     // Build a null graph.
                     let g = $G::<$V>::null();
@@ -1009,8 +999,6 @@ mod directed {
                     assert_eq!(search.predecessor.get(&2), Some(&&1));
                     assert_eq!(search.predecessor.get(&3), None);
                     assert_eq!(search.predecessor.get(&4), Some(&&3));
-
-                    Ok(())
                 }
 
                 #[test]
@@ -1059,7 +1047,6 @@ mod directed {
         use crate::algorithms::{TopologicalSort, BFS, DFS};
         use crate::graphs::storages::DirectedAdjacencyList;
         use crate::traits::{From, Storage};
-        use crate::types::*;
 
         generic_tests!(DirectedAdjacencyList, i32);
     }

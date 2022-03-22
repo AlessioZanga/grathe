@@ -3,7 +3,7 @@ mod capacity;
 // FIXME: mod connectivity;
 mod convert;
 // FIXME: mod directions;
-// FIXME: mod extend;
+mod extend;
 // FIXME: mod from;
 // FIXME: mod io;
 // FIXME: mod linalg;

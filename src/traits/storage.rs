@@ -1,5 +1,5 @@
 use super::{Capacity, Operators};
-use crate::types::{EdgeIterator, Error, Vertex, VertexIterator};
+use crate::types::{EdgeIterator, Vertex, VertexIterator};
 use std::fmt::Debug;
 
 /// The graph storage trait.
@@ -34,11 +34,10 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// assert_eq!(g.size(), 2);
     /// ```
     ///
-    fn new<I, J, V>(v_iter: I, e_iter: J) -> Self
+    fn new<I, J>(v_iter: I, e_iter: J) -> Self
     where
-        I: IntoIterator<Item = V>,
-        J: IntoIterator<Item = (V, V)>,
-        V: Into<Self::Vertex>;
+        I: IntoIterator<Item = Self::Vertex>,
+        J: IntoIterator<Item = (Self::Vertex, Self::Vertex)>;
 
     /// Null constructor.
     ///
@@ -82,10 +81,9 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// assert_eq!(g.size(), 0);
     /// ```
     ///
-    fn empty<I, V>(iter: I) -> Self
+    fn empty<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>;
+        I: IntoIterator<Item = Self::Vertex>;
 
     /// Complete constructor.
     ///
@@ -107,10 +105,9 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// assert_eq!(g.size(), g.order() * g.order());
     /// ```
     ///
-    fn complete<I, V>(iter: I) -> Self
+    fn complete<I>(iter: I) -> Self
     where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>;
+        I: IntoIterator<Item = Self::Vertex>;
 
     /// Clears the graph.
     ///
@@ -339,9 +336,7 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # }
     /// ```
     ///
-    fn add_vertex<V>(&mut self, x: V) -> Result<Self::Vertex, Error<Self::Vertex>>
-    where
-        V: Into<Self::Vertex>;
+    fn add_vertex(&mut self, x: Self::Vertex) -> bool;
 
     /// Deletes vertex from the graph.
     ///
@@ -375,7 +370,7 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # }
     /// ```
     ///
-    fn del_vertex(&mut self, x: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+    fn del_vertex(&mut self, x: &Self::Vertex) -> bool;
 
     /// Checks edge in the graph.
     ///
@@ -415,7 +410,7 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # }
     /// ```
     ///
-    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> Result<bool, Error<Self::Vertex>>;
+    fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
 
     /// Adds edge to the graph.
     ///
@@ -464,7 +459,7 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # }
     /// ```
     ///
-    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+    fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
 
     /// Deletes edge from the graph.
     ///
@@ -501,7 +496,7 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # }
     /// ```
     ///
-    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Result<(), Error<Self::Vertex>>;
+    fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
 
     /// Degree of vertex.
     ///

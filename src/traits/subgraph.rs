@@ -1,6 +1,6 @@
-use crate::traits::Storage;
+use crate::traits::{Extend, From, Storage};
 
-pub trait Subgraph: PartialOrd + Storage {
+pub trait Subgraph: From + Extend + Storage {
     /// Builds subgraph from given vertices.
     ///
     /// Builds a subgraph, preserving edges between given vertices.
@@ -10,23 +10,17 @@ pub trait Subgraph: PartialOrd + Storage {
     ///
     /// Panics if the vertex identifiers do not exist in the graph.
     ///
-    fn subgraph<I, V>(&self, iter: I) -> Self
+    fn subgraph<I>(&self, iter: I) -> Self
     where
-        I: IntoIterator<Item = V>,
-        V: Into<Self::Vertex>,
+        I: IntoIterator<Item = Self::Vertex>,
     {
         // Build a subgraph from the given vertices.
-        let mut subgraph: Self = Default::default();
-        for x in iter {
-            subgraph.add_vertex(x).ok();
-        }
+        let mut subgraph = Self::from_vertices(iter);
         // Check if is it a proper subgraph of self,
         // i.e. given vertices are contained in self.
         assert!(subgraph.is_subgraph(self));
         // Copy edges into subgraph.
-        for (x, y) in self.edges_iter() {
-            subgraph.add_edge(x, y).ok();
-        }
+        subgraph.extend_edges(self.edges_iter().map(|(x, y)| (x.clone(), y.clone())));
 
         subgraph
     }
