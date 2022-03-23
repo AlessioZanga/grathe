@@ -20,7 +20,7 @@ where
     /// Given graph reference.
     graph: &'a G,
     /// Generic placeholder for direction.
-    _direction: std::marker::PhantomData<D>,
+    direction: std::marker::PhantomData<D>,
     /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
     vertices: VecDeque<&'a G::Vertex>,
     /// To-be-visited queue with the source vertex.
@@ -79,7 +79,7 @@ where
             // Set target graph.
             graph: g,
             // Generic placeholder for direction.
-            _direction: Default::default(),
+            direction: Default::default(),
             // Initialize the [`Forest`] to-be-visited queue.
             vertices: Default::default(),
             // Initialize the to-be-visited queue with the source vertex.

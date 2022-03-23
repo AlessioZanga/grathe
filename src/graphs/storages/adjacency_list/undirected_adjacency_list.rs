@@ -183,12 +183,15 @@ where
     {
         // Initialize the data storage using the vertex set.
         let data: Vec<_> = iter.into_iter().collect();
+        // Compute the final size.
+        let size: usize = (data.len() * (data.len() + 1)) / 2;
 
         Self {
             _data: data
                 .iter()
                 .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
                 .collect(),
+            _size: size,
             ..Default::default()
         }
     }
@@ -206,7 +209,9 @@ where
 
     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a> {
         Box::new(ExactSizeIter::new(
-            self._data.iter().flat_map(|(x, ys)| std::iter::repeat(x).zip(ys)),
+            self._data
+                .iter()
+                .flat_map(|(x, ys)| std::iter::repeat(x).zip(ys).filter(|(x, y)| x <= y)),
             self.size(),
         ))
     }
@@ -255,33 +260,41 @@ where
     }
 
     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // If no vertex found, return false.
-        if let Some(adjacent) = self._data.get(x) {
-            // Otherwise check second vertex.
-            if self._data.contains_key(y) {
-                // Otherwise check if it is in the adjacency list.
-                return adjacent.contains(y);
-            }
+        // Check if first vertex exists.
+        match self._data.get(x) {
+            // No vertex defined.
+            None => panic!(),
+            // Check if second vertex exists.
+            Some(adjacent) => match self._data.contains_key(y) {
+                // No vertex defined.
+                false => panic!(),
+                // Check if it is in the adjacency set.
+                true => adjacent.contains(y),
+            },
         }
-
-        false
     }
 
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Check if second vertex exists.
-        if self._data.contains_key(y) {
-            // Get mutable vertex adjacency list.
-            if let Some(adjacent) = self._data.get_mut(x) {
-                // Try to insert vertex into adjacency list.
-                if adjacent.insert(y.clone()) {
-                    // Add reversed edge.
-                    assert!(self._data.get_mut(y).unwrap().insert(x.clone()));
-                    // Update size.
-                    self._size += 1;
+        match self._data.contains_key(y) {
+            // No vertex defined.
+            false => panic!(),
+            // Get mutable vertex adjacency set.
+            true => match self._data.get_mut(x) {
+                // No vertex defined.
+                None => panic!(),
+                // Try to insert vertex into adjacency set.
+                Some(adjacent) => {
+                    if adjacent.insert(y.clone()) {
+                        // Add reversed edge.
+                        assert!(self._data.get_mut(y).unwrap().insert(x.clone()));
+                        // Update size.
+                        self._size += 1;
 
-                    return true;
+                        return true;
+                    }
                 }
-            }
+            },
         }
 
         false
@@ -289,19 +302,25 @@ where
 
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Check if second vertex exists.
-        if self._data.contains_key(y) {
-            // Get mutable vertex adjacency list.
-            if let Some(adjacent) = self._data.get_mut(x) {
-                // Try to remove vertex from adjacency list.
-                if adjacent.remove(y) {
-                    // Delete reversed edge.
-                    assert!(self._data.get_mut(y).unwrap().remove(x));
-                    // Update size.
-                    self._size -= 1;
+        match self._data.contains_key(y) {
+            // No vertex defined.
+            false => panic!(),
+            // Get mutable vertex adjacency set.
+            true => match self._data.get_mut(x) {
+                // No vertex defined.
+                None => panic!(),
+                // Try to remove vertex from adjacency set.
+                Some(adjacent) => {
+                    if adjacent.remove(y) {
+                        // Delete reversed edge.
+                        assert!(self._data.get_mut(y).unwrap().remove(x));
+                        // Update size.
+                        self._size -= 1;
 
-                    return true;
+                        return true;
+                    }
                 }
-            }
+            },
         }
 
         false

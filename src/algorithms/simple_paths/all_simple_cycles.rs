@@ -19,7 +19,7 @@ where
     /// Given graph reference.
     graph: &'a G,
     /// Generic placeholder for direction.
-    _direction: std::marker::PhantomData<D>,
+    direction: std::marker::PhantomData<D>,
     /// The currently visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Map of *blocked* vertices in order to avoid double counting.
@@ -81,7 +81,7 @@ where
             // Set target graph.
             graph: g,
             // Generic placeholder for direction.
-            _direction: Default::default(),
+            direction: Default::default(),
             // Initialize the currently visited stack.
             stack: Default::default(),
             // Initialize blocked map.

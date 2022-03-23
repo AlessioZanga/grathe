@@ -17,7 +17,7 @@ where
     /// Given graph reference.
     graph: &'a G,
     /// Generic placeholder for direction.
-    _direction: std::marker::PhantomData<D>,
+    direction: std::marker::PhantomData<D>,
     /// The visit stack.
     stack: Vec<&'a G::Vertex>,
     /// Global time counter.
@@ -82,7 +82,7 @@ where
             // Set target graph.
             graph: g,
             // Generic placeholder for direction.
-            _direction: Default::default(),
+            direction: Default::default(),
             // Initialize the to-be-visited queue with the source vertex.
             stack: Default::default(),
             // Initialize the global clock.

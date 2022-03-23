@@ -149,9 +149,12 @@ where
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
         for (x, y) in e_iter.into_iter() {
-            data.entry(x).or_default().insert(y.into());
+            data.entry(y.clone()).or_default();
+            data.entry(x).or_default().insert(y);
             size += 1;
         }
+
+        println!("{:?}", data);
 
         Self {
             _data: data,
@@ -258,31 +261,39 @@ where
     }
 
     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // If no vertex found, return false.
-        if let Some(adjacent) = self._data.get(x) {
-            // Otherwise check second vertex.
-            if self._data.contains_key(y) {
-                // Otherwise check if it is in the adjacency list.
-                return adjacent.contains(y);
-            }
+        // Check if first vertex exists.
+        match self._data.get(x) {
+            // No vertex defined.
+            None => panic!(),
+            // Check if second vertex exists.
+            Some(adjacent) => match self._data.contains_key(y) {
+                // No vertex defined.
+                false => panic!(),
+                // Check if it is in the adjacency set.
+                true => adjacent.contains(y),
+            },
         }
-
-        false
     }
 
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Check if second vertex exists.
-        if self._data.contains_key(y) {
-            // Get mutable vertex adjacency list.
-            if let Some(adjacent) = self._data.get_mut(x) {
-                // Try to insert vertex into adjacency list.
-                if adjacent.insert(y.clone()) {
-                    // Update size.
-                    self._size += 1;
+        match self._data.contains_key(y) {
+            // No vertex defined.
+            false => panic!(),
+            // Get mutable vertex adjacency set.
+            true => match self._data.get_mut(x) {
+                // No vertex defined.
+                None => panic!(),
+                // Try to insert vertex into adjacency set.
+                Some(adjacent) => {
+                    if adjacent.insert(y.clone()) {
+                        // Update size.
+                        self._size += 1;
 
-                    return true;
+                        return true;
+                    }
                 }
-            }
+            },
         }
 
         false
@@ -290,17 +301,23 @@ where
 
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Check if second vertex exists.
-        if self._data.contains_key(y) {
-            // Get mutable vertex adjacency list.
-            if let Some(adjacent) = self._data.get_mut(x) {
-                // Try to remove vertex from adjacency list.
-                if adjacent.remove(y) {
-                    // Update size.
-                    self._size -= 1;
+        match self._data.contains_key(y) {
+            // No vertex defined.
+            false => panic!(),
+            // Get mutable vertex adjacency set.
+            true => match self._data.get_mut(x) {
+                // No vertex defined.
+                None => panic!(),
+                // Try to remove vertex from adjacency set.
+                Some(adjacent) => {
+                    if adjacent.remove(y) {
+                        // Update size.
+                        self._size -= 1;
 
-                    return true;
+                        return true;
+                    }
                 }
-            }
+            },
         }
 
         false
