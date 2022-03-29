@@ -27,6 +27,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn add_edge<G>() -> Result<(), Error<i32>>
     where
@@ -59,6 +60,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn del_edge<G>() -> Result<(), Error<i32>>
     where
@@ -83,6 +85,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn neighbors_iter<G>() -> Result<(), Error<i32>>
     where
@@ -119,6 +122,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn add_undirected_edge<G>() -> Result<(), Error<i32>>
     where

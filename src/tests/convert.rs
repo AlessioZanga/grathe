@@ -31,7 +31,7 @@ mod undirected {
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, 1), (1, 0), (1, 2), (2, 1), (2, 3), (3, 2)],
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -80,7 +80,7 @@ mod undirected {
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, vec![1]), (1, vec![0, 2]), (2, vec![1, 3]), (3, vec![2])],
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -150,7 +150,7 @@ mod undirected {
                     [false, false, true, false],
                 ]),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -205,14 +205,14 @@ mod undirected {
                     vec![true, true, true, true, true, true],
                 ),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
                 (
                     (5, 5),
-                    vec![0, 0, 1, 1, 2, 2, 3, 4],
-                    vec![2, 3, 2, 4, 0, 1, 0, 1],
+                    vec![0, 2, 0, 3, 1, 2, 1, 4],
+                    vec![2, 0, 3, 0, 2, 1, 4, 1],
                     vec![true, true, true, true, true, true, true, true],
                 ),
             ),
@@ -251,7 +251,7 @@ mod undirected {
                 vec![(0, 1), (1, 2), (2, 3)],
                 arr2(&[[1, 0, 0], [1, 1, 0], [0, 1, 1], [0, 0, 1]]),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -300,7 +300,7 @@ mod undirected {
                     vec![1, 1, 1, 1, 1, 1],
                 ),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -358,7 +358,7 @@ mod directed {
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, 1), (1, 2), (2, 3)],
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -407,7 +407,7 @@ mod directed {
                 vec![(0, 1), (1, 2), (2, 3)],
                 vec![(0, vec![1]), (1, vec![2]), (2, vec![3]), (3, vec![])],
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -471,7 +471,7 @@ mod directed {
                     [false, false, false, false],
                 ]),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -517,7 +517,7 @@ mod directed {
                 vec![(0, 1), (1, 2), (2, 3)],
                 ((4, 4), vec![0, 1, 2], vec![1, 2, 3], vec![true, true, true]),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -558,7 +558,7 @@ mod directed {
                 vec![(0, 1), (1, 2), (2, 3)],
                 arr2(&[[-1, 0, 0], [1, -1, 0], [0, 1, -1], [0, 0, 1]]),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],
@@ -607,7 +607,7 @@ mod directed {
                     vec![-1, 1, -1, 1, -1, 1],
                 ),
             ),
-            // ... random vertices and random edges,
+            // ... random vertices and edges,
             (
                 vec![71, 1, 58, 3, 75],
                 vec![(71, 1), (1, 58), (58, 3), (3, 75)],

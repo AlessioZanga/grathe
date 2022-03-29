@@ -87,6 +87,8 @@ pub trait From: Storage {
         let mut g = Self::with_capacity(lower);
         // Add edges to the graph.
         iter.for_each(|(x, y)| {
+            g.add_vertex(x.clone());
+            g.add_vertex(y.clone());
             g.add_edge(&x, &y);
         });
 

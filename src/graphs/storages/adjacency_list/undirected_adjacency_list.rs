@@ -44,13 +44,19 @@ where
     fn complement(&self) -> Self {
         // Copy the vertex set.
         let vertices: BTreeSet<_> = self._data.keys().cloned().collect();
-
         // Iterate over every permutation of V^2.
+        let data: AdjacencyList<_> = vertices
+            .iter()
+            .map(|x| (x.clone(), vertices.difference(&self._data[x]).cloned().collect()))
+            .collect();
+        let size = data
+            .iter()
+            .map(|(x, ys)| ys.iter().filter(|y| x <= y).count())
+            .fold(0, |acc, x| acc + x);
+
         Self {
-            _data: vertices
-                .iter()
-                .map(|x| (x.clone(), vertices.difference(&self._data[x]).cloned().collect()))
-                .collect(),
+            _data: data,
+            _size: size,
             ..Default::default()
         }
     }
@@ -287,7 +293,7 @@ where
                 Some(adjacent) => {
                     if adjacent.insert(y.clone()) {
                         // Add reversed edge.
-                        assert!(self._data.get_mut(y).unwrap().insert(x.clone()));
+                        self._data.get_mut(y).unwrap().insert(x.clone());
                         // Update size.
                         self._size += 1;
 
@@ -313,7 +319,7 @@ where
                 Some(adjacent) => {
                     if adjacent.remove(y) {
                         // Delete reversed edge.
-                        assert!(self._data.get_mut(y).unwrap().remove(x));
+                        self._data.get_mut(y).unwrap().remove(x);
                         // Update size.
                         self._size -= 1;
 
@@ -359,6 +365,7 @@ where
         let mut out = EdgeList::<Self::Vertex>::new();
         for (x, y) in self.edges_iter() {
             out.insert((x.clone(), y.clone()));
+            out.insert((y.clone(), x.clone()));
         }
 
         out
@@ -371,6 +378,7 @@ where
         }
         for (x, y) in self.edges_iter() {
             out.entry(x.clone()).or_default().insert(y.clone());
+            out.entry(y.clone()).or_default().insert(x.clone());
         }
 
         out
@@ -384,7 +392,9 @@ where
         idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
         for (x, y) in self.edges_iter() {
-            out[(idx[&x], idx[&y])] = true;
+            let (x, y) = (idx[&x], idx[&y]);
+            out[(x, y)] = true;
+            out[(y, x)] = true;
         }
 
         out
@@ -400,7 +410,11 @@ where
         idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
         for (x, y) in self.edges_iter() {
-            out.add_triplet(idx[&x], idx[&y], true);
+            let (x, y) = (idx[&x], idx[&y]);
+            out.add_triplet(x, y, true);
+            if x != y {
+                out.add_triplet(y, x, true);
+            }
         }
 
         out

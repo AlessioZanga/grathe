@@ -7,6 +7,7 @@ mod tests {
     use all_asserts::*;
 
     #[test]
+    #[ignore]
     // FIXME:
     fn has_graph_attrs<G>()
     where
@@ -22,6 +23,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn get_graph_attrs<G>()
     where
@@ -37,6 +39,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn get_mut_graph_attrs<G>()
     where
@@ -55,6 +58,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn set_graph_attrs<G>()
     where
@@ -71,6 +75,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn unset_graph_attrs<G>()
     where
@@ -88,6 +93,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn has_vertex_attrs<G>()
     where
@@ -115,6 +121,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn get_vertex_attrs<G>()
     where
@@ -142,6 +149,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn get_mut_vertex_attrs<G>()
     where
@@ -172,6 +180,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn set_vertex_attrs<G>()
     where
@@ -200,6 +209,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn unset_vertex_attrs<G>()
     where
@@ -229,6 +239,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn has_edge_attrs<G>()
     where
@@ -256,6 +267,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn get_edge_attrs<G>()
     where
@@ -283,6 +295,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn get_mut_edge_attrs<G>()
     where
@@ -313,6 +326,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn set_edge_attrs<G>()
     where
@@ -341,6 +355,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     // FIXME:
     fn unset_edge_attrs<G>()
     where

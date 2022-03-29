@@ -1,13 +1,13 @@
 // FIXME: mod algorithms;
-// FIXME: mod capacity;
+mod capacity;
 // FIXME: mod connectivity;
-// FIXME: mod convert;
+mod convert;
 // FIXME: mod directions;
-// FIXME: mod extend;
-// FIXME: mod from;
+mod extend;
+mod from;
 // FIXME: mod io;
 // FIXME: mod linalg;
-// FIXME: mod operators;
+mod operators;
 // FIXME: mod readme;
 mod storage;
 // FIXME: mod subgraph;

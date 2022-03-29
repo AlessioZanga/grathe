@@ -44,13 +44,16 @@ where
     fn complement(&self) -> Self {
         // Copy the vertex set.
         let vertices: BTreeSet<_> = self._data.keys().cloned().collect();
-
         // Iterate over every permutation of V^2.
+        let data: AdjacencyList<_> = vertices
+            .iter()
+            .map(|x| (x.clone(), vertices.difference(&self._data[x]).cloned().collect()))
+            .collect();
+        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+
         Self {
-            _data: vertices
-                .iter()
-                .map(|x| (x.clone(), vertices.difference(&self._data[x]).cloned().collect()))
-                .collect(),
+            _data: data,
+            _size: size,
             ..Default::default()
         }
     }
@@ -154,8 +157,6 @@ where
             size += 1;
         }
 
-        println!("{:?}", data);
-
         Self {
             _data: data,
             _size: size,
@@ -218,7 +219,13 @@ where
     }
 
     fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
-        Box::new(self._data[x].iter())
+        let mut adjacents: BTreeSet<&'a Self::Vertex> = self._data[x].iter().collect();
+        for (y, zs) in &self._data {
+            if zs.contains(x) {
+                adjacents.insert(y);
+            }
+        }
+        Box::new(adjacents.into_iter())
     }
 
     fn order(&self) -> usize {
