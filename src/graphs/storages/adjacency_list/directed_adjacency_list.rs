@@ -148,7 +148,7 @@ where
         J: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Initialize the data storage using the vertex set.
-        let mut size: usize = 0;
+        let mut size = 0;
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
         for (x, y) in e_iter.into_iter() {
@@ -191,7 +191,7 @@ where
             .iter()
             .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
             .collect();
-        let size: usize = data.len() * data.len();
+        let size = data.len() * data.len();
 
         Self {
             _data: data,

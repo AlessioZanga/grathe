@@ -27,9 +27,6 @@ pub mod types;
 // Tools, macros, etc.
 mod utils;
 
-// Tests.
-mod tests;
-
 // Include Pest dependencies.
 extern crate pest;
 #[macro_use]

@@ -1,7 +1,0 @@
-digraph {
-    fear -> anger;
-}
-
-digraph {
-    anger -> hate;
-}

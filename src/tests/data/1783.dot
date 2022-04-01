@@ -1,5 +1,0 @@
-digraph code {
-edge [weight=1073741824];
-  "1" -> "0";
-}
-

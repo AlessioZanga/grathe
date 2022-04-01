@@ -1,6 +1,0 @@
-digraph {
-   { rank=same; n1; n2 }
-   
-   n2 -> n1 [ arrowhead=normal, headport=s ]
-}
-

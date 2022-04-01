@@ -1,5 +1,0 @@
-digraph g {
-    layout=twopi
-    splines=ortho
-    a -> b
-}
