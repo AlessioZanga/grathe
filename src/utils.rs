@@ -1,6 +1,6 @@
 /// Partial compares sets.
 macro_rules! partial_cmp_sets {
-    ($a:ident, $b:ident) => {
+    ($a: ident, $b: ident) => {
         if $a.len() == $b.len() && $a.eq(&$b) {
             Some(Ordering::Equal)
         } else if $a.len() < $b.len() && $a.is_subset(&$b) {

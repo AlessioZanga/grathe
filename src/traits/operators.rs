@@ -56,7 +56,7 @@ pub trait Operators {
 }
 
 macro_rules! impl_operators {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> $crate::traits::Operators for $graph<V, A>
         where
             V: $crate::types::Vertex,
@@ -105,7 +105,7 @@ macro_rules! impl_operators {
 pub(crate) use impl_operators;
 
 macro_rules! impl_operators_extension {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> std::ops::Not for &$graph<V, A>
         where
             V: $crate::types::Vertex,

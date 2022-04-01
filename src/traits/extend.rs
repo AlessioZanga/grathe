@@ -105,7 +105,7 @@ pub trait Extend: Storage {
 }
 
 macro_rules! impl_extend {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> $crate::traits::Extend for $graph<V, A>
         where
             V: $crate::types::Vertex,

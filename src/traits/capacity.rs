@@ -135,7 +135,7 @@ pub trait Capacity {
 }
 
 macro_rules! impl_capacity {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> $crate::traits::Capacity for $graph<V, A>
         where
             V: $crate::types::Vertex,

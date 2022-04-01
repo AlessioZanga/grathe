@@ -216,7 +216,7 @@ impl TryInto<String> for DOT {
         use std::fmt::Write;
         // Define macro to write attributes.
         macro_rules! write_attributes {
-            ($string:ident, $attributes:ident) => {
+            ($string: ident, $attributes: ident) => {
                 if !$attributes.is_empty() {
                     // Write attributes.
                     write!(

@@ -1,5 +1,5 @@
 macro_rules! impl_partial_ord {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> PartialOrd for $graph<V, A>
         where
             V: $crate::types::Vertex,

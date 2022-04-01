@@ -1,8 +1,7 @@
 #[cfg(test)]
 mod undirected {
-
     macro_rules! generic_tests {
-        ($G:ident, $V:ident) => {
+        ($G: ident, $V: ident) => {
             paste::item! {
                 #[test]
                 fn breadth_first_search_tree()
@@ -587,7 +586,7 @@ mod undirected {
 mod directed {
 
     macro_rules! generic_tests {
-        ($G:ident, $V:ident) => {
+        ($G: ident, $V: ident) => {
             paste::item! {
                 #[test]
                 fn breadth_first_search_tree()
@@ -733,7 +732,7 @@ mod directed {
                     let mut search = BFS::new(
                         &g,
                         None,
-                        $grathe::algorithms::Traversal::Forest
+                        grathe::algorithms::Traversal::Forest
                     );
                     // To search on a null graph
                     // without a source vertex
@@ -751,7 +750,7 @@ mod directed {
                     let mut search = BFS::new(
                         &g,
                         None,
-                        $grathe::algorithms::Traversal::Forest
+                        grathe::algorithms::Traversal::Forest
                     );
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();
@@ -954,7 +953,7 @@ mod directed {
                     let mut search = DFS::new(
                         &g,
                         None,
-                        $grathe::algorithms::Traversal::Forest
+                        grathe::algorithms::Traversal::Forest
                     );
                     // To search on a null graph
                     // without a source vertex
@@ -969,7 +968,7 @@ mod directed {
                     let mut search = DFS::new(
                         &g,
                         None,
-                        $grathe::algorithms::Traversal::Forest
+                        grathe::algorithms::Traversal::Forest
                     );
                     // Collect the vertex in pre-order.
                     let order: Vec<_> = search.by_ref().collect();

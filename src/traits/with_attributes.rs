@@ -113,7 +113,7 @@ where
 }
 
 macro_rules! impl_with_attributes {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> $crate::traits::WithAttributes<V> for $graph<V, A>
         where
             V: $crate::types::Vertex,

@@ -2,7 +2,7 @@
 mod directed {
 
     macro_rules! generic_tests {
-        ($G:ident, $U:ident) => {
+        ($G: ident, $U: ident) => {
             paste::item! {
                 #[test]
                 fn all_cycles() {
@@ -133,7 +133,7 @@ mod directed {
 mod undirected {
 
     macro_rules! generic_tests {
-        ($G:ident, $U:ident) => {
+        ($G: ident, $U: ident) => {
             paste::item! {
                 #[test]
                 // FIXME:

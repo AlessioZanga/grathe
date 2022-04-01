@@ -77,7 +77,7 @@ pub trait Subgraph: From + Extend + Storage {
 }
 
 macro_rules! impl_subgraph {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> $crate::traits::Subgraph for $graph<V, A>
         where
             V: $crate::types::Vertex,

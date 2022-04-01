@@ -97,7 +97,7 @@ pub trait From: Storage {
 }
 
 macro_rules! impl_from {
-    ($graph:ident) => {
+    ($graph: ident) => {
         impl<V, A> $crate::traits::From for $graph<V, A>
         where
             V: $crate::types::Vertex,
