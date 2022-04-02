@@ -1,6 +1,7 @@
 use crate::graphs::attributes::AttributesMap;
 use crate::traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes};
 use crate::types::{directions, AdjacencyList, EdgeIterator, EdgeList, Error, ExactSizeIter, Vertex, VertexIterator};
+use crate::{E, V};
 use ndarray::Array2;
 use sprs::TriMat;
 use std::cmp::Ordering;
@@ -49,6 +50,7 @@ where
             .iter()
             .map(|x| (x.clone(), vertices.difference(&self._data[x]).cloned().collect()))
             .collect();
+        // Compute complement size.
         let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
 
         Self {
@@ -60,72 +62,86 @@ where
 
     fn union(&self, other: &Self) -> Self {
         // Clone internal storage status.
-        let mut union = self._data.clone();
-
+        let mut data = self._data.clone();
         // For each other entry.
         for (x, ys) in other._data.iter() {
             // Get the correspondent entry on the union (or default it).
-            let zs = union.entry(x.clone()).or_default();
+            let zs = data.entry(x.clone()).or_default();
             // Perform union of entries.
             *zs = zs.union(ys).cloned().collect();
         }
+        // Compute union size.
+        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
 
         // Return the union graph.
         Self {
-            _data: union,
+            _data: data,
+            _size: size,
             ..Default::default()
         }
     }
 
     fn intersection(&self, other: &Self) -> Self {
-        Self {
-            _data: self
-                ._data
-                .iter()
-                // For each entry in the current graph.
-                .filter_map(|(x, ys)| {
-                    other._data.get(x).map(|zs| {
-                        // If there a common vertex, then intersect its adjacent vertices.
-                        (x.clone(), ys.intersection(zs).cloned().collect())
-                    })
+        let data: AdjacencyList<_> = self
+            ._data
+            .iter()
+            // For each entry in the current graph.
+            .filter_map(|(x, ys)| {
+                other._data.get(x).map(|zs| {
+                    // If there a common vertex, then intersect its adjacent vertices.
+                    (x.clone(), ys.intersection(zs).cloned().collect())
                 })
-                .collect(),
+            })
+            .collect();
+        // Compute intersection size.
+        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+
+        Self {
+            _data: data,
+            _size: size,
             ..Default::default()
         }
     }
 
     fn symmetric_difference(&self, other: &Self) -> Self {
         // Clone internal storage status.
-        let mut symmetric_difference = self._data.clone();
-
+        let mut data = self._data.clone();
         // For each other entry.
         for (x, ys) in other._data.iter() {
             // Get the correspondent entry on the union (or default it).
-            let zs = symmetric_difference.entry(x.clone()).or_default();
+            let zs = data.entry(x.clone()).or_default();
             // Perform symmetric difference of entries.
             *zs = zs.symmetric_difference(ys).cloned().collect();
         }
+        // Compute symmetric difference size.
+        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
 
         // Return the symmetric difference graph.
         Self {
-            _data: symmetric_difference,
+            _data: data,
+            _size: size,
             ..Default::default()
         }
     }
 
     fn difference(&self, other: &Self) -> Self {
+        let data: AdjacencyList<_> = self
+            ._data
+            .iter()
+            // For each entry in the current graph.
+            .map(|(x, ys)| match other._data.get(x) {
+                // If there a common vertex, then subtract its adjacent vertices.
+                Some(zs) => (x.clone(), ys.difference(zs).cloned().collect()),
+                // Else return as it is.
+                None => (x.clone(), ys.clone()),
+            })
+            .collect();
+        // Compute difference size.
+        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+
         Self {
-            _data: self
-                ._data
-                .iter()
-                // For each entry in the current graph.
-                .map(|(x, ys)| match other._data.get(x) {
-                    // If there a common vertex, then subtract its adjacent vertices.
-                    Some(zs) => (x.clone(), ys.difference(zs).cloned().collect()),
-                    // Else return as it is.
-                    None => (x.clone(), ys.clone()),
-                })
-                .collect(),
+            _data: data,
+            _size: size,
             ..Default::default()
         }
     }
@@ -361,7 +377,7 @@ where
 {
     fn edge_list(&self) -> EdgeList<Self::Vertex> {
         let mut out = EdgeList::<Self::Vertex>::new();
-        for (x, y) in self.edges_iter() {
+        for (x, y) in E!(self) {
             out.insert((x.clone(), y.clone()));
         }
 
@@ -370,10 +386,10 @@ where
 
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
         let mut out = AdjacencyList::<Self::Vertex>::new();
-        for x in self.vertices_iter() {
+        for x in V!(self) {
             out.entry(x.clone()).or_default();
         }
-        for (x, y) in self.edges_iter() {
+        for (x, y) in E!(self) {
             out.entry(x.clone()).or_default().insert(y.clone());
         }
 
@@ -385,9 +401,9 @@ where
         let mut idx = HashMap::with_capacity(n);
         let mut out = Array2::from_elem((n, n), false);
         // Build vid-to-index mapping.
-        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        idx.extend(V!(self).enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
-        for (x, y) in self.edges_iter() {
+        for (x, y) in E!(self) {
             out[(idx[&x], idx[&y])] = true;
         }
 
@@ -401,9 +417,9 @@ where
         // Reserve capacity for sparse matrix.
         out.reserve(self.size());
         // Build vid-to-index mapping.
-        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        idx.extend(V!(self).enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
-        for (x, y) in self.edges_iter() {
+        for (x, y) in E!(self) {
             out.add_triplet(idx[&x], idx[&y], true);
         }
 
@@ -415,9 +431,9 @@ where
         let mut idx = HashMap::with_capacity(n);
         let mut out = Array2::from_elem((n, m), 0);
         // Build vid-to-index mapping.
-        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        idx.extend(V!(self).enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
-        for (i, (x, y)) in self.edges_iter().enumerate() {
+        for (i, (x, y)) in E!(self).enumerate() {
             out[(idx[&x], i)] -= 1;
             out[(idx[&y], i)] += 1;
         }
@@ -432,9 +448,9 @@ where
         // Reserve capacity for sparse matrix.
         out.reserve(2 * m);
         // Build vid-to-index mapping.
-        idx.extend(self.vertices_iter().enumerate().map(|(i, x)| (x, i)));
+        idx.extend(V!(self).enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
-        for (i, (x, y)) in self.edges_iter().enumerate() {
+        for (i, (x, y)) in E!(self).enumerate() {
             if x != y {
                 out.add_triplet(idx[&x], i, -1);
                 out.add_triplet(idx[&y], i, 1);

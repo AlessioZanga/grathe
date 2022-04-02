@@ -1,4 +1,5 @@
 #[cfg(test)]
+mod tests {
 mod undirected {
     macro_rules! generic_tests {
         ($G: ident) => {
@@ -8,7 +9,7 @@ mod undirected {
 
             #[test]
             fn edge_list() {
-                // Test `$G::<i32>::edge_list() -> EdgeList`.
+                // Test `G::edge_list() -> EdgeList`.
 
                 // Test for ...
                 let data = [
@@ -55,7 +56,7 @@ mod undirected {
 
             #[test]
             fn adjacency_list() {
-                // Test `$G::<i32>::adjacency_list() -> AdjacencyList`.
+                // Test `G::adjacency_list() -> AdjacencyList`.
 
                 // Test for ...
                 let data = [
@@ -109,7 +110,7 @@ mod undirected {
 
             #[test]
             fn dense_adjacency_matrix() {
-                // Test `$G::<i32>::dense_adjacency_matrix() -> Array2<bool>`.
+                // Test `G::dense_adjacency_matrix() -> Array2<bool>`.
 
                 // Test for ...
                 let data = [
@@ -175,7 +176,7 @@ mod undirected {
 
             #[test]
             fn sparse_adjacency_matrix() {
-                // Test `$G::<i32>::sparse_adjacency_matrix() -> TriMat<bool>`.
+                // Test `G::sparse_adjacency_matrix() -> TriMat<bool>`.
 
                 // Test for ...
                 let data = [
@@ -227,7 +228,7 @@ mod undirected {
 
             #[test]
             fn dense_incidence_matrix() {
-                // Test `$G::<i32>::dense_incidence_matrix() -> Array2<i8>`.
+                // Test `G::dense_incidence_matrix() -> Array2<i8>`.
 
                 // Test for ...
                 let data = [
@@ -270,7 +271,7 @@ mod undirected {
 
             #[test]
             fn sparse_incidence_matrix() {
-                // Test `$G::<i32>::sparse_incidence_matrix() -> TriMat<i8>`.
+                // Test `G::sparse_incidence_matrix() -> TriMat<i8>`.
 
                 // Test for ...
                 let data = [
@@ -328,7 +329,6 @@ mod undirected {
     }
 }
 
-#[cfg(test)]
 mod directed {
     macro_rules! generic_tests {
         ($G: ident) => {
@@ -338,7 +338,7 @@ mod directed {
 
             #[test]
             fn edge_list() {
-                // Test `$G::<i32>::edge_list() -> EdgeList`.
+                // Test `G::edge_list() -> EdgeList`.
 
                 // Test for ...
                 let data = [
@@ -376,7 +376,7 @@ mod directed {
 
             #[test]
             fn adjacency_list() {
-                // Test `$G::<i32>::adjacency_list() -> AdjacencyList`.
+                // Test `G::adjacency_list() -> AdjacencyList`.
 
                 // Test for ...
                 let data = [
@@ -430,7 +430,7 @@ mod directed {
 
             #[test]
             fn dense_adjacency_matrix() {
-                // Test `$G::<i32>::dense_adjacency_matrix() -> Array2<bool>`.
+                // Test `G::dense_adjacency_matrix() -> Array2<bool>`.
 
                 // Test for ...
                 let data = [
@@ -496,7 +496,7 @@ mod directed {
 
             #[test]
             fn sparse_adjacency_matrix() {
-                // Test `$G::<i32>::sparse_adjacency_matrix() -> TriMat<bool>`.
+                // Test `G::sparse_adjacency_matrix() -> TriMat<bool>`.
 
                 // Test for ...
                 let data = [
@@ -543,7 +543,7 @@ mod directed {
 
             #[test]
             fn dense_incidence_matrix() {
-                // Test `$G::<i32>::dense_incidence_matrix() -> Array2<i8>`.
+                // Test `G::dense_incidence_matrix() -> Array2<i8>`.
 
                 // Test for ...
                 let data = [
@@ -586,7 +586,7 @@ mod directed {
 
             #[test]
             fn sparse_incidence_matrix() {
-                // Test `$G::<i32>::sparse_incidence_matrix() -> TriMat<i8>`.
+                // Test `G::sparse_incidence_matrix() -> TriMat<i8>`.
 
                 // Test for ...
                 let data = [
@@ -642,4 +642,5 @@ mod directed {
         use grathe::graphs::storages::DirectedAdjacencyList;
         generic_tests!(DirectedAdjacencyList);
     }
+}
 }

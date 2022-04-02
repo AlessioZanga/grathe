@@ -1,4 +1,5 @@
 use crate::traits::{Extend, From, Storage};
+use crate::E;
 
 pub trait Subgraph: From + Extend + Storage {
     /// Builds subgraph from given vertices.
@@ -20,7 +21,7 @@ pub trait Subgraph: From + Extend + Storage {
         // i.e. given vertices are contained in self.
         assert!(subgraph.is_subgraph(self));
         // Copy edges into subgraph.
-        subgraph.extend_edges(self.edges_iter().map(|(x, y)| (x.clone(), y.clone())));
+        subgraph.extend_edges(E!(self).map(|(x, y)| (x.clone(), y.clone())));
 
         subgraph
     }

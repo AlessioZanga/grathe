@@ -31,14 +31,14 @@ macro_rules! impl_partial_ord {
             ///
             fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
                 // Collect vertex sets for comparison.
-                let a: std::collections::HashSet<_> = self.vertices_iter().collect();
+                let a: std::collections::HashSet<_> = V!(self).collect();
                 let b: std::collections::HashSet<_> = other.vertices_iter().collect();
                 // Partial ordering of vertex sets.
                 let vertices: Option<std::cmp::Ordering> = crate::utils::partial_cmp_sets!(a, b);
                 // If vertices are comparable.
                 if let Some(vertices) = vertices {
                     // Collect edge sets for comparison.
-                    let a: std::collections::HashSet<_> = self.edges_iter().collect();
+                    let a: std::collections::HashSet<_> = E!(self).collect();
                     let b: std::collections::HashSet<_> = other.edges_iter().collect();
                     // Partial ordering of edge sets.
                     let edges: Option<std::cmp::Ordering> = $crate::utils::partial_cmp_sets!(a, b);
