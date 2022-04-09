@@ -2,7 +2,6 @@
 mod with_attributes {
     macro_rules! generic_tests {
         ($G: ident) => {
-            use all_asserts::*;
             use grathe::graphs::attributes::AttributesMap;
             use grathe::traits::{Storage, WithAttributes};
             use grathe::{E, V};
@@ -233,10 +232,82 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn has_vertex_attrs() {
-                todo!()
+                // Test `G::has_vertex_attrs(i32) -> bool`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![(&0, true)]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![(&0, true)],
+                    ),
+                    // ... multiple vertices and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (1.,))],
+                        vec![(&0, true), (&1, false), (&2, true), (&3, true)],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (58, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (1.,)),
+                            ((1, 58), (1.,)),
+                            ((58, 3), (1.,)),
+                            ((3, 75), (1.,)),
+                        ],
+                        vec![(&1, false), (&3, false), (&58, true), (&71, true), (&75, true)],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            (&1, false),
+                            (&3, false),
+                            (&18, true),
+                            (&29, true),
+                            (&35, true),
+                            (&58, false),
+                            (&62, true),
+                            (&71, false),
+                            (&75, false),
+                            (&99, true),
+                            (&100, true),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for (x, f) in l {
+                        assert_eq!(g.has_vertex_attrs(x), f);
+                    }
+                }
             }
 
             #[test]
@@ -249,10 +320,93 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn get_vertex_attrs() {
-                todo!()
+                // Test `G::get_vertex_attrs(i32) -> Result`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![(&0, Some(&(0,)))]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![(&0, Some(&(0,)))],
+                    ),
+                    // ... multiple vertices and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (1.,))],
+                        vec![
+                            (&0, Some(&(0,))),
+                            (&1, None),
+                            (&2, Some(&(0,))),
+                            (&3, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (58, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (1.,)),
+                            ((1, 58), (1.,)),
+                            ((58, 3), (1.,)),
+                            ((3, 75), (1.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&58, Some(&(0,))),
+                            (&71, Some(&(0,))),
+                            (&75, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&18, Some(&(0,))),
+                            (&29, Some(&(0,))),
+                            (&35, Some(&(0,))),
+                            (&58, None),
+                            (&62, Some(&(0,))),
+                            (&71, None),
+                            (&75, None),
+                            (&99, Some(&(0,))),
+                            (&100, Some(&(0,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for (x, f) in l {
+                        assert_eq!(g.get_vertex_attrs(x).ok(), f);
+                    }
+                }
             }
 
             #[test]
@@ -265,10 +419,93 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn get_mut_vertex_attrs() {
-                todo!()
+                // Test `G::get_vertex_attrs(i32) -> Result`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![(&0, Some(&(0,)))]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![(&0, Some(&(0,)))],
+                    ),
+                    // ... multiple vertices and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (1.,))],
+                        vec![
+                            (&0, Some(&(0,))),
+                            (&1, None),
+                            (&2, Some(&(0,))),
+                            (&3, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (58, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (1.,)),
+                            ((1, 58), (1.,)),
+                            ((58, 3), (1.,)),
+                            ((3, 75), (1.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&58, Some(&(0,))),
+                            (&71, Some(&(0,))),
+                            (&75, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&18, Some(&(0,))),
+                            (&29, Some(&(0,))),
+                            (&35, Some(&(0,))),
+                            (&58, None),
+                            (&62, Some(&(0,))),
+                            (&71, None),
+                            (&75, None),
+                            (&99, Some(&(0,))),
+                            (&100, Some(&(0,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let mut g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for (x, f) in l {
+                        assert_eq!(g.get_mut_vertex_attrs(x).ok().copied().as_ref(), f);
+                    }
+                }
             }
 
             #[test]
@@ -281,10 +518,100 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn set_vertex_attrs() {
-                todo!()
+                // Test `G::set_vertex_attrs(i32, (i64,))`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![(&0, Some(&(0,)))]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![(&0, Some(&(0,)))],
+                    ),
+                    // ... multiple vertices and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (1.,))],
+                        vec![
+                            (&0, Some(&(0,))),
+                            (&1, None),
+                            (&2, Some(&(0,))),
+                            (&3, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (58, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (1.,)),
+                            ((1, 58), (1.,)),
+                            ((58, 3), (1.,)),
+                            ((3, 75), (1.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&58, Some(&(0,))),
+                            (&71, Some(&(0,))),
+                            (&75, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&18, Some(&(0,))),
+                            (&29, Some(&(0,))),
+                            (&35, Some(&(0,))),
+                            (&58, None),
+                            (&62, Some(&(0,))),
+                            (&71, None),
+                            (&75, None),
+                            (&99, Some(&(0,))),
+                            (&100, Some(&(0,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let mut g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for (x, f) in l {
+                        assert_eq!(g.has_vertex_attrs(x), f.is_some());
+                        assert_eq!(g.unset_vertex_attrs(x).ok().as_ref(), f);
+                        assert!(!g.has_vertex_attrs(x));
+                        if let Some(f) = f {
+                            g.set_vertex_attrs(x, f.clone());
+                            assert!(g.has_vertex_attrs(x));
+                            assert_eq!(g.get_vertex_attrs(x).ok(), Some(f));
+                        }
+                    }
+                }
             }
 
             #[test]
@@ -297,10 +624,95 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn unset_vertex_attrs() {
-                todo!()
+                // Test `G::unset_vertex_attrs(i32) -> Result`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![(&0, Some(&(0,)))]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![(&0, Some(&(0,)))],
+                    ),
+                    // ... multiple vertices and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (1.,))],
+                        vec![
+                            (&0, Some(&(0,))),
+                            (&1, None),
+                            (&2, Some(&(0,))),
+                            (&3, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (58, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (1.,)),
+                            ((1, 58), (1.,)),
+                            ((58, 3), (1.,)),
+                            ((3, 75), (1.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&58, Some(&(0,))),
+                            (&71, Some(&(0,))),
+                            (&75, Some(&(0,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            (&1, None),
+                            (&3, None),
+                            (&18, Some(&(0,))),
+                            (&29, Some(&(0,))),
+                            (&35, Some(&(0,))),
+                            (&58, None),
+                            (&62, Some(&(0,))),
+                            (&71, None),
+                            (&75, None),
+                            (&99, Some(&(0,))),
+                            (&100, Some(&(0,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let mut g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for (x, f) in l {
+                        assert_eq!(g.has_vertex_attrs(x), f.is_some());
+                        assert_eq!(g.unset_vertex_attrs(x).ok().as_ref(), f);
+                        assert!(!g.has_vertex_attrs(x));
+                    }
+                }
             }
 
             #[test]
@@ -313,10 +725,80 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn has_edge_attrs() {
-                todo!()
+                // Test `G::get_edge_attrs(i32, i32) -> Result`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![((&0, &0), true)],
+                    ),
+                    // ... multiple vertices and multiple edges,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (1, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (0.,)), ((1, 2), (0.,)), ((2, 3), (0.,))],
+                        vec![((&0, &1), true), ((&1, &2), true), ((&2, &3), true)],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (1, (0,)), (58, (0,)), (3, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&1, &58), true),
+                            ((&3, &75), true),
+                            ((&58, &3), true),
+                            ((&71, &1), true),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&71, &1), true),
+                            ((&1, &58), true),
+                            ((&58, &3), true),
+                            ((&3, &75), true),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for ((x, y), f) in l {
+                        assert_eq!(g.has_edge_attrs(x, y), f);
+                    }
+                }
             }
 
             #[test]
@@ -329,10 +811,84 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn get_edge_attrs() {
-                todo!()
+                // Test `G::get_edge_attrs(i32, i32) -> Result`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![((&0, &0), Some(&(0.,)))],
+                    ),
+                    // ... multiple vertices and multiple edges,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (1, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (0.,)), ((1, 2), (0.,)), ((2, 3), (0.,))],
+                        vec![
+                            ((&0, &1), Some(&(0.,))),
+                            ((&1, &2), Some(&(0.,))),
+                            ((&2, &3), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (1, (0,)), (58, (0,)), (3, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&1, &58), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&71, &1), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&71, &1), Some(&(0.,))),
+                            ((&1, &58), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for ((x, y), f) in l {
+                        assert_eq!(g.get_edge_attrs(x, y).ok(), f);
+                    }
+                }
             }
 
             #[test]
@@ -345,10 +901,84 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn get_mut_edge_attrs() {
-                todo!()
+                // Test `G::get_mut_edge_attrs(i32, i32) -> Result`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![((&0, &0), Some(&(0.,)))],
+                    ),
+                    // ... multiple vertices and multiple edges,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (1, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (0.,)), ((1, 2), (0.,)), ((2, 3), (0.,))],
+                        vec![
+                            ((&0, &1), Some(&(0.,))),
+                            ((&1, &2), Some(&(0.,))),
+                            ((&2, &3), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (1, (0,)), (58, (0,)), (3, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&1, &58), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&71, &1), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&71, &1), Some(&(0.,))),
+                            ((&1, &58), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let mut g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for ((x, y), f) in l {
+                        assert_eq!(g.get_mut_edge_attrs(x, y).ok().copied().as_ref(), f);
+                    }
+                }
             }
 
             #[test]
@@ -361,10 +991,91 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn set_edge_attrs() {
-                todo!()
+                // Test `G::set_edge_attrs(i32, i32, (f64,))`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![((&0, &0), Some(&(0.,)))],
+                    ),
+                    // ... multiple vertices and multiple edges,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (1, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (0.,)), ((1, 2), (0.,)), ((2, 3), (0.,))],
+                        vec![
+                            ((&0, &1), Some(&(0.,))),
+                            ((&1, &2), Some(&(0.,))),
+                            ((&2, &3), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (1, (0,)), (58, (0,)), (3, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&1, &58), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&71, &1), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&71, &1), Some(&(0.,))),
+                            ((&1, &58), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let mut g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for ((x, y), f) in l {
+                        assert_eq!(g.has_edge_attrs(x, y), f.is_some());
+                        assert_eq!(g.unset_edge_attrs(x, y).ok().as_ref(), f);
+                        assert!(!g.has_edge_attrs(x, y));
+                        if let Some(f) = f {
+                            g.set_edge_attrs(x, y, f.clone());
+                            assert!(g.has_edge_attrs(x, y));
+                            assert_eq!(g.get_edge_attrs(x, y).ok(), Some(f));
+                        }
+                    }
+                }
             }
 
             #[test]
@@ -377,10 +1088,86 @@ mod with_attributes {
             }
 
             #[test]
-            #[ignore]
-            // FIXME:
             fn unset_edge_attrs() {
-                todo!()
+                // Test `G::unset_edge_attrs(i32, i32) -> Result`.
+
+                // Test for ...
+                let data = [
+                    // NOTE: This would panic!
+                    // ... zero vertices and zero edges,
+                    // (None, vec![], vec![], vec![]),
+                    // ... one vertex and zero edges,
+                    (Some((true,)), vec![(0, (0,))], vec![], vec![]),
+                    // ... one vertex and one edge,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,))],
+                        vec![((0, 0), (0.,))],
+                        vec![((&0, &0), Some(&(0.,)))],
+                    ),
+                    // ... multiple vertices and multiple edges,
+                    (
+                        Some((true,)),
+                        vec![(0, (0,)), (1, (0,)), (2, (0,)), (3, (0,))],
+                        vec![((0, 1), (0.,)), ((1, 2), (0.,)), ((2, 3), (0.,))],
+                        vec![
+                            ((&0, &1), Some(&(0.,))),
+                            ((&1, &2), Some(&(0.,))),
+                            ((&2, &3), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![(71, (0,)), (1, (0,)), (58, (0,)), (3, (0,)), (75, (0,))],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&1, &58), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&71, &1), Some(&(0.,))),
+                        ],
+                    ),
+                    // ... random non-overlapping vertices and edges,
+                    (
+                        Some((true,)),
+                        vec![
+                            (35, (0,)),
+                            (62, (0,)),
+                            (99, (0,)),
+                            (29, (0,)),
+                            (100, (0,)),
+                            (18, (0,)),
+                        ],
+                        vec![
+                            ((71, 1), (0.,)),
+                            ((1, 58), (0.,)),
+                            ((58, 3), (0.,)),
+                            ((3, 75), (0.,)),
+                        ],
+                        vec![
+                            ((&71, &1), Some(&(0.,))),
+                            ((&1, &58), Some(&(0.,))),
+                            ((&58, &3), Some(&(0.,))),
+                            ((&3, &75), Some(&(0.,))),
+                        ],
+                    ),
+                ];
+
+                // Test for each scenario.
+                for (i, j, k, l) in data {
+                    let mut g = $G::<i32, AttributesMap<i32, (bool,), (i64,), (f64,)>>::new_with_attributes(i, j, k);
+                    for ((x, y), f) in l {
+                        assert!(g.has_edge_attrs(x, y));
+                        assert_eq!(g.unset_edge_attrs(x, y).ok().as_ref(), f);
+                        assert!(!g.has_edge_attrs(x, y));
+                    }
+                }
             }
 
             #[test]
