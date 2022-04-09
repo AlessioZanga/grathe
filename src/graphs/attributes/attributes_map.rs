@@ -44,13 +44,13 @@ where
     type VertexAttributes = Y;
     type EdgeAttributes = Z;
 
-    fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
+    fn new_with_attributes<I, J>(x: Option<Self::GraphAttributes>, y: I, z: J) -> Self
     where
         I: IntoIterator<Item = (V, Self::VertexAttributes)>,
         J: IntoIterator<Item = ((V, V), Self::EdgeAttributes)>,
     {
         Self {
-            gattrs: Some(x),
+            gattrs: x,
             vattrs: y.into_iter().collect(),
             eattrs: z.into_iter().collect(),
         }

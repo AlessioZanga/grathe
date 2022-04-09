@@ -6,8 +6,6 @@ pub trait Operators {
     ///
     /// $$ \overline{G} \thinspace \equiv \thinspace \lbrace (x, y) \thinspace | \thinspace (x, y) \in (V(G) \times V(G)) \wedge (x, y) \not \in E(G) \rbrace $$
     ///
-    /// Ignores additional attributes (for now).
-    ///
     fn complement(&self) -> Self;
 
     /// Union of two graphs.
@@ -16,8 +14,6 @@ pub trait Operators {
     ///
     /// $$ G \cup H \thinspace \equiv \thinspace V(G) \cup V(H) \wedge E(G) \cup E(H) $$
     ///
-    /// Ignores additional attributes (for now).
-    ///
     fn union(&self, other: &Self) -> Self;
 
     /// Intersection of two graphs.
@@ -25,8 +21,6 @@ pub trait Operators {
     /// Let $G$ and $H$ be two graphs, then the intersection graph $G \cap H$ is defined as:
     ///
     /// $$ G \cap H \thinspace \equiv \thinspace V(G) \cap V(H) \wedge E(G) \cap E(H) $$
-    ///
-    /// Ignores additional attributes (for now).
     ///
     fn intersection(&self, other: &Self) -> Self;
 
@@ -40,8 +34,6 @@ pub trait Operators {
     ///
     /// $$ G \thinspace \Delta \thinspace H \thinspace \equiv \thinspace (G - H) \cup (H - G) $$
     ///
-    /// Ignores additional attributes (for now).
-    ///
     fn symmetric_difference(&self, other: &Self) -> Self;
 
     /// Difference of two graphs.
@@ -50,11 +42,10 @@ pub trait Operators {
     ///
     /// $$ G - H \thinspace \equiv \thinspace E(G) - E(H) $$
     ///
-    /// Ignores additional attributes (for now).
-    ///
     fn difference(&self, other: &Self) -> Self;
 }
 
+#[allow(unused_macros)]
 macro_rules! impl_operators {
     ($graph: ident) => {
         impl<V, A> $crate::traits::Operators for $graph<V, A>
@@ -119,8 +110,6 @@ macro_rules! impl_operators_extension {
             ///
             /// $$ \overline{G} \thinspace \equiv \thinspace \lbrace (x, y) \thinspace | \thinspace (x, y) \in (V(G) \times V(G)) \wedge (x, y) \not \in E(G) \rbrace $$
             ///
-            /// Ignores additional attributes (for now).
-            ///
             fn not(self) -> Self::Output {
                 self.complement()
             }
@@ -139,8 +128,6 @@ macro_rules! impl_operators_extension {
             ///
             /// $$ G \cap H \thinspace \equiv \thinspace V(G) \cap V(H) \wedge E(G) \cap E(H) $$
             ///
-            /// Ignores additional attributes (for now).
-            ///
             fn bitand(self, rhs: Self) -> Self::Output {
                 self.intersection(rhs)
             }
@@ -158,8 +145,6 @@ macro_rules! impl_operators_extension {
             /// Let $G$ and $H$ be two graphs, then the union graph $G \cup H$ is defined as:
             ///
             /// $$ G \cup H \thinspace \equiv \thinspace V(G) \cup V(H) \wedge E(G) \cup E(H) $$
-            ///
-            /// Ignores additional attributes (for now).
             ///
             fn bitor(self, rhs: Self) -> Self::Output {
                 self.union(rhs)
@@ -183,8 +168,6 @@ macro_rules! impl_operators_extension {
             ///
             /// $$ G \thinspace \Delta \thinspace H \thinspace \equiv \thinspace (G - H) \cup (H - G) $$
             ///
-            /// Ignores additional attributes (for now).
-            ///
             fn bitxor(self, rhs: Self) -> Self::Output {
                 self.symmetric_difference(rhs)
             }
@@ -202,8 +185,6 @@ macro_rules! impl_operators_extension {
             /// Let $G$ and $H$ be two graphs, then the difference graph $G - H$ is defined as:
             ///
             /// $$ G - H \thinspace \equiv \thinspace E(G) - E(H) $$
-            ///
-            /// Ignores additional attributes (for now).
             ///
             fn sub(self, rhs: Self) -> Self::Output {
                 self.difference(rhs)

@@ -16,7 +16,7 @@ where
     type EdgeAttributes;
 
     /// New constructor.
-    fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
+    fn new_with_attributes<I, J>(x: Option<Self::GraphAttributes>, y: I, z: J) -> Self
     where
         I: IntoIterator<Item = (V, Self::VertexAttributes)>,
         J: IntoIterator<Item = ((V, V), Self::EdgeAttributes)>;
@@ -123,7 +123,7 @@ macro_rules! impl_with_attributes {
             type VertexAttributes = A::VertexAttributes;
             type EdgeAttributes = A::EdgeAttributes;
 
-            fn new_with_attributes<I, J>(x: Self::GraphAttributes, y: I, z: J) -> Self
+            fn new_with_attributes<I, J>(x: Option<Self::GraphAttributes>, y: I, z: J) -> Self
             where
                 I: IntoIterator<Item = (V, Self::VertexAttributes)>,
                 J: IntoIterator<Item = ((V, V), Self::EdgeAttributes)>,

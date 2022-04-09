@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod operators {
     mod undirected {
         macro_rules! generic_tests {
             ($G: ident) => {
@@ -161,24 +161,167 @@ mod tests {
                 }
 
                 #[test]
-                #[ignore]
-                // FIXME:
                 fn intersection() {
-                    todo!()
+                    // Test `G::intersection(&G) -> Self`.
+
+                    // Test for ...
+                    let data = [
+                        // ... zero vertices and zero edges,
+                        ((vec![], vec![]), (vec![], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and zero edges,
+                        ((vec![], vec![]), (vec![0], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and one edge,
+                        (
+                            (vec![0], vec![]),
+                            (vec![0], vec![(0, 0)]),
+                            (1, 0, vec![&0], vec![]),
+                        ),
+                        // ... multiple vertices and zero edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![]),
+                            (vec![0, 1, 4, 5], vec![]),
+                            (2, 0, vec![&0, &1], vec![]),
+                        ),
+                        // ... multiple vertices and one edge,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1)]),
+                            (vec![0, 1, 4, 5], vec![(1, 0)]),
+                            (2, 1, vec![&0, &1], vec![(&0, &1)]),
+                        ),
+                        // ... multiple vertices and multiple edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1), (1, 2), (2, 3)]),
+                            (vec![0, 1, 2, 3], vec![(0, 1), (2, 3), (3, 3)]),
+                            (4, 2, vec![&0, &1, &2, &3], vec![(&0, &1), (&2, &3)]),
+                        ),
+                    ];
+
+                    // Test for each scenario.
+                    for ((a, b), (i, j), k) in data {
+                        let f = $G::<i32>::new(a, b);
+                        let g = $G::<i32>::new(i, j);
+                        let h = f.intersection(&g);
+                        assert_eq!(h, (&f & &g));
+                        assert_eq!(h, (&g & &f));
+                        assert_eq!(h, (&f & &h));
+                        assert_eq!(h, (&g & &h));
+
+                        let (o, s, v, e) = k;
+                        assert_eq!(h.order(), o);
+                        assert_eq!(h.size(), s);
+                        assert_eq!(Vec::from_iter(V!(h)), v);
+                        assert_eq!(Vec::from_iter(E!(h)), e);
+                    }
                 }
 
                 #[test]
-                #[ignore]
-                // FIXME:
                 fn symmetric_difference() {
-                    todo!()
+                    // Test `G::symmetric_difference(&G) -> Self`.
+
+                    // Test for ...
+                    let data = [
+                        // ... zero vertices and zero edges,
+                        ((vec![], vec![]), (vec![], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and zero edges,
+                        (
+                            (vec![], vec![]),
+                            (vec![0], vec![]),
+                            (1, 0, vec![&0], vec![]),
+                        ),
+                        // ... one vertex and one edge,
+                        (
+                            (vec![0], vec![]),
+                            (vec![0], vec![(0, 0)]),
+                            (1, 1, vec![&0], vec![(&0, &0)]),
+                        ),
+                        // ... multiple vertices and zero edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![]),
+                            (vec![0, 1, 4, 5], vec![]),
+                            (6, 0, vec![&0, &1, &2, &3, &4, &5], vec![]),
+                        ),
+                        // ... multiple vertices and one edge,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1)]),
+                            (vec![0, 1, 4, 5], vec![(1, 0)]),
+                            (6, 0, vec![&0, &1, &2, &3, &4, &5], vec![]),
+                        ),
+                        // ... multiple vertices and multiple edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1), (1, 2), (2, 3)]),
+                            (vec![0, 1, 2, 3], vec![(0, 1), (2, 3), (3, 3)]),
+                            (4, 2, vec![&0, &1, &2, &3], vec![(&1, &2), (&3, &3)]),
+                        ),
+                    ];
+
+                    // Test for each scenario.
+                    for ((a, b), (i, j), k) in data {
+                        let f = $G::<i32>::new(a, b);
+                        let g = $G::<i32>::new(i, j);
+                        let h = f.symmetric_difference(&g);
+                        assert_eq!(h, (&f ^ &g));
+                        assert_eq!(h, (&g ^ &f));
+
+                        let (o, s, v, e) = k;
+                        assert_eq!(h.order(), o);
+                        assert_eq!(h.size(), s);
+                        assert_eq!(Vec::from_iter(V!(h)), v);
+                        assert_eq!(Vec::from_iter(E!(h)), e);
+                    }
                 }
 
                 #[test]
-                #[ignore]
-                // FIXME:
                 fn difference() {
-                    todo!()
+                    // Test `G::difference(&G) -> Self`.
+
+                    // Test for ...
+                    let data = [
+                        // ... zero vertices and zero edges,
+                        ((vec![], vec![]), (vec![], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and zero edges,
+                        ((vec![], vec![]), (vec![0], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and one edge,
+                        (
+                            (vec![0], vec![]),
+                            (vec![0], vec![(0, 0)]),
+                            (1, 0, vec![&0], vec![]),
+                        ),
+                        // ... multiple vertices and zero edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![]),
+                            (vec![0, 1, 4, 5], vec![]),
+                            (4, 0, vec![&0, &1, &2, &3], vec![]),
+                        ),
+                        // ... multiple vertices and one edge,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1)]),
+                            (vec![0, 1, 4, 5], vec![(1, 0)]),
+                            (4, 0, vec![&0, &1, &2, &3], vec![]),
+                        ),
+                        // ... multiple vertices and multiple edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1), (1, 2), (2, 3)]),
+                            (vec![0, 1, 2, 3], vec![(0, 1), (2, 3), (3, 3)]),
+                            (4, 1, vec![&0, &1, &2, &3], vec![(&1, &2)]),
+                        ),
+                    ];
+
+                    // Test for each scenario.
+                    for ((a, b), (i, j), k) in data {
+                        let f = $G::<i32>::new(a, b);
+                        let g = $G::<i32>::new(i, j);
+                        let h = f.difference(&g);
+                        assert_eq!(h, (&f - &g));
+                        // assert_eq!(h, (&g - &f));
+                        // assert_eq!(h, (&f - &h));
+                        // assert_eq!(h, (&g - &h));
+
+                        let (o, s, v, e) = k;
+                        assert_eq!(h.order(), o);
+                        assert_eq!(h.size(), s);
+                        assert_eq!(Vec::from_iter(V!(h)), v);
+                        assert_eq!(Vec::from_iter(E!(h)), e);
+                    }
                 }
             };
         }
@@ -370,24 +513,167 @@ mod tests {
                 }
 
                 #[test]
-                #[ignore]
-                // FIXME:
                 fn intersection() {
-                    todo!()
+                    // Test `G::intersection(&G) -> Self`.
+
+                    // Test for ...
+                    let data = [
+                        // ... zero vertices and zero edges,
+                        ((vec![], vec![]), (vec![], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and zero edges,
+                        ((vec![], vec![]), (vec![0], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and one edge,
+                        (
+                            (vec![0], vec![]),
+                            (vec![0], vec![(0, 0)]),
+                            (1, 0, vec![&0], vec![]),
+                        ),
+                        // ... multiple vertices and zero edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![]),
+                            (vec![0, 1, 4, 5], vec![]),
+                            (2, 0, vec![&0, &1], vec![]),
+                        ),
+                        // ... multiple vertices and one edge,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1)]),
+                            (vec![0, 1, 4, 5], vec![(1, 0)]),
+                            (2, 0, vec![&0, &1], vec![]),
+                        ),
+                        // ... multiple vertices and multiple edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1), (1, 2), (2, 3)]),
+                            (vec![0, 1, 2, 3], vec![(0, 1), (2, 3), (3, 3)]),
+                            (4, 2, vec![&0, &1, &2, &3], vec![(&0, &1), (&2, &3)]),
+                        ),
+                    ];
+
+                    // Test for each scenario.
+                    for ((a, b), (i, j), k) in data {
+                        let f = $G::<i32>::new(a, b);
+                        let g = $G::<i32>::new(i, j);
+                        let h = f.intersection(&g);
+                        assert_eq!(h, (&f & &g));
+                        assert_eq!(h, (&g & &f));
+                        assert_eq!(h, (&f & &h));
+                        assert_eq!(h, (&g & &h));
+
+                        let (o, s, v, e) = k;
+                        assert_eq!(h.order(), o);
+                        assert_eq!(h.size(), s);
+                        assert_eq!(Vec::from_iter(V!(h)), v);
+                        assert_eq!(Vec::from_iter(E!(h)), e);
+                    }
                 }
 
                 #[test]
-                #[ignore]
-                // FIXME:
                 fn symmetric_difference() {
-                    todo!()
+                    // Test `G::symmetric_difference(&G) -> Self`.
+
+                    // Test for ...
+                    let data = [
+                        // ... zero vertices and zero edges,
+                        ((vec![], vec![]), (vec![], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and zero edges,
+                        (
+                            (vec![], vec![]),
+                            (vec![0], vec![]),
+                            (1, 0, vec![&0], vec![]),
+                        ),
+                        // ... one vertex and one edge,
+                        (
+                            (vec![0], vec![]),
+                            (vec![0], vec![(0, 0)]),
+                            (1, 1, vec![&0], vec![(&0, &0)]),
+                        ),
+                        // ... multiple vertices and zero edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![]),
+                            (vec![0, 1, 4, 5], vec![]),
+                            (6, 0, vec![&0, &1, &2, &3, &4, &5], vec![]),
+                        ),
+                        // ... multiple vertices and one edge,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1)]),
+                            (vec![0, 1, 4, 5], vec![(1, 0)]),
+                            (6, 2, vec![&0, &1, &2, &3, &4, &5], vec![(&0, &1), (&1, &0)]),
+                        ),
+                        // ... multiple vertices and multiple edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1), (1, 2), (2, 3)]),
+                            (vec![0, 1, 2, 3], vec![(0, 1), (2, 3), (3, 3)]),
+                            (4, 2, vec![&0, &1, &2, &3], vec![(&1, &2), (&3, &3)]),
+                        ),
+                    ];
+
+                    // Test for each scenario.
+                    for ((a, b), (i, j), k) in data {
+                        let f = $G::<i32>::new(a, b);
+                        let g = $G::<i32>::new(i, j);
+                        let h = f.symmetric_difference(&g);
+                        assert_eq!(h, (&f ^ &g));
+                        assert_eq!(h, (&g ^ &f));
+
+                        let (o, s, v, e) = k;
+                        assert_eq!(h.order(), o);
+                        assert_eq!(h.size(), s);
+                        assert_eq!(Vec::from_iter(V!(h)), v);
+                        assert_eq!(Vec::from_iter(E!(h)), e);
+                    }
                 }
 
                 #[test]
-                #[ignore]
-                // FIXME:
                 fn difference() {
-                    todo!()
+                    // Test `G::difference(&G) -> Self`.
+
+                    // Test for ...
+                    let data = [
+                        // ... zero vertices and zero edges,
+                        ((vec![], vec![]), (vec![], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and zero edges,
+                        ((vec![], vec![]), (vec![0], vec![]), (0, 0, vec![], vec![])),
+                        // ... one vertex and one edge,
+                        (
+                            (vec![0], vec![]),
+                            (vec![0], vec![(0, 0)]),
+                            (1, 0, vec![&0], vec![]),
+                        ),
+                        // ... multiple vertices and zero edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![]),
+                            (vec![0, 1, 4, 5], vec![]),
+                            (4, 0, vec![&0, &1, &2, &3], vec![]),
+                        ),
+                        // ... multiple vertices and one edge,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1)]),
+                            (vec![0, 1, 4, 5], vec![(1, 0)]),
+                            (4, 1, vec![&0, &1, &2, &3], vec![(&0, &1)]),
+                        ),
+                        // ... multiple vertices and multiple edges,
+                        (
+                            (vec![0, 1, 2, 3], vec![(0, 1), (1, 2), (2, 3)]),
+                            (vec![0, 1, 2, 3], vec![(0, 1), (2, 3), (3, 3)]),
+                            (4, 1, vec![&0, &1, &2, &3], vec![(&1, &2)]),
+                        ),
+                    ];
+
+                    // Test for each scenario.
+                    for ((a, b), (i, j), k) in data {
+                        let f = $G::<i32>::new(a, b);
+                        let g = $G::<i32>::new(i, j);
+                        let h = f.difference(&g);
+                        assert_eq!(h, (&f - &g));
+                        // assert_eq!(h, (&g - &f));
+                        // assert_eq!(h, (&f - &h));
+                        // assert_eq!(h, (&g - &h));
+
+                        let (o, s, v, e) = k;
+                        assert_eq!(h.order(), o);
+                        assert_eq!(h.size(), s);
+                        assert_eq!(Vec::from_iter(V!(h)), v);
+                        assert_eq!(Vec::from_iter(E!(h)), e);
+                    }
                 }
             };
         }

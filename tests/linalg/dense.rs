@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod dense {
     use grathe::graphs::storages::UndirectedAdjacencyList;
     use grathe::linalg::dense as linalg;
     use grathe::traits::{Convert, From, Storage};

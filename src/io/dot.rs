@@ -331,7 +331,7 @@ impl IO for DOT {
             .into_iter()
             .map(|graph| match graph {
                 Parsed::Graph(vertices, edges, attributes) => G::new_with_attributes(
-                    x(attributes),
+                    Some(x(attributes)),
                     vertices.into_iter().map(|vertex| match vertex {
                         Parsed::Vertex(x, attributes) => (f(x), y(attributes)),
                         _ => unreachable!(),

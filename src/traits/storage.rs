@@ -232,10 +232,6 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     ///
     /// Return the graph order (aka. $|V|$).
     ///
-    /// # Complexity
-    ///
-    /// $O(1)$ - Constant.
-    ///
     /// # Examples
     ///
     /// ```
@@ -251,10 +247,6 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// Size of the graph.
     ///
     /// Return the graph size (aka. $|E|$).
-    ///
-    /// # Complexity
-    ///
-    /// $O(|E|)$ - Liner in the size of graph.
     ///
     /// # Examples
     ///

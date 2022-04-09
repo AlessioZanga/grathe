@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod io {
     mod dot {
         use all_asserts::*;
         use grathe::graphs::attributes::AttributesMap;

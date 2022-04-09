@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod undirected {
     use grathe::graphs::storages::UndirectedAdjacencyList;
     use grathe::traits::Undirected;
     use grathe::types::Error;

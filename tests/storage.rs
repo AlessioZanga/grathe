@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod storage {
     mod undirected {
         macro_rules! generic_tests {
             ($G: ident) => {

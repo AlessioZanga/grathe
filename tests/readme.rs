@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod readme {
     macro_rules! external_doc_test {
         ($x:expr) => {
             #[doc = $x]

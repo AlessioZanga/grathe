@@ -1,6 +1,9 @@
 use crate::graphs::attributes::AttributesMap;
 use crate::traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes};
-use crate::types::{directions, AdjacencyList, EdgeIterator, EdgeList, Error, ExactSizeIter, Vertex, VertexIterator};
+use crate::types::{
+    directions, AdjacencyList, DenseAdjacencyMatrix, EdgeIterator, EdgeList, Error, ExactSizeIter,
+    SparseAdjacencyMatrix, Vertex, VertexIterator,
+};
 use crate::{E, V};
 use ndarray::Array2;
 use sprs::TriMat;
@@ -51,7 +54,7 @@ where
             .map(|x| (x.clone(), vertices.difference(&self._data[x]).cloned().collect()))
             .collect();
         // Compute complement size.
-        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+        let size = data.iter().map(|(_, ys)| ys.len()).sum();
 
         Self {
             _data: data,
@@ -71,7 +74,7 @@ where
             *zs = zs.union(ys).cloned().collect();
         }
         // Compute union size.
-        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+        let size = data.iter().map(|(_, ys)| ys.len()).sum();
 
         // Return the union graph.
         Self {
@@ -94,7 +97,7 @@ where
             })
             .collect();
         // Compute intersection size.
-        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+        let size = data.iter().map(|(_, ys)| ys.len()).sum();
 
         Self {
             _data: data,
@@ -114,7 +117,7 @@ where
             *zs = zs.symmetric_difference(ys).cloned().collect();
         }
         // Compute symmetric difference size.
-        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+        let size = data.iter().map(|(_, ys)| ys.len()).sum();
 
         // Return the symmetric difference graph.
         Self {
@@ -137,7 +140,7 @@ where
             })
             .collect();
         // Compute difference size.
-        let size = data.iter().map(|(_, ys)| ys.len()).fold(0, |acc, x| acc + x);
+        let size = data.iter().map(|(_, ys)| ys.len()).sum();
 
         Self {
             _data: data,
@@ -396,10 +399,10 @@ where
         out
     }
 
-    fn dense_adjacency_matrix(&self) -> Array2<bool> {
+    fn dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
         let n = self.order();
         let mut idx = HashMap::with_capacity(n);
-        let mut out = Array2::from_elem((n, n), false);
+        let mut out = DenseAdjacencyMatrix::from_elem((n, n), false);
         // Build vid-to-index mapping.
         idx.extend(V!(self).enumerate().map(|(i, x)| (x, i)));
         // Fill the output matrix.
@@ -410,10 +413,10 @@ where
         out
     }
 
-    fn sparse_adjacency_matrix(&self) -> TriMat<bool> {
+    fn sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
         let n = self.order();
         let mut idx = HashMap::with_capacity(n);
-        let mut out = TriMat::new((n, n));
+        let mut out = SparseAdjacencyMatrix::new((n, n));
         // Reserve capacity for sparse matrix.
         out.reserve(self.size());
         // Build vid-to-index mapping.

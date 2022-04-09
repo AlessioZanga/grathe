@@ -48,8 +48,8 @@ pub trait Extend: Storage {
         let (lower, _) = iter.size_hint();
         // Reserve additional capacity.
         self.reserve(lower);
-        // Add vertex to the graph.
-        iter.map(|x| self.add_vertex(x)).fold(false, |acc, x| acc || x)
+        // Add vertex to the graph. NOTE: Do not replace with `any`, since it is a short circuit implementation.
+        iter.fold(false, |acc, x| acc | self.add_vertex(x))
     }
 
     /// Extends graph with given edges.
@@ -99,8 +99,8 @@ pub trait Extend: Storage {
         let (lower, _) = iter.size_hint();
         // Reserve additional capacity.
         self.reserve(lower);
-        // Add edge to the graph.
-        iter.map(|(x, y)| self.add_edge(&x, &y)).fold(false, |acc, x| acc || x)
+        // Add edge to the graph. NOTE: Do not replace with `any`, since it is a short circuit implementation.
+        iter.fold(false, |acc, (x, y)| acc | self.add_edge(&x, &y))
     }
 }
 

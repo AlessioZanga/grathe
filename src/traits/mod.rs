@@ -22,6 +22,7 @@ pub use from::From;
 
 mod operators;
 pub use operators::Operators;
+#[allow(unused_imports)]
 pub(crate) use operators::{impl_operators, impl_operators_extension};
 
 mod partial_ord;

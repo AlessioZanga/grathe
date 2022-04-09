@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod directed {
     use grathe::graphs::storages::DirectedAdjacencyList;
     use grathe::traits::Directed;
     use grathe::types::Error;

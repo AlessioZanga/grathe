@@ -13,10 +13,6 @@ macro_rules! impl_partial_ord {
             ///
             /// $$G \leq H \equiv V(G) \leq V(H) \wedge E(G) \leq E(H)$$
             ///
-            /// # Complexity
-            ///
-            /// $O(|V| + |E|)$ - Linear in the order and size of the graph.
-            ///
             /// # Examples
             ///
             /// ```

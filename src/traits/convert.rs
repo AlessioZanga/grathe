@@ -1,5 +1,5 @@
 use crate::traits::Storage;
-use crate::types::{AdjacencyList, EdgeList};
+use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
 use ndarray::Array2;
 use sprs::TriMat;
 
@@ -39,13 +39,13 @@ pub trait Convert: Storage {
     ///
     /// $$ \textbf{A}_{i,j} = \begin{cases} 1, & \text{if } (i, j) \in \textbf{E}, \newline 0, & \text{Otherwise.} \end{cases} $$
     ///
-    fn dense_adjacency_matrix(&self) -> Array2<bool>;
+    fn dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix;
 
     /// Sparse adjacency matrix of a graph.
     ///
     /// Defined as its [dense variant][`Convert::dense_adjacency_matrix`].
     ///
-    fn sparse_adjacency_matrix(&self) -> TriMat<bool>;
+    fn sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix;
 
     /// Dense incidence matrix of a graph.
     ///

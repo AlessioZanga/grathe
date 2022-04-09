@@ -1,5 +1,5 @@
 #[cfg(test)]
-mod tests {
+mod capacity {
     macro_rules! generic_tests {
         ($G: ident) => {
             use all_asserts::*;

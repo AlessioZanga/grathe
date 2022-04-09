@@ -1,3 +1,5 @@
+use ndarray::Array2;
+use sprs::TriMat;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -76,6 +78,12 @@ pub type EdgeList<V> = BTreeSet<(V, V)>;
 /// Adjacency list type.
 pub type AdjacencyList<V> = BTreeMap<V, BTreeSet<V>>;
 
+/// Dense adjacency matrix type.
+pub type DenseAdjacencyMatrix = Array2<bool>;
+
+/// Sparse adjacency matrix type.
+pub type SparseAdjacencyMatrix = TriMat<bool>;
+
 /// Error enumerator.
 #[derive(Debug, Error, PartialEq)]
 pub enum Error<V> {
@@ -93,7 +101,10 @@ pub enum Error<V> {
     ParseFailed(String),
 }
 
+/// Directions pseudo-enumerator for generics algorithms.
 pub mod directions {
+    /// Undirected pseudo-enumerator for generics algorithms.
     pub struct Undirected {}
+    /// Directed pseudo-enumerator for generics algorithms.
     pub struct Directed {}
 }
