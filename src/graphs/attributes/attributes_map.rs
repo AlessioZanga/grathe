@@ -1,7 +1,9 @@
-use crate::traits::WithAttributes;
-use crate::types::{Error, Vertex};
-use std::collections::HashMap;
-use std::fmt::Debug;
+use std::{collections::HashMap, fmt::Debug};
+
+use crate::{
+    traits::WithAttributes,
+    types::{Error, Vertex},
+};
 
 /// A simple hashmap-based attribute manager.
 #[derive(Debug)]

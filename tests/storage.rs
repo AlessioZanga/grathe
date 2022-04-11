@@ -3,10 +3,9 @@ mod storage {
     mod undirected {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::Storage;
-                use grathe::utils::is_sorted;
-                use grathe::{Adj, E, V};
                 use std::cmp::Ordering;
+
+                use grathe::{traits::Storage, utils::is_sorted, Adj, E, V};
 
                 #[test]
                 fn eq() {
@@ -891,10 +890,9 @@ mod storage {
     mod directed {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::Storage;
-                use grathe::utils::is_sorted;
-                use grathe::{Adj, E, V};
                 use std::cmp::Ordering;
+
+                use grathe::{traits::Storage, utils::is_sorted, Adj, E, V};
 
                 #[test]
                 fn eq() {

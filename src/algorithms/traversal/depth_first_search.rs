@@ -1,11 +1,16 @@
+use std::{
+    collections::{HashMap, VecDeque},
+    iter::FusedIterator,
+    marker::PhantomData,
+    vec::Vec,
+};
+
 use super::Traversal;
-use crate::traits::{Directed, Storage, Undirected};
-use crate::types::directions;
-use crate::V;
-use std::collections::{HashMap, VecDeque};
-use std::iter::FusedIterator;
-use std::marker::PhantomData;
-use std::vec::Vec;
+use crate::{
+    traits::{Directed, Storage, Undirected},
+    types::directions,
+    V,
+};
 
 /// Depth-first search structure.
 ///

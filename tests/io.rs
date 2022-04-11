@@ -2,10 +2,11 @@
 mod io {
     mod dot {
         use all_asserts::*;
-        use grathe::graphs::attributes::AttributesMap;
-        use grathe::graphs::storages::UndirectedAdjacencyList;
-        use grathe::io::{DOT, IO};
-        use grathe::traits::{Storage, WithAttributes};
+        use grathe::{
+            graphs::{attributes::AttributesMap, storages::UndirectedAdjacencyList},
+            io::{DOT, IO},
+            traits::{Storage, WithAttributes},
+        };
         use tempfile::NamedTempFile;
 
         const DATA: [(&str, &str); 13] = [

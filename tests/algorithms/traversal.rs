@@ -641,9 +641,11 @@ mod undirected {
     }
 
     mod adjacency_list {
-        use grathe::algorithms::{LexBFS, LexDFS, BFS, DFS};
-        use grathe::graphs::storages::UndirectedAdjacencyList;
-        use grathe::traits::{From, Storage};
+        use grathe::{
+            algorithms::{LexBFS, LexDFS, BFS, DFS},
+            graphs::storages::UndirectedAdjacencyList,
+            traits::{From, Storage},
+        };
 
         generic_tests!(UndirectedAdjacencyList);
     }
@@ -1092,9 +1094,11 @@ mod directed {
     }
 
     mod adjacency_list {
-        use grathe::algorithms::{TopologicalSort, BFS, DFS};
-        use grathe::graphs::storages::DirectedAdjacencyList;
-        use grathe::traits::{From, Storage};
+        use grathe::{
+            algorithms::{TopologicalSort, BFS, DFS},
+            graphs::storages::DirectedAdjacencyList,
+            traits::{From, Storage},
+        };
 
         generic_tests!(DirectedAdjacencyList);
     }

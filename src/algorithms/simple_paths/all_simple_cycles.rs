@@ -1,9 +1,14 @@
-use crate::traits::{Directed, Storage, Undirected};
-use crate::types::directions;
-use crate::V;
-use std::collections::{HashMap, HashSet};
-use std::marker::PhantomData;
-use std::vec::Vec;
+use std::{
+    collections::{HashMap, HashSet},
+    marker::PhantomData,
+    vec::Vec,
+};
+
+use crate::{
+    traits::{Directed, Storage, Undirected},
+    types::directions,
+    V,
+};
 
 /// Find all cycles in a given graph.
 ///

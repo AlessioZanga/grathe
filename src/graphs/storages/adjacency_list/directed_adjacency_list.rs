@@ -1,14 +1,20 @@
-use crate::graphs::attributes::AttributesMap;
-use crate::traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes};
-use crate::types::{
-    directions, AdjacencyList, DenseAdjacencyMatrix, EdgeIterator, EdgeList, Error, ExactSizeIter,
-    SparseAdjacencyMatrix, Vertex, VertexIterator,
+use std::{
+    cmp::Ordering,
+    collections::{btree_map::Entry, BTreeSet, HashMap},
 };
-use crate::{E, V};
-use ndarray::Array2;
+
+use ndarray::prelude::*;
 use sprs::TriMat;
-use std::cmp::Ordering;
-use std::collections::{btree_map::Entry, BTreeSet, HashMap};
+
+use crate::{
+    graphs::attributes::AttributesMap,
+    traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes},
+    types::{
+        directions, AdjacencyList, DenseAdjacencyMatrix, EdgeIterator, EdgeList, Error, ExactSizeIter,
+        SparseAdjacencyMatrix, Vertex, VertexIterator,
+    },
+    E, V,
+};
 
 #[derive(Debug, Default)]
 pub struct DirectedAdjacencyList<V, A = AttributesMap<V, (), (), ()>>
@@ -357,18 +363,18 @@ where
     V: Vertex,
     A: WithAttributes<V>,
 {
+    // FIXME:
     fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // FIXME:
         todo!()
     }
 
+    // FIXME:
     fn is_connected(&self) -> bool {
-        // FIXME:
         todo!()
     }
 
+    // FIXME:
     fn is_acyclic(&self) -> bool {
-        // FIXME:
         todo!()
     }
 }

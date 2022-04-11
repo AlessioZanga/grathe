@@ -2,9 +2,11 @@
 mod with_attributes {
     macro_rules! generic_tests {
         ($G: ident) => {
-            use grathe::graphs::attributes::AttributesMap;
-            use grathe::traits::{Storage, WithAttributes};
-            use grathe::{E, V};
+            use grathe::{
+                graphs::attributes::AttributesMap,
+                traits::{Storage, WithAttributes},
+                E, V,
+            };
 
             #[test]
             fn new_with_attributes() {

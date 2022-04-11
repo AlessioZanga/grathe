@@ -3,8 +3,10 @@ mod subgraph {
     macro_rules! generic_tests {
         ($G: ident) => {
             use all_asserts::*;
-            use grathe::traits::{Storage, Subgraph};
-            use grathe::{E, V};
+            use grathe::{
+                traits::{Storage, Subgraph},
+                E, V,
+            };
 
             #[test]
             fn subgraph_is_subgraph_is_supergraph() {

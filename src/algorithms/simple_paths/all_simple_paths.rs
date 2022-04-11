@@ -1,8 +1,9 @@
-use crate::traits::{Directed, Storage, Undirected};
-use crate::types::directions;
-use std::collections::HashSet;
-use std::marker::PhantomData;
-use std::vec::Vec;
+use std::{collections::HashSet, marker::PhantomData, vec::Vec};
+
+use crate::{
+    traits::{Directed, Storage, Undirected},
+    types::directions,
+};
 
 /// Find all simple paths in a graph for given source and target vertices.
 pub struct AllSimplePaths<'a, G, D>

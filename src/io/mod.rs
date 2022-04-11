@@ -1,9 +1,9 @@
 mod dot;
+use std::{collections::HashMap, path::Path};
+
 pub use dot::*;
 
 use crate::traits::{Storage, WithAttributes};
-use std::collections::HashMap;
-use std::path::Path;
 
 /// The parser IO trait.
 pub trait IO: TryFrom<String> + TryInto<String> {

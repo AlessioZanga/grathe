@@ -1,5 +1,6 @@
-use crate::types::{Error, Vertex};
 use std::fmt::Debug;
+
+use crate::types::{Error, Vertex};
 
 /// The graph attribute trait.
 pub trait WithAttributes<V>: Default + Debug

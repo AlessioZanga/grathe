@@ -1,8 +1,10 @@
-use crate::traits::Undirected;
-use crate::V;
-use std::cmp::Ordering;
-use std::collections::{HashMap, VecDeque};
-use std::iter::FusedIterator;
+use std::{
+    cmp::Ordering,
+    collections::{HashMap, VecDeque},
+    iter::FusedIterator,
+};
+
+use crate::{traits::Undirected, V};
 
 /// Lexicographic depth-first search structure.
 ///

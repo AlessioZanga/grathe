@@ -1,5 +1,4 @@
-use crate::traits::Storage;
-use crate::types::VertexIterator;
+use crate::{traits::Storage, types::VertexIterator};
 
 /// Undirected graph trait.
 pub trait Undirected: Storage {

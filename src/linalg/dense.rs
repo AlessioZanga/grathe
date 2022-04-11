@@ -1,9 +1,15 @@
-use crate::V;
-use crate::traits::{Convert, Storage};
-use ndarray::{Array, Array1, Array2, Axis};
-use ndarray_linalg::lobpcg::{lobpcg, LobpcgResult, TruncatedOrder};
-use ndarray_linalg::{flatten, into_col, EigVals, EigValshInto, UPLO};
+use ndarray::prelude::*;
+use ndarray_linalg::{
+    flatten, into_col,
+    lobpcg::{lobpcg, LobpcgResult, TruncatedOrder},
+    EigVals, EigValshInto, UPLO,
+};
 use num_complex::Complex;
+
+use crate::{
+    traits::{Convert, Storage},
+    V,
+};
 
 /// Adjacency matrix of a graph.
 ///
@@ -15,7 +21,7 @@ use num_complex::Complex;
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -69,7 +75,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -171,7 +177,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -208,7 +214,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr1;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -243,7 +249,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -295,7 +301,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -358,7 +364,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -404,7 +410,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -464,7 +470,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr2;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///
@@ -522,7 +528,7 @@ where
 ///
 /// ```
 /// use approx::*;
-/// use ndarray::arr1;
+/// use ndarray::prelude::*;
 /// use grathe::prelude::*;
 /// use grathe::linalg::dense as linalg;
 ///

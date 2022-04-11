@@ -1,6 +1,6 @@
-use crate::traits::Storage;
-use crate::types::VertexIterator;
 use std::collections::{BTreeSet, VecDeque};
+
+use crate::{traits::Storage, types::VertexIterator};
 
 /// Directed graph trait.
 pub trait Directed: Storage {

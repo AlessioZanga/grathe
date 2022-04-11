@@ -1,5 +1,7 @@
-use crate::traits::{Extend, From, Storage};
-use crate::E;
+use crate::{
+    traits::{Extend, From, Storage},
+    E,
+};
 
 /// The subgraph trait.
 pub trait Subgraph: From + Extend + Storage {

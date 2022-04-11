@@ -1,19 +1,20 @@
-use super::IO;
-use crate::traits::{Storage, WithAttributes};
-use itertools::Itertools;
-use pest::error::Error as ParserError;
-use pest::iterators::Pair;
-use pest::Parser;
-use std::collections::HashMap;
-use std::io::{Error as IOError, ErrorKind as IOErrorKind};
-use std::path::Path;
-use std::vec::Vec;
+#[cfg(test)]
+use std::println as debug;
+use std::{
+    collections::HashMap,
+    io::{Error as IOError, ErrorKind as IOErrorKind},
+    path::Path,
+    vec::Vec,
+};
 
+use itertools::Itertools;
 // Workaround for logging during tests
 #[cfg(not(test))]
 use log::debug;
-#[cfg(test)]
-use std::println as debug;
+use pest::{error::Error as ParserError, iterators::Pair, Parser};
+
+use super::IO;
+use crate::traits::{Storage, WithAttributes};
 
 // Enumerator for parsed values.
 enum Parsed {

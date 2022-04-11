@@ -4,7 +4,7 @@ mod convert {
         macro_rules! generic_tests {
             ($G: ident) => {
                 use grathe::traits::{Convert, Storage};
-                use ndarray::{arr2, Array2};
+                use ndarray::prelude::*;
                 use sprs::TriMat;
 
                 #[test]
@@ -343,7 +343,7 @@ mod convert {
         macro_rules! generic_tests {
             ($G: ident) => {
                 use grathe::traits::{Convert, Storage};
-                use ndarray::{arr2, Array2};
+                use ndarray::prelude::*;
                 use sprs::TriMat;
 
                 #[test]

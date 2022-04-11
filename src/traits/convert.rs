@@ -1,7 +1,10 @@
-use crate::traits::Storage;
-use crate::types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix};
-use ndarray::Array2;
+use ndarray::prelude::*;
 use sprs::TriMat;
+
+use crate::{
+    traits::Storage,
+    types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix},
+};
 
 /// The graph conversion trait.
 pub trait Convert: Storage {

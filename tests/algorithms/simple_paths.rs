@@ -59,9 +59,11 @@ mod undirected {
     }
 
     mod adjacency_list {
-        use grathe::algorithms::{AllSimpleCycles, AllSimplePaths};
-        use grathe::graphs::storages::UndirectedAdjacencyList;
-        use grathe::traits::{From, Storage};
+        use grathe::{
+            algorithms::{AllSimpleCycles, AllSimplePaths},
+            graphs::storages::UndirectedAdjacencyList,
+            traits::{From, Storage},
+        };
 
         generic_tests!(UndirectedAdjacencyList);
     }
@@ -177,9 +179,11 @@ mod directed {
     }
 
     mod adjacency_list {
-        use grathe::algorithms::{AllSimpleCycles, AllSimplePaths};
-        use grathe::graphs::storages::DirectedAdjacencyList;
-        use grathe::traits::{From, Storage};
+        use grathe::{
+            algorithms::{AllSimpleCycles, AllSimplePaths},
+            graphs::storages::DirectedAdjacencyList,
+            traits::{From, Storage},
+        };
 
         generic_tests!(DirectedAdjacencyList);
     }

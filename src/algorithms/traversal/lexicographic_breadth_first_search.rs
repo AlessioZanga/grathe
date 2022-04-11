@@ -1,7 +1,9 @@
-use crate::traits::Undirected;
-use crate::V;
-use std::collections::{HashMap, HashSet, VecDeque};
-use std::iter::FusedIterator;
+use std::{
+    collections::{HashMap, HashSet, VecDeque},
+    iter::FusedIterator,
+};
+
+use crate::{traits::Undirected, V};
 
 /// Lexicographic breadth-first search structure.
 ///

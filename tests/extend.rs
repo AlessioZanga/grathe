@@ -4,8 +4,7 @@ mod extend {
         macro_rules! generic_tests {
             ($G: ident) => {
                 use grathe::traits::{Extend, Storage};
-                use rand::seq::SliceRandom;
-                use rand::thread_rng;
+                use rand::{seq::SliceRandom, thread_rng};
 
                 #[test]
                 fn extend_vertices() {
@@ -160,8 +159,7 @@ mod extend {
         macro_rules! generic_tests {
             ($G: ident) => {
                 use grathe::traits::{Extend, Storage};
-                use rand::seq::SliceRandom;
-                use rand::thread_rng;
+                use rand::{seq::SliceRandom, thread_rng};
 
                 #[test]
                 fn extend_vertices() {

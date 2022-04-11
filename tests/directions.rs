@@ -3,9 +3,11 @@ mod directions {
     mod undirected {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::{Storage, Undirected};
-                use grathe::utils::is_sorted;
-                use grathe::Ne;
+                use grathe::{
+                    traits::{Storage, Undirected},
+                    utils::is_sorted,
+                    Ne,
+                };
 
                 #[test]
                 fn neighbors_iter() {
@@ -123,9 +125,11 @@ mod directions {
     mod directed {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::{Directed, Storage};
-                use grathe::utils::is_sorted;
-                use grathe::{An, Ch, De, Pa};
+                use grathe::{
+                    traits::{Directed, Storage},
+                    utils::is_sorted,
+                    An, Ch, De, Pa,
+                };
 
                 #[test]
                 fn ancestors_iter() {

@@ -3,8 +3,10 @@ mod operators {
     mod undirected {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::{Operators, Storage};
-                use grathe::{E, V};
+                use grathe::{
+                    traits::{Operators, Storage},
+                    E, V,
+                };
 
                 #[test]
                 fn complement() {
@@ -335,8 +337,10 @@ mod operators {
     mod directed {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::{Operators, Storage};
-                use grathe::{E, V};
+                use grathe::{
+                    traits::{Operators, Storage},
+                    E, V,
+                };
 
                 #[test]
                 fn complement() {

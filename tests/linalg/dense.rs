@@ -3,8 +3,7 @@ mod undirected {
     macro_rules! generic_tests {
         ($G: ident) => {
             use approx::*;
-            use grathe::linalg::dense as linalg;
-            use grathe::traits::From;
+            use grathe::{linalg::dense as linalg, traits::From};
             use ndarray::prelude::*;
 
             #[test]
@@ -305,8 +304,7 @@ mod directed {
     macro_rules! generic_tests {
         ($G: ident) => {
             use approx::*;
-            use grathe::linalg::dense as linalg;
-            use grathe::traits::From;
+            use grathe::{linalg::dense as linalg, traits::From};
             use ndarray::prelude::*;
 
             #[test]

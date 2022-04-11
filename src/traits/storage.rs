@@ -1,6 +1,7 @@
+use std::fmt::Debug;
+
 use super::{Capacity, Operators};
 use crate::types::{EdgeIterator, Vertex, VertexIterator};
-use std::fmt::Debug;
 
 /// The graph storage trait.
 pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {

@@ -1,8 +1,11 @@
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fmt::Debug,
+    hash::Hash,
+};
+
 use ndarray::Array2;
 use sprs::TriMat;
-use std::collections::{BTreeMap, BTreeSet};
-use std::fmt::Debug;
-use std::hash::Hash;
 use thiserror::Error;
 
 /// The base vertex trait.

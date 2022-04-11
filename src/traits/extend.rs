@@ -40,9 +40,9 @@ pub trait Extend: Storage {
     /// Extends graph with given edges.
     ///
     /// Extends graph with given sequence of edges identifiers.
-    /// 
+    ///
     /// # Panics
-    /// 
+    ///
     /// Panics if at least one vertex is not in the graph.
     ///
     /// # Examples

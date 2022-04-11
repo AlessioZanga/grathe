@@ -3,10 +3,11 @@ mod from {
     mod undirected {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::{From, Storage};
-                use grathe::{E, V};
-                use rand::seq::SliceRandom;
-                use rand::thread_rng;
+                use grathe::{
+                    traits::{From, Storage},
+                    E, V,
+                };
+                use rand::{seq::SliceRandom, thread_rng};
 
                 #[test]
                 fn from_vertices() {
@@ -128,10 +129,11 @@ mod from {
     mod directed {
         macro_rules! generic_tests {
             ($G: ident) => {
-                use grathe::traits::{From, Storage};
-                use grathe::{E, V};
-                use rand::seq::SliceRandom;
-                use rand::thread_rng;
+                use grathe::{
+                    traits::{From, Storage},
+                    E, V,
+                };
+                use rand::{seq::SliceRandom, thread_rng};
 
                 #[test]
                 fn from_vertices() {

@@ -1,6 +1,9 @@
+use std::{
+    collections::{HashMap, VecDeque},
+    iter::FusedIterator,
+};
+
 use crate::traits::Directed;
-use std::collections::{HashMap, VecDeque};
-use std::iter::FusedIterator;
 
 /// Topological sort search structure.
 pub struct TopologicalSort<'a, G>
