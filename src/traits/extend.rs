@@ -9,33 +9,18 @@ pub trait Extend: Storage {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::null();
     ///
     /// // Extend graph with vertices.
-    /// g.extend_vertices([0, 3, 1, 2])?;
+    /// assert!(g.extend_vertices([0, 3, 1, 2]));
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 0);
     ///
-    /// // Extending with existing vertices yields an error.
-    /// assert_true!(g.extend_vertices([0]).is_err());
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graphl::null();
-    ///
-    /// // Extend graph with vertices.
-    /// g.extend_vertices(["0", "3", "1", "2"])?;
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 0);
-    ///
-    /// // Extending with existing vertices yields an error.
-    /// assert_true!(g.extend_vertices(["0"]).is_err());
-    /// # Ok(())
-    /// # }
+    /// // Extending with existing vertices return false.
+    /// assert!(!g.extend_vertices([0]));
     /// ```
     ///
     fn extend_vertices<I>(&mut self, iter: I) -> bool
@@ -55,38 +40,26 @@ pub trait Extend: Storage {
     /// Extends graph with given edges.
     ///
     /// Extends graph with given sequence of edges identifiers.
-    /// Non-existing vertices will be added as well.
+    /// 
+    /// # Panics
+    /// 
+    /// Panics if at least one vertex is not in the graph.
     ///
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
-    /// // Build a null graph.
-    /// let mut g = Graph::null();
+    /// // Build an empty graph.
+    /// let mut g = Graph::empty([0, 1, 2, 3]);
     ///
     /// // Extend graph with edges.
-    /// g.extend_edges([(0, 3), (1, 2)])?;
+    /// assert!(g.extend_edges([(0, 3), (1, 2)]));
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 2);
     ///
-    /// // Extending with existing edges yields an error.
-    /// assert_true!(g.extend_edges([(0, 3)]).is_err());
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graphl::null();
-    ///
-    /// // Extend graph with edges.
-    /// g.extend_edges([("0", "3"), ("1", "2")])?;
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 2);
-    ///
-    /// // Extending with existing edges yields an error.
-    /// assert_true!(g.extend_edges([("0", "3")]).is_err());
-    /// # Ok(())
-    /// # }
+    /// // Extending with existing edges return false.
+    /// assert!(!g.extend_edges([(0, 3)]));
     /// ```
     ///
     fn extend_edges<I>(&mut self, iter: I) -> bool

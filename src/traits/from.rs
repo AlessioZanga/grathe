@@ -9,25 +9,18 @@ pub trait From: Storage {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // A sequence of unique vertex.
-    /// let sequence = [0, 3, 1, 2];
+    /// let vertices = [0, 3, 1, 2];
     ///
     /// // Build a graph given a vector of vertex.
-    /// let g = Graph::from_vertices(sequence);
+    /// let g = Graph::from_vertices(vertices);
     ///
     /// // Build a graph given any `IntoIterator`.
     /// let h = Graph::from_vertices(0..4);
     ///
     /// assert_eq!(g, h);
-    ///
-    /// // A sequence of unique vertex.
-    /// let sequence = ["0", "3", "1", "2"];
-    ///
-    /// // Build a graph given a vector of vertex labels.
-    /// let g = Graphl::from_vertices(sequence);
     /// ```
     ///
     fn from_vertices<I>(iter: I) -> Self
@@ -55,22 +48,13 @@ pub trait From: Storage {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // A sequence of unique edges.
-    /// let sequence = [(0, 1), (2, 3), (1, 2)];
+    /// let edges = [(0, 1), (2, 3), (1, 2)];
     ///
     /// // Build a graph given a vector of edges.
-    /// let g = Graph::from_edges(sequence);
-    /// assert_eq!(g.order(), 4);
-    /// assert_eq!(g.size(), 3);
-    ///
-    /// // A sequence of unique edge labels pairs.
-    /// let sequence = [("0", "1"), ("2", "3"), ("1", "2")];
-    ///
-    /// // Build a graph given a vector of vertex labels pairs.
-    /// let g = Graphl::from_edges(sequence);
+    /// let g = Graph::from_edges(edges);
     /// assert_eq!(g.order(), 4);
     /// assert_eq!(g.size(), 3);
     /// ```

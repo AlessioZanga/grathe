@@ -116,7 +116,6 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // Build a new graph.
@@ -143,21 +142,20 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
     /// // Build a 3rd order graph.
     /// let g = Graph::from_vertices(0..3);
     ///
     /// // Use the vertex set iterator.
-    /// assert_true!(g.vertices_iter().eq(&[0, 1, 2]));
+    /// assert!(g.vertices_iter().eq(&[0, 1, 2]));
     ///
     /// // Use the associated macro 'V!'.
-    /// assert_true!(g.vertices_iter().eq(V!(g)));
+    /// assert!(g.vertices_iter().eq(V!(g)));
     ///
     /// // Iterate over the vertex set.
     /// for x in V!(g) {
-    ///     assert_true!(g.has_vertex(x));
+    ///     assert!(g.has_vertex(x));
     /// }
     /// ```
     ///
@@ -170,25 +168,21 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a 3rd order graph.
-    /// let g = Graph::from_edges([(0, 1), (1, 0)]);
+    /// let g = Graph::from_edges([(0, 1), (3, 2)]);
     ///
     /// // Use the vertex set iterator.
-    /// assert_true!(g.edges_iter().eq([(&0, &1), (&1, &0)]));
+    /// assert!(g.edges_iter().eq([(&0, &1), (&2, &3)]));
     ///
     /// // Use the associated macro 'E!'.
-    /// assert_true!(g.edges_iter().eq(E!(g)));
+    /// assert!(g.edges_iter().eq(E!(g)));
     ///
     /// // Iterate over the vertex set.
     /// for (x, y) in E!(g) {
-    ///     assert_true!(g.has_edge(&x, &y)?);
+    ///     assert!(g.has_edge(&x, &y));
     /// }
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     fn edges_iter<'a>(&'a self) -> Box<dyn EdgeIterator<'a, Self::Vertex> + 'a>;
@@ -204,26 +198,21 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error>
-    /// # {
     /// // Build a graph from edges.
     /// let g = Graph::from_edges([(0, 1), (2, 0), (0, 0)]);
     ///
     /// // Use the adjacent iterator.
-    /// assert_true!(g.adjacents_iter(&0).eq(&[0, 1, 2]));
+    /// assert!(g.adjacents_iter(&0).eq(&[0, 1, 2]));
     ///
     /// // Use the associated macro 'Adj!'.
-    /// assert_true!(g.adjacents_iter(&0).eq(Adj!(g, &0)));
+    /// assert!(g.adjacents_iter(&0).eq(Adj!(g, &0)));
     ///
     /// // Iterate over the adjacent set.
     /// for &x in Adj!(g, &0) {
-    ///     assert_true!(g.has_edge(&0, &x)?);
+    ///     assert!(g.has_edge(&0, &x));
     /// }
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a>;
@@ -269,27 +258,15 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a 2nd order graph.
     /// let g = Graph::from_vertices(0..2);
     ///
-    /// // Check vertex.
-    /// assert_true!(g.has_vertex(&0));
-    /// assert_false!(g.has_vertex(&2));
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graphl::null();
-    ///
-    /// // Add a vertex given its label.
-    /// let i = g.add_vertex("0")?;
-    ///
-    /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_vertex(&i));
-    /// # Ok(())
-    /// # }
+    /// // Check vertices.
+    /// assert!(g.has_vertex(&0));
+    /// assert!(g.has_vertex(&1));
+    /// assert!(!g.has_vertex(&2));
     /// ```
     ///
     fn has_vertex(&self, x: &Self::Vertex) -> bool;
@@ -305,27 +282,14 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::null();
     ///
     /// // Add a new vertex.
-    /// let i = g.add_vertex(0)?;
-    /// assert_true!(g.has_vertex(&i));
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graphl::null();
-    ///
-    /// // Add a vertex given its label.
-    /// let i = g.add_vertex("0")?;
-    ///
-    /// // Adding an existing vertex label yields an error.
-    /// assert_true!(g.add_vertex("0").is_err());
-    /// # Ok(())
-    /// # }
+    /// assert!(g.add_vertex(0));
+    /// assert!(g.has_vertex(&0));
     /// ```
     ///
     fn add_vertex(&mut self, x: Self::Vertex) -> bool;
@@ -341,25 +305,21 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
     /// let mut g = Graph::null();
     ///
     /// // Add a new vertex.
-    /// let i = g.add_vertex(0)?;
-    /// assert_true!(g.has_vertex(&i));
+    /// assert!(g.add_vertex(0));
+    /// assert!(g.has_vertex(&0));
     ///
     /// // Delete the newly added vertex.
-    /// g.del_vertex(&i)?;
-    /// assert_false!(g.has_vertex(&i));
+    /// assert!(g.del_vertex(&0));
+    /// assert!(!g.has_vertex(&0));
     ///
-    /// // Deleting a non-existing vertex yields an error.
-    /// assert_true!(g.del_vertex(&i).is_err());
-    /// # Ok(())
-    /// # }
+    /// // Deleting a non-existing vertex return false.
+    /// assert!(!g.del_vertex(&0));
     /// ```
     ///
     fn del_vertex(&mut self, x: &Self::Vertex) -> bool;
@@ -368,38 +328,20 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     ///
     /// Checks whether the graph has a given edge or not.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// At least one of the vertex identifiers does not exist in the graph.
+    /// Panics if at least one of the vertex identifiers does not exist in the graph.
     ///
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
     /// let g = Graph::from_edges([(0, 1), (3, 2)]);
     ///
     /// // Check edge.
-    /// assert_true!(g.has_edge(&0, &1)?);
-    ///
-    /// // Checking an edge with non-existing vertex yields an error.
-    /// assert_true!(g.has_edge(&0, &42).is_err());
-    ///
-    /// // Build a null graph.
-    /// let mut g = Graphl::null();
-    ///
-    /// // Add a edge given its label.
-    /// let x = g.add_vertex("0")?;
-    /// let y = g.add_vertex("1")?;
-    /// g.add_edge(&x, &y)?;
-    ///
-    /// // Check that the newly added label is indeed in the graph.
-    /// assert_true!(g.has_edge(&x, &y)?);
-    /// # Ok(())
-    /// # }
+    /// assert!(g.has_edge(&0, &1));
     /// ```
     ///
     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
@@ -408,47 +350,24 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     ///
     /// Add new edge identifier into the graph.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// At least one of the vertex identifiers does not exist in the graph,
-    /// or the edge identifier already exists in the graph.
+    /// At least one of the vertex identifiers does not exist in the graph.
     ///
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a 2nd order graph.
     /// let mut g = Graph::from_vertices(0..2);
     ///
-    /// // Set vertices identifiers.
-    /// let (x, y) = (0, 1);
-    ///
     /// // Add a new edge from vertex.
-    /// g.add_edge(&x, &y)?;
-    /// assert_true!(g.has_edge(&x, &y)?);
+    /// assert!(g.add_edge(&0, &1));
+    /// assert!(g.has_edge(&0, &1));
     ///
-    /// // Adding an existing edge yields an error.
-    /// assert_true!(g.add_edge(&x, &y).is_err());
-    ///
-    /// // Build a 3rd order graph.
-    /// let mut g = Graphl::from_vertices(
-    ///     (0..3).into_iter().map(|x| x.to_string())
-    /// );
-    ///
-    /// // Set vertices identifiers.
-    /// let x: String = "0".into();
-    /// let y: String = "1".into();
-    ///
-    /// // Add a edge given its label.
-    /// g.add_edge(&x, &y)?;
-    ///
-    /// // Adding an existing edge label yields an error.
-    /// assert_true!(g.add_edge(&x, &y).is_err());
-    /// # Ok(())
-    /// # }
+    /// // Adding an existing edge return false.
+    /// assert!(!g.add_edge(&0, &1));
     /// ```
     ///
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
@@ -457,35 +376,24 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     ///
     /// Remove given edge identifier from the graph.
     ///
-    /// # Errors
+    /// # Panics
     ///
-    /// At least one of the vertex identifiers does not exist in the graph,
-    /// or the edge identifier does not exist in the graph.
+    /// Panics if at least one of the vertex identifiers does not exist in the graph.
     ///
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a null graph.
-    /// let mut g = Graph::null();
+    /// let mut g = Graph::from_edges([(0, 1), (3, 2)]);
     ///
-    /// // Add a new edge.
-    /// let x = g.add_vertex(0)?;
-    /// let y = g.add_vertex(1)?;
-    /// g.add_edge(&x, &y)?;
-    /// assert_true!(g.has_edge(&x, &y)?);
+    /// // Delete an edge.
+    /// assert!(g.del_edge(&0, &1));
+    /// assert!(!g.has_edge(&0, &1));
     ///
-    /// // Delete the newly added edge.
-    /// g.del_edge(&x, &y)?;
-    /// assert_false!(g.has_edge(&x, &y)?);
-    ///
-    /// // Deleting a non-existing edge yields an error.
-    /// assert_true!(g.del_edge(&x, &y).is_err());
-    /// # Ok(())
-    /// # }
+    /// // Deleting a non-existing edge return false.
+    /// assert!(!g.del_edge(&0, &1));
     /// ```
     ///
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool;
@@ -501,20 +409,16 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
     /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Get the degree of `1`.
-    /// assert_true!(
+    /// assert!(
     ///     g.degree(&1) == 3 &&
     ///     g.degree(&1) == Adj!(g, &1).count()
     /// );
-    /// # Ok(())
-    /// # }
     /// ```
     ///
     fn degree(&self, x: &Self::Vertex) -> usize {
@@ -532,17 +436,13 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
     /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is isolated (a.k.a not connected).
-    /// assert_false!(g.is_isolated_vertex(&0));
-    /// # Ok(())
-    /// # }
+    /// assert!(!g.is_isolated_vertex(&0));
     /// ```
     ///
     fn is_isolated_vertex(&self, x: &Self::Vertex) -> bool {
@@ -560,17 +460,13 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// # Examples
     ///
     /// ```
-    /// use all_asserts::*;
     /// use grathe::prelude::*;
     ///
-    /// # fn main() -> Result<(), anyhow::Error> {
     /// // Build a graph.
     /// let g = Graph::from_edges([(0, 1), (2, 1), (3, 1)]);
     ///
     /// // Check if `0` is pendant (a.k.a is connected to just one vertex).
-    /// assert_true!(g.is_pendant_vertex(&0));
-    /// # Ok(())
-    /// # }
+    /// assert!(g.is_pendant_vertex(&0));
     /// ```
     ///
     fn is_pendant_vertex(&self, x: &Self::Vertex) -> bool {

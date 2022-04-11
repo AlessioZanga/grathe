@@ -289,7 +289,7 @@ where
 /// $\textbf{A}$ the [adjacency matrix][`adjacency_matrix`],
 /// and can also be derived from the [incidence matrix][`incidence_matrix`] $\textbf{B}$ as:
 ///
-/// $$ \textbf{L} = \textbf{B}\textbf{B}^T $$
+/// $$ |\textbf{L}| = \textbf{B}\textbf{B}^T $$
 ///
 /// # Examples
 ///
@@ -323,7 +323,7 @@ where
 /// // Check Laplacian matrix from incidence matrix.
 /// let B = linalg::incidence_matrix(&g);
 /// assert_relative_eq!(
-///     linalg::laplacian_matrix(&g),
+///     linalg::laplacian_matrix(&g).mapv(|x| f32::abs(x)),
 ///     B.dot(&B.t())
 /// );
 /// ```
