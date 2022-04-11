@@ -510,14 +510,14 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     ///
     /// // Get the degree of `1`.
     /// assert_true!(
-    ///     g.degree_of(&1) == 3 &&
-    ///     g.degree_of(&1) == Adj!(g, &1).count()
+    ///     g.degree(&1) == 3 &&
+    ///     g.degree(&1) == Adj!(g, &1).count()
     /// );
     /// # Ok(())
     /// # }
     /// ```
     ///
-    fn degree_of(&self, x: &Self::Vertex) -> usize {
+    fn degree(&self, x: &Self::Vertex) -> usize {
         self.adjacents_iter(x).count()
     }
 
@@ -546,7 +546,7 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// ```
     ///
     fn is_isolated_vertex(&self, x: &Self::Vertex) -> bool {
-        self.degree_of(x) == 0
+        self.degree(x) == 0
     }
 
     /// Is pendant vertex.
@@ -574,7 +574,7 @@ pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
     /// ```
     ///
     fn is_pendant_vertex(&self, x: &Self::Vertex) -> bool {
-        self.degree_of(x) == 1
+        self.degree(x) == 1
     }
 }
 

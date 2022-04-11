@@ -4,28 +4,9 @@ mod storage {
         macro_rules! generic_tests {
             ($G: ident) => {
                 use grathe::traits::Storage;
+                use grathe::utils::is_sorted;
                 use grathe::{Adj, E, V};
                 use std::cmp::Ordering;
-
-                // TODO: Replace with is_sorted method on iterators once stable.
-                #[allow(dead_code)]
-                fn is_sorted<I>(data: I) -> bool
-                where
-                    I: IntoIterator,
-                    I::Item: Ord,
-                {
-                    let mut it = data.into_iter();
-                    match it.next() {
-                        None => true,
-                        Some(first) => it
-                            .scan(first, |state, next| {
-                                let cmp = *state <= next;
-                                *state = next;
-                                Some(cmp)
-                            })
-                            .all(|b| b),
-                    }
-                }
 
                 #[test]
                 fn eq() {
@@ -911,28 +892,9 @@ mod storage {
         macro_rules! generic_tests {
             ($G: ident) => {
                 use grathe::traits::Storage;
+                use grathe::utils::is_sorted;
                 use grathe::{Adj, E, V};
                 use std::cmp::Ordering;
-
-                // TODO: Replace with is_sorted method on iterators once stable.
-                #[allow(dead_code)]
-                fn is_sorted<I>(data: I) -> bool
-                where
-                    I: IntoIterator,
-                    I::Item: Ord,
-                {
-                    let mut it = data.into_iter();
-                    match it.next() {
-                        None => true,
-                        Some(first) => it
-                            .scan(first, |state, next| {
-                                let cmp = *state <= next;
-                                *state = next;
-                                Some(cmp)
-                            })
-                            .all(|b| b),
-                    }
-                }
 
                 #[test]
                 fn eq() {

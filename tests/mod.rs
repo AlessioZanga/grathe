@@ -1,3 +1,2 @@
-// FIXME: mod algorithms;
-// FIXME: mod directions;
-// FIXME: mod linalg;
+mod algorithms;
+mod linalg;

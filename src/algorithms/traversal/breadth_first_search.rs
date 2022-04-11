@@ -4,6 +4,7 @@ use crate::types::directions;
 use crate::V;
 use std::collections::{HashMap, VecDeque};
 use std::iter::FusedIterator;
+use std::marker::PhantomData;
 
 /// Breadth-first search structure.
 ///
@@ -19,8 +20,6 @@ where
 {
     /// Given graph reference.
     graph: &'a G,
-    /// Generic placeholder for direction.
-    direction: std::marker::PhantomData<D>,
     /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
     vertices: VecDeque<&'a G::Vertex>,
     /// To-be-visited queue with the source vertex.
@@ -29,6 +28,8 @@ where
     pub distance: HashMap<&'a G::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
     pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
+    /// Generic placeholder for direction.
+    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> BreadthFirstSearch<'a, G, D>
@@ -78,8 +79,6 @@ where
         let mut search = Self {
             // Set target graph.
             graph: g,
-            // Generic placeholder for direction.
-            direction: Default::default(),
             // Initialize the [`Forest`] to-be-visited queue.
             vertices: Default::default(),
             // Initialize the to-be-visited queue with the source vertex.
@@ -88,6 +87,8 @@ where
             distance: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
+            // Generic placeholder for direction.
+            _direction_type: Default::default(),
         };
         // If the graph is null.
         if g.order() == 0 {

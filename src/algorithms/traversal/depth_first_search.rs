@@ -4,6 +4,7 @@ use crate::types::directions;
 use crate::V;
 use std::collections::{HashMap, VecDeque};
 use std::iter::FusedIterator;
+use std::marker::PhantomData;
 use std::vec::Vec;
 
 /// Depth-first search structure.
@@ -16,8 +17,6 @@ where
 {
     /// Given graph reference.
     graph: &'a G,
-    /// Generic placeholder for direction.
-    direction: std::marker::PhantomData<D>,
     /// The visit stack.
     stack: Vec<&'a G::Vertex>,
     /// Global time counter.
@@ -28,6 +27,8 @@ where
     pub finish_time: HashMap<&'a G::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
     pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
+    /// Generic placeholder for direction.
+    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> DepthFirstSearch<'a, G, D>
@@ -81,8 +82,6 @@ where
         let mut search = Self {
             // Set target graph.
             graph: g,
-            // Generic placeholder for direction.
-            direction: Default::default(),
             // Initialize the to-be-visited queue with the source vertex.
             stack: Default::default(),
             // Initialize the global clock.
@@ -93,6 +92,8 @@ where
             finish_time: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
+            // Generic placeholder for direction.
+            _direction_type: Default::default(),
         };
         // If the graph is null.
         if g.order() == 0 {

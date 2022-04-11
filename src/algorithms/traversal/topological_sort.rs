@@ -40,7 +40,7 @@ where
         // For each vertex in the graph.
         for x in search.graph.vertices_iter() {
             // Compute its in-degree.
-            match search.graph.in_degree_of(x) {
+            match search.graph.in_degree(x) {
                 // If the in-degree is zero, then add it to the queue.
                 0 => search.queue.push_back(x),
                 // Otherwise, add it to the map.

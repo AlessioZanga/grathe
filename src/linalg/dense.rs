@@ -1,3 +1,4 @@
+use crate::V;
 use crate::traits::{Convert, Storage};
 use ndarray::{Array, Array1, Array2, Axis};
 use ndarray_linalg::lobpcg::{lobpcg, LobpcgResult, TruncatedOrder};
@@ -227,7 +228,7 @@ pub fn degree_vector<G>(g: &G) -> Array1<f32>
 where
     G: Convert + Storage,
 {
-    adjacency_matrix(g).sum_axis(Axis(1))
+    Array1::from_iter(V!(g).map(|x| g.degree(x) as f32))
 }
 
 /// Degree matrix of a graph.

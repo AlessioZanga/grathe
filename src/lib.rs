@@ -24,8 +24,8 @@ pub mod traits;
 /// Crate-wide types.
 pub mod types;
 
-// Tools, macros, etc.
-mod utils;
+/// Tools, macros, etc.
+pub mod utils;
 
 // Include Pest dependencies.
 extern crate pest;

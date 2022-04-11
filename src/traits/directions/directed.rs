@@ -97,7 +97,7 @@ pub trait Directed: Storage {
     ///
     /// Panics if the vertex identifier does not exist in the graph.
     ///
-    fn in_degree_of(&self, x: &Self::Vertex) -> usize {
+    fn in_degree(&self, x: &Self::Vertex) -> usize {
         return self.parents_iter(x).count();
     }
 
@@ -109,7 +109,7 @@ pub trait Directed: Storage {
     ///
     /// Panics if the vertex identifier does not exist in the graph.
     ///
-    fn out_degree_of(&self, x: &Self::Vertex) -> usize {
+    fn out_degree(&self, x: &Self::Vertex) -> usize {
         return self.children_iter(x).count();
     }
 }

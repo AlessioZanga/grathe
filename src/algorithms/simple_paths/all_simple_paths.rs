@@ -1,6 +1,7 @@
 use crate::traits::{Directed, Storage, Undirected};
 use crate::types::directions;
 use std::collections::HashSet;
+use std::marker::PhantomData;
 use std::vec::Vec;
 
 /// Find all simple paths in a graph for given source and target vertices.
@@ -10,14 +11,14 @@ where
 {
     /// Given graph reference.
     graph: &'a G,
-    /// Generic placeholder for direction.
-    direction: std::marker::PhantomData<D>,
     /// To-be-visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Already visited set.
     visited: HashSet<&'a G::Vertex>,
     /// Vector of found simple paths.
     pub simple_paths: Vec<Vec<&'a G::Vertex>>,
+    /// Generic placeholder for direction.
+    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> AllSimplePaths<'a, G, D>
@@ -67,14 +68,14 @@ where
         Self {
             // Set target graph.
             graph: g,
-            // Generic placeholder for direction.
-            direction: Default::default(),
             // Initialize the to-be-visited queue with source and target vertices.
             stack: From::from([x, y]),
             // Initialize the already visited set.
             visited: Default::default(),
             // Initialize vector of found simple paths.
             simple_paths: Default::default(),
+            // Generic placeholder for direction.
+            _direction_type: Default::default(),
         }
     }
 }
