@@ -19,7 +19,7 @@ use crate::{
 };
 
 /// Undirected graph based on adjacency list storage layout.
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct UndirectedAdjacencyList<V, A = AttributesMap<V, (), (), ()>>
 where
     V: Vertex,

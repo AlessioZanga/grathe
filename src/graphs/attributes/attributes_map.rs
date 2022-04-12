@@ -6,13 +6,13 @@ use crate::{
 };
 
 /// A simple hashmap-based attribute manager.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AttributesMap<V, X, Y, Z>
 where
     V: Vertex,
-    X: Debug,
-    Y: Debug,
-    Z: Debug,
+    X: Clone + Debug,
+    Y: Clone + Debug,
+    Z: Clone + Debug,
 {
     gattrs: Option<X>,
     vattrs: HashMap<V, Y>,
@@ -22,9 +22,9 @@ where
 impl<V, X, Y, Z> Default for AttributesMap<V, X, Y, Z>
 where
     V: Vertex,
-    X: Debug,
-    Y: Debug,
-    Z: Debug,
+    X: Clone + Debug,
+    Y: Clone + Debug,
+    Z: Clone + Debug,
 {
     fn default() -> Self {
         Self {
@@ -38,9 +38,9 @@ where
 impl<V, X, Y, Z> WithAttributes<V> for AttributesMap<V, X, Y, Z>
 where
     V: Vertex,
-    X: Debug,
-    Y: Debug,
-    Z: Debug,
+    X: Clone + Debug,
+    Y: Clone + Debug,
+    Z: Clone + Debug,
 {
     type GraphAttributes = X;
     type VertexAttributes = Y;

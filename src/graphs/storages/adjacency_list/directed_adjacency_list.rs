@@ -18,7 +18,7 @@ use crate::{
 };
 
 /// Directed graph based on adjacency list storage layout.
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct DirectedAdjacencyList<V, A = AttributesMap<V, (), (), ()>>
 where
     V: Vertex,

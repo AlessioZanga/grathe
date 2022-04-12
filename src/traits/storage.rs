@@ -4,7 +4,7 @@ use super::{Capacity, Operators};
 use crate::types::{EdgeIterator, Vertex, VertexIterator};
 
 /// The graph storage trait.
-pub trait Storage: Capacity + Debug + Default + Eq + Operators + PartialOrd {
+pub trait Storage: Capacity + Clone + Debug + Default + Eq + Operators + PartialOrd {
     /// Vertex identifier type.
     type Vertex: Vertex;
 
