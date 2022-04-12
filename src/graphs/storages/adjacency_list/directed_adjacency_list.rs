@@ -8,6 +8,7 @@ use sprs::TriMat;
 
 use crate::{
     graphs::attributes::AttributesMap,
+    prelude::{DFSEdge, DFSEdges, Traversal, BFS},
     traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes},
     types::{
         directions, AdjacencyList, DenseAdjacencyMatrix, EdgeIterator, EdgeList, Error, ExactSizeIter,
@@ -16,6 +17,7 @@ use crate::{
     E, V,
 };
 
+/// Directed graph based on adjacency list storage layout.
 #[derive(Debug, Default)]
 pub struct DirectedAdjacencyList<V, A = AttributesMap<V, (), (), ()>>
 where
@@ -363,19 +365,21 @@ where
     V: Vertex,
     A: WithAttributes<V>,
 {
-    // FIXME:
     fn has_path(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        todo!()
+        // Account for self loops and then execute BFS.
+        // NOTE: The difference between performing self.has_edge(z, y),
+        // instead of z == y, is due to the possible presence of cycles.
+        self.has_edge(x, y) || BFS::from((self, x)).skip(1).any(|z| self.has_edge(z, y))
     }
 
-    // FIXME:
     fn is_connected(&self) -> bool {
-        todo!()
+        // A graph is connected if a tree-traversal discover every vertex in the graph.
+        BFS::from(self).count() == self.order()
     }
 
-    // FIXME:
     fn is_acyclic(&self) -> bool {
-        todo!()
+        // A graph is acyclic if it does not contain any back edge.
+        !DFSEdges::new(self, None, Traversal::Forest).any(|e| matches!(e, DFSEdge::Back(_, _)))
     }
 }
 

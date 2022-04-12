@@ -149,7 +149,7 @@ where
                 // Push vertices onto the stack in reverse order, this makes
                 // traversal order and neighborhood order the same.
                 self.stack.extend(queue);
-                // Filter the base case. TODO: Simplify this.
+                // Filter the base case. TODO: Simplify this. Base case-related.
                 if x != y && self.predecessor.contains_key(y) {
                     // discovery[x] < discovery[y] && finish[x] < finish[y].
                     return Some(DFSEdge::Tree(x, y));
@@ -158,9 +158,9 @@ where
             } else {
                 // Remove it from stack.
                 self.stack.pop();
-                // Check if current vertex can be GRAY. TODO: Simplify this.
+                // Check if current vertex can be GRAY. TODO: Simplify this. Base case-related.
                 let flag = self.predecessor.get(y);
-                // Check if it is GRAY (not BLACK). TODO: Simplify this.
+                // Check if it is GRAY (not BLACK). TODO: Simplify this. Base case-related.
                 if (flag.is_none() || flag == Some(&x)) && !self.finish_time.contains_key(y) {
                     // Set its finish time (as BLACK).
                     self.finish_time.insert(y, self.time);
@@ -169,12 +169,12 @@ where
                 }
             }
             // Classify the incoming edge w.r.t. the timings.
-            if self.discovery_time[x] > self.discovery_time[y] {
-                if self.discovery_time[x] < *self.finish_time.get(y).unwrap_or(&0) {
-                    // discovery[x] > discovery[y] && discovery[x] < finish[y].
-                    return Some(DFSEdge::Back(x, y));
-                }
-                // Given that the graph is undirected, there are no forward nor cross edges.
+            // NOTE: Given that the graph is undirected, there are no forward nor cross edges.
+            if self.discovery_time[x] > self.discovery_time[y]
+                && self.discovery_time[x] < *self.finish_time.get(y).unwrap_or(&0)
+            {
+                // discovery[x] > discovery[y] && discovery[x] < finish[y].
+                return Some(DFSEdge::Back(x, y));
             }
         }
 
@@ -214,7 +214,7 @@ where
                 // Push vertices onto the stack in reverse order, this makes
                 // traversal order and neighborhood order the same.
                 self.stack.extend(queue);
-                // Filter the base case. TODO: Simplify this.
+                // Filter the base case. TODO: Simplify this. Base case-related.
                 if x != y && self.predecessor.contains_key(y) {
                     // discovery[x] < discovery[y] && discovery[x] > finish[y].
                     return Some(DFSEdge::Tree(x, y));
@@ -223,9 +223,9 @@ where
             } else {
                 // Remove it from stack.
                 self.stack.pop();
-                // Check if current vertex can be GRAY. TODO: Simplify this.
+                // Check if current vertex can be GRAY. TODO: Simplify this. Base case-related.
                 let flag = self.predecessor.get(y);
-                // Check if it is GRAY (not BLACK). TODO: Simplify this.
+                // Check if it is GRAY (not BLACK). TODO: Simplify this. Base case-related.
                 if (flag.is_none() || flag == Some(&x)) && !self.finish_time.contains_key(y) {
                     // Set its finish time (as BLACK).
                     self.finish_time.insert(y, self.time);
@@ -243,7 +243,7 @@ where
                     return Some(DFSEdge::Cross(x, y));
                 }
             } else {
-                // Finally ... TODO: Simplify this.
+                // Finally ... TODO: Simplify this. Partially base case-related.
                 let flag = self.predecessor.get(y);
                 // ... if it is not a Tree edge ...
                 if x != y && flag.is_some() && flag != Some(&x) {
