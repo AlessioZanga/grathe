@@ -8,7 +8,7 @@ use super::Traversal;
 use crate::{
     traits::{Directed, Storage, Undirected},
     types::directions,
-    V, Ne, Ch,
+    Ch, Ne, V,
 };
 
 /// Breadth-first search structure.

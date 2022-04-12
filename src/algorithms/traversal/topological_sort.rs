@@ -3,7 +3,7 @@ use std::{
     iter::FusedIterator,
 };
 
-use crate::{traits::Directed, V, Ch};
+use crate::{traits::Directed, Ch, V};
 
 /// Topological sort search structure.
 pub struct TopologicalSort<'a, G>

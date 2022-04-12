@@ -4,7 +4,7 @@ use std::{
     iter::FusedIterator,
 };
 
-use crate::{traits::Undirected, V, Ne};
+use crate::{traits::Undirected, Ne, V};
 
 /// Lexicographic depth-first search structure.
 ///

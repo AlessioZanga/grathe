@@ -3,7 +3,7 @@ mod undirected {
     macro_rules! generic_tests {
         ($G: ident) => {
             use grathe::{
-                algorithms::{DFSEdges, LexBFS, LexDFS, BFS, DFS, DFSEdge},
+                algorithms::{DFSEdge, DFSEdges, LexBFS, LexDFS, BFS, DFS},
                 traits::{From, Storage},
             };
 
@@ -710,6 +710,11 @@ mod undirected {
 mod directed {
     macro_rules! generic_tests {
         ($G: ident) => {
+            use grathe::{
+                algorithms::{DFSEdge, DFSEdges, TopologicalSort, Traversal, BFS, DFS},
+                traits::{From, Storage},
+            };
+
             #[test]
             fn breadth_first_search_tree() {
                 // Build a null graph.
@@ -848,7 +853,7 @@ mod directed {
                 // Build a null graph.
                 let g = $G::<i32>::null();
                 // Build a search object.
-                let mut search = BFS::new(&g, None, grathe::algorithms::Traversal::Forest);
+                let mut search = BFS::new(&g, None, Traversal::Forest);
                 // To search on a null graph
                 // without a source vertex
                 // yields no result.
@@ -869,7 +874,7 @@ mod directed {
                     (9, 8),
                 ]);
                 // Build a search object.
-                let mut search = BFS::new(&g, None, grathe::algorithms::Traversal::Forest);
+                let mut search = BFS::new(&g, None, Traversal::Forest);
                 // Collect the vertex in pre-order.
                 let order: Vec<_> = search.by_ref().collect();
                 // Check visit order.
@@ -1064,7 +1069,7 @@ mod directed {
                 // Build a null graph.
                 let g = $G::<i32>::null();
                 // Build a search object.
-                let mut search = DFS::new(&g, None, grathe::algorithms::Traversal::Forest);
+                let mut search = DFS::new(&g, None, Traversal::Forest);
                 // To search on a null graph
                 // without a source vertex
                 // yields no result.
@@ -1073,7 +1078,7 @@ mod directed {
                 // Build a disconnected graph.
                 let g = $G::<i32>::from_edges([(0, 1), (1, 2), (3, 4)]);
                 // Build a search object.
-                let mut search = DFS::new(&g, None, grathe::algorithms::Traversal::Forest);
+                let mut search = DFS::new(&g, None, Traversal::Forest);
                 // Collect the vertex in pre-order.
                 let order: Vec<_> = search.by_ref().collect();
                 // Check visit order.
@@ -1102,6 +1107,219 @@ mod directed {
                 assert_eq!(search.predecessor.get(&2), Some(&&1));
                 assert_eq!(search.predecessor.get(&3), None);
                 assert_eq!(search.predecessor.get(&4), Some(&&3));
+            }
+
+            #[test]
+            fn depth_first_search_edges_tree() {
+                // Build a null graph.
+                let g = $G::<i32>::null();
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields no result.
+                assert_eq!(search.next(), None);
+
+                // Build an empty graph.
+                let g = $G::<i32>::empty([0, 1]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields no result.
+                assert_eq!(search.next(), None);
+
+                // Build a non-empty graph.
+                let g = $G::<i32>::from_edges([(0, 1)]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), None);
+
+                // Build a trivial graph.
+                let g = $G::<i32>::from_edges([(0, 1), (1, 2), (2, 0)]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&2, &0)));
+                assert_eq!(search.next(), None);
+
+                // Build a trivial graph.
+                let g = $G::<i32>::from_edges([(0, 1), (1, 2), (2, 0), (1, 3)]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&2, &0)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &3)));
+                assert_eq!(search.next(), None);
+
+                // Build a non-trivial graph.
+                // From "https://www.csd.uoc.gr/~hy583/papers/ch3_4.pdf", Fig. 3.2.
+                let g = $G::<i32>::from_edges([
+                    // a, b, c, d, e, f, g, h
+                    // 0, 1, 2, 3, 4, 5, 6, 7
+
+                    // a --> b,
+                    (0, 1),
+                    // a --> c,
+                    (0, 2),
+                    // a --> d,
+                    (0, 3),
+                    // a --> f,
+                    (0, 5),
+                    // b --> d,
+                    (1, 3),
+                    // c --> d,
+                    (2, 3),
+                    // c --> e,
+                    (2, 4),
+                    // d --> e,
+                    (3, 4),
+                    // d --> f,
+                    (3, 5),
+                    // e --> a,
+                    (4, 0),
+                    // e --> f,
+                    (4, 5),
+                    // g --> b,
+                    (6, 1),
+                    // g --> h,
+                    (6, 7),
+                    // h --> d.
+                    (7, 3),
+                ]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &3)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&3, &4)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&4, &0)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&4, &5)));
+                assert_eq!(search.next(), Some(DFSEdge::Forward(&3, &5))); // NOTE: This is missing in the example...
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Cross(&2, &3)));
+                assert_eq!(search.next(), Some(DFSEdge::Cross(&2, &4)));
+                assert_eq!(search.next(), Some(DFSEdge::Forward(&0, &3)));
+                assert_eq!(search.next(), Some(DFSEdge::Forward(&0, &5)));
+                assert_eq!(search.next(), None);
+            }
+
+            #[test]
+            #[should_panic]
+            fn depth_first_search_edges_tree_should_panic() {
+                // Build a null graph.
+                let g = $G::<i32>::null();
+                DFSEdges::from((&g, &0)).next();
+            }
+
+            #[test]
+            fn depth_first_search_edges_forest() {
+                // Build a null graph.
+                let g = $G::<i32>::null();
+                // Build a search object.
+                let mut search = DFSEdges::new(&g, None, Traversal::Forest);
+                // Yields no result.
+                assert_eq!(search.next(), None);
+
+                // Build an empty graph.
+                let g = $G::<i32>::empty([0, 1]);
+                // Build a search object.
+                let mut search = DFSEdges::new(&g, None, Traversal::Forest);
+                // Yields no result.
+                assert_eq!(search.next(), None);
+
+                // Build a non-empty graph.
+                let g = $G::<i32>::from_edges([(0, 1)]);
+                // Build a search object.
+                let mut search = DFSEdges::new(&g, None, Traversal::Forest);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), None);
+
+                // Build a trivial graph.
+                let g = $G::<i32>::from_edges([(0, 1), (1, 2), (2, 0)]);
+                // Build a search object.
+                let mut search = DFSEdges::new(&g, None, Traversal::Forest);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&2, &0)));
+                assert_eq!(search.next(), None);
+
+                // Build a trivial graph.
+                let g = $G::<i32>::from_edges([(0, 1), (1, 2), (2, 0), (1, 3)]);
+                // Build a search object.
+                let mut search = DFSEdges::new(&g, None, Traversal::Forest);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&2, &0)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &3)));
+                assert_eq!(search.next(), None);
+
+                // Build a non-trivial graph.
+                // From "https://www.csd.uoc.gr/~hy583/papers/ch3_4.pdf", Fig. 3.2.
+                let g = $G::<i32>::from_edges([
+                    // a, b, c, d, e, f, g, h
+                    // 0, 1, 2, 3, 4, 5, 6, 7
+
+                    // a --> b,
+                    (0, 1),
+                    // a --> c,
+                    (0, 2),
+                    // a --> d,
+                    (0, 3),
+                    // a --> f,
+                    (0, 5),
+                    // b --> d,
+                    (1, 3),
+                    // c --> d,
+                    (2, 3),
+                    // c --> e,
+                    (2, 4),
+                    // d --> e,
+                    (3, 4),
+                    // d --> f,
+                    (3, 5),
+                    // e --> a,
+                    (4, 0),
+                    // e --> f,
+                    (4, 5),
+                    // g --> b,
+                    (6, 1),
+                    // g --> h,
+                    (6, 7),
+                    // h --> d.
+                    (7, 3),
+                ]);
+                // Build a search object.
+                let mut search = DFSEdges::new(&g, None, Traversal::Forest);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &3)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&3, &4)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&4, &0)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&4, &5)));
+                assert_eq!(search.next(), Some(DFSEdge::Forward(&3, &5))); // NOTE: This is missing in the example...
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Cross(&2, &3)));
+                assert_eq!(search.next(), Some(DFSEdge::Cross(&2, &4)));
+                assert_eq!(search.next(), Some(DFSEdge::Forward(&0, &3)));
+                assert_eq!(search.next(), Some(DFSEdge::Forward(&0, &5)));
+                assert_eq!(search.next(), Some(DFSEdge::Cross(&6, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&6, &7)));
+                assert_eq!(search.next(), Some(DFSEdge::Cross(&7, &3)));
+                assert_eq!(search.next(), None);
+            }
+
+            #[test]
+            #[should_panic]
+            fn depth_first_search_edges_forest_should_panic() {
+                // Build a null graph.
+                let g = $G::<i32>::null();
+                DFSEdges::from((&g, &0)).next();
             }
 
             #[test]
@@ -1149,11 +1367,7 @@ mod directed {
     }
 
     mod adjacency_list {
-        use grathe::{
-            algorithms::{TopologicalSort, BFS, DFS},
-            graphs::storages::DirectedAdjacencyList,
-            traits::{From, Storage},
-        };
+        use grathe::graphs::storages::DirectedAdjacencyList;
 
         generic_tests!(DirectedAdjacencyList);
     }

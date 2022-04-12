@@ -4,13 +4,12 @@ use std::{
     marker::PhantomData,
 };
 
+use super::Traversal;
 use crate::{
     traits::{Directed, Storage, Undirected},
     types::{directions, Vertex},
-    Ne, V,
+    Ch, Ne, V,
 };
-
-use super::Traversal;
 
 /// Edge classification performed by the [depth first search edges](`DepthFirstSearchEdges`) algorithm.
 #[derive(Debug, PartialEq, Eq)]
@@ -135,7 +134,7 @@ where
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
                 for z in Ne!(self.graph, y) {
-                    // Filter incoming edge.
+                    // Filter incoming edge. TODO: Simplify this.
                     if self.predecessor.get(y) == Some(&z) {
                         continue;
                     }
@@ -150,7 +149,7 @@ where
                 // Push vertices onto the stack in reverse order, this makes
                 // traversal order and neighborhood order the same.
                 self.stack.extend(queue);
-                // Filter the base case.
+                // Filter the base case. TODO: Simplify this.
                 if x != y && self.predecessor.contains_key(y) {
                     // discovery[x] < discovery[y] && finish[x] < finish[y].
                     return Some(DFSEdge::Tree(x, y));
@@ -159,11 +158,10 @@ where
             } else {
                 // Remove it from stack.
                 self.stack.pop();
-                // Check if current vertex can be GRAY.
+                // Check if current vertex can be GRAY. TODO: Simplify this.
                 let flag = self.predecessor.get(y);
-                let flag = flag.is_none() || flag == Some(&x);
-                // Check if it is GRAY (not BLACK).
-                if flag && !self.finish_time.contains_key(y) {
+                // Check if it is GRAY (not BLACK). TODO: Simplify this.
+                if (flag.is_none() || flag == Some(&x)) && !self.finish_time.contains_key(y) {
                     // Set its finish time (as BLACK).
                     self.finish_time.insert(y, self.time);
                     // Increment time.
@@ -172,18 +170,11 @@ where
             }
             // Classify the incoming edge w.r.t. the timings.
             if self.discovery_time[x] > self.discovery_time[y] {
-                if self.finish_time.get(x).unwrap_or(&0) > self.finish_time.get(y).unwrap_or(&0) {
-                    // discovery[x] > discovery[y] && finish[x] > finish[y], or ...
-                    return Some(DFSEdge::Cross(x, y));
-                } else {
-                    // discovery[x] > discovery[y] && finish[x] < finish[y], or ...
+                if self.discovery_time[x] < *self.finish_time.get(y).unwrap_or(&0) {
+                    // discovery[x] > discovery[y] && discovery[x] < finish[y].
                     return Some(DFSEdge::Back(x, y));
                 }
-            } else {
-                if self.finish_time.get(x).unwrap_or(&0) > self.finish_time.get(y).unwrap_or(&0) {
-                    // discovery[x] < discovery[y] && finish[x] > finish[y].
-                    return Some(DFSEdge::Forward(x, y));
-                }
+                // Given that the graph is undirected, there are no forward nor cross edges.
             }
         }
 
@@ -197,9 +188,71 @@ impl<'a, G> Iterator for DepthFirstSearchEdges<'a, G, directions::Directed>
 where
     G: Storage + Directed,
 {
-    type Item = &'a G::Vertex;
+    type Item = DFSEdge<'a, G::Vertex>;
 
     fn next(&mut self) -> Option<Self::Item> {
+        // If there are still vertices to be visited.
+        while let Some(&(x, y)) = self.stack.last() {
+            // Check if vertex is WHITE (i.e. was not seen before).
+            if !self.discovery_time.contains_key(y) {
+                // Set its discover time (as GRAY).
+                self.discovery_time.insert(y, self.time);
+                // Increment time.
+                self.time += 1;
+                // Initialize visiting queue.
+                let mut queue = VecDeque::new();
+                // Iterate over reachable vertices.
+                for z in Ch!(self.graph, y) {
+                    // Filter already visited vertices (as GRAY).
+                    if !self.discovery_time.contains_key(z) {
+                        // Set predecessor.
+                        self.predecessor.insert(z, y);
+                    }
+                    // Add to queue.
+                    queue.push_front((y, z));
+                }
+                // Push vertices onto the stack in reverse order, this makes
+                // traversal order and neighborhood order the same.
+                self.stack.extend(queue);
+                // Filter the base case. TODO: Simplify this.
+                if x != y && self.predecessor.contains_key(y) {
+                    // discovery[x] < discovery[y] && discovery[x] > finish[y].
+                    return Some(DFSEdge::Tree(x, y));
+                }
+            // If the vertex is NOT WHITE.
+            } else {
+                // Remove it from stack.
+                self.stack.pop();
+                // Check if current vertex can be GRAY. TODO: Simplify this.
+                let flag = self.predecessor.get(y);
+                // Check if it is GRAY (not BLACK). TODO: Simplify this.
+                if (flag.is_none() || flag == Some(&x)) && !self.finish_time.contains_key(y) {
+                    // Set its finish time (as BLACK).
+                    self.finish_time.insert(y, self.time);
+                    // Increment time.
+                    self.time += 1;
+                }
+            }
+            // Classify the incoming edge w.r.t. the timings.
+            if self.discovery_time[x] > self.discovery_time[y] {
+                if self.discovery_time[x] < *self.finish_time.get(y).unwrap_or(&0) {
+                    // discovery[x] > discovery[y] && discovery[x] < finish[y], or ...
+                    return Some(DFSEdge::Back(x, y));
+                } else {
+                    // discovery[x] > discovery[y] && discovery[x] > finish[y], or ...
+                    return Some(DFSEdge::Cross(x, y));
+                }
+            } else {
+                // Finally ... TODO: Simplify this.
+                let flag = self.predecessor.get(y);
+                // ... if it is not a Tree edge ...
+                if x != y && flag.is_some() && flag != Some(&x) {
+                    // ... then it is a Forward edge.
+                    return Some(DFSEdge::Forward(x, y));
+                }
+            }
+        }
+
         None
     }
 }

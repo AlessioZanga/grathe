@@ -7,7 +7,7 @@ use std::{
 use crate::{
     traits::{Directed, Storage, Undirected},
     types::directions,
-    V, Ch,
+    Ch, V,
 };
 
 /// Find all cycles in a given graph.

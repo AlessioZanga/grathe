@@ -2,7 +2,8 @@ use std::{collections::HashSet, marker::PhantomData, vec::Vec};
 
 use crate::{
     traits::{Directed, Storage, Undirected},
-    types::directions, Ne, Ch,
+    types::directions,
+    Ch, Ne,
 };
 
 /// Find all simple paths in a graph for given source and target vertices.
