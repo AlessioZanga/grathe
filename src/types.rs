@@ -4,7 +4,7 @@ use std::{
     hash::Hash,
 };
 
-use ndarray::Array2;
+use ndarray::prelude::*;
 use sprs::TriMat;
 use thiserror::Error;
 

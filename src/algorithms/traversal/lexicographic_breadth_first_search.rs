@@ -3,7 +3,7 @@ use std::{
     iter::FusedIterator,
 };
 
-use crate::{traits::Undirected, V};
+use crate::{traits::Undirected, V, Ne};
 
 /// Lexicographic breadth-first search structure.
 ///
@@ -91,7 +91,7 @@ where
             // Select the first vertex from the partition.
             let x = p.pop_front().unwrap();
             // Get neighbors of selected vertex.
-            let mut neighbors: HashSet<_> = self.graph.neighbors_iter(x).collect();
+            let mut neighbors: HashSet<_> = Ne!(self.graph, x).collect();
             // Initialize the new partitioning ordering.
             // TODO: Replace the partitions queue with a vector and begin/end
             // indices pairs once `partition_in_place` is stabilized.

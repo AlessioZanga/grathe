@@ -9,7 +9,7 @@ use super::Traversal;
 use crate::{
     traits::{Directed, Storage, Undirected},
     types::directions,
-    V,
+    V, Ne, Ch,
 };
 
 /// Depth-first search structure.
@@ -151,7 +151,7 @@ where
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for y in self.graph.neighbors_iter(x) {
+                for y in Ne!(self.graph, x) {
                     // Filter already visited vertices (as GRAY).
                     if !self.discovery_time.contains_key(y) {
                         // Set predecessor.
@@ -203,7 +203,7 @@ where
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for y in self.graph.children_iter(x) {
+                for y in Ch!(self.graph, x) {
                     // Filter already visited vertices (as GRAY).
                     if !self.discovery_time.contains_key(y) {
                         // Set predecessor.

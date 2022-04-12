@@ -2,6 +2,11 @@
 mod undirected {
     macro_rules! generic_tests {
         ($G: ident) => {
+            use grathe::{
+                algorithms::{DFSEdges, LexBFS, LexDFS, BFS, DFS, DFSEdge},
+                traits::{From, Storage},
+            };
+
             #[test]
             fn breadth_first_search_tree() {
                 // Build a null graph.
@@ -302,6 +307,60 @@ mod undirected {
                 // Build a null graph.
                 let g = $G::<i32>::null();
                 DFS::from((&g, &0)).next();
+            }
+
+            #[test]
+            fn depth_first_search_edges_tree() {
+                // Build a null graph.
+                let g = $G::<i32>::null();
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields no result.
+                assert_eq!(search.next(), None);
+
+                // Build an empty graph.
+                let g = $G::<i32>::empty([0, 1]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields no result.
+                assert_eq!(search.next(), None);
+
+                // Build a non-empty graph.
+                let g = $G::<i32>::from_edges([(0, 1)]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), None);
+
+                // Build a trivial graph.
+                let g = $G::<i32>::from_edges([(0, 1), (1, 2), (2, 0)]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&2, &0)));
+                assert_eq!(search.next(), None);
+
+                // Build a trivial graph.
+                let g = $G::<i32>::from_edges([(0, 1), (1, 2), (2, 0), (1, 3)]);
+                // Build a search object.
+                let mut search = DFSEdges::from(&g);
+                // Yields some results.
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&0, &1)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &2)));
+                assert_eq!(search.next(), Some(DFSEdge::Back(&2, &0)));
+                assert_eq!(search.next(), Some(DFSEdge::Tree(&1, &3)));
+                assert_eq!(search.next(), None);
+            }
+
+            #[test]
+            #[should_panic]
+            fn depth_first_search_edges_tree_should_panic() {
+                // Build a null graph.
+                let g = $G::<i32>::null();
+                DFSEdges::from((&g, &0)).next();
             }
 
             #[test]
@@ -641,11 +700,7 @@ mod undirected {
     }
 
     mod adjacency_list {
-        use grathe::{
-            algorithms::{LexBFS, LexDFS, BFS, DFS},
-            graphs::storages::UndirectedAdjacencyList,
-            traits::{From, Storage},
-        };
+        use grathe::graphs::storages::UndirectedAdjacencyList;
 
         generic_tests!(UndirectedAdjacencyList);
     }

@@ -2,7 +2,7 @@ use std::{collections::HashSet, marker::PhantomData, vec::Vec};
 
 use crate::{
     traits::{Directed, Storage, Undirected},
-    types::directions,
+    types::directions, Ne, Ch,
 };
 
 /// Find all simple paths in a graph for given source and target vertices.
@@ -91,7 +91,7 @@ where
         // Set current vertex as visited.
         self.visited.insert(x);
         // For each vertex reachable from the current vertex.
-        for z in self.graph.neighbors_iter(x) {
+        for z in Ne!(self.graph, x) {
             // If the next vertex is the target.
             if z == y {
                 // Then clones the stack into the results.
@@ -138,7 +138,7 @@ where
         // Set current vertex as visited.
         self.visited.insert(x);
         // For each vertex reachable from the current vertex.
-        for z in self.graph.children_iter(x) {
+        for z in Ch!(self.graph, x) {
             // If the next vertex is the target.
             if z == y {
                 // Then clones the stack into the results.

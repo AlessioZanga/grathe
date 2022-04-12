@@ -3,7 +3,7 @@ use std::{
     iter::FusedIterator,
 };
 
-use crate::traits::Directed;
+use crate::{traits::Directed, V, Ch};
 
 /// Topological sort search structure.
 pub struct TopologicalSort<'a, G>
@@ -41,7 +41,7 @@ where
             visit: Default::default(),
         };
         // For each vertex in the graph.
-        for x in search.graph.vertices_iter() {
+        for x in V!(search.graph) {
             // Compute its in-degree.
             match search.graph.in_degree(x) {
                 // If the in-degree is zero, then add it to the queue.
@@ -67,7 +67,7 @@ where
         // While there are still vertices with zero in-degree.
         if let Some(x) = self.queue.pop_front() {
             // For each child of the selected vertex.
-            for y in self.graph.children_iter(x) {
+            for y in Ch!(self.graph, x) {
                 // If it was not visited before.
                 if let Some(z) = self.visit.get(y) {
                     // Update its in-degree.

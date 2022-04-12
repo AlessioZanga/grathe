@@ -4,7 +4,7 @@ use std::{
     iter::FusedIterator,
 };
 
-use crate::{traits::Undirected, V};
+use crate::{traits::Undirected, V, Ne};
 
 /// Lexicographic depth-first search structure.
 ///
@@ -137,7 +137,7 @@ where
             // Remove selected vertex from the visit queue.
             self.queue.remove(x);
             // Iterate over vertex neighbors.
-            for y in self.graph.neighbors_iter(x) {
+            for y in Ne!(self.graph, x) {
                 // If neighbor has not been visited yet.
                 if let Some(y_label) = self.queue.get_mut(y) {
                     // Set its predecessor.

@@ -7,7 +7,7 @@ use std::{
 use crate::{
     traits::{Directed, Storage, Undirected},
     types::directions,
-    V,
+    V, Ch,
 };
 
 /// Find all cycles in a given graph.
@@ -119,7 +119,7 @@ where
     G: Storage + Directed,
 {
     fn block(&mut self, x: &'a G::Vertex) {
-        for y in self.graph.children_iter(x) {
+        for y in Ch!(self.graph, x) {
             if y < self.stack[0] {
                 continue;
             }
@@ -142,7 +142,7 @@ where
         self.blocked.entry(x).or_default();
 
         // Iterate over reachable vertices from graph.
-        for y in self.graph.children_iter(x) {
+        for y in Ch!(self.graph, x) {
             // If current vertex is lower then starting vertex,
             // then skip this iteration.
             if y < self.stack[0] {

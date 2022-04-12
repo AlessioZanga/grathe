@@ -8,7 +8,7 @@ use super::Traversal;
 use crate::{
     traits::{Directed, Storage, Undirected},
     types::directions,
-    V,
+    V, Ne, Ch,
 };
 
 /// Breadth-first search structure.
@@ -155,7 +155,7 @@ where
         // If there are still vertices to be visited.
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for y in self.graph.neighbors_iter(x) {
+            for y in Ne!(self.graph, x) {
                 // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
@@ -207,7 +207,7 @@ where
         // If there are still vertices to be visited.
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for y in self.graph.children_iter(x) {
+            for y in Ch!(self.graph, x) {
                 // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
