@@ -54,9 +54,14 @@ mod extend {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let mut g = $G::<i32>::new(i, []);
-                        let (v, f, o) = j;
-                        assert_eq!(g.extend_vertices(v), f);
+                        let mut g = $G::<i32>::new(i.clone(), []);
+                        let (v, f, o) = j.clone();
+                        assert_eq!(
+                            g.extend_vertices(v),
+                            f,
+                            "with test data: '{:?}'",
+                            (i, "[]", j)
+                        );
                         assert_eq!(g.order(), o);
                     }
                 }
@@ -131,9 +136,9 @@ mod extend {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let mut g = $G::<i32>::new(i, []);
-                        let (e, f, s) = j;
-                        assert_eq!(g.extend_edges(e), f);
+                        let mut g = $G::<i32>::new(i.clone(), []);
+                        let (e, f, s) = j.clone();
+                        assert_eq!(g.extend_edges(e), f, "with test data: '{:?}'", (i, "[]", j));
                         assert_eq!(g.size(), s);
                     }
                 }
@@ -209,9 +214,14 @@ mod extend {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let mut g = $G::<i32>::new(i, []);
-                        let (v, f, o) = j;
-                        assert_eq!(g.extend_vertices(v), f);
+                        let mut g = $G::<i32>::new(i.clone(), []);
+                        let (v, f, o) = j.clone();
+                        assert_eq!(
+                            g.extend_vertices(v),
+                            f,
+                            "with test data: '{:?}'",
+                            (i, "[]", j)
+                        );
                         assert_eq!(g.order(), o);
                     }
                 }
@@ -286,9 +296,9 @@ mod extend {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let mut g = $G::<i32>::new(i, []);
-                        let (e, f, s) = j;
-                        assert_eq!(g.extend_edges(e), f);
+                        let mut g = $G::<i32>::new(i.clone(), []);
+                        let (e, f, s) = j.clone();
+                        assert_eq!(g.extend_edges(e), f, "with test data: '{:?}'", (i, "[]", j));
                         assert_eq!(g.size(), s);
                     }
                 }

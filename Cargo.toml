@@ -47,3 +47,6 @@ x86_64-pc-windows-msvc = { triplet = "x64-windows", dev-dependencies = ["openbla
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--html-in-header", "./doc/headers.html"]
+
+[profile.coverage]
+inherits = "dev"

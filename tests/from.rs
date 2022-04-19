@@ -48,9 +48,9 @@ mod from {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let g = $G::<i32>::from_vertices(i);
-                        let (v, o) = j;
-                        assert!(V!(g).eq(&v));
+                        let g = $G::<i32>::from_vertices(i.clone());
+                        let (v, o) = j.clone();
+                        assert!(V!(g).eq(&v), "with test data: '{:?}'", (i, j));
                         assert_eq!(g.order(), o);
                     }
                 }
@@ -110,10 +110,14 @@ mod from {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::from_edges(j);
-                        let (e, s) = k;
-                        assert!(E!(g).eq(e.iter().map(|e| (&e.0, &e.1))));
+                    for (i, j) in data {
+                        let g = $G::<i32>::from_edges(i.clone());
+                        let (e, s) = j.clone();
+                        assert!(
+                            E!(g).eq(e.iter().map(|e| (&e.0, &e.1))),
+                            "with test data: '{:?}'",
+                            (i, j)
+                        );
                         assert_eq!(g.size(), s);
                     }
                 }
@@ -174,9 +178,9 @@ mod from {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let g = $G::<i32>::from_vertices(i);
-                        let (v, o) = j;
-                        assert!(V!(g).eq(&v));
+                        let g = $G::<i32>::from_vertices(i.clone());
+                        let (v, o) = j.clone();
+                        assert!(V!(g).eq(&v), "with test data: '{:?}'", (i, j));
                         assert_eq!(g.order(), o);
                     }
                 }
@@ -247,10 +251,14 @@ mod from {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::from_edges(j);
-                        let (e, s) = k;
-                        assert!(E!(g).eq(e.iter().map(|e| (&e.0, &e.1))));
+                    for (i, j) in data {
+                        let g = $G::<i32>::from_edges(i.clone());
+                        let (e, s) = j.clone();
+                        assert!(
+                            E!(g).eq(e.iter().map(|e| (&e.0, &e.1))),
+                            "with test data: '{:?}'",
+                            (i, j)
+                        );
                         assert_eq!(g.size(), s);
                     }
                 }

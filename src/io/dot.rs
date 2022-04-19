@@ -345,13 +345,13 @@ impl IO for DOT {
 
     fn read(path: &Path) -> Result<Self, IOError> {
         let string = std::fs::read_to_string(path)?;
-        Self::try_from(string).map_err(|_| IOError::new(IOErrorKind::InvalidData, "invalid data"))
+        Self::try_from(string).map_err(|_| IOError::from(IOErrorKind::InvalidData))
     }
 
     fn write(self, path: &Path) -> Result<(), IOError> {
         match TryInto::<String>::try_into(self) {
             Ok(string) => std::fs::write(path, string),
-            Err(_) => Err(IOError::new(IOErrorKind::InvalidData, "invalid data")),
+            Err(_) => Err(IOError::from(IOErrorKind::InvalidData)),
         }
     }
 }

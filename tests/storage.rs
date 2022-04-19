@@ -116,10 +116,10 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        for (i, j, f) in k {
-                            let h = $G::<i32>::new(i, j);
-                            assert_eq!(g.eq(&h), f);
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        for (i, j, f) in k.clone() {
+                            let h = $G::<i32>::new(i.clone(), j.clone());
+                            assert_eq!(g.eq(&h), f, "with test data: '{:?}'", (i, j, k));
                         }
                     }
                 }
@@ -236,10 +236,14 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        for (i, j, f) in k {
-                            let h = $G::<i32>::new(i, j);
-                            assert!(g.partial_cmp(&h).eq(&f));
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        for (i, j, f) in k.clone() {
+                            let h = $G::<i32>::new(i.clone(), j.clone());
+                            assert!(
+                                g.partial_cmp(&h).eq(&f),
+                                "with test data: '{:?}'",
+                                (i, j, k)
+                            );
                         }
                     }
                 }
@@ -330,12 +334,17 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let (o, s, v, e) = k;
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let (o, s, v, e) = k.clone();
                         assert_eq!(g.order(), o);
                         assert_eq!(g.size(), s);
                         assert_eq!(Vec::from_iter(V!(g)), v);
-                        assert_eq!(Vec::from_iter(E!(g)), e);
+                        assert_eq!(
+                            Vec::from_iter(E!(g)),
+                            e,
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -368,12 +377,12 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::empty(i);
-                        let (o, v) = k;
+                    for (i, j) in data {
+                        let g = $G::<i32>::empty(i.clone());
+                        let (o, v) = j.clone();
                         assert_eq!(g.order(), o);
                         assert_eq!(g.size(), 0);
-                        assert_eq!(Vec::from_iter(V!(g)), v);
+                        assert_eq!(Vec::from_iter(V!(g)), v, "with test data: '{:?}'", (i, j));
                         assert_eq!(Vec::from_iter(E!(g)), Vec::<(&i32, &i32)>::new());
                     }
                 }
@@ -436,13 +445,13 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::complete(i);
-                        let (o, v, e) = k;
+                    for (i, j) in data {
+                        let g = $G::<i32>::complete(i.clone());
+                        let (o, v, e) = j.clone();
                         assert_eq!(g.order(), o);
                         assert_eq!(g.size(), (o * (o + 1)) / 2);
                         assert_eq!(Vec::from_iter(V!(g)), v);
-                        assert_eq!(Vec::from_iter(E!(g)), e);
+                        assert_eq!(Vec::from_iter(E!(g)), e, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -473,7 +482,7 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let mut g = $G::<i32>::new(i, j);
+                        let mut g = $G::<i32>::new(i.clone(), j.clone());
                         g.clear();
                         assert_eq!(g.order(), 0);
                         assert_eq!(g.size(), 0);
@@ -499,10 +508,15 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::new(i, vec![]);
+                    for (i, j) in data {
+                        let g = $G::<i32>::new(i.clone(), []);
                         assert!(is_sorted(V!(g)));
-                        assert_eq!(Vec::from_iter(V!(g)), k);
+                        assert_eq!(
+                            Vec::from_iter(V!(g)),
+                            j.clone(),
+                            "with test data: '{:?}'",
+                            (i, j)
+                        );
                     }
                 }
 
@@ -529,10 +543,15 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::new(vec![], j);
+                    for (i, j) in data {
+                        let g = $G::<i32>::new(vec![], i.clone());
                         assert!(is_sorted(E!(g)));
-                        assert_eq!(Vec::from_iter(E!(g)), k);
+                        assert_eq!(
+                            Vec::from_iter(E!(g)),
+                            j.clone(),
+                            "with test data: '{:?}'",
+                            (i, j)
+                        );
                     }
                 }
 
@@ -606,10 +625,15 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        for (x, ys) in k {
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        for (x, ys) in k.clone() {
                             assert!(is_sorted(Adj!(g, x)));
-                            assert_eq!(Vec::from_iter(Adj!(g, x)), ys);
+                            assert_eq!(
+                                Vec::from_iter(Adj!(g, x)),
+                                ys,
+                                "with test data: '{:?}'",
+                                (i, j, k)
+                            );
                         }
                     }
                 }
@@ -640,9 +664,9 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::empty(i);
-                        assert_eq!(g.order(), k);
+                    for (i, j) in data {
+                        let g = $G::<i32>::empty(i.clone());
+                        assert_eq!(g.order(), j, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -663,9 +687,9 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::new([], j);
-                        assert_eq!(g.size(), k);
+                    for (i, j) in data {
+                        let g = $G::<i32>::new([], i.clone());
+                        assert_eq!(g.size(), j, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -686,10 +710,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::empty(i);
-                        let (v, f) = k;
-                        assert_eq!(g.has_vertex(v), f);
+                    for (i, j) in data {
+                        let g = $G::<i32>::empty(i.clone());
+                        let (v, f) = j.clone();
+                        assert_eq!(g.has_vertex(v), f, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -710,10 +734,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let mut g = $G::<i32>::empty(i);
-                        let (v, f) = k;
-                        assert_eq!(g.add_vertex(v), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::empty(i.clone());
+                        let (v, f) = j.clone();
+                        assert_eq!(g.add_vertex(v), f, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -734,10 +758,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let mut g = $G::<i32>::empty(i);
-                        let (v, f) = k;
-                        assert_eq!(g.del_vertex(v), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::empty(i.clone());
+                        let (v, f) = j.clone();
+                        assert_eq!(g.del_vertex(v), f, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -770,10 +794,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::new([], j);
-                        for ((x, y), f) in k {
-                            assert_eq!(g.has_edge(x, y), f);
+                    for (i, j) in data {
+                        let g = $G::<i32>::new([], i.clone());
+                        for ((x, y), f) in j.clone() {
+                            assert_eq!(g.has_edge(x, y), f, "with test data: '{:?}'", (i, j));
                         }
                     }
                 }
@@ -816,10 +840,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let mut g = $G::<i32>::new([], j);
-                        for ((x, y), f) in k {
-                            assert_eq!(g.add_edge(x, y), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::new([], i.clone());
+                        for ((x, y), f) in j.clone() {
+                            assert_eq!(g.add_edge(x, y), f, "with test data: '{:?}'", (i, j));
                         }
                     }
                 }
@@ -862,10 +886,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let mut g = $G::<i32>::new([], j);
-                        for ((x, y), f) in k {
-                            assert_eq!(g.del_edge(x, y), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::new([], i.clone());
+                        for ((x, y), f) in j.clone() {
+                            assert_eq!(g.del_edge(x, y), f, "with test data: '{:?}'", (i, j));
                         }
                     }
                 }
@@ -1003,10 +1027,10 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        for (i, j, f) in k {
-                            let h = $G::<i32>::new(i, j);
-                            assert_eq!(g.eq(&h), f);
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        for (i, j, f) in k.clone() {
+                            let h = $G::<i32>::new(i.clone(), j.clone());
+                            assert_eq!(g.eq(&h), f, "with test data: '{:?}'", (i, j, k));
                         }
                     }
                 }
@@ -1123,10 +1147,14 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        for (i, j, f) in k {
-                            let h = $G::<i32>::new(i, j);
-                            assert!(g.partial_cmp(&h).eq(&f));
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        for (i, j, f) in k.clone() {
+                            let h = $G::<i32>::new(i.clone(), j.clone());
+                            assert!(
+                                g.partial_cmp(&h).eq(&f),
+                                "with test data: '{:?}'",
+                                (i, j, k)
+                            );
                         }
                     }
                 }
@@ -1211,12 +1239,17 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let (o, s, v, e) = k;
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let (o, s, v, e) = k.clone();
                         assert_eq!(g.order(), o);
                         assert_eq!(g.size(), s);
                         assert_eq!(Vec::from_iter(V!(g)), v);
-                        assert_eq!(Vec::from_iter(E!(g)), e);
+                        assert_eq!(
+                            Vec::from_iter(E!(g)),
+                            e,
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -1249,12 +1282,12 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::empty(i);
-                        let (o, v) = k;
+                    for (i, j) in data {
+                        let g = $G::<i32>::empty(i.clone());
+                        let (o, v) = j.clone();
                         assert_eq!(g.order(), o);
                         assert_eq!(g.size(), 0);
-                        assert_eq!(Vec::from_iter(V!(g)), v);
+                        assert_eq!(Vec::from_iter(V!(g)), v, "with test data: '{:?}'", (i, j));
                         assert_eq!(Vec::from_iter(E!(g)), Vec::<(&i32, &i32)>::new());
                     }
                 }
@@ -1333,13 +1366,13 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::complete(i);
-                        let (o, v, e) = k;
+                    for (i, j) in data {
+                        let g = $G::<i32>::complete(i.clone());
+                        let (o, v, e) = j.clone();
                         assert_eq!(g.order(), o);
                         assert_eq!(g.size(), o * o);
                         assert_eq!(Vec::from_iter(V!(g)), v);
-                        assert_eq!(Vec::from_iter(E!(g)), e);
+                        assert_eq!(Vec::from_iter(E!(g)), e, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -1370,7 +1403,7 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j) in data {
-                        let mut g = $G::<i32>::new(i, j);
+                        let mut g = $G::<i32>::new(i.clone(), j.clone());
                         g.clear();
                         assert_eq!(g.order(), 0);
                         assert_eq!(g.size(), 0);
@@ -1396,10 +1429,15 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::empty(i);
+                    for (i, j) in data {
+                        let g = $G::<i32>::empty(i.clone());
                         assert!(is_sorted(V!(g)));
-                        assert_eq!(Vec::from_iter(V!(g)), k);
+                        assert_eq!(
+                            Vec::from_iter(V!(g)),
+                            j.clone(),
+                            "with test data: '{:?}'",
+                            (i, j)
+                        );
                     }
                 }
 
@@ -1426,10 +1464,15 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::new(vec![], j);
+                    for (i, j) in data {
+                        let g = $G::<i32>::new(vec![], i.clone());
                         assert!(is_sorted(E!(g)));
-                        assert_eq!(Vec::from_iter(E!(g)), k);
+                        assert_eq!(
+                            Vec::from_iter(E!(g)),
+                            j.clone(),
+                            "with test data: '{:?}'",
+                            (i, j)
+                        );
                     }
                 }
 
@@ -1503,10 +1546,15 @@ mod storage {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        for (x, ys) in k {
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        for (x, ys) in k.clone() {
                             assert!(is_sorted(Adj!(g, x)));
-                            assert_eq!(Vec::from_iter(Adj!(g, x)), ys);
+                            assert_eq!(
+                                Vec::from_iter(Adj!(g, x)),
+                                ys,
+                                "with test data: '{:?}'",
+                                (i, j, k)
+                            );
                         }
                     }
                 }
@@ -1537,9 +1585,9 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::empty(i);
-                        assert_eq!(g.order(), k);
+                    for (i, j) in data {
+                        let g = $G::<i32>::empty(i.clone());
+                        assert_eq!(g.order(), j, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -1560,9 +1608,9 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::new([], j);
-                        assert_eq!(g.size(), k);
+                    for (i, j) in data {
+                        let g = $G::<i32>::new([], i.clone());
+                        assert_eq!(g.size(), j, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -1583,10 +1631,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let g = $G::<i32>::empty(i);
-                        let (v, f) = k;
-                        assert_eq!(g.has_vertex(v), f);
+                    for (i, j) in data {
+                        let g = $G::<i32>::empty(i.clone());
+                        let (v, f) = j.clone();
+                        assert_eq!(g.has_vertex(v), f, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -1607,10 +1655,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let mut g = $G::<i32>::empty(i);
-                        let (v, f) = k;
-                        assert_eq!(g.add_vertex(v), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::empty(i.clone());
+                        let (v, f) = j.clone();
+                        assert_eq!(g.add_vertex(v), f, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -1631,10 +1679,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (i, k) in data {
-                        let mut g = $G::<i32>::empty(i);
-                        let (v, f) = k;
-                        assert_eq!(g.del_vertex(v), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::empty(i.clone());
+                        let (v, f) = j.clone();
+                        assert_eq!(g.del_vertex(v), f, "with test data: '{:?}'", (i, j));
                     }
                 }
 
@@ -1667,10 +1715,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let g = $G::<i32>::new([], j);
-                        for ((x, y), f) in k {
-                            assert_eq!(g.has_edge(x, y), f);
+                    for (i, j) in data {
+                        let g = $G::<i32>::new([], i.clone());
+                        for ((x, y), f) in j.clone() {
+                            assert_eq!(g.has_edge(x, y), f, "with test data: '{:?}'", (i, j));
                         }
                     }
                 }
@@ -1713,10 +1761,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let mut g = $G::<i32>::new([], j);
-                        for ((x, y), f) in k {
-                            assert_eq!(g.add_edge(x, y), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::new([], i.clone());
+                        for ((x, y), f) in j.clone() {
+                            assert_eq!(g.add_edge(x, y), f, "with test data: '{:?}'", (i, j));
                         }
                     }
                 }
@@ -1759,10 +1807,10 @@ mod storage {
                     ];
 
                     // Test for each scenario.
-                    for (j, k) in data {
-                        let mut g = $G::<i32>::new([], j);
-                        for ((x, y), f) in k {
-                            assert_eq!(g.del_edge(x, y), f);
+                    for (i, j) in data {
+                        let mut g = $G::<i32>::new([], i.clone());
+                        for ((x, y), f) in j.clone() {
+                            assert_eq!(g.del_edge(x, y), f, "with test data: '{:?}'", (i, j));
                         }
                     }
                 }

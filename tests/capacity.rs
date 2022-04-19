@@ -31,7 +31,7 @@ mod capacity {
                 // Test for each scenario.
                 for i in data {
                     let g = $G::<i32>::with_capacity(i);
-                    assert_le!(g.capacity(), i);
+                    assert_le!(g.capacity(), i, "with test data: '{:?}'", i);
                     assert_eq!(g.order(), 0);
                     assert_eq!(g.size(), 0);
                 }
@@ -53,7 +53,7 @@ mod capacity {
                 for i in data {
                     let mut g = $G::<i32>::default();
                     g.reserve(i);
-                    assert_le!(g.capacity(), i);
+                    assert_le!(g.capacity(), i, "with test data: '{:?}'", i);
                     assert_eq!(g.order(), 0);
                     assert_eq!(g.size(), 0);
                 }
@@ -75,7 +75,7 @@ mod capacity {
                 for i in data {
                     let mut g = $G::<i32>::default();
                     g.shrink_to(i);
-                    assert_le!(g.capacity(), i);
+                    assert_le!(g.capacity(), i, "with test data: '{:?}'", i);
                     assert_eq!(g.order(), 0);
                     assert_eq!(g.size(), 0);
                 }

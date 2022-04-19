@@ -48,9 +48,14 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let k = k.into_iter();
-                        assert_eq!(g.edge_list(), FromIterator::from_iter(k));
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let l = k.clone().into_iter();
+                        assert_eq!(
+                            g.edge_list(),
+                            FromIterator::from_iter(l),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -100,11 +105,17 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let k = k
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let l = k
+                            .clone()
                             .into_iter()
                             .map(|(x, y)| (x, FromIterator::from_iter(y.into_iter())));
-                        assert_eq!(g.adjacency_list(), FromIterator::from_iter(k));
+                        assert_eq!(
+                            g.adjacency_list(),
+                            FromIterator::from_iter(l),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -169,8 +180,13 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        assert_eq!(g.dense_adjacency_matrix(), k);
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        assert_eq!(
+                            g.dense_adjacency_matrix(),
+                            k.clone(),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -224,11 +240,13 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let (s, x, y, z) = k;
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let (s, x, y, z) = k.clone();
                         assert_eq!(
                             g.sparse_adjacency_matrix(),
-                            TriMat::from_triplets(s, x, y, z)
+                            TriMat::from_triplets(s, x, y, z),
+                            "with test data: '{:?}'",
+                            (i, j, k)
                         );
                     }
                 }
@@ -271,8 +289,13 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        assert_eq!(g.dense_incidence_matrix(), k);
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        assert_eq!(
+                            g.dense_incidence_matrix(),
+                            k.clone(),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -322,11 +345,13 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let (s, x, y, z) = k;
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let (s, x, y, z) = k.clone();
                         assert_eq!(
                             g.sparse_incidence_matrix(),
-                            TriMat::from_triplets(s, x, y, z)
+                            TriMat::from_triplets(s, x, y, z),
+                            "with test data: '{:?}'",
+                            (i, j, k)
                         );
                     }
                 }
@@ -378,9 +403,14 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let k = k.into_iter();
-                        assert_eq!(g.edge_list(), FromIterator::from_iter(k));
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let l = k.clone().into_iter();
+                        assert_eq!(
+                            g.edge_list(),
+                            FromIterator::from_iter(l),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -430,11 +460,17 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let k = k
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let l = k
+                            .clone()
                             .into_iter()
                             .map(|(x, y)| (x, FromIterator::from_iter(y.into_iter())));
-                        assert_eq!(g.adjacency_list(), FromIterator::from_iter(k));
+                        assert_eq!(
+                            g.adjacency_list(),
+                            FromIterator::from_iter(l),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -496,11 +532,15 @@ mod convert {
                             ]),
                         ),
                     ];
-
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        assert_eq!(g.dense_adjacency_matrix(), k);
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        assert_eq!(
+                            g.dense_adjacency_matrix(),
+                            k.clone(),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -549,11 +589,13 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let (s, x, y, z) = k;
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let (s, x, y, z) = k.clone();
                         assert_eq!(
                             g.sparse_adjacency_matrix(),
-                            TriMat::from_triplets(s, x, y, z)
+                            TriMat::from_triplets(s, x, y, z),
+                            "with test data: '{:?}'",
+                            (i, j, k)
                         );
                     }
                 }
@@ -596,8 +638,13 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        assert_eq!(g.dense_incidence_matrix(), k);
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        assert_eq!(
+                            g.dense_incidence_matrix(),
+                            k.clone(),
+                            "with test data: '{:?}'",
+                            (i, j, k)
+                        );
                     }
                 }
 
@@ -647,11 +694,13 @@ mod convert {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i, j);
-                        let (s, x, y, z) = k;
+                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let (s, x, y, z) = k.clone();
                         assert_eq!(
                             g.sparse_incidence_matrix(),
-                            TriMat::from_triplets(s, x, y, z)
+                            TriMat::from_triplets(s, x, y, z),
+                            "with test data: '{:?}'",
+                            (i, j, k)
                         );
                     }
                 }
