@@ -12,9 +12,6 @@ documentation = "https://docs.rs/grathe"
 keywords = ["graph", "graph-algorithms", "graph-theory", "networks"]
 categories = ["algorithms", "data-structures", "mathematics", "science"]
 
-# See more keys and their definitions at:
-# https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 delegate = "^0.6"
 itertools = "^0.10"
@@ -31,12 +28,13 @@ thiserror = "^1.0"
 all_asserts = "^2.3"
 anyhow = "^1.0"
 approx = "^0.5"
-paste = "^1.0"
-tempfile = "^3.2"
+env_logger = "^0.9"
 ndarray = { version = "^0.15", features = ["approx-0_5"] }
 ndarray-linalg = { version = "^0.14", features = ["openblas-system"] }
 openblas-src = { version = "^0.10", features = ["system"] }
+paste = "^1.0"
 rand = "^0.8"
+tempfile = "^3.2"
 
 [package.metadata.vcpkg]
 git = "https://github.com/AlessioZanga/vcpkg"
@@ -48,4 +46,4 @@ x86_64-apple-darwin = { triplet = "x64-osx", dev-dependencies = ["openblas"] }
 x86_64-pc-windows-msvc = { triplet = "x64-windows", dev-dependencies = ["openblas"] }
 
 [package.metadata.docs.rs]
-rustdoc-args = [ "--html-in-header", "./doc/headers.html" ]
+rustdoc-args = ["--html-in-header", "./doc/headers.html"]

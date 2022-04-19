@@ -1,5 +1,3 @@
-#[cfg(test)]
-use std::println as debug;
 use std::{
     collections::HashMap,
     io::{Error as IOError, ErrorKind as IOErrorKind},
@@ -8,8 +6,6 @@ use std::{
 };
 
 use itertools::Itertools;
-// Workaround for logging during tests
-#[cfg(not(test))]
 use log::debug;
 use pest::{error::Error as ParserError, iterators::Pair, Parser};
 
