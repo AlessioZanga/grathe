@@ -107,10 +107,20 @@ pub enum Error<V> {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum Marker {
-    None = 0,
-    Tail = 1,
-    Head = 2,
-    Cric = 3,
+    /// X -x- Y, aka. no edge,
+    None,
+    /// X o-o Y,
+    CircCirc,
+    /// X o-> Y,
+    CircHead,
+    /// X o-- Y,
+    CircTail,
+    /// X --- Y,
+    TailTail,
+    /// X --> Y,
+    TailHead,
+    /// X <-> Y.
+    HeadHead,
 }
 
 impl Default for Marker {
