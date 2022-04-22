@@ -1,7 +1,7 @@
-use super::Storage;
+use super::{Capacity, Storage};
 
 /// The graph extend trait.
-pub trait Extend: Storage {
+pub trait Extend: Capacity + Storage {
     /// Extends graph with given vertices.
     ///
     /// Extends graph with given sequence of vertex identifiers.

@@ -25,9 +25,9 @@ where
     V: Vertex,
     A: WithAttributes<V>,
 {
+    _attributes: A,
     _data: AdjacencyList<V>,
     _size: usize,
-    _attributes: A,
 }
 
 impl<V, A> PartialEq for UndirectedAdjacencyList<V, A>
@@ -48,6 +48,8 @@ where
 }
 
 crate::traits::impl_partial_ord!(UndirectedAdjacencyList);
+
+crate::traits::impl_capacity!(UndirectedAdjacencyList);
 
 impl<V, A> Operators for UndirectedAdjacencyList<V, A>
 where
@@ -176,14 +178,14 @@ where
         J: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Initialize the data storage using the vertex set.
-        let mut size = 0;
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
-        for (x, y) in e_iter.into_iter() {
+        let size = e_iter.into_iter().fold(0, |acc, (x, y)| {
             data.entry(x.clone()).or_default().insert(y.clone());
             data.entry(y).or_default().insert(x);
-            size += 1;
-        }
+
+            acc + 1
+        });
 
         Self {
             _data: data,
@@ -214,14 +216,15 @@ where
     {
         // Initialize the data storage using the vertex set.
         let data: Vec<_> = iter.into_iter().collect();
+        let data: AdjacencyList<_> = data
+            .iter()
+            .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
+            .collect();
         // Compute the final size.
         let size = (data.len() * (data.len() + 1)) / 2;
 
         Self {
-            _data: data
-                .iter()
-                .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
-                .collect(),
+            _data: data,
             _size: size,
             ..Default::default()
         }
@@ -357,8 +360,6 @@ where
         false
     }
 }
-
-crate::traits::impl_capacity!(UndirectedAdjacencyList);
 
 impl<V, A> Connectivity for UndirectedAdjacencyList<V, A>
 where

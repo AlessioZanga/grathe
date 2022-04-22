@@ -1,7 +1,7 @@
-use super::Storage;
+use super::{Capacity, Storage};
 
 /// The graph from trait.
-pub trait From: Storage {
+pub trait From: Capacity + Storage {
     /// From vertex constructor.
     ///
     /// Construct a graph from a given sequence of vertex, ignoring repeated ones.

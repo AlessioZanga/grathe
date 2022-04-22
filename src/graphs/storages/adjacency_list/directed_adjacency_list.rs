@@ -24,9 +24,9 @@ where
     V: Vertex,
     A: WithAttributes<V>,
 {
+    _attributes: A,
     _data: AdjacencyList<V>,
     _size: usize,
-    _attributes: A,
 }
 
 impl<V, A> PartialEq for DirectedAdjacencyList<V, A>
@@ -47,6 +47,8 @@ where
 }
 
 crate::traits::impl_partial_ord!(DirectedAdjacencyList);
+
+crate::traits::impl_capacity!(DirectedAdjacencyList);
 
 impl<V, A> Operators for DirectedAdjacencyList<V, A>
 where
@@ -175,14 +177,14 @@ where
         J: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Initialize the data storage using the vertex set.
-        let mut size = 0;
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
-        for (x, y) in e_iter.into_iter() {
+        let size = e_iter.into_iter().fold(0, |acc, (x, y)| {
             data.entry(y.clone()).or_default();
             data.entry(x).or_default().insert(y);
-            size += 1;
-        }
+
+            acc + 1
+        });
 
         Self {
             _data: data,
@@ -357,8 +359,6 @@ where
         false
     }
 }
-
-crate::traits::impl_capacity!(DirectedAdjacencyList);
 
 impl<V, A> Connectivity for DirectedAdjacencyList<V, A>
 where
