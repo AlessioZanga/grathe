@@ -7,6 +7,7 @@ use crate::{
     graphs::attributes::AttributesMap,
     traits::{Directed, PartiallyDirected, Storage, Undirected, WithAttributes},
     types::{directions, DenseMarkerMatrix, EdgeIterator, ExactSizeIter, Marker, Vertex, VertexIterator},
+    E,
 };
 
 #[derive(Clone, Debug, Default)]
@@ -412,6 +413,20 @@ where
         }
 
         g
+    }
+
+    fn from_undirected<G>(g: G) -> Self
+    where
+        G: Undirected<Vertex = Self::Vertex>,
+    {
+        Self::new_with_marker([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Marker::TailTail)))
+    }
+
+    fn from_directed<G>(g: G) -> Self
+    where
+        G: Directed<Vertex = Self::Vertex>,
+    {
+        Self::new_with_marker([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Marker::TailHead)))
     }
 
     fn has_marker(&self, x: &Self::Vertex, y: &Self::Vertex, m: Marker) -> bool {

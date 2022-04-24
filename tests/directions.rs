@@ -1167,6 +1167,18 @@ mod directions {
                 }
 
                 #[test]
+                fn from_undirected() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                fn from_directed() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
                 fn has_marker() {
                     // FIXME:
                     todo!()
