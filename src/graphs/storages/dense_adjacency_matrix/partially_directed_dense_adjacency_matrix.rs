@@ -454,26 +454,35 @@ where
         );
         // Map vertex to matrix index.
         let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        // Get current marker pair.
+        let n = self._data[[x, y]];
         // If the marker pair is already set ...
-        if self._data[[x, y]].eq(&m) {
+        if m.eq(&n) {
             // ... do not modify the matrix.
             return false;
         }
         // Increase the size only if None.
-        if matches!(self._data[[x, y]], Marker::None) {
+        if matches!(n, Marker::None) {
             self._size += 1;
         }
         // Set the marker pair.
-        match m {
+        match (m, n) {
             // If the marker pair is symmetric ...
-            Marker::TailTail => {
+            (Marker::TailTail, _) => {
                 // ... set the edge symmetrically.
                 self._data[[y, x]] = m;
                 self._data[[x, y]] = m;
             }
             // Otherwise, the marker pair is asymmetric.
-            Marker::TailHead => {
-                // ... set the edge asymmetrically.
+            (Marker::TailHead, Marker::TailTail) => {
+                // ... set the edge asymmetrically ...
+                self._data[[x, y]] = m;
+                // ... and unset the symmetric edge.
+                self._data[[y, x]] = Marker::None;
+            }
+            // Otherwise, the marker pair is asymmetric.
+            (Marker::TailHead, Marker::None | Marker::TailHead) => {
+                // ... set the edge asymmetrically ...
                 self._data[[x, y]] = m;
             }
             // Invalid marker pairs have already been filtered out.
