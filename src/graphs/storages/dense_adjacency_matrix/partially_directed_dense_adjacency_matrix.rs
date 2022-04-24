@@ -472,6 +472,8 @@ where
                 // ... set the edge symmetrically.
                 self._data[[y, x]] = m;
                 self._data[[x, y]] = m;
+
+                true
             }
             // Otherwise, the marker pair is asymmetric.
             (Marker::TailHead, Marker::TailTail) => {
@@ -479,49 +481,18 @@ where
                 self._data[[x, y]] = m;
                 // ... and unset the symmetric edge.
                 self._data[[y, x]] = Marker::None;
+
+                true
             }
             // Otherwise, the marker pair is asymmetric.
             (Marker::TailHead, Marker::None | Marker::TailHead) => {
                 // ... set the edge asymmetrically ...
                 self._data[[x, y]] = m;
+
+                true
             }
             // Invalid marker pairs have already been filtered out.
             _ => unreachable!(),
         }
-
-        false
-    }
-
-    fn unset_marker(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Marker> {
-        // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
-        // Get the marker pair.
-        let m = self._data[[x, y]];
-        // If the marker pair is not set ...
-        if matches!(m, Marker::None) {
-            // ... do not modify the matrix.
-            return None;
-        }
-        // Decrease the size only if not None,
-        // i.e. just checked for it on the line before.
-        self._size -= 1;
-        // Unset the marker pair.
-        match m {
-            // If the marker pair is symmetric ...
-            Marker::TailTail => {
-                // ... set the edge symmetrically.
-                self._data[[y, x]] = Marker::None;
-                self._data[[x, y]] = Marker::None;
-            }
-            // Otherwise, the marker pair is asymmetric.
-            Marker::TailHead => {
-                // ... set the edge asymmetrically.
-                self._data[[x, y]] = Marker::None;
-            }
-            // Invalid marker pairs have already been filtered out.
-            _ => unreachable!(),
-        };
-
-        Some(m)
     }
 }

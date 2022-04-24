@@ -297,63 +297,58 @@ where
     }
 
     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // Check if first vertex exists.
-        match self._data.get(x) {
-            // No vertex defined.
-            None => panic!(),
-            // Check if second vertex exists.
-            Some(adjacent) => match self._data.contains_key(y) {
-                // No vertex defined.
-                false => panic!(),
-                // Check if it is in the adjacency set.
-                true => adjacent.contains(y),
-            },
-        }
+        // Check vertices indentifiers.
+        assert!(
+            self._data.contains_key(x),
+            "Vertex identifiers does not exist in the graph"
+        );
+        assert!(
+            self._data.contains_key(y),
+            "Vertex identifiers does not exist in the graph"
+        );
+
+        self._data.get(x).unwrap().contains(y)
     }
 
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // Check if second vertex exists.
-        match self._data.contains_key(y) {
-            // No vertex defined.
-            false => panic!(),
-            // Get mutable vertex adjacency set.
-            true => match self._data.get_mut(x) {
-                // No vertex defined.
-                None => panic!(),
-                // Try to insert vertex into adjacency set.
-                Some(adjacent) => {
-                    if adjacent.insert(y.clone()) {
-                        // Update size.
-                        self._size += 1;
+        // Check vertices indentifiers.
+        assert!(
+            self._data.contains_key(x),
+            "Vertex identifiers does not exist in the graph"
+        );
+        assert!(
+            self._data.contains_key(y),
+            "Vertex identifiers does not exist in the graph"
+        );
 
-                        return true;
-                    }
-                }
-            },
+        // Get mutable reference to adjacency set.
+        if self._data.get_mut(x).unwrap().insert(y.clone()) {
+            // Update size.
+            self._size += 1;
+
+            return true;
         }
 
         false
     }
 
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // Check if second vertex exists.
-        match self._data.contains_key(y) {
-            // No vertex defined.
-            false => panic!(),
-            // Get mutable vertex adjacency set.
-            true => match self._data.get_mut(x) {
-                // No vertex defined.
-                None => panic!(),
-                // Try to remove vertex from adjacency set.
-                Some(adjacent) => {
-                    if adjacent.remove(y) {
-                        // Update size.
-                        self._size -= 1;
+        // Check vertices indentifiers.
+        assert!(
+            self._data.contains_key(x),
+            "Vertex identifiers does not exist in the graph"
+        );
+        assert!(
+            self._data.contains_key(y),
+            "Vertex identifiers does not exist in the graph"
+        );
 
-                        return true;
-                    }
-                }
-            },
+        // Get mutable reference to adjacency set.
+        if self._data.get_mut(x).unwrap().remove(y) {
+            // Update size.
+            self._size -= 1;
+
+            return true;
         }
 
         false

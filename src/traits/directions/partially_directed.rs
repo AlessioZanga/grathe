@@ -20,6 +20,4 @@ pub trait PartiallyDirected: Undirected + Directed {
     fn get_marker(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Marker>;
 
     fn set_marker(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: Marker) -> bool;
-
-    fn unset_marker(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Marker>;
 }

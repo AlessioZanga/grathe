@@ -1155,6 +1155,7 @@ mod directions {
                 }
 
                 #[test]
+                #[ignore]
                 fn new_with_marker() {
                     // FIXME:
                     todo!()
@@ -1162,23 +1163,27 @@ mod directions {
 
                 #[test]
                 #[should_panic]
+                #[ignore]
                 fn new_with_marker_should_panic() {
                     // FIXME:
                 }
 
                 #[test]
+                #[ignore]
                 fn from_undirected() {
                     // FIXME:
                     todo!()
                 }
 
                 #[test]
+                #[ignore]
                 fn from_directed() {
                     // FIXME:
                     todo!()
                 }
 
                 #[test]
+                #[ignore]
                 fn has_marker() {
                     // FIXME:
                     todo!()
@@ -1186,11 +1191,13 @@ mod directions {
 
                 #[test]
                 #[should_panic]
+                #[ignore]
                 fn has_marker_should_panic() {
                     // FIXME:
                 }
 
                 #[test]
+                #[ignore]
                 fn get_marker() {
                     // FIXME:
                     todo!()
@@ -1198,11 +1205,13 @@ mod directions {
 
                 #[test]
                 #[should_panic]
+                #[ignore]
                 fn get_marker_should_panic() {
                     // FIXME:
                 }
 
                 #[test]
+                #[ignore]
                 fn set_marker() {
                     // FIXME:
                     todo!()
@@ -1210,19 +1219,8 @@ mod directions {
 
                 #[test]
                 #[should_panic]
+                #[ignore]
                 fn set_marker_should_panic() {
-                    // FIXME:
-                }
-
-                #[test]
-                fn unset_marker() {
-                    // FIXME:
-                    todo!()
-                }
-
-                #[test]
-                #[should_panic]
-                fn unset_marker_should_panic() {
                     // FIXME:
                 }
             };
