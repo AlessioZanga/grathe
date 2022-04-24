@@ -107,7 +107,7 @@ pub enum Error<V> {
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub enum Marker {
-    /// X -x- Y, aka. no edge,
+    /// X -/- Y, aka. no edge,
     None,
     /// X o-o Y,
     CircCirc,

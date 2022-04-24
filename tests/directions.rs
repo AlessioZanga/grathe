@@ -712,7 +712,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_markers(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(An!(g, x)),
@@ -784,7 +784,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_markers(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(Pa!(g, x)),
@@ -856,7 +856,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_markers(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(Ch!(g, x)),
@@ -928,7 +928,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_markers(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(De!(g, x)),
@@ -1000,7 +1000,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let mut g = $G::<i32>::new_with_markers(i.clone(), j.clone());
+                        let mut g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, y, f) = k.clone();
                         assert_eq!(
                             g.add_directed_edge(x, y),
@@ -1071,7 +1071,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_markers(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(g.in_degree(x), l, "with test data: '{:?}'", (i, j, k));
                         assert_eq!(g.in_degree(x), Pa!(g, x).count());
@@ -1138,7 +1138,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_markers(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(g.out_degree(x), l, "with test data: '{:?}'", (i, j, k));
                         assert_eq!(g.out_degree(x), Ch!(g, x).count());
@@ -1152,6 +1152,66 @@ mod directions {
 
                     let g = $G::<i32>::null();
                     g.out_degree(&0);
+                }
+
+                #[test]
+                fn new_with_marker() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[should_panic]
+                fn new_with_marker_should_panic() {
+                    // FIXME:
+                }
+
+                #[test]
+                fn has_marker() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[should_panic]
+                fn has_marker_should_panic() {
+                    // FIXME:
+                }
+
+                #[test]
+                fn get_marker() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[should_panic]
+                fn get_marker_should_panic() {
+                    // FIXME:
+                }
+
+                #[test]
+                fn set_marker() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[should_panic]
+                fn set_marker_should_panic() {
+                    // FIXME:
+                }
+
+                #[test]
+                fn unset_marker() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[should_panic]
+                fn unset_marker_should_panic() {
+                    // FIXME:
                 }
             };
         }
