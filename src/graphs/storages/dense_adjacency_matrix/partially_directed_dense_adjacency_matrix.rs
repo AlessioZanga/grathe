@@ -1,12 +1,16 @@
 use std::{collections::BTreeSet, iter::repeat};
 
 use bimap::BiBTreeMap;
-use ndarray::{s, Axis};
+use ndarray::{s, Array2, Axis};
+use sprs::TriMat;
 
 use crate::{
     graphs::attributes::AttributesMap,
-    traits::{Directed, PartiallyDirected, Storage, Undirected, WithAttributes},
-    types::{directions, DenseMarkerMatrix, EdgeIterator, ExactSizeIter, Marker, Vertex, VertexIterator},
+    traits::{Convert, Directed, PartiallyDirected, Storage, Undirected, WithAttributes},
+    types::{
+        directions, DenseAdjacencyMatrix, DenseMarkerMatrix, EdgeIterator, ExactSizeIter, Marker,
+        SparseAdjacencyMatrix, SparseMarkerMatrix, Vertex, VertexIterator,
+    },
     E,
 };
 
@@ -384,6 +388,74 @@ where
     }
 }
 
+impl<V, A> Convert for PartiallyDirectedDenseAdjacencyMatrix<V, A>
+where
+    V: Vertex,
+    A: WithAttributes<V>,
+{
+    fn dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
+        self._data.mapv(|x| match x {
+            Marker::None => false,
+            Marker::TailTail | Marker::TailHead => true,
+            // Invalid marker pairs have already been filtered out.
+            _ => unreachable!(),
+        })
+    }
+
+    fn sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
+        self._data
+            .indexed_iter()
+            .map(|((i, j), x)| {
+                let x = match x {
+                    Marker::None => false,
+                    Marker::TailTail | Marker::TailHead => true,
+                    // Invalid marker pairs have already been filtered out.
+                    _ => unreachable!(),
+                };
+                (x, i, j)
+            })
+            .fold(
+                {
+                    let (n, m) = (self.order(), self.size());
+                    SparseAdjacencyMatrix::with_capacity((n, n), m)
+                },
+                |mut acc, (x, i, j)| {
+                    acc.add_triplet(i, j, x.clone());
+
+                    acc
+                },
+            )
+    }
+
+    fn dense_incidence_matrix(&self) -> Array2<i8> {
+        // FIXME:
+        todo!()
+    }
+
+    fn sparse_incidence_matrix(&self) -> TriMat<i8> {
+        // FIXME:
+        todo!()
+    }
+
+    fn dense_marker_matrix(&self) -> DenseMarkerMatrix {
+        self._data.clone()
+    }
+
+    fn sparse_marker_matrix(&self) -> SparseMarkerMatrix {
+        self._data.indexed_iter().fold(
+            {
+                let (n, m) = (self.order(), self.size());
+                SparseMarkerMatrix::with_capacity((n, n), m)
+            },
+            |mut acc, ((i, j), x)| {
+                acc.add_triplet(i, j, x.clone());
+
+                acc
+            },
+        )
+    }
+}
+
 impl<V, A> PartiallyDirected for PartiallyDirectedDenseAdjacencyMatrix<V, A>
 where
     V: Vertex,
@@ -494,9 +566,5 @@ where
             // Invalid marker pairs have already been filtered out.
             _ => unreachable!(),
         }
-    }
-
-    fn dense_marker_matrix(&self) -> DenseMarkerMatrix {
-        self._data.clone()
     }
 }
