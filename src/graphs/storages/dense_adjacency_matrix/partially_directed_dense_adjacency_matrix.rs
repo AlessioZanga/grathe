@@ -495,4 +495,8 @@ where
             _ => unreachable!(),
         }
     }
+
+    fn dense_marker_matrix(&self) -> DenseMarkerMatrix {
+        self._data.clone()
+    }
 }

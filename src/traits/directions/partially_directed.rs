@@ -1,5 +1,5 @@
 use super::{Directed, Undirected};
-use crate::types::Marker;
+use crate::{types::Marker, prelude::DenseMarkerMatrix};
 
 pub trait PartiallyDirected: Undirected + Directed {
     fn new_with_marker<I, J>(v_iter: I, e_iter: J) -> Self
@@ -20,4 +20,6 @@ pub trait PartiallyDirected: Undirected + Directed {
     fn get_marker(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Marker>;
 
     fn set_marker(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: Marker) -> bool;
+
+    fn dense_marker_matrix(&self) -> DenseMarkerMatrix;
 }
