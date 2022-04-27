@@ -10,7 +10,7 @@ use crate::{
     types::{
         directions, DenseAdjacencyMatrix, DenseMarkerMatrix, EdgeIterator, ExactSizeIter, Marker,
         SparseAdjacencyMatrix, SparseMarkerMatrix, Vertex, VertexIterator,
-    }
+    },
 };
 
 /// Partially-directed graph based on dense adjacency matrix storage layout.
@@ -461,13 +461,15 @@ where
     V: Vertex,
     A: WithAttributes<V>,
 {
-    fn from_dense_marker_matrix(data: DenseMarkerMatrix) -> Self {
+    fn from_dense_marker_matrix(data: DenseMarkerMatrix, variables: Vec<V>) -> Self {
         // Check if the marker pair is valid.
         assert!(
             data.iter()
                 .all(|m| matches!(m, Marker::None | Marker::TailTail | Marker::TailHead)),
             "Invalid marker pair. Partially-directed graphs can accept only TailTail and TailHead."
         );
+        // Add variables to the index.
+        let idxs = variables.into_iter().enumerate().map(|(i, x)| (x, i)).collect();
         // Compute the final size.
         let size = data
             .indexed_iter()
@@ -491,6 +493,7 @@ where
 
         Self {
             _data: data,
+            _idxs: idxs,
             _size: size,
             ..Default::default()
         }

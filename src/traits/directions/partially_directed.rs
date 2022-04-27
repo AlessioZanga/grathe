@@ -1,7 +1,8 @@
 use super::{Directed, Undirected};
 use crate::{
+    prelude::DenseMarkerMatrix,
     types::{directions, Marker},
-    E, V, prelude::DenseMarkerMatrix,
+    E, V,
 };
 
 pub trait PartiallyDirected: Undirected + Directed {
@@ -34,7 +35,7 @@ pub trait PartiallyDirected: Undirected + Directed {
         )
     }
 
-    fn from_dense_marker_matrix(data: DenseMarkerMatrix) -> Self;
+    fn from_dense_marker_matrix(data: DenseMarkerMatrix, variables: Vec<Self::Vertex>) -> Self;
 
     fn new_with_marker<I, J>(v_iter: I, e_iter: J) -> Self
     where
