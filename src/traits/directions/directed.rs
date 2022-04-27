@@ -1,9 +1,21 @@
 use std::collections::{BTreeSet, VecDeque};
 
-use crate::{traits::Storage, types::VertexIterator};
+use crate::{
+    traits::Storage,
+    types::{directions, VertexIterator},
+    E, V,
+};
 
 /// Directed graph trait.
 pub trait Directed: Storage {
+    /// Constructs from another directed graph.
+    fn from_directed<G>(other: G) -> Self
+    where
+        G: Directed<Vertex = Self::Vertex, Direction = directions::Directed>,
+    {
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+    }
+
     /// Ancestors iterator.
     ///
     /// Iterates over the vertex set $An(G, X)$ of a given vertex $X$.

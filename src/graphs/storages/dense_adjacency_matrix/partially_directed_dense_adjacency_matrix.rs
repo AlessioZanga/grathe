@@ -11,9 +11,10 @@ use crate::{
         directions, DenseAdjacencyMatrix, DenseMarkerMatrix, EdgeIterator, ExactSizeIter, Marker,
         SparseAdjacencyMatrix, SparseMarkerMatrix, Vertex, VertexIterator,
     },
-    E,
+    E, V,
 };
 
+/// Partially-directed graph based on dense adjacency matrix storage layout.
 #[derive(Clone, Debug, Default)]
 pub struct PartiallyDirectedDenseAdjacencyMatrix<V, A = AttributesMap<V, (), (), ()>>
 where
@@ -487,18 +488,41 @@ where
         g
     }
 
-    fn from_undirected<G>(g: G) -> Self
-    where
-        G: Undirected<Vertex = Self::Vertex>,
-    {
-        Self::new_with_marker([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Marker::TailTail)))
-    }
+    fn edges_with_marker_iter<'a>(
+        &'a self,
+    ) -> Box<dyn Iterator<Item = (&'a Self::Vertex, &'a Self::Vertex, &'a Marker)> + 'a> {
+        Box::new(ExactSizeIter::new(
+            self._data.indexed_iter().filter_map(|((x, y), m)| {
+                match m {
+                    Marker::None => None,
+                    Marker::TailTail => {
+                        // Return only first appearance of the edge.
+                        if x > y {
+                            return None;
+                        }
+                        // Map matrix index to vertex.
+                        let (x, y) = (
+                            self._idxs.get_by_right(&x).unwrap(),
+                            self._idxs.get_by_right(&y).unwrap(),
+                        );
 
-    fn from_directed<G>(g: G) -> Self
-    where
-        G: Directed<Vertex = Self::Vertex>,
-    {
-        Self::new_with_marker([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Marker::TailHead)))
+                        Some((x, y, m))
+                    }
+                    Marker::TailHead => {
+                        // Map matrix index to vertex.
+                        let (x, y) = (
+                            self._idxs.get_by_right(&x).unwrap(),
+                            self._idxs.get_by_right(&y).unwrap(),
+                        );
+
+                        Some((x, y, m))
+                    }
+                    // Invalid marker pairs have already been filtered out.
+                    _ => unreachable!(),
+                }
+            }),
+            self._size,
+        ))
     }
 
     fn has_marker(&self, x: &Self::Vertex, y: &Self::Vertex, m: Marker) -> bool {

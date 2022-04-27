@@ -346,6 +346,20 @@ mod convert {
                         );
                     }
                 }
+
+                #[test]
+                #[ignore]
+                fn dense_marker_matrix() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn sparse_marker_matrix() {
+                    // FIXME:
+                    todo!()
+                }
             };
         }
 
@@ -694,6 +708,20 @@ mod convert {
                             (i, j, k)
                         );
                     }
+                }
+
+                #[test]
+                #[ignore]
+                fn dense_marker_matrix() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn sparse_marker_matrix() {
+                    // FIXME:
+                    todo!()
                 }
             };
         }

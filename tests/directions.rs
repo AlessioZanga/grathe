@@ -10,6 +10,27 @@ mod directions {
                 };
 
                 #[test]
+                #[ignore]
+                fn from_undirected() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn from_directed() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn from_partially_directed() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
                 fn neighbors_iter() {
                     // Test `G::neighbors_iter(i32) -> Iter<Item = i32>`.
 
@@ -140,6 +161,13 @@ mod directions {
                     utils::is_sorted,
                     An, Ch, De, Pa,
                 };
+
+                #[test]
+                #[ignore]
+                fn from_directed() {
+                    // FIXME:
+                    todo!()
+                }
 
                 #[test]
                 fn ancestors_iter() {
@@ -545,6 +573,27 @@ mod directions {
                     utils::is_sorted,
                     An, Ch, De, Ne, Pa,
                 };
+
+                #[test]
+                #[ignore]
+                fn from_undirected() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn from_directed() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn from_partially_directed() {
+                    // FIXME:
+                    todo!()
+                }
 
                 #[test]
                 fn neighbors_iter() {
@@ -1170,14 +1219,7 @@ mod directions {
 
                 #[test]
                 #[ignore]
-                fn from_undirected() {
-                    // FIXME:
-                    todo!()
-                }
-
-                #[test]
-                #[ignore]
-                fn from_directed() {
+                fn edges_with_marker_iter() {
                     // FIXME:
                     todo!()
                 }

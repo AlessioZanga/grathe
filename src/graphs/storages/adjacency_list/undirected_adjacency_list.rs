@@ -10,7 +10,7 @@ use sprs::TriMat;
 use crate::{
     graphs::attributes::AttributesMap,
     prelude::{DFSEdge, DFSEdges, Traversal, BFS},
-    traits::{Connectivity, Convert, Operators, Storage, Undirected, WithAttributes},
+    traits::{Connectivity, Convert, Directed, Operators, PartiallyDirected, Storage, Undirected, WithAttributes},
     types::{
         directions, AdjacencyList, DenseAdjacencyMatrix, DenseMarkerMatrix, EdgeIterator, Error, ExactSizeIter, Marker,
         SparseAdjacencyMatrix, SparseMarkerMatrix, Vertex, VertexIterator,

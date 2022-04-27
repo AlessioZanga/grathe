@@ -1,7 +1,35 @@
-use crate::{traits::Storage, types::VertexIterator};
+use crate::{
+    traits::{Directed, PartiallyDirected, Storage},
+    types::{directions, VertexIterator},
+    E, V,
+};
 
 /// Undirected graph trait.
 pub trait Undirected: Storage {
+    /// Constructs from another undirected graph.
+    fn from_undirected<G>(other: G) -> Self
+    where
+        G: Undirected<Vertex = Self::Vertex, Direction = directions::Undirected>,
+    {
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+    }
+
+    /// Constructs from a directed graph by making any edge undirected.
+    fn from_directed<G>(other: G) -> Self
+    where
+        G: Directed<Vertex = Self::Vertex, Direction = directions::Directed>,
+    {
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+    }
+
+    /// Constructs from a partially-directed graph by making any edge undirected.
+    fn from_partially_directed<G>(other: G) -> Self
+    where
+        G: PartiallyDirected<Vertex = Self::Vertex, Direction = directions::PartiallyDirected>,
+    {
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+    }
+
     /// Neighbor iterator.
     ///
     /// Iterates over the vertex set $Ne(G, X)$ of a given vertex $X$.
