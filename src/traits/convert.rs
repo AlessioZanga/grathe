@@ -57,7 +57,9 @@ pub trait Convert: Storage {
     ///
     fn sparse_incidence_matrix(&self) -> TriMat<i8>;
 
+    /// Dense marker matrix of a graph.
     fn dense_marker_matrix(&self) -> DenseMarkerMatrix;
 
+    /// Dense marker matrix of a graph.
     fn sparse_marker_matrix(&self) -> SparseMarkerMatrix;
 }
