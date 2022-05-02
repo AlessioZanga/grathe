@@ -106,7 +106,7 @@ pub enum Error<V> {
 
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub enum Marker {
+pub enum Mark {
     /// X -/- Y, aka. no edge,
     None,
     /// X o-o Y,
@@ -123,15 +123,15 @@ pub enum Marker {
     HeadHead,
 }
 
-impl Default for Marker {
+impl Default for Mark {
     fn default() -> Self {
-        Marker::None
+        Mark::None
     }
 }
 
-pub type DenseMarkerMatrix = Array2<Marker>;
+pub type DenseMarkMatrix = Array2<Mark>;
 
-pub type SparseMarkerMatrix = TriMat<Marker>;
+pub type SparseMarkMatrix = TriMat<Mark>;
 
 /// Directions pseudo-enumerator for generics algorithms.
 pub mod directions {

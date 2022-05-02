@@ -11,8 +11,8 @@ use crate::{
     prelude::{DFSEdge, DFSEdges, Traversal, BFS},
     traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes},
     types::{
-        directions, AdjacencyList, DenseAdjacencyMatrix, DenseMarkerMatrix, EdgeIterator, Error, ExactSizeIter, Marker,
-        SparseAdjacencyMatrix, SparseMarkerMatrix, Vertex, VertexIterator,
+        directions, AdjacencyList, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeIterator, Error, ExactSizeIter, Mark,
+        SparseAdjacencyMatrix, SparseMarkMatrix, Vertex, VertexIterator,
     },
     Ch, E, V,
 };
@@ -455,27 +455,27 @@ where
         out
     }
 
-    fn dense_marker_matrix(&self) -> DenseMarkerMatrix {
+    fn dense_mark_matrix(&self) -> DenseMarkMatrix {
         self.dense_adjacency_matrix().mapv(|x| match x {
-            false => Marker::None,
-            true => Marker::TailHead,
+            false => Mark::None,
+            true => Mark::TailHead,
         })
     }
 
-    fn sparse_marker_matrix(&self) -> SparseMarkerMatrix {
+    fn sparse_mark_matrix(&self) -> SparseMarkMatrix {
         self.sparse_adjacency_matrix()
             .into_iter()
             .map(|(&x, (i, j))| {
                 let x = match x {
-                    false => Marker::None,
-                    true => Marker::TailHead,
+                    false => Mark::None,
+                    true => Mark::TailHead,
                 };
                 (x, i, j)
             })
             .fold(
                 {
                     let (n, m) = (self.order(), self.size());
-                    SparseMarkerMatrix::with_capacity((n, n), m)
+                    SparseMarkMatrix::with_capacity((n, n), m)
                 },
                 |mut acc, (x, i, j)| {
                     acc.add_triplet(i, j, x);

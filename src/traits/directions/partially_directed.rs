@@ -1,7 +1,7 @@
 use super::{Directed, Undirected};
 use crate::{
-    prelude::DenseMarkerMatrix,
-    types::{directions, Marker},
+    prelude::DenseMarkMatrix,
+    types::{directions, Mark},
     E, V,
 };
 
@@ -11,7 +11,7 @@ pub trait PartiallyDirected: Undirected + Directed {
     where
         G: Undirected<Vertex = Self::Vertex>,
     {
-        Self::new_with_marker([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Marker::TailTail)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Mark::TailTail)))
     }
 
     /// Constructs from a directed graph.
@@ -19,7 +19,7 @@ pub trait PartiallyDirected: Undirected + Directed {
     where
         G: Directed<Vertex = Self::Vertex>,
     {
-        Self::new_with_marker([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Marker::TailHead)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Mark::TailHead)))
     }
 
     /// Constructs from another partially-directed graph.
@@ -27,28 +27,26 @@ pub trait PartiallyDirected: Undirected + Directed {
     where
         G: PartiallyDirected<Vertex = Self::Vertex, Direction = directions::PartiallyDirected>,
     {
-        Self::new_with_marker(
+        Self::new_with_mark(
             V!(other).cloned(),
-            other
-                .edges_with_marker_iter()
-                .map(|(x, y, m)| (x.clone(), y.clone(), *m)),
+            other.edges_with_mark_iter().map(|(x, y, m)| (x.clone(), y.clone(), *m)),
         )
     }
 
-    fn from_dense_marker_matrix(data: DenseMarkerMatrix, variables: Vec<Self::Vertex>) -> Self;
+    fn from_dense_mark_matrix(data: DenseMarkMatrix, variables: Vec<Self::Vertex>) -> Self;
 
-    fn new_with_marker<I, J>(v_iter: I, e_iter: J) -> Self
+    fn new_with_mark<I, J>(v_iter: I, e_iter: J) -> Self
     where
         I: IntoIterator<Item = Self::Vertex>,
-        J: IntoIterator<Item = (Self::Vertex, Self::Vertex, Marker)>;
+        J: IntoIterator<Item = (Self::Vertex, Self::Vertex, Mark)>;
 
-    fn edges_with_marker_iter<'a>(
+    fn edges_with_mark_iter<'a>(
         &'a self,
-    ) -> Box<dyn Iterator<Item = (&'a Self::Vertex, &'a Self::Vertex, &'a Marker)> + 'a>;
+    ) -> Box<dyn Iterator<Item = (&'a Self::Vertex, &'a Self::Vertex, &'a Mark)> + 'a>;
 
-    fn has_marker(&self, x: &Self::Vertex, y: &Self::Vertex, m: Marker) -> bool;
+    fn has_mark(&self, x: &Self::Vertex, y: &Self::Vertex, m: Mark) -> bool;
 
-    fn get_marker(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Marker>;
+    fn get_mark(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Mark>;
 
-    fn set_marker(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: Marker) -> bool;
+    fn set_mark(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: Mark) -> bool;
 }

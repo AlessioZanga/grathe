@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::{
     traits::{PartiallyMixed, Storage},
-    types::{directions, Marker},
+    types::{directions, Mark},
     Adj,
 };
 
@@ -57,12 +57,12 @@ where
             // If W has not been visited yet, and ...
             if !self.visited.contains(w) {
                 // ... W -/- Z, and ...
-                if self.g.has_marker(w, z, Marker::None)
-                    && self.g.has_marker(z, w, Marker::None)
+                if self.g.has_mark(w, z, Mark::None)
+                    && self.g.has_mark(z, w, Mark::None)
                     && matches!(
                         // ... W *-> X ...
-                        self.g.get_marker(w, x).unwrap(),
-                        Marker::CircHead | Marker::HeadHead | Marker::TailHead
+                        self.g.get_mark(w, x).unwrap(),
+                        Mark::CircHead | Mark::HeadHead | Mark::TailHead
                     )
                 // ... then W forms a discriminating path for X, Y and Z.
                 {
@@ -75,9 +75,9 @@ where
                 // .. else if W extends the current path ...
                 } else if
                 // ... W --> Z, and ...
-                self.g.has_marker(w, z, Marker::TailHead)
+                self.g.has_mark(w, z, Mark::TailHead)
                     // ... W <-> X ...
-                    && self.g.has_marker(w, x, Marker::HeadHead)
+                    && self.g.has_mark(w, x, Mark::HeadHead)
                 {
                     // ... then, call the visit procedure recursively.
                     let discriminating_path = self.visit(w, z);

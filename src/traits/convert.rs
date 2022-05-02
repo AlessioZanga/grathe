@@ -3,9 +3,7 @@ use sprs::TriMat;
 
 use crate::{
     traits::Storage,
-    types::{
-        AdjacencyList, DenseAdjacencyMatrix, DenseMarkerMatrix, EdgeList, SparseAdjacencyMatrix, SparseMarkerMatrix,
-    },
+    types::{AdjacencyList, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeList, SparseAdjacencyMatrix, SparseMarkMatrix},
     Adj, E, V,
 };
 
@@ -57,9 +55,9 @@ pub trait Convert: Storage {
     ///
     fn sparse_incidence_matrix(&self) -> TriMat<i8>;
 
-    /// Dense marker matrix of a graph.
-    fn dense_marker_matrix(&self) -> DenseMarkerMatrix;
+    /// Dense mark matrix of a graph.
+    fn dense_mark_matrix(&self) -> DenseMarkMatrix;
 
-    /// Dense marker matrix of a graph.
-    fn sparse_marker_matrix(&self) -> SparseMarkerMatrix;
+    /// Dense mark matrix of a graph.
+    fn sparse_mark_matrix(&self) -> SparseMarkMatrix;
 }

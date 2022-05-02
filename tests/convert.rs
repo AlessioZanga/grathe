@@ -349,14 +349,14 @@ mod convert {
 
                 #[test]
                 #[ignore]
-                fn dense_marker_matrix() {
+                fn dense_mark_matrix() {
                     // FIXME:
                     todo!()
                 }
 
                 #[test]
                 #[ignore]
-                fn sparse_marker_matrix() {
+                fn sparse_mark_matrix() {
                     // FIXME:
                     todo!()
                 }
@@ -712,14 +712,14 @@ mod convert {
 
                 #[test]
                 #[ignore]
-                fn dense_marker_matrix() {
+                fn dense_mark_matrix() {
                     // FIXME:
                     todo!()
                 }
 
                 #[test]
                 #[ignore]
-                fn sparse_marker_matrix() {
+                fn sparse_mark_matrix() {
                     // FIXME:
                     todo!()
                 }

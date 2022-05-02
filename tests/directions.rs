@@ -569,7 +569,7 @@ mod directions {
             ($G: ident) => {
                 use grathe::{
                     traits::{Directed, PartiallyDirected, Storage, Undirected},
-                    types::Marker,
+                    types::Mark,
                     utils::is_sorted,
                     An, Ch, De, Ne, Pa,
                 };
@@ -607,16 +607,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, vec![])),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailTail)], (&0, vec![&0])),
+                        (vec![0], vec![(0, 0, Mark::TailTail)], (&0, vec![&0])),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, vec![])),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailTail),
-                                (1, 2, Marker::TailTail),
-                                (2, 3, Marker::TailTail),
+                                (0, 1, Mark::TailTail),
+                                (1, 2, Mark::TailTail),
+                                (2, 3, Mark::TailTail),
                             ],
                             (&0, vec![&1]),
                         ),
@@ -624,10 +624,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailTail),
-                                (1, 58, Marker::TailTail),
-                                (58, 3, Marker::TailTail),
-                                (3, 75, Marker::TailTail),
+                                (71, 1, Mark::TailTail),
+                                (1, 58, Mark::TailTail),
+                                (58, 3, Mark::TailTail),
+                                (3, 75, Mark::TailTail),
                             ],
                             (&1, vec![&58, &71]),
                         ),
@@ -635,10 +635,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailTail),
-                                (1, 58, Marker::TailTail),
-                                (58, 3, Marker::TailTail),
-                                (3, 75, Marker::TailTail),
+                                (71, 1, Mark::TailTail),
+                                (1, 58, Mark::TailTail),
+                                (58, 3, Mark::TailTail),
+                                (3, 75, Mark::TailTail),
                             ],
                             (&1, vec![&58, &71]),
                         ),
@@ -646,7 +646,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(Ne!(g, x)),
@@ -736,16 +736,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, vec![])),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailHead)], (&0, vec![&0])),
+                        (vec![0], vec![(0, 0, Mark::TailHead)], (&0, vec![&0])),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, vec![])),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailHead),
-                                (1, 2, Marker::TailHead),
-                                (2, 3, Marker::TailHead),
+                                (0, 1, Mark::TailHead),
+                                (1, 2, Mark::TailHead),
+                                (2, 3, Mark::TailHead),
                             ],
                             (&3, vec![&0, &1, &2]),
                         ),
@@ -753,10 +753,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, vec![&71]),
                         ),
@@ -764,10 +764,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, vec![&71]),
                         ),
@@ -775,7 +775,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(An!(g, x)),
@@ -808,16 +808,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, vec![])),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailHead)], (&0, vec![&0])),
+                        (vec![0], vec![(0, 0, Mark::TailHead)], (&0, vec![&0])),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, vec![])),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailHead),
-                                (1, 2, Marker::TailHead),
-                                (2, 3, Marker::TailHead),
+                                (0, 1, Mark::TailHead),
+                                (1, 2, Mark::TailHead),
+                                (2, 3, Mark::TailHead),
                             ],
                             (&3, vec![&2]),
                         ),
@@ -825,10 +825,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, vec![&71]),
                         ),
@@ -836,10 +836,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, vec![&71]),
                         ),
@@ -847,7 +847,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(Pa!(g, x)),
@@ -880,16 +880,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, vec![])),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailHead)], (&0, vec![&0])),
+                        (vec![0], vec![(0, 0, Mark::TailHead)], (&0, vec![&0])),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, vec![])),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailHead),
-                                (1, 2, Marker::TailHead),
-                                (2, 3, Marker::TailHead),
+                                (0, 1, Mark::TailHead),
+                                (1, 2, Mark::TailHead),
+                                (2, 3, Mark::TailHead),
                             ],
                             (&2, vec![&3]),
                         ),
@@ -897,10 +897,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&71, vec![&1]),
                         ),
@@ -908,10 +908,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&71, vec![&1]),
                         ),
@@ -919,7 +919,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(Ch!(g, x)),
@@ -952,16 +952,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, vec![])),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailHead)], (&0, vec![&0])),
+                        (vec![0], vec![(0, 0, Mark::TailHead)], (&0, vec![&0])),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, vec![])),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailHead),
-                                (1, 2, Marker::TailHead),
-                                (2, 3, Marker::TailHead),
+                                (0, 1, Mark::TailHead),
+                                (1, 2, Mark::TailHead),
+                                (2, 3, Mark::TailHead),
                             ],
                             (&0, vec![&1, &2, &3]),
                         ),
@@ -969,10 +969,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, vec![&3, &58, &75]),
                         ),
@@ -980,10 +980,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, vec![&3, &58, &75]),
                         ),
@@ -991,7 +991,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(De!(g, x)),
@@ -1024,16 +1024,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, &0, true)),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailHead)], (&0, &0, false)),
+                        (vec![0], vec![(0, 0, Mark::TailHead)], (&0, &0, false)),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, &0, true)),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailHead),
-                                (1, 2, Marker::TailHead),
-                                (2, 3, Marker::TailHead),
+                                (0, 1, Mark::TailHead),
+                                (1, 2, Mark::TailHead),
+                                (2, 3, Mark::TailHead),
                             ],
                             (&0, &1, false),
                         ),
@@ -1041,10 +1041,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&3, &58, true),
                         ),
@@ -1052,10 +1052,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&62, &99, true),
                         ),
@@ -1063,7 +1063,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let mut g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let mut g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, y, f) = k.clone();
                         assert_eq!(
                             g.add_directed_edge(x, y),
@@ -1095,16 +1095,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, 0)),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailHead)], (&0, 1)),
+                        (vec![0], vec![(0, 0, Mark::TailHead)], (&0, 1)),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, 0)),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailHead),
-                                (1, 2, Marker::TailHead),
-                                (2, 3, Marker::TailHead),
+                                (0, 1, Mark::TailHead),
+                                (1, 2, Mark::TailHead),
+                                (2, 3, Mark::TailHead),
                             ],
                             (&1, 1),
                         ),
@@ -1112,10 +1112,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, 1),
                         ),
@@ -1123,10 +1123,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&3, 1),
                         ),
@@ -1134,7 +1134,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(g.in_degree(x), l, "with test data: '{:?}'", (i, j, k));
                         assert_eq!(g.in_degree(x), Pa!(g, x).count());
@@ -1162,16 +1162,16 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, 0)),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0, Marker::TailHead)], (&0, 1)),
+                        (vec![0], vec![(0, 0, Mark::TailHead)], (&0, 1)),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, 0)),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![
-                                (0, 1, Marker::TailHead),
-                                (1, 2, Marker::TailHead),
-                                (2, 3, Marker::TailHead),
+                                (0, 1, Mark::TailHead),
+                                (1, 2, Mark::TailHead),
+                                (2, 3, Mark::TailHead),
                             ],
                             (&1, 1),
                         ),
@@ -1179,10 +1179,10 @@ mod directions {
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&1, 1),
                         ),
@@ -1190,10 +1190,10 @@ mod directions {
                         (
                             vec![35, 62, 99, 29, 100, 18],
                             vec![
-                                (71, 1, Marker::TailHead),
-                                (1, 58, Marker::TailHead),
-                                (58, 3, Marker::TailHead),
-                                (3, 75, Marker::TailHead),
+                                (71, 1, Mark::TailHead),
+                                (1, 58, Mark::TailHead),
+                                (58, 3, Mark::TailHead),
+                                (3, 75, Mark::TailHead),
                             ],
                             (&3, 1),
                         ),
@@ -1201,7 +1201,7 @@ mod directions {
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_mark(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(g.out_degree(x), l, "with test data: '{:?}'", (i, j, k));
                         assert_eq!(g.out_degree(x), Ch!(g, x).count());
@@ -1219,7 +1219,7 @@ mod directions {
 
                 #[test]
                 #[ignore]
-                fn new_with_marker() {
+                fn new_with_mark() {
                     // FIXME:
                     todo!()
                 }
@@ -1227,34 +1227,20 @@ mod directions {
                 #[test]
                 #[should_panic]
                 #[ignore]
-                fn new_with_marker_should_panic() {
+                fn new_with_mark_should_panic() {
                     // FIXME:
                 }
 
                 #[test]
                 #[ignore]
-                fn edges_with_marker_iter() {
-                    // FIXME:
-                    todo!()
-                }
-
-                #[test]
-                #[ignore]
-                fn has_marker() {
+                fn edges_with_mark_iter() {
                     // FIXME:
                     todo!()
                 }
 
                 #[test]
-                #[should_panic]
                 #[ignore]
-                fn has_marker_should_panic() {
-                    // FIXME:
-                }
-
-                #[test]
-                #[ignore]
-                fn get_marker() {
+                fn has_mark() {
                     // FIXME:
                     todo!()
                 }
@@ -1262,13 +1248,13 @@ mod directions {
                 #[test]
                 #[should_panic]
                 #[ignore]
-                fn get_marker_should_panic() {
+                fn has_mark_should_panic() {
                     // FIXME:
                 }
 
                 #[test]
                 #[ignore]
-                fn set_marker() {
+                fn get_mark() {
                     // FIXME:
                     todo!()
                 }
@@ -1276,7 +1262,21 @@ mod directions {
                 #[test]
                 #[should_panic]
                 #[ignore]
-                fn set_marker_should_panic() {
+                fn get_mark_should_panic() {
+                    // FIXME:
+                }
+
+                #[test]
+                #[ignore]
+                fn set_mark() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[should_panic]
+                #[ignore]
+                fn set_mark_should_panic() {
                     // FIXME:
                 }
             };

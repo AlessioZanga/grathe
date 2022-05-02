@@ -14,11 +14,9 @@ pub trait Mixed: PartiallyDirected {
     where
         G: Mixed<Vertex = Self::Vertex, Direction = directions::Mixed>,
     {
-        Self::new_with_marker(
+        Self::new_with_mark(
             V!(other).cloned(),
-            other
-                .edges_with_marker_iter()
-                .map(|(x, y, m)| (x.clone(), y.clone(), *m)),
+            other.edges_with_mark_iter().map(|(x, y, m)| (x.clone(), y.clone(), *m)),
         )
     }
 }
