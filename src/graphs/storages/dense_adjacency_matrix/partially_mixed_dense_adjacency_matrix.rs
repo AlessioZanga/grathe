@@ -390,21 +390,14 @@ where
     A: WithAttributes<V>,
 {
     fn dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
-        self._data.mapv(|x| match x {
-            Marker::None => false,
-            _ => true,
-        })
+        self._data.mapv(|x| !matches!(x, Marker::None))
     }
 
     fn sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
         self._data
             .indexed_iter()
             .map(|((i, j), x)| {
-                let x = match x {
-                    Marker::None => false,
-                    _ => true,
-                };
-                (x, i, j)
+                (!matches!(x, Marker::None), i, j)
             })
             .fold(
                 {

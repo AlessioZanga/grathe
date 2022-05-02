@@ -385,7 +385,7 @@ where
 {
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
         V!(self)
-            .map(|x| (x.clone(), FromIterator::from_iter(Ch!(self, &x).cloned())))
+            .map(|x| (x.clone(), FromIterator::from_iter(Ch!(self, x).cloned())))
             .collect()
     }
 
