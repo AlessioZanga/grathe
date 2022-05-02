@@ -1,7 +1,6 @@
 use std::{
     collections::{HashMap, VecDeque},
     iter::FusedIterator,
-    marker::PhantomData,
 };
 
 use super::Traversal;
@@ -33,7 +32,7 @@ where
 ///
 pub struct DepthFirstSearchEdges<'a, G, D>
 where
-    G: Storage,
+    G: Storage<Direction = D>,
 {
     /// Given graph reference.
     graph: &'a G,
@@ -47,8 +46,6 @@ where
     pub finish_time: HashMap<&'a G::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
     pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
-    /// Generic placeholder for direction.
-    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> DepthFirstSearchEdges<'a, G, D>
@@ -79,8 +76,6 @@ where
             finish_time: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
-            // Generic placeholder for direction.
-            _direction_type: Default::default(),
         };
         // If the graph is null.
         if g.order() == 0 {
@@ -117,7 +112,7 @@ where
 
 impl<'a, G> Iterator for DepthFirstSearchEdges<'a, G, directions::Undirected>
 where
-    G: Storage + Undirected,
+    G: Storage<Direction = directions::Undirected> + Undirected,
 {
     type Item = DFSEdge<'a, G::Vertex>;
 
@@ -182,11 +177,14 @@ where
     }
 }
 
-impl<'a, G> FusedIterator for DepthFirstSearchEdges<'a, G, directions::Undirected> where G: Storage + Undirected {}
+impl<'a, G> FusedIterator for DepthFirstSearchEdges<'a, G, directions::Undirected> where
+    G: Storage<Direction = directions::Undirected> + Undirected
+{
+}
 
 impl<'a, G> Iterator for DepthFirstSearchEdges<'a, G, directions::Directed>
 where
-    G: Storage + Directed,
+    G: Storage<Direction = directions::Directed> + Directed,
 {
     type Item = DFSEdge<'a, G::Vertex>;
 
@@ -257,7 +255,10 @@ where
     }
 }
 
-impl<'a, G> FusedIterator for DepthFirstSearchEdges<'a, G, directions::Directed> where G: Storage + Directed {}
+impl<'a, G> FusedIterator for DepthFirstSearchEdges<'a, G, directions::Directed> where
+    G: Storage<Direction = directions::Directed> + Directed
+{
+}
 
 impl<'a, G, D> From<&'a G> for DepthFirstSearchEdges<'a, G, D>
 where

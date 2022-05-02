@@ -1,4 +1,4 @@
-use std::{collections::HashSet, marker::PhantomData, vec::Vec};
+use std::{collections::HashSet, vec::Vec};
 
 use crate::{
     traits::{Directed, Storage, Undirected},
@@ -9,7 +9,7 @@ use crate::{
 /// Find all simple paths in a graph for given source and target vertices.
 pub struct AllSimplePaths<'a, G, D>
 where
-    G: Storage,
+    G: Storage<Direction = D>,
 {
     /// Given graph reference.
     graph: &'a G,
@@ -19,8 +19,6 @@ where
     visited: HashSet<&'a G::Vertex>,
     /// Vector of found simple paths.
     pub simple_paths: Vec<Vec<&'a G::Vertex>>,
-    /// Generic placeholder for direction.
-    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> AllSimplePaths<'a, G, D>
@@ -48,7 +46,7 @@ where
     /// let mut search = AllSimplePaths::from((&g, &0, &3));
     ///
     /// // Run the algorithm and assert later.
-    /// search.run();
+    /// search.call_mut();
     ///
     /// // In this graph there are four simple paths from `0` to `3`,
     /// // these are reported in discovery order.
@@ -76,15 +74,13 @@ where
             visited: Default::default(),
             // Initialize vector of found simple paths.
             simple_paths: Default::default(),
-            // Generic placeholder for direction.
-            _direction_type: Default::default(),
         }
     }
 }
 
 impl<'a, G> AllSimplePaths<'a, G, directions::Undirected>
 where
-    G: Storage + Undirected,
+    G: Storage<Direction = directions::Undirected> + Undirected,
 {
     fn visit(&mut self, x: &'a G::Vertex, y: &'a G::Vertex) {
         // Push current vertex onto stack.
@@ -117,7 +113,9 @@ where
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) -> &Self {
+    /// TODO: Replace with FnMut once stabilized.
+    ///
+    pub fn call_mut(&mut self) -> &Self {
         // Get target vertex.
         let y = self.stack.pop().unwrap();
         // Get source vertex.
@@ -131,7 +129,7 @@ where
 
 impl<'a, G> AllSimplePaths<'a, G, directions::Directed>
 where
-    G: Storage + Directed,
+    G: Storage<Direction = directions::Directed> + Directed,
 {
     fn visit(&mut self, x: &'a G::Vertex, y: &'a G::Vertex) {
         // Push current vertex onto stack.
@@ -164,7 +162,9 @@ where
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) -> &Self {
+    /// TODO: Replace with FnMut once stabilized.
+    ///
+    pub fn call_mut(&mut self) -> &Self {
         // Get target vertex.
         let y = self.stack.pop().unwrap();
         // Get source vertex.
