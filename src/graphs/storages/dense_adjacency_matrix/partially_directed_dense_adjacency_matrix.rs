@@ -153,7 +153,7 @@ where
 
                         Some((x, y))
                     }
-                    // Invalid marker pairs have already been filtered out.
+                    // Invalid markers have already been filtered out.
                     _ => unreachable!(),
                 }
             }),
@@ -310,7 +310,7 @@ where
 
                 true
             }
-            // Invalid marker pairs have already been filtered out.
+            // Invalid markers have already been filtered out.
             _ => unreachable!(),
         }
     }
@@ -397,7 +397,7 @@ where
         self._data.mapv(|x| match x {
             Marker::None => false,
             Marker::TailTail | Marker::TailHead => true,
-            // Invalid marker pairs have already been filtered out.
+            // Invalid markers have already been filtered out.
             _ => unreachable!(),
         })
     }
@@ -409,7 +409,7 @@ where
                 let x = match x {
                     Marker::None => false,
                     Marker::TailTail | Marker::TailHead => true,
-                    // Invalid marker pairs have already been filtered out.
+                    // Invalid markers have already been filtered out.
                     _ => unreachable!(),
                 };
                 (x, i, j)
@@ -485,7 +485,7 @@ where
                         1
                     }
                     Marker::TailHead => 1,
-                    // Invalid marker pairs have already been filtered out.
+                    // Invalid markers have already been filtered out.
                     _ => unreachable!(),
                 }
             })
@@ -554,7 +554,7 @@ where
 
                         Some((x, y, m))
                     }
-                    // Invalid marker pairs have already been filtered out.
+                    // Invalid markers have already been filtered out.
                     _ => unreachable!(),
                 }
             }),
@@ -624,7 +624,7 @@ where
 
                 true
             }
-            // Invalid marker pairs have already been filtered out.
+            // Invalid markers have already been filtered out.
             _ => unreachable!(),
         }
     }
