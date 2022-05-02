@@ -17,7 +17,13 @@ pub type DiGraph = storages::DirectedAdjacencyList<i32>;
 pub type DiGraphl = storages::DirectedAdjacencyList<String>;
 
 /// Default partially-directed graph implementation based on dense adjacency matrix.
-pub type PartiallyDiGraph = storages::PartiallyDirectedDenseAdjacencyMatrix<i32>;
+pub type PartiallyDirectedGraph = storages::PartiallyDirectedDenseAdjacencyMatrix<i32>;
 
 /// Default partially-directed graph with labels implementation based on dense adjacency matrix.
-pub type PartiallyDiGraphl = storages::PartiallyDirectedDenseAdjacencyMatrix<String>;
+pub type PartiallyDirectedGraphl = storages::PartiallyDirectedDenseAdjacencyMatrix<String>;
+
+/// Default partially-mixed graph implementation based on dense adjacency matrix.
+pub type PartiallyMixedGraph = storages::PartiallyMixedDenseAdjacencyMatrix<i32>;
+
+/// Default partially-mixed graph with labels implementation based on dense adjacency matrix.
+pub type PartiallyMixedGraphl = storages::PartiallyMixedDenseAdjacencyMatrix<String>;

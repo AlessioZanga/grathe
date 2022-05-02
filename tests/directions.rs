@@ -607,32 +607,46 @@ mod directions {
                         // ... one vertex and zero edges,
                         (vec![0], vec![], (&0, vec![])),
                         // ... one vertex and one edge,
-                        (vec![0], vec![(0, 0)], (&0, vec![&0])),
+                        (vec![0], vec![(0, 0, Marker::TailTail)], (&0, vec![&0])),
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], (&0, vec![])),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
-                            vec![(0, 1), (1, 2), (2, 3)],
+                            vec![
+                                (0, 1, Marker::TailTail),
+                                (1, 2, Marker::TailTail),
+                                (2, 3, Marker::TailTail),
+                            ],
                             (&0, vec![&1]),
                         ),
                         // ... random vertices and edges,
                         (
                             vec![71, 1, 58, 3, 75],
-                            vec![(71, 1), (1, 58), (58, 3), (3, 75)],
+                            vec![
+                                (71, 1, Marker::TailTail),
+                                (1, 58, Marker::TailTail),
+                                (58, 3, Marker::TailTail),
+                                (3, 75, Marker::TailTail),
+                            ],
                             (&1, vec![&58, &71]),
                         ),
                         // ... random non-overlapping vertices and edges,
                         (
                             vec![35, 62, 99, 29, 100, 18],
-                            vec![(71, 1), (1, 58), (58, 3), (3, 75)],
+                            vec![
+                                (71, 1, Marker::TailTail),
+                                (1, 58, Marker::TailTail),
+                                (58, 3, Marker::TailTail),
+                                (3, 75, Marker::TailTail),
+                            ],
                             (&1, vec![&58, &71]),
                         ),
                     ];
 
                     // Test for each scenario.
                     for (i, j, k) in data {
-                        let g = $G::<i32>::new(i.clone(), j.clone());
+                        let g = $G::<i32>::new_with_marker(i.clone(), j.clone());
                         let (x, l) = k.clone();
                         assert_eq!(
                             Vec::from_iter(Ne!(g, x)),
@@ -1271,6 +1285,11 @@ mod directions {
         mod partially_directed_dense_adjacency_matrix {
             use grathe::graphs::storages::PartiallyDirectedDenseAdjacencyMatrix;
             generic_tests!(PartiallyDirectedDenseAdjacencyMatrix);
+        }
+
+        mod partially_mixed_dense_adjacency_matrix {
+            use grathe::graphs::storages::PartiallyMixedDenseAdjacencyMatrix;
+            generic_tests!(PartiallyMixedDenseAdjacencyMatrix);
         }
     }
 }
