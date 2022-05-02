@@ -396,9 +396,7 @@ where
     fn sparse_adjacency_matrix(&self) -> SparseAdjacencyMatrix {
         self._data
             .indexed_iter()
-            .map(|((i, j), x)| {
-                (!matches!(x, Marker::None), i, j)
-            })
+            .map(|((i, j), x)| (!matches!(x, Marker::None), i, j))
             .fold(
                 {
                     let (n, m) = (self.order(), self.size());
