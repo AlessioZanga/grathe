@@ -20,7 +20,7 @@ where
     G: Storage<Direction = D>,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// The visit stack.
     stack: Vec<&'a G::Vertex>,
     /// Global time counter.
@@ -83,7 +83,7 @@ where
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the to-be-visited queue with the source vertex.
             stack: Default::default(),
             // Initialize the global clock.
@@ -146,7 +146,7 @@ where
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for y in Ne!(self.graph, x) {
+                for y in Ne!(self.g, x) {
                     // Filter already visited vertices (as GRAY).
                     if !self.discovery_time.contains_key(y) {
                         // Set predecessor.
@@ -201,7 +201,7 @@ where
                 // Initialize visiting queue.
                 let mut queue = VecDeque::new();
                 // Iterate over reachable vertices.
-                for y in Ch!(self.graph, x) {
+                for y in Ch!(self.g, x) {
                     // Filter already visited vertices (as GRAY).
                     if !self.discovery_time.contains_key(y) {
                         // Set predecessor.

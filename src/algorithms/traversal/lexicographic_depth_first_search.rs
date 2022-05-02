@@ -15,7 +15,7 @@ where
     G: Undirected,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// Current index.
     index: usize,
     /// To-be-visited queue.
@@ -76,7 +76,7 @@ where
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize index.
             index: Default::default(),
             // Initialize the to-be-visited queue with labels.
@@ -137,7 +137,7 @@ where
             // Remove selected vertex from the visit queue.
             self.queue.remove(x);
             // Iterate over vertex neighbors.
-            for y in Ne!(self.graph, x) {
+            for y in Ne!(self.g, x) {
                 // If neighbor has not been visited yet.
                 if let Some(y_label) = self.queue.get_mut(y) {
                     // Set its predecessor.

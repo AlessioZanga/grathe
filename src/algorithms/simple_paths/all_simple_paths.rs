@@ -12,7 +12,7 @@ where
     G: Storage<Direction = D>,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// To-be-visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Already visited set.
@@ -67,7 +67,7 @@ where
 
         Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the to-be-visited queue with source and target vertices.
             stack: From::from([x, y]),
             // Initialize the already visited set.
@@ -88,7 +88,7 @@ where
         // Set current vertex as visited.
         self.visited.insert(x);
         // For each vertex reachable from the current vertex.
-        for z in Ne!(self.graph, x) {
+        for z in Ne!(self.g, x) {
             // If the next vertex is the target.
             if z == y {
                 // Then clones the stack into the results.
@@ -137,7 +137,7 @@ where
         // Set current vertex as visited.
         self.visited.insert(x);
         // For each vertex reachable from the current vertex.
-        for z in Ch!(self.graph, x) {
+        for z in Ch!(self.g, x) {
             // If the next vertex is the target.
             if z == y {
                 // Then clones the stack into the results.

@@ -23,7 +23,7 @@ where
     G: Storage<Direction = D>,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
     vertices: VecDeque<&'a G::Vertex>,
     /// To-be-visited queue with the source vertex.
@@ -80,7 +80,7 @@ where
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the [`Forest`] to-be-visited queue.
             vertices: Default::default(),
             // Initialize the to-be-visited queue with the source vertex.
@@ -150,7 +150,7 @@ where
         // If there are still vertices to be visited.
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for y in Ne!(self.graph, x) {
+            for y in Ne!(self.g, x) {
                 // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
@@ -205,7 +205,7 @@ where
         // If there are still vertices to be visited.
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for y in Ch!(self.graph, x) {
+            for y in Ch!(self.g, x) {
                 // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.

@@ -23,7 +23,7 @@ where
     G: Storage<Direction = D>,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// The currently visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Map of *blocked* vertices in order to avoid double counting.
@@ -83,7 +83,7 @@ where
     pub fn new(g: &'a G) -> Self {
         Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the currently visited stack.
             stack: Default::default(),
             // Initialize blocked map.
@@ -116,7 +116,7 @@ where
     G: Storage<Direction = directions::Directed> + Directed,
 {
     fn block(&mut self, x: &'a G::Vertex) {
-        for y in Ch!(self.graph, x) {
+        for y in Ch!(self.g, x) {
             if y < self.stack[0] {
                 continue;
             }
@@ -139,7 +139,7 @@ where
         self.blocked.entry(x).or_default();
 
         // Iterate over reachable vertices from graph.
-        for y in Ch!(self.graph, x) {
+        for y in Ch!(self.g, x) {
             // If current vertex is lower then starting vertex,
             // then skip this iteration.
             if y < self.stack[0] {
@@ -190,7 +190,7 @@ where
     /// TODO: Replace with FnMut once stabilized.
     ///
     pub fn call_mut(&mut self) -> &Self {
-        for x in V!(self.graph) {
+        for x in V!(self.g) {
             // Visit current vertex recursively.
             self.circuit(x);
             // Clear map of blocked vertices.
