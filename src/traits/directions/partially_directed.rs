@@ -31,7 +31,7 @@ pub trait PartiallyDirected: Undirected + Directed {
             V!(other).cloned(),
             other
                 .edges_with_marker_iter()
-                .map(|(x, y, m)| (x.clone(), y.clone(), m.clone())),
+                .map(|(x, y, m)| (x.clone(), y.clone(), *m)),
         )
     }
 

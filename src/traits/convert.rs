@@ -25,7 +25,7 @@ pub trait Convert: Storage {
     ///
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
         V!(self)
-            .map(|x| (x.clone(), FromIterator::from_iter(Adj!(self, &x).cloned())))
+            .map(|x| (x.clone(), FromIterator::from_iter(Adj!(self, x).cloned())))
             .collect()
     }
 

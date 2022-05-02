@@ -163,7 +163,7 @@ where
 
     fn adjacents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Map vertex to matrix index.
-        let x = *self._idxs.get_by_left(&x).unwrap();
+        let x = *self._idxs.get_by_left(x).unwrap();
 
         Box::new(
             repeat(x)
@@ -191,7 +191,7 @@ where
         // Try to add the vertex from the map.
         if !self._idxs.contains_left(&x) {
             // Find the upper bound index.
-            let i = match self._idxs.iter().find(|&(y, _)| &x < &y) {
+            let i = match self._idxs.iter().find(|&(y, _)| &x < y) {
                 None => {
                     // If no upper bound index is found, define new one.
                     let i = self._idxs.len();
@@ -264,14 +264,14 @@ where
 
     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         !matches!(self._data[[x, y]], Marker::None)
     }
 
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
             Marker::None => {
@@ -289,7 +289,7 @@ where
 
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
             Marker::None => false,
@@ -323,7 +323,7 @@ where
 {
     fn neighbors_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Map vertex to matrix index.
-        let x = *self._idxs.get_by_left(&x).unwrap();
+        let x = *self._idxs.get_by_left(x).unwrap();
 
         Box::new(repeat(x).zip(0..self._data.shape()[0]).filter_map(|(x, y)| {
             // If i --- j then j is a neighbor of i.
@@ -346,7 +346,7 @@ where
 {
     fn parents_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Map vertex to matrix index.
-        let i = *self._idxs.get_by_left(&x).unwrap();
+        let i = *self._idxs.get_by_left(x).unwrap();
 
         Box::new(repeat(i).zip(0..self._data.shape()[0]).filter_map(|(i, j)| {
             // If j --> i then j is a parent of i.
@@ -359,7 +359,7 @@ where
 
     fn children_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
         // Map vertex to matrix index.
-        let x = *self._idxs.get_by_left(&x).unwrap();
+        let x = *self._idxs.get_by_left(x).unwrap();
 
         Box::new(repeat(x).zip(0..self._data.shape()[0]).filter_map(|(x, y)| {
             // If i --> j then j is a child of i.
@@ -372,7 +372,7 @@ where
 
     fn add_directed_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
         // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
             Marker::None => {
@@ -420,7 +420,7 @@ where
                     SparseAdjacencyMatrix::with_capacity((n, n), m)
                 },
                 |mut acc, (x, i, j)| {
-                    acc.add_triplet(i, j, x.clone());
+                    acc.add_triplet(i, j, x);
 
                     acc
                 },
@@ -447,8 +447,8 @@ where
                 let (n, m) = (self.order(), self.size());
                 SparseMarkerMatrix::with_capacity((n, n), m)
             },
-            |mut acc, ((i, j), x)| {
-                acc.add_triplet(i, j, x.clone());
+            |mut acc, ((i, j), m)| {
+                acc.add_triplet(i, j, *m);
 
                 acc
             },
@@ -564,14 +564,14 @@ where
 
     fn has_marker(&self, x: &Self::Vertex, y: &Self::Vertex, m: Marker) -> bool {
         // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         self._data[[x, y]].eq(&m)
     }
 
     fn get_marker(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Marker> {
         // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
             Marker::None => None,
@@ -586,7 +586,7 @@ where
             "Invalid marker pair. Partially-directed graphs can accept only TailTail and TailHead."
         );
         // Map vertex to matrix index.
-        let (&x, &y) = (self._idxs.get_by_left(&x).unwrap(), self._idxs.get_by_left(&y).unwrap());
+        let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
         // Get current marker pair.
         let n = self._data[[x, y]];
         // If the marker pair is already set ...
