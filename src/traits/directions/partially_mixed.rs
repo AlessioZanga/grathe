@@ -1,7 +1,7 @@
 use super::Mixed;
 use crate::{
-    traits::{Directed, Undirected},
-    types::{directions, Mark},
+    traits::Undirected,
+    types::{directions, Mark as M},
     E, V,
 };
 
@@ -11,7 +11,7 @@ pub trait PartiallyMixed: Mixed {
     where
         G: Undirected<Vertex = Self::Vertex>,
     {
-        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Mark::CircCirc)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), M::CircCirc)))
     }
 
     /// Constructs from another mixed graph.

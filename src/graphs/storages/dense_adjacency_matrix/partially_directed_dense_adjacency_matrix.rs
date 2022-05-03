@@ -8,8 +8,8 @@ use crate::{
     graphs::attributes::AttributesMap,
     traits::{Convert, Directed, PartiallyDirected, Storage, Undirected, WithAttributes},
     types::{
-        directions, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeIterator, ExactSizeIter, Mark, SparseAdjacencyMatrix,
-        SparseMarkMatrix, Vertex, VertexIterator,
+        directions, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeIterator, ExactSizeIter, Mark as M,
+        SparseAdjacencyMatrix, SparseMarkMatrix, Vertex, VertexIterator,
     },
 };
 
@@ -60,7 +60,7 @@ where
         // Initialize the data storage using the vertex set.
         let idxs: BTreeSet<_> = FromIterator::from_iter(v_iter);
         let idxs: BiBTreeMap<_, _> = idxs.into_iter().enumerate().map(|(i, x)| (x, i)).collect();
-        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), Mark::None);
+        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), M::None);
 
         let mut g = Self {
             _data: data,
@@ -89,7 +89,7 @@ where
         // Initialize the data storage using the vertex set.
         let idxs: BTreeSet<_> = FromIterator::from_iter(iter);
         let idxs: BiBTreeMap<_, _> = idxs.into_iter().enumerate().map(|(i, x)| (x, i)).collect();
-        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), Mark::None);
+        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), M::None);
 
         Self {
             _data: data,
@@ -104,7 +104,7 @@ where
     {
         let idxs: BTreeSet<_> = FromIterator::from_iter(iter);
         let idxs: BiBTreeMap<_, _> = idxs.into_iter().enumerate().map(|(i, x)| (x, i)).collect();
-        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), Mark::TailTail);
+        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), M::TailTail);
         // Compute the final size.
         let size = (data.shape()[0] * (data.shape()[0] + 1)) / 2;
 
@@ -130,8 +130,8 @@ where
         Box::new(ExactSizeIter::new(
             self._data.indexed_iter().filter_map(|((x, y), m)| {
                 match m {
-                    Mark::None => None,
-                    Mark::TailTail => {
+                    M::None => None,
+                    M::TailTail => {
                         // Return only first appearance of the edge.
                         if x > y {
                             return None;
@@ -144,7 +144,7 @@ where
 
                         Some((x, y))
                     }
-                    Mark::TailHead => {
+                    M::TailHead => {
                         // Map matrix index to vertex.
                         let (x, y) = (
                             self._idxs.get_by_right(&x).unwrap(),
@@ -169,7 +169,7 @@ where
             repeat(x)
                 .zip(0..self._data.shape()[0])
                 .filter_map(|(x, y)| match self._data[[x, y]] {
-                    Mark::None => None,
+                    M::None => None,
                     _ => Some(self._idxs.get_by_right(&y).unwrap()),
                 }),
         )
@@ -220,7 +220,7 @@ where
             // Compute the next valid index.
             let j = i + 1;
             // Allocate memory for new data matrix.
-            let mut data = DenseMarkMatrix::from_elem((self._idxs.len(), self._idxs.len()), Mark::None);
+            let mut data = DenseMarkMatrix::from_elem((self._idxs.len(), self._idxs.len()), M::None);
 
             // Copy the data from the previous data matrix.
             data.slice_mut(s![..i, ..i]).assign(&self._data.slice(s![..i, ..i])); // Top-left     minor of the matrix.
@@ -254,7 +254,7 @@ where
             self._data.remove_index(Axis(0), i);
             self._data.remove_index(Axis(1), i);
             // Compute the final size of the graph.
-            self._size = self._data.mapv(|x| !matches!(x, Mark::None) as usize).sum();
+            self._size = self._data.mapv(|x| !matches!(x, M::None) as usize).sum();
 
             return true;
         }
@@ -266,7 +266,7 @@ where
         // Map vertex to matrix index.
         let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
-        !matches!(self._data[[x, y]], Mark::None)
+        !matches!(self._data[[x, y]], M::None)
     }
 
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
@@ -274,10 +274,10 @@ where
         let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
-            Mark::None => {
+            M::None => {
                 // Insert the default edge symmetrically.
-                self._data[[y, x]] = Mark::TailTail;
-                self._data[[x, y]] = Mark::TailTail;
+                self._data[[y, x]] = M::TailTail;
+                self._data[[x, y]] = M::TailTail;
 
                 self._size += 1;
 
@@ -292,19 +292,19 @@ where
         let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
-            Mark::None => false,
-            Mark::TailTail => {
+            M::None => false,
+            M::TailTail => {
                 // Delete the edge symmetrically.
-                self._data[[y, x]] = Mark::None;
-                self._data[[x, y]] = Mark::None;
+                self._data[[y, x]] = M::None;
+                self._data[[x, y]] = M::None;
 
                 self._size -= 1;
 
                 true
             }
-            Mark::TailHead => {
+            M::TailHead => {
                 // Delete the edge asymmetrically.
-                self._data[[x, y]] = Mark::None;
+                self._data[[x, y]] = M::None;
 
                 self._size -= 1;
 
@@ -328,7 +328,7 @@ where
         Box::new(repeat(x).zip(0..self._data.shape()[0]).filter_map(|(x, y)| {
             // If i --- j then j is a neighbor of i.
             match self._data[[x, y]] {
-                Mark::TailTail => Some(self._idxs.get_by_right(&y).unwrap()),
+                M::TailTail => Some(self._idxs.get_by_right(&y).unwrap()),
                 _ => None,
             }
         }))
@@ -351,7 +351,7 @@ where
         Box::new(repeat(i).zip(0..self._data.shape()[0]).filter_map(|(i, j)| {
             // If j --> i then j is a parent of i.
             match self._data[[j, i]] {
-                Mark::TailHead => Some(self._idxs.get_by_right(&j).unwrap()),
+                M::TailHead => Some(self._idxs.get_by_right(&j).unwrap()),
                 _ => None,
             }
         }))
@@ -364,7 +364,7 @@ where
         Box::new(repeat(x).zip(0..self._data.shape()[0]).filter_map(|(x, y)| {
             // If i --> j then j is a child of i.
             match self._data[[x, y]] {
-                Mark::TailHead => Some(self._idxs.get_by_right(&y).unwrap()),
+                M::TailHead => Some(self._idxs.get_by_right(&y).unwrap()),
                 _ => None,
             }
         }))
@@ -375,9 +375,9 @@ where
         let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
-            Mark::None => {
+            M::None => {
                 // Insert the edge asymmetrically.
-                self._data[[x, y]] = Mark::TailHead;
+                self._data[[x, y]] = M::TailHead;
 
                 self._size += 1;
 
@@ -395,8 +395,8 @@ where
 {
     fn dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
         self._data.mapv(|x| match x {
-            Mark::None => false,
-            Mark::TailTail | Mark::TailHead => true,
+            M::None => false,
+            M::TailTail | M::TailHead => true,
             // Invalid marks have already been filtered out.
             _ => unreachable!(),
         })
@@ -407,8 +407,8 @@ where
             .indexed_iter()
             .map(|((i, j), x)| {
                 let x = match x {
-                    Mark::None => false,
-                    Mark::TailTail | Mark::TailHead => true,
+                    M::None => false,
+                    M::TailTail | M::TailHead => true,
                     // Invalid marks have already been filtered out.
                     _ => unreachable!(),
                 };
@@ -462,11 +462,10 @@ where
     A: WithAttributes<V>,
 {
     fn from_dense_mark_matrix(data: DenseMarkMatrix, variables: Vec<V>) -> Self {
-        // Check if the mark is valid.
+        // Check if the M is valid.
         assert!(
-            data.iter()
-                .all(|m| matches!(m, Mark::None | Mark::TailTail | Mark::TailHead)),
-            "Invalid mark. Partially-directed graphs can accept only TailTail and TailHead."
+            data.iter().all(|m| matches!(m, M::None | M::TailTail | M::TailHead)),
+            "Invalid M. Partially-directed graphs can accept only TailTail and TailHead."
         );
         // Add variables to the index.
         let idxs = variables.into_iter().enumerate().map(|(i, x)| (x, i)).collect();
@@ -475,8 +474,8 @@ where
             .indexed_iter()
             .map(|((i, j), &m)| {
                 match m {
-                    Mark::None => 0,
-                    Mark::TailTail => {
+                    M::None => 0,
+                    M::TailTail => {
                         // Return only first appearance of the edge.
                         if i > j {
                             return 0;
@@ -484,7 +483,7 @@ where
 
                         1
                     }
-                    Mark::TailHead => 1,
+                    M::TailHead => 1,
                     // Invalid marks have already been filtered out.
                     _ => unreachable!(),
                 }
@@ -502,12 +501,12 @@ where
     fn new_with_mark<I, J>(v_iter: I, e_iter: J) -> Self
     where
         I: IntoIterator<Item = Self::Vertex>,
-        J: IntoIterator<Item = (Self::Vertex, Self::Vertex, Mark)>,
+        J: IntoIterator<Item = (Self::Vertex, Self::Vertex, M)>,
     {
         // Initialize the data storage using the vertex set.
         let idxs: BTreeSet<_> = FromIterator::from_iter(v_iter);
         let idxs: BiBTreeMap<_, _> = idxs.into_iter().enumerate().map(|(i, x)| (x, i)).collect();
-        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), Mark::None);
+        let data = DenseMarkMatrix::from_elem((idxs.len(), idxs.len()), M::None);
 
         let mut g = Self {
             _data: data,
@@ -527,12 +526,12 @@ where
 
     fn edges_with_mark_iter<'a>(
         &'a self,
-    ) -> Box<dyn Iterator<Item = (&'a Self::Vertex, &'a Self::Vertex, &'a Mark)> + 'a> {
+    ) -> Box<dyn Iterator<Item = (&'a Self::Vertex, &'a Self::Vertex, &'a M)> + 'a> {
         Box::new(ExactSizeIter::new(
             self._data.indexed_iter().filter_map(|((x, y), m)| {
                 match m {
-                    Mark::None => None,
-                    Mark::TailTail => {
+                    M::None => None,
+                    M::TailTail => {
                         // Return only first appearance of the edge.
                         if x > y {
                             return None;
@@ -545,7 +544,7 @@ where
 
                         Some((x, y, m))
                     }
-                    Mark::TailHead => {
+                    M::TailHead => {
                         // Map matrix index to vertex.
                         let (x, y) = (
                             self._idxs.get_by_right(&x).unwrap(),
@@ -562,63 +561,63 @@ where
         ))
     }
 
-    fn has_mark(&self, x: &Self::Vertex, y: &Self::Vertex, m: Mark) -> bool {
+    fn has_mark(&self, x: &Self::Vertex, y: &Self::Vertex, m: M) -> bool {
         // Map vertex to matrix index.
         let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         self._data[[x, y]].eq(&m)
     }
 
-    fn get_mark(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Mark> {
+    fn get_mark(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<M> {
         // Map vertex to matrix index.
         let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
 
         match self._data[[x, y]] {
-            Mark::None => None,
+            M::None => None,
             m => Some(m),
         }
     }
 
-    fn set_mark(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: Mark) -> bool {
-        // Check if the mark is valid.
+    fn set_mark(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: M) -> bool {
+        // Check if the M is valid.
         assert!(
-            matches!(m, Mark::TailTail | Mark::TailHead),
-            "Invalid mark. Partially-directed graphs can accept only TailTail and TailHead."
+            matches!(m, M::TailTail | M::TailHead),
+            "Invalid M. Partially-directed graphs can accept only TailTail and TailHead."
         );
         // Map vertex to matrix index.
         let (&x, &y) = (self._idxs.get_by_left(x).unwrap(), self._idxs.get_by_left(y).unwrap());
-        // Get current mark.
+        // Get current M.
         let n = self._data[[x, y]];
-        // If the mark is already set ...
+        // If the M is already set ...
         if m.eq(&n) {
             // ... do not modify the matrix.
             return false;
         }
         // Increase the size only if None.
-        if matches!(n, Mark::None) {
+        if matches!(n, M::None) {
             self._size += 1;
         }
-        // Set the mark.
+        // Set the M.
         match (m, n) {
-            // If the mark is symmetric ...
-            (Mark::TailTail, _) => {
+            // If the M is symmetric ...
+            (M::TailTail, _) => {
                 // ... set the edge symmetrically.
                 self._data[[y, x]] = m;
                 self._data[[x, y]] = m;
 
                 true
             }
-            // Otherwise, the mark is asymmetric.
-            (Mark::TailHead, Mark::TailTail) => {
+            // Otherwise, the M is asymmetric.
+            (M::TailHead, M::TailTail) => {
                 // ... set the edge asymmetrically ...
                 self._data[[x, y]] = m;
                 // ... and unset the symmetric edge.
-                self._data[[y, x]] = Mark::None;
+                self._data[[y, x]] = M::None;
 
                 true
             }
-            // Otherwise, the mark is asymmetric.
-            (Mark::TailHead, Mark::None | Mark::TailHead) => {
+            // Otherwise, the M is asymmetric.
+            (M::TailHead, M::None | M::TailHead) => {
                 // ... set the edge asymmetrically ...
                 self._data[[x, y]] = m;
 

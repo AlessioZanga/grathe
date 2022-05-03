@@ -1,7 +1,7 @@
 use super::{Directed, Undirected};
 use crate::{
     prelude::DenseMarkMatrix,
-    types::{directions, Mark},
+    types::{directions, Mark as M},
     E, V,
 };
 
@@ -11,7 +11,7 @@ pub trait PartiallyDirected: Undirected + Directed {
     where
         G: Undirected<Vertex = Self::Vertex>,
     {
-        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Mark::TailTail)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), M::TailTail)))
     }
 
     /// Constructs from a directed graph.
@@ -19,7 +19,7 @@ pub trait PartiallyDirected: Undirected + Directed {
     where
         G: Directed<Vertex = Self::Vertex>,
     {
-        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), Mark::TailHead)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), M::TailHead)))
     }
 
     /// Constructs from another partially-directed graph.
@@ -38,15 +38,14 @@ pub trait PartiallyDirected: Undirected + Directed {
     fn new_with_mark<I, J>(v_iter: I, e_iter: J) -> Self
     where
         I: IntoIterator<Item = Self::Vertex>,
-        J: IntoIterator<Item = (Self::Vertex, Self::Vertex, Mark)>;
+        J: IntoIterator<Item = (Self::Vertex, Self::Vertex, M)>;
 
-    fn edges_with_mark_iter<'a>(
-        &'a self,
-    ) -> Box<dyn Iterator<Item = (&'a Self::Vertex, &'a Self::Vertex, &'a Mark)> + 'a>;
+    fn edges_with_mark_iter<'a>(&'a self)
+        -> Box<dyn Iterator<Item = (&'a Self::Vertex, &'a Self::Vertex, &'a M)> + 'a>;
 
-    fn has_mark(&self, x: &Self::Vertex, y: &Self::Vertex, m: Mark) -> bool;
+    fn has_mark(&self, x: &Self::Vertex, y: &Self::Vertex, m: M) -> bool;
 
-    fn get_mark(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<Mark>;
+    fn get_mark(&self, x: &Self::Vertex, y: &Self::Vertex) -> Option<M>;
 
-    fn set_mark(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: Mark) -> bool;
+    fn set_mark(&mut self, x: &Self::Vertex, y: &Self::Vertex, m: M) -> bool;
 }

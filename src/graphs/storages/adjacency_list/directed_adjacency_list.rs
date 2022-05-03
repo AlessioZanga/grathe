@@ -11,8 +11,8 @@ use crate::{
     prelude::{DFSEdge, DFSEdges, Traversal, BFS},
     traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes},
     types::{
-        directions, AdjacencyList, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeIterator, Error, ExactSizeIter, Mark,
-        SparseAdjacencyMatrix, SparseMarkMatrix, Vertex, VertexIterator,
+        directions, AdjacencyList, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeIterator, Error, ExactSizeIter,
+        Mark as M, SparseAdjacencyMatrix, SparseMarkMatrix, Vertex, VertexIterator,
     },
     Ch, E, V,
 };
@@ -457,8 +457,8 @@ where
 
     fn dense_mark_matrix(&self) -> DenseMarkMatrix {
         self.dense_adjacency_matrix().mapv(|x| match x {
-            false => Mark::None,
-            true => Mark::TailHead,
+            false => M::None,
+            true => M::TailHead,
         })
     }
 
@@ -467,8 +467,8 @@ where
             .into_iter()
             .map(|(&x, (i, j))| {
                 let x = match x {
-                    false => Mark::None,
-                    true => Mark::TailHead,
+                    false => M::None,
+                    true => M::TailHead,
                 };
                 (x, i, j)
             })
