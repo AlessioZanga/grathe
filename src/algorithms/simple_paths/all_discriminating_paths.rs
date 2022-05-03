@@ -27,6 +27,7 @@ impl<'a, G, D> AllDiscriminatingPaths<'a, G, D>
 where
     G: Storage<Direction = D> + PartiallyDirected,
 {
+    /// Build an *all (minimal) discriminating paths* search structure.
     pub fn new(g: &'a G) -> Self {
         // Find all valid triplets.
         let queue = V!(g)
@@ -36,11 +37,11 @@ where
                 let (x, y, z) = (p[0], p[1], p[2]);
                 // Check if the triplet satisfy the initial discriminating path.
                 if
-                // X is a collider for Y, i.e. X <-* Y, and...
+                // X is a collider for Y, i.e. X <-* Y, and ...
                 matches!(g.get_mark(y, x), Some(M::CircHead | M::HeadHead | M::TailHead))
                     // ... Y is adjacent to Z, and ...
-                    && !(g.has_mark(y, z, M::None) && g.has_mark(z, y, M::None))
-                    // ... X is a parent of Y.
+                    && !(g.has_mark(y, z, M::None) || g.has_mark(z, y, M::None))
+                    // ... X is a parent of Z.
                     && g.has_mark(x, z, M::TailHead)
                 {
                     return Some((x, y, z));
@@ -102,21 +103,15 @@ where
             // If W has not been visited yet, and ...
             if !self.visited.contains(w) {
                 // ... W -/- Z, and ...
-                if self.g.has_mark(w, z, M::None)
-                    && self.g.has_mark(z, w, M::None)
-                    && matches!(
-                        // ... W *-> X ...
-                        self.g.get_mark(w, x).unwrap(),
-                        M::CircHead | M::HeadHead | M::TailHead
-                    )
+                if (self.g.has_mark(w, z, M::None) && self.g.has_mark(z, w, M::None))
+                    // ... W --> X ...
+                    && self.g.has_mark(w, x, M::TailHead)
                 // ... then W forms a discriminating path for X, Y and Z.
                 {
                     // Add W to the path and ...
                     self.stack.push(w);
-                    // Clear the visited set.
-                    self.visited.clear();
                     // Drain the stack in the reversed order.
-                    return Some(self.stack.drain(..).rev().collect());
+                    return Some(self.stack.iter().rev().cloned().collect());
                 // .. else if W extends the current path ...
                 } else if
                 // ... W --> Z, and ...
@@ -153,8 +148,14 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         // If there are still triplets to be visited.
         while let Some((x, y, z)) = self.queue.pop() {
+            // Set Y and Z as visited, X will be set immediately after the `visit` call.
+            self.stack.extend([z, y]);
+            self.visited.extend([y, z]);
             // Check if a discriminating path for (X, Y, Z) exists.
             let discriminating_path = self.visit(x, y, z);
+            // Clear the stack.
+            self.visited.clear();
+            self.stack.clear();
             // If a path is found ...
             if discriminating_path.is_some() {
                 // ... return recursively.

@@ -133,16 +133,18 @@ where
                     M::None => None,
                     M::CircCirc | M::HeadHead | M::TailTail => {
                         // Return only first appearance of the edge.
-                        if x > y {
-                            return None;
-                        }
-                        // Map matrix index to vertex.
-                        let (x, y) = (
-                            self._idxs.get_by_right(&x).unwrap(),
-                            self._idxs.get_by_right(&y).unwrap(),
-                        );
+                        match x > y {
+                            false => {
+                                // Map matrix index to vertex.
+                                let (x, y) = (
+                                    self._idxs.get_by_right(&x).unwrap(),
+                                    self._idxs.get_by_right(&y).unwrap(),
+                                );
 
-                        Some((x, y))
+                                Some((x, y))
+                            }
+                            true => None,
+                        }
                     }
                     M::CircHead | M::CircTail | M::TailHead => {
                         // Map matrix index to vertex.
@@ -165,9 +167,9 @@ where
 
         Box::new(
             repeat(x)
-                .zip(0..self._data.shape()[0])
-                .filter_map(|(x, y)| match self._data[[x, y]] {
-                    M::None => None,
+                .zip(0..self.order())
+                .filter_map(|(x, y)| match (self._data[[x, y]], self._data[[y, x]]) {
+                    (M::None, M::None) => None,
                     _ => Some(self._idxs.get_by_right(&y).unwrap()),
                 }),
         )
@@ -601,4 +603,27 @@ where
             (M::None, _) => unreachable!(),
         }
     }
+}
+
+impl<V, A> Mixed for PartiallyMixedDenseAdjacencyMatrix<V, A>
+where
+    V: Vertex,
+    A: WithAttributes<V>,
+{
+    fn spouses_iter<'a>(&'a self, x: &'a Self::Vertex) -> Box<dyn VertexIterator<'a, Self::Vertex> + 'a> {
+        // FIXME:
+        todo!()
+    }
+
+    fn add_bidirected_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
+        // FIXME:
+        todo!()
+    }
+}
+
+impl<V, A> PartiallyMixed for PartiallyMixedDenseAdjacencyMatrix<V, A>
+where
+    V: Vertex,
+    A: WithAttributes<V>,
+{
 }

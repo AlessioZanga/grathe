@@ -167,9 +167,9 @@ where
 
         Box::new(
             repeat(x)
-                .zip(0..self._data.shape()[0])
-                .filter_map(|(x, y)| match self._data[[x, y]] {
-                    M::None => None,
+                .zip(0..self.order())
+                .filter_map(|(x, y)| match (self._data[[x, y]], self._data[[y, x]]) {
+                    (M::None, M::None) => None,
                     _ => Some(self._idxs.get_by_right(&y).unwrap()),
                 }),
         )
