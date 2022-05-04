@@ -1,3 +1,6 @@
+mod all_circle_paths;
+pub use all_circle_paths::AllCirclePaths;
+
 mod all_discriminating_paths;
 pub use all_discriminating_paths::AllDiscriminatingPaths;
 

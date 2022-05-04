@@ -138,7 +138,10 @@ mod tests {
         for (i, j, k) in data {
             let g = PartiallyMixedGraph::new_with_mark(i.clone(), j.clone());
 
-            assert_eq!(AllDiscriminatingPaths::new(&g).collect::<Vec<_>>(), k);
+            let search = AllDiscriminatingPaths::new(&g);
+            let discriminating_paths = search.collect::<Vec<_>>();
+
+            assert_eq!(discriminating_paths, k);
         }
     }
 }
