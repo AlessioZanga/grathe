@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 
 use itertools::Itertools;
 
@@ -16,7 +16,7 @@ where
     /// Given graph reference.
     g: &'a G,
     /// To-be-visited triplets.
-    queue: Vec<(&'a G::Vertex, &'a G::Vertex, &'a G::Vertex)>,
+    queue: VecDeque<(&'a G::Vertex, &'a G::Vertex, &'a G::Vertex)>,
     /// To-be-visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Already visited set.
@@ -40,7 +40,7 @@ where
                 // X is a collider for Y, i.e. X <-* Y, and ...
                 matches!(g.get_mark(y, x), Some(M::CircHead | M::HeadHead | M::TailHead))
                     // ... Y is adjacent to Z, and ...
-                    && !(g.has_mark(y, z, M::None) || g.has_mark(z, y, M::None))
+                    && !(g.has_mark(y, z, M::None) && g.has_mark(z, y, M::None))
                     // ... X is a parent of Z.
                     && g.has_mark(x, z, M::TailHead)
                 {
@@ -147,15 +147,12 @@ where
 
     fn next(&mut self) -> Option<Self::Item> {
         // If there are still triplets to be visited.
-        while let Some((x, y, z)) = self.queue.pop() {
+        while let Some((x, y, z)) = self.queue.pop_front() {
             // Set Y and Z as visited, X will be set immediately after the `visit` call.
-            self.stack.extend([z, y]);
-            self.visited.extend([y, z]);
+            self.stack = FromIterator::from_iter([z, y]);
+            self.visited = FromIterator::from_iter([y, z]);
             // Check if a discriminating path for (X, Y, Z) exists.
             let discriminating_path = self.visit(x, y, z);
-            // Clear the stack.
-            self.visited.clear();
-            self.stack.clear();
             // If a path is found ...
             if discriminating_path.is_some() {
                 // ... return recursively.
