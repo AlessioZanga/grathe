@@ -4,7 +4,7 @@ use ndarray_linalg::{
     lobpcg::{lobpcg, LobpcgResult, TruncatedOrder},
     EigVals, EigValshInto, UPLO,
 };
-use num_complex::Complex;
+use num::Complex;
 
 use crate::{
     traits::{Convert, Storage},
