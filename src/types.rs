@@ -5,14 +5,15 @@ use std::{
 };
 
 use ndarray::prelude::*;
+use num::cast::AsPrimitive;
 use sprs::TriMat;
 use thiserror::Error;
 
 /// The base vertex trait.
-pub trait Vertex: Clone + Debug + Default + Eq + Hash + Ord {}
+pub trait Vertex: AsPrimitive<Self> + Copy + Debug + Default + Eq + Hash + Ord {}
 
 // Blanket implementation of vertex trait.
-impl<V> Vertex for V where V: Clone + Debug + Default + Eq + Hash + Ord {}
+impl<V> Vertex for V where V: AsPrimitive<Self> + Copy + Debug + Default + Eq + Hash + Ord {}
 
 /// Vertex iterator trait.
 #[rustfmt::skip]

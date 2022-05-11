@@ -132,7 +132,7 @@ macro_rules! impl_with_attributes {
                 let y: Vec<_> = y.into_iter().collect();
                 let z: Vec<_> = z.into_iter().collect();
 
-                let mut out = Self::new(y.iter().map(|(y, _)| y.clone()), z.iter().map(|(z, _)| z.clone()));
+                let mut out = Self::new(y.iter().map(|(y, _)| *y), z.iter().map(|(z, _)| z.clone()));
 
                 out._attributes = A::new_with_attributes(x, y, z);
 

@@ -83,50 +83,48 @@ where
     }
 
     fn get_vertex_attrs(&self, x: &V) -> Result<&Self::VertexAttributes, Error<V>> {
-        self.vattrs
-            .get(x)
-            .ok_or_else(|| Error::VertexAttributesNotDefined(x.clone()))
+        self.vattrs.get(x).ok_or_else(|| Error::VertexAttributesNotDefined(*x))
     }
 
     fn get_mut_vertex_attrs(&mut self, x: &V) -> Result<&mut Self::VertexAttributes, Error<V>> {
         self.vattrs
             .get_mut(x)
-            .ok_or_else(|| Error::VertexAttributesNotDefined(x.clone()))
+            .ok_or_else(|| Error::VertexAttributesNotDefined(*x))
     }
 
     fn set_vertex_attrs(&mut self, x: &V, y: Self::VertexAttributes) {
-        self.vattrs.insert(x.clone(), y);
+        self.vattrs.insert(*x, y);
     }
 
     fn unset_vertex_attrs(&mut self, x: &V) -> Result<Self::VertexAttributes, Error<V>> {
         self.vattrs
             .remove(x)
-            .ok_or_else(|| Error::VertexAttributesNotDefined(x.clone()))
+            .ok_or_else(|| Error::VertexAttributesNotDefined(*x))
     }
 
     fn has_edge_attrs(&self, x: &V, y: &V) -> bool {
-        self.eattrs.contains_key(&(x.clone(), y.clone()))
+        self.eattrs.contains_key(&(*x, *y))
     }
 
     fn get_edge_attrs(&self, x: &V, y: &V) -> Result<&Self::EdgeAttributes, Error<V>> {
         self.eattrs
-            .get(&(x.clone(), y.clone()))
-            .ok_or_else(|| Error::EdgeAttributesNotDefined(x.clone(), y.clone()))
+            .get(&(*x, *y))
+            .ok_or_else(|| Error::EdgeAttributesNotDefined(*x, *y))
     }
 
     fn get_mut_edge_attrs(&mut self, x: &V, y: &V) -> Result<&mut Self::EdgeAttributes, Error<V>> {
         self.eattrs
-            .get_mut(&(x.clone(), y.clone()))
-            .ok_or_else(|| Error::EdgeAttributesNotDefined(x.clone(), y.clone()))
+            .get_mut(&(*x, *y))
+            .ok_or_else(|| Error::EdgeAttributesNotDefined(*x, *y))
     }
 
     fn set_edge_attrs(&mut self, x: &V, y: &V, z: Self::EdgeAttributes) {
-        self.eattrs.insert((x.clone(), y.clone()), z);
+        self.eattrs.insert((*x, *y), z);
     }
 
     fn unset_edge_attrs(&mut self, x: &V, y: &V) -> Result<Self::EdgeAttributes, Error<V>> {
         self.eattrs
-            .remove(&(x.clone(), y.clone()))
-            .ok_or_else(|| Error::EdgeAttributesNotDefined(x.clone(), y.clone()))
+            .remove(&(*x, *y))
+            .ok_or_else(|| Error::EdgeAttributesNotDefined(*x, *y))
     }
 }

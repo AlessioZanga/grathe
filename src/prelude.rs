@@ -1,7 +1,7 @@
 /// Re-export algorithms.
 pub use crate::algorithms::*;
 /// Re-export graphs.
-pub use crate::graphs::{DiGraph, DiGraphl, Graph, Graphl};
+pub use crate::graphs::{DiGraph, Graph};
 /// Re-export traits.
 pub use crate::traits::*;
 /// Re-export types.

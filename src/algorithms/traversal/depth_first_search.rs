@@ -122,7 +122,7 @@ where
         // If visit variant is Forest.
         if matches!(m, Traversal::Forest) {
             // Add vertices to the visit stack in reverse to preserve order.
-            let mut queue = VecDeque::with_capacity(g.order());
+            let mut queue = VecDeque::<&'a G::Vertex>::with_capacity(g.order());
             queue.extend(V!(g).filter(|&y| y != x));
             search.stack.extend(queue.iter().rev());
         }

@@ -59,7 +59,7 @@ where
         // Iterate over every permutation of V^2.
         let data: AdjacencyList<_> = vertices
             .iter()
-            .map(|x| (x.clone(), vertices.difference(&self._data[x]).cloned().collect()))
+            .map(|x| (*x, vertices.difference(&self._data[x]).cloned().collect()))
             .collect();
         // Compute complement size.
         let size = data.iter().map(|(_, ys)| ys.len()).sum();
@@ -77,7 +77,7 @@ where
         // For each other entry.
         for (x, ys) in other._data.iter() {
             // Get the correspondent entry on the union (or default it).
-            let zs = data.entry(x.clone()).or_default();
+            let zs = data.entry(*x).or_default();
             // Perform union of entries.
             *zs = zs.union(ys).cloned().collect();
         }
@@ -100,7 +100,7 @@ where
             .filter_map(|(x, ys)| {
                 other._data.get(x).map(|zs| {
                     // If there a common vertex, then intersect its adjacent vertices.
-                    (x.clone(), ys.intersection(zs).cloned().collect())
+                    (*x, ys.intersection(zs).cloned().collect())
                 })
             })
             .collect();
@@ -120,7 +120,7 @@ where
         // For each other entry.
         for (x, ys) in other._data.iter() {
             // Get the correspondent entry on the union (or default it).
-            let zs = data.entry(x.clone()).or_default();
+            let zs = data.entry(*x).or_default();
             // Perform symmetric difference of entries.
             *zs = zs.symmetric_difference(ys).cloned().collect();
         }
@@ -142,9 +142,9 @@ where
             // For each entry in the current graph.
             .map(|(x, ys)| match other._data.get(x) {
                 // If there a common vertex, then subtract its adjacent vertices.
-                Some(zs) => (x.clone(), ys.difference(zs).cloned().collect()),
+                Some(zs) => (*x, ys.difference(zs).cloned().collect()),
                 // Else return as it is.
-                None => (x.clone(), ys.clone()),
+                None => (*x, ys.clone()),
             })
             .collect();
         // Compute difference size.
@@ -179,7 +179,7 @@ where
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
         for (x, y) in e_iter.into_iter() {
-            data.entry(y.clone()).or_default();
+            data.entry(y).or_default();
             data.entry(x).or_default().insert(y);
             size += 1;
         }
@@ -214,10 +214,7 @@ where
         // Initialize the data storage using the vertex set.
         let data: Vec<_> = iter.into_iter().collect();
         // Fill the data storage by copying the vertex set.
-        let data: AdjacencyList<Self::Vertex> = data
-            .iter()
-            .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
-            .collect();
+        let data: AdjacencyList<Self::Vertex> = data.iter().map(|x| (*x, BTreeSet::from_iter(data.clone()))).collect();
         let size = data.len() * data.len();
 
         Self {
@@ -320,7 +317,7 @@ where
                 None => panic!(),
                 // Try to insert vertex into adjacency set.
                 Some(adjacent) => {
-                    if adjacent.insert(y.clone()) {
+                    if adjacent.insert(*y) {
                         // Update size.
                         self._size += 1;
 
@@ -391,7 +388,7 @@ where
     fn edge_list(&self) -> EdgeList<Self::Vertex> {
         let mut out = EdgeList::<Self::Vertex>::new();
         for (x, y) in E!(self) {
-            out.insert((x.clone(), y.clone()));
+            out.insert((*x, *y));
         }
 
         out
@@ -400,10 +397,10 @@ where
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
         let mut out = AdjacencyList::<Self::Vertex>::new();
         for x in V!(self) {
-            out.entry(x.clone()).or_default();
+            out.entry(*x).or_default();
         }
         for (x, y) in E!(self) {
-            out.entry(x.clone()).or_default().insert(y.clone());
+            out.entry(*x).or_default().insert(*y);
         }
 
         out
