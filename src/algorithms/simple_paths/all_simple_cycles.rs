@@ -209,3 +209,12 @@ where
         Self::new(g)
     }
 }
+
+impl<'a, G, D> Into<Vec<Vec<&'a G::Vertex>>> for AllSimpleCycles<'a, G, D>
+where
+    G: Storage<Direction = D>,
+{
+    fn into(self) -> Vec<Vec<&'a G::Vertex>> {
+        self.simple_cycles
+    }
+}

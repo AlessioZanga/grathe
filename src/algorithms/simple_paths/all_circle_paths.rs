@@ -13,6 +13,10 @@ where
 {
     /// Given graph reference.
     g: &'a G,
+    /// Given source vertex.
+    x: &'a G::Vertex,
+    /// Given target vertex.
+    y: &'a G::Vertex,
     /// To-be-visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Already visited set.
@@ -37,8 +41,12 @@ where
         Self {
             // Set target graph.
             g,
+            // Set source vertex.
+            x,
+            // Set target vertex.
+            y,
             // Initialize the to-be-visited queue with source and target vertices.
-            stack: From::from([x, y]),
+            stack: Default::default(),
             // Initialize the already visited set.
             visited: Default::default(),
             // Initialize vector of found circle paths.
@@ -88,12 +96,8 @@ where
     /// TODO: Replace with FnMut once stabilized.
     ///
     pub fn call_mut(&mut self) -> &Self {
-        // Get target vertex.
-        let y = self.stack.pop().unwrap();
-        // Get source vertex.
-        let x = self.stack.pop().unwrap();
         // Visit given graph.
-        self.visit(x, y);
+        self.visit(self.x, self.y);
 
         self
     }
@@ -105,5 +109,14 @@ where
 {
     fn from((g, x, y): (&'a G, &'a G::Vertex, &'a G::Vertex)) -> Self {
         Self::new(g, x, y)
+    }
+}
+
+impl<'a, G, D> Into<Vec<Vec<&'a G::Vertex>>> for AllCirclePaths<'a, G, D>
+where
+    G: Storage<Direction = D>,
+{
+    fn into(self) -> Vec<Vec<&'a G::Vertex>> {
+        self.circle_paths
     }
 }
