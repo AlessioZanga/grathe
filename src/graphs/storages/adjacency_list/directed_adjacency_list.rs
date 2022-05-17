@@ -319,7 +319,7 @@ where
         );
 
         // Get mutable reference to adjacency set.
-        if self._data.get_mut(x).unwrap().insert(y) {
+        if self._data.get_mut(x).unwrap().insert(*y) {
             // Update size.
             self._size += 1;
 
@@ -382,7 +382,7 @@ where
 {
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
         V!(self)
-            .map(|x| (x, FromIterator::from_iter(Ch!(self, x).cloned())))
+            .map(|x| (*x, FromIterator::from_iter(Ch!(self, x).cloned())))
             .collect()
     }
 
