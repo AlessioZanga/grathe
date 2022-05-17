@@ -17,19 +17,19 @@ impl<V> Vertex for V where V: AsPrimitive<Self> + Copy + Debug + Default + Eq + 
 
 /// Vertex iterator trait.
 #[rustfmt::skip]
-pub trait VertexIterator<'a, V: 'a>: Debug + Iterator<Item = &'a V> {}
+pub trait VertexIterator<'a, V: 'a>: Iterator<Item = &'a V> {}
 
 // Blanket implementation of vertex iterator trait.
 #[rustfmt::skip]
-impl<'a, I, V> VertexIterator<'a, V> for I where I: Debug + Iterator<Item = &'a V>, V: 'a {}
+impl<'a, I, V> VertexIterator<'a, V> for I where I: Iterator<Item = &'a V>, V: 'a {}
 
 /// Edge iterator trait.
 #[rustfmt::skip]
-pub trait EdgeIterator<'a, V: 'a>: Debug + ExactSizeIterator + Iterator<Item = (&'a V, &'a V)> {}
+pub trait EdgeIterator<'a, V: 'a>: ExactSizeIterator + Iterator<Item = (&'a V, &'a V)> {}
 
 // Blanket implementation of edge iterator trait.
 #[rustfmt::skip]
-impl<'a, I, V> EdgeIterator<'a, V> for I where I: Debug + ExactSizeIterator + Iterator<Item = (&'a V, &'a V)>, V: 'a {}
+impl<'a, I, V> EdgeIterator<'a, V> for I where I: ExactSizeIterator + Iterator<Item = (&'a V, &'a V)>, V: 'a {}
 
 /// Iterator with exact size.
 #[derive(Debug)]
@@ -105,10 +105,42 @@ pub enum Error<V> {
     ParseFailed(String),
 }
 
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub enum Mark {
+    /// X -/- Y, aka. no edge,
+    None,
+    /// X o-o Y,
+    CircCirc,
+    /// X o-> Y,
+    CircHead,
+    /// X o-- Y,
+    CircTail,
+    /// X --- Y,
+    TailTail,
+    /// X --> Y,
+    TailHead,
+    /// X <-> Y.
+    HeadHead,
+}
+
+impl Default for Mark {
+    fn default() -> Self {
+        Mark::None
+    }
+}
+
+pub type DenseMarkMatrix = Array2<Mark>;
+
+pub type SparseMarkMatrix = TriMat<Mark>;
+
 /// Directions pseudo-enumerator for generics algorithms.
 pub mod directions {
     /// Undirected pseudo-enumerator for generics algorithms.
     pub struct Undirected {}
     /// Directed pseudo-enumerator for generics algorithms.
     pub struct Directed {}
+    pub struct PartiallyDirected {}
+    pub struct Mixed {}
+    pub struct PartiallyMixed {}
 }

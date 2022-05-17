@@ -3,7 +3,8 @@ use sprs::TriMat;
 
 use crate::{
     traits::Storage,
-    types::{AdjacencyList, DenseAdjacencyMatrix, EdgeList, SparseAdjacencyMatrix},
+    types::{AdjacencyList, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeList, SparseAdjacencyMatrix, SparseMarkMatrix},
+    Adj, E, V,
 };
 
 /// The graph conversion trait.
@@ -12,29 +13,19 @@ pub trait Convert: Storage {
     ///
     /// Return the edge list representing the graph.
     ///
-    /// # Examples
-    ///
-    /// ```
-    /// use all_asserts::*;
-    /// use grathe::prelude::*;
-    ///
-    /// // A sequence of uniques edges.
-    /// let sequence = [(0, 1), (1, 0)];
-    ///
-    /// // Build a graph from a sequence of edges.
-    /// let g = Graph::from_edges(sequence);
-    ///
-    /// // Return an edge list (a.k.a. a *set* of edges) from the graph.
-    /// assert_eq!(g.edge_list(), EdgeList::from(sequence));
-    /// ```
-    ///
-    fn edge_list(&self) -> EdgeList<Self::Vertex>;
+    fn edge_list(&self) -> EdgeList<Self::Vertex> {
+        E!(self).map(|(x, y)| (x.clone(), y.clone())).collect()
+    }
 
     /// Adjacency list adapter.
     ///
     /// Return the adjacency list representing the graph.
     ///
-    fn adjacency_list(&self) -> AdjacencyList<Self::Vertex>;
+    fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
+        V!(self)
+            .map(|x| (x.clone(), FromIterator::from_iter(Adj!(self, x).cloned())))
+            .collect()
+    }
 
     /// Dense adjacency matrix of a graph.
     ///
@@ -63,4 +54,10 @@ pub trait Convert: Storage {
     /// Defined as its [dense variant][`Convert::dense_incidence_matrix`].
     ///
     fn sparse_incidence_matrix(&self) -> TriMat<i8>;
+
+    /// Dense M matrix of a graph.
+    fn dense_mark_matrix(&self) -> DenseMarkMatrix;
+
+    /// Dense M matrix of a graph.
+    fn sparse_mark_matrix(&self) -> SparseMarkMatrix;
 }

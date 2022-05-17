@@ -1,4 +1,4 @@
-use std::{collections::HashSet, marker::PhantomData, vec::Vec};
+use std::{collections::HashSet, vec::Vec};
 
 use crate::{
     traits::{Directed, Storage, Undirected},
@@ -9,18 +9,20 @@ use crate::{
 /// Find all simple paths in a graph for given source and target vertices.
 pub struct AllSimplePaths<'a, G, D>
 where
-    G: Storage,
+    G: Storage<Direction = D>,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
+    /// Given source vertex.
+    x: &'a G::Vertex,
+    /// Given target vertex.
+    y: &'a G::Vertex,
     /// To-be-visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Already visited set.
     visited: HashSet<&'a G::Vertex>,
     /// Vector of found simple paths.
     pub simple_paths: Vec<Vec<&'a G::Vertex>>,
-    /// Generic placeholder for direction.
-    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> AllSimplePaths<'a, G, D>
@@ -48,7 +50,7 @@ where
     /// let mut search = AllSimplePaths::from((&g, &0, &3));
     ///
     /// // Run the algorithm and assert later.
-    /// search.run();
+    /// search.call_mut();
     ///
     /// // In this graph there are four simple paths from `0` to `3`,
     /// // these are reported in discovery order.
@@ -69,22 +71,24 @@ where
 
         Self {
             // Set target graph.
-            graph: g,
+            g,
+            // Set source vertex.
+            x,
+            // Set target vertex.
+            y,
             // Initialize the to-be-visited queue with source and target vertices.
-            stack: From::from([x, y]),
+            stack: Default::default(),
             // Initialize the already visited set.
             visited: Default::default(),
             // Initialize vector of found simple paths.
             simple_paths: Default::default(),
-            // Generic placeholder for direction.
-            _direction_type: Default::default(),
         }
     }
 }
 
 impl<'a, G> AllSimplePaths<'a, G, directions::Undirected>
 where
-    G: Storage + Undirected,
+    G: Storage<Direction = directions::Undirected> + Undirected,
 {
     fn visit(&mut self, x: &'a G::Vertex, y: &'a G::Vertex) {
         // Push current vertex onto stack.
@@ -92,7 +96,7 @@ where
         // Set current vertex as visited.
         self.visited.insert(x);
         // For each vertex reachable from the current vertex.
-        for z in Ne!(self.graph, x) {
+        for z in Ne!(self.g, x) {
             // If the next vertex is the target.
             if z == y {
                 // Then clones the stack into the results.
@@ -117,13 +121,11 @@ where
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) -> &Self {
-        // Get target vertex.
-        let y = self.stack.pop().unwrap();
-        // Get source vertex.
-        let x = self.stack.pop().unwrap();
+    /// TODO: Replace with FnMut once stabilized.
+    ///
+    pub fn call_mut(&mut self) -> &Self {
         // Visit given graph.
-        self.visit(x, y);
+        self.visit(self.x, self.y);
 
         self
     }
@@ -131,7 +133,7 @@ where
 
 impl<'a, G> AllSimplePaths<'a, G, directions::Directed>
 where
-    G: Storage + Directed,
+    G: Storage<Direction = directions::Directed> + Directed,
 {
     fn visit(&mut self, x: &'a G::Vertex, y: &'a G::Vertex) {
         // Push current vertex onto stack.
@@ -139,7 +141,7 @@ where
         // Set current vertex as visited.
         self.visited.insert(x);
         // For each vertex reachable from the current vertex.
-        for z in Ch!(self.graph, x) {
+        for z in Ch!(self.g, x) {
             // If the next vertex is the target.
             if z == y {
                 // Then clones the stack into the results.
@@ -164,13 +166,11 @@ where
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) -> &Self {
-        // Get target vertex.
-        let y = self.stack.pop().unwrap();
-        // Get source vertex.
-        let x = self.stack.pop().unwrap();
+    /// TODO: Replace with FnMut once stabilized.
+    ///
+    pub fn call_mut(&mut self) -> &Self {
         // Visit given graph.
-        self.visit(x, y);
+        self.visit(self.x, self.y);
 
         self
     }
@@ -182,5 +182,14 @@ where
 {
     fn from((g, x, y): (&'a G, &'a G::Vertex, &'a G::Vertex)) -> Self {
         Self::new(g, x, y)
+    }
+}
+
+impl<'a, G, D> Into<Vec<Vec<&'a G::Vertex>>> for AllSimplePaths<'a, G, D>
+where
+    G: Storage<Direction = D>,
+{
+    fn into(self) -> Vec<Vec<&'a G::Vertex>> {
+        self.simple_paths
     }
 }

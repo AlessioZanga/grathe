@@ -4,7 +4,7 @@ use crate::{
 };
 
 /// The subgraph trait.
-pub trait Subgraph: From + Extend + Storage {
+pub trait Subgraph: From + Extend + PartialOrd + Storage {
     /// Builds subgraph from given vertices.
     ///
     /// Builds a subgraph, preserving edges between given vertices.

@@ -24,7 +24,7 @@ mod undirected {
                     (12, 13),
                 ]);
                 let mut search = AllSimpleCycles::from(&g);
-                search.run();
+                search.call_mut();
                 assert_eq!(
                     search.simple_cycles,
                     [vec![&3, &4, &6, &5, &3], vec![&11, &12, &13, &11]]
@@ -35,7 +35,7 @@ mod undirected {
             fn all_simple_paths() {
                 let g = $G::<i32>::from_edges([(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]);
                 let mut search = AllSimplePaths::from((&g, &0, &3));
-                search.run();
+                search.call_mut();
                 assert_eq!(
                     search.simple_paths,
                     [
@@ -53,7 +53,7 @@ mod undirected {
             fn all_simple_paths_should_panic() {
                 // Build a null graph.
                 let g = $G::<i32>::null();
-                AllSimplePaths::from((&g, &0, &1)).run();
+                AllSimplePaths::from((&g, &0, &1)).call_mut();
             }
         };
     }
@@ -78,7 +78,7 @@ mod directed {
                 // Test from Figure 1 of reference paper.
                 let g = $G::<i32>::from_edges([(0, 1), (1, 2), (2, 3), (2, 4), (3, 4), (4, 1)]);
                 let mut search = AllSimpleCycles::from(&g);
-                search.run();
+                search.call_mut();
 
                 assert_eq!(
                     search.simple_cycles,
@@ -126,7 +126,7 @@ mod directed {
                     (15, 0),
                 ]);
                 let mut search = AllSimpleCycles::from(&g);
-                search.run();
+                search.call_mut();
 
                 assert_eq!(
                     search.simple_cycles,
@@ -156,7 +156,7 @@ mod directed {
             fn all_simple_paths() {
                 let g = $G::<i32>::from_edges([(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)]);
                 let mut search = AllSimplePaths::from((&g, &0, &3));
-                search.run();
+                search.call_mut();
                 assert_eq!(
                     search.simple_paths,
                     [
@@ -173,7 +173,7 @@ mod directed {
             fn all_simple_paths_should_panic() {
                 // Build a null graph.
                 let g = $G::<i32>::null();
-                AllSimplePaths::from((&g, &0, &1)).run();
+                AllSimplePaths::from((&g, &0, &1)).call_mut();
             }
         };
     }

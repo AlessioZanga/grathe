@@ -22,27 +22,18 @@ mod convert {
                         // ... multiple vertices and zero edges,
                         (vec![0, 1, 2, 3], vec![], vec![]),
                         // ... multiple vertices and one edge,
-                        (vec![0, 1, 2, 3], vec![(0, 1)], vec![(0, 1), (1, 0)]),
+                        (vec![0, 1, 2, 3], vec![(0, 1)], vec![(0, 1)]),
                         // ... multiple vertices and multiple edges,
                         (
                             vec![0, 1, 2, 3],
                             vec![(0, 1), (1, 2), (2, 3)],
-                            vec![(0, 1), (1, 0), (1, 2), (2, 1), (2, 3), (3, 2)],
+                            vec![(0, 1), (1, 2), (2, 3)],
                         ),
                         // ... random vertices and edges,
                         (
                             vec![71, 1, 58, 3, 75],
                             vec![(71, 1), (1, 58), (58, 3), (3, 75)],
-                            vec![
-                                (1, 58),
-                                (1, 71),
-                                (3, 58),
-                                (3, 75),
-                                (58, 1),
-                                (58, 3),
-                                (71, 1),
-                                (75, 3),
-                            ],
+                            vec![(1, 58), (1, 71), (3, 58), (3, 75)],
                         ),
                     ];
 
@@ -354,6 +345,20 @@ mod convert {
                             (i, j, k)
                         );
                     }
+                }
+
+                #[test]
+                #[ignore]
+                fn dense_mark_matrix() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn sparse_mark_matrix() {
+                    // FIXME:
+                    todo!()
                 }
             };
         }
@@ -703,6 +708,20 @@ mod convert {
                             (i, j, k)
                         );
                     }
+                }
+
+                #[test]
+                #[ignore]
+                fn dense_mark_matrix() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn sparse_mark_matrix() {
+                    // FIXME:
+                    todo!()
                 }
             };
         }

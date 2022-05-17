@@ -1,6 +1,5 @@
 use std::{
     collections::{HashMap, HashSet},
-    marker::PhantomData,
     vec::Vec,
 };
 
@@ -21,10 +20,10 @@ use crate::{
 ///
 pub struct AllSimpleCycles<'a, G, D>
 where
-    G: Storage,
+    G: Storage<Direction = D>,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// The currently visited stack.
     stack: Vec<&'a G::Vertex>,
     /// Map of *blocked* vertices in order to avoid double counting.
@@ -33,8 +32,6 @@ where
     pub simple_cycles: Vec<Vec<&'a G::Vertex>>,
     /// Map of vertices popularity (i.e. how many cycles a vertex appears in).
     pub popularity: HashMap<&'a G::Vertex, usize>,
-    /// Generic placeholder for direction.
-    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> AllSimpleCycles<'a, G, D>
@@ -60,7 +57,7 @@ where
     /// let mut search = AllSimpleCycles::from(&g);
     ///
     /// // Run the algorithm and assert later.
-    /// search.run();
+    /// search.call_mut();
     ///
     /// // In this graph there are two directed cycles,
     /// // these are reported in discovery order.
@@ -86,7 +83,7 @@ where
     pub fn new(g: &'a G) -> Self {
         Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the currently visited stack.
             stack: Default::default(),
             // Initialize blocked map.
@@ -95,31 +92,31 @@ where
             simple_cycles: Default::default(),
             // Initialize popularity map.
             popularity: Default::default(),
-            // Generic placeholder for direction.
-            _direction_type: Default::default(),
         }
     }
 }
 
 impl<'a, G> AllSimpleCycles<'a, G, directions::Undirected>
 where
-    G: Storage + Undirected,
+    G: Storage<Direction = directions::Undirected> + Undirected,
 {
     /// Execute the procedure.
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) -> &Self {
+    /// TODO: Replace with FnMut once stabilized.
+    ///
+    pub fn call_mut(&mut self) -> &Self {
         todo!()
     }
 }
 
 impl<'a, G> AllSimpleCycles<'a, G, directions::Directed>
 where
-    G: Storage + Directed,
+    G: Storage<Direction = directions::Directed> + Directed,
 {
     fn block(&mut self, x: &'a G::Vertex) {
-        for y in Ch!(self.graph, x) {
+        for y in Ch!(self.g, x) {
             if y < self.stack[0] {
                 continue;
             }
@@ -142,7 +139,7 @@ where
         self.blocked.entry(x).or_default();
 
         // Iterate over reachable vertices from graph.
-        for y in Ch!(self.graph, x) {
+        for y in Ch!(self.g, x) {
             // If current vertex is lower then starting vertex,
             // then skip this iteration.
             if y < self.stack[0] {
@@ -190,8 +187,10 @@ where
     ///
     /// Execute the procedure and store the results for later queries.
     ///
-    pub fn run(&mut self) -> &Self {
-        for x in V!(self.graph) {
+    /// TODO: Replace with FnMut once stabilized.
+    ///
+    pub fn call_mut(&mut self) -> &Self {
+        for x in V!(self.g) {
             // Visit current vertex recursively.
             self.circuit(x);
             // Clear map of blocked vertices.
@@ -208,5 +207,14 @@ where
 {
     fn from(g: &'a G) -> Self {
         Self::new(g)
+    }
+}
+
+impl<'a, G, D> Into<Vec<Vec<&'a G::Vertex>>> for AllSimpleCycles<'a, G, D>
+where
+    G: Storage<Direction = D>,
+{
+    fn into(self) -> Vec<Vec<&'a G::Vertex>> {
+        self.simple_cycles
     }
 }

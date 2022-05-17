@@ -13,6 +13,7 @@ keywords = ["graph", "graph-algorithms", "graph-theory", "networks"]
 categories = ["algorithms", "data-structures", "mathematics", "science"]
 
 [dependencies]
+bimap = "^0.6"
 delegate = "^0.6"
 itertools = "^0.10"
 log = "^0.4"

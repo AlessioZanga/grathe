@@ -1,10 +1,9 @@
 use std::fmt::Debug;
 
-use super::{Capacity, Operators};
 use crate::types::{EdgeIterator, Vertex, VertexIterator};
 
 /// The graph storage trait.
-pub trait Storage: Capacity + Clone + Debug + Default + Eq + Operators + PartialOrd {
+pub trait Storage: Clone + Debug + Default + Eq {
     /// Vertex identifier type.
     type Vertex: Vertex;
 

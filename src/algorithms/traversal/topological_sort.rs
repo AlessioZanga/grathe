@@ -11,7 +11,7 @@ where
     G: Directed,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     // To-be-visited queue.
     queue: VecDeque<&'a G::Vertex>,
     // Visit map with vertices in-degrees.
@@ -34,16 +34,16 @@ where
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the to-be-visited queue with the source vertex.
             queue: Default::default(),
             // Initialize the visit map.
             visit: Default::default(),
         };
         // For each vertex in the graph.
-        for x in V!(search.graph) {
+        for x in V!(search.g) {
             // Compute its in-degree.
-            match search.graph.in_degree(x) {
+            match search.g.in_degree(x) {
                 // If the in-degree is zero, then add it to the queue.
                 0 => search.queue.push_back(x),
                 // Otherwise, add it to the map.
@@ -67,7 +67,7 @@ where
         // While there are still vertices with zero in-degree.
         if let Some(x) = self.queue.pop_front() {
             // For each child of the selected vertex.
-            for y in Ch!(self.graph, x) {
+            for y in Ch!(self.g, x) {
                 // If it was not visited before.
                 if let Some(z) = self.visit.get(y) {
                     // Update its in-degree.

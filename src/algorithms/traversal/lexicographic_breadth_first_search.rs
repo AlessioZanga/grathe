@@ -14,7 +14,7 @@ where
     G: Undirected,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// To-be-visited queue.
     pub partitions: VecDeque<VecDeque<&'a G::Vertex>>,
     /// Predecessor of each discovered vertex (except the source vertex).
@@ -41,7 +41,7 @@ where
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the to-be-visited queue with the first partition, if any.
             partitions: Default::default(),
             // Initialize the predecessor map.
@@ -91,7 +91,7 @@ where
             // Select the first vertex from the partition.
             let x = p.pop_front().unwrap();
             // Get neighbors of selected vertex.
-            let mut neighbors: HashSet<_> = Ne!(self.graph, x).collect();
+            let mut neighbors: HashSet<_> = Ne!(self.g, x).collect();
             // Initialize the new partitioning ordering.
             // TODO: Replace the partitions queue with a vector and begin/end
             // indices pairs once `partition_in_place` is stabilized.

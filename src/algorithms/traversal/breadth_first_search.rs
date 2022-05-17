@@ -1,7 +1,6 @@
 use std::{
     collections::{HashMap, VecDeque},
     iter::FusedIterator,
-    marker::PhantomData,
 };
 
 use super::Traversal;
@@ -21,10 +20,10 @@ use crate::{
 ///
 pub struct BreadthFirstSearch<'a, G, D>
 where
-    G: Storage,
+    G: Storage<Direction = D>,
 {
     /// Given graph reference.
-    graph: &'a G,
+    g: &'a G,
     /// To-be-visited queue for the [`Forest`](super::Traversal) variant.
     vertices: VecDeque<&'a G::Vertex>,
     /// To-be-visited queue with the source vertex.
@@ -33,8 +32,6 @@ where
     pub distance: HashMap<&'a G::Vertex, usize>,
     /// Predecessor of each discovered vertex (except the source vertex).
     pub predecessor: HashMap<&'a G::Vertex, &'a G::Vertex>,
-    /// Generic placeholder for direction.
-    _direction_type: PhantomData<D>,
 }
 
 impl<'a, G, D> BreadthFirstSearch<'a, G, D>
@@ -83,7 +80,7 @@ where
         // Initialize default search object.
         let mut search = Self {
             // Set target graph.
-            graph: g,
+            g,
             // Initialize the [`Forest`] to-be-visited queue.
             vertices: Default::default(),
             // Initialize the to-be-visited queue with the source vertex.
@@ -92,8 +89,6 @@ where
             distance: Default::default(),
             // Initialize the predecessor map.
             predecessor: Default::default(),
-            // Generic placeholder for direction.
-            _direction_type: Default::default(),
         };
         // If the graph is null.
         if g.order() == 0 {
@@ -130,7 +125,7 @@ where
 
 impl<'a, G> Iterator for BreadthFirstSearch<'a, G, directions::Undirected>
 where
-    G: Storage + Undirected,
+    G: Storage<Direction = directions::Undirected> + Undirected,
 {
     type Item = &'a G::Vertex;
 
@@ -155,7 +150,7 @@ where
         // If there are still vertices to be visited.
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for y in Ne!(self.graph, x) {
+            for y in Ne!(self.g, x) {
                 // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
@@ -178,11 +173,14 @@ where
     }
 }
 
-impl<'a, G> FusedIterator for BreadthFirstSearch<'a, G, directions::Undirected> where G: Storage + Undirected {}
+impl<'a, G> FusedIterator for BreadthFirstSearch<'a, G, directions::Undirected> where
+    G: Storage<Direction = directions::Undirected> + Undirected
+{
+}
 
 impl<'a, G> Iterator for BreadthFirstSearch<'a, G, directions::Directed>
 where
-    G: Storage + Directed,
+    G: Storage<Direction = directions::Directed> + Directed,
 {
     type Item = &'a G::Vertex;
 
@@ -207,7 +205,7 @@ where
         // If there are still vertices to be visited.
         if let Some(x) = self.queue.pop_front() {
             // Iterate over the reachable vertices of the popped vertex.
-            for y in Ch!(self.graph, x) {
+            for y in Ch!(self.g, x) {
                 // If the vertex was never seen before.
                 if !self.distance.contains_key(y) {
                     // Compute the distance from its predecessor.
@@ -230,7 +228,10 @@ where
     }
 }
 
-impl<'a, G> FusedIterator for BreadthFirstSearch<'a, G, directions::Directed> where G: Storage + Directed {}
+impl<'a, G> FusedIterator for BreadthFirstSearch<'a, G, directions::Directed> where
+    G: Storage<Direction = directions::Directed> + Directed
+{
+}
 
 impl<'a, G, D> From<&'a G> for BreadthFirstSearch<'a, G, D>
 where

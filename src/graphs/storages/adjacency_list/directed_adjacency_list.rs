@@ -11,10 +11,10 @@ use crate::{
     prelude::{DFSEdge, DFSEdges, Traversal, BFS},
     traits::{Connectivity, Convert, Directed, Operators, Storage, WithAttributes},
     types::{
-        directions, AdjacencyList, DenseAdjacencyMatrix, EdgeIterator, EdgeList, Error, ExactSizeIter,
-        SparseAdjacencyMatrix, Vertex, VertexIterator,
+        directions, AdjacencyList, DenseAdjacencyMatrix, DenseMarkMatrix, EdgeIterator, Error, ExactSizeIter,
+        Mark as M, SparseAdjacencyMatrix, SparseMarkMatrix, Vertex, VertexIterator,
     },
-    E, V,
+    Ch, E, V,
 };
 
 /// Directed graph based on adjacency list storage layout.
@@ -24,9 +24,9 @@ where
     V: Vertex,
     A: WithAttributes<V>,
 {
+    _attributes: A,
     _data: AdjacencyList<V>,
     _size: usize,
-    _attributes: A,
 }
 
 impl<V, A> PartialEq for DirectedAdjacencyList<V, A>
@@ -47,6 +47,8 @@ where
 }
 
 crate::traits::impl_partial_ord!(DirectedAdjacencyList);
+
+crate::traits::impl_capacity!(DirectedAdjacencyList);
 
 impl<V, A> Operators for DirectedAdjacencyList<V, A>
 where
@@ -175,14 +177,14 @@ where
         J: IntoIterator<Item = (Self::Vertex, Self::Vertex)>,
     {
         // Initialize the data storage using the vertex set.
-        let mut size = 0;
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
-        for (x, y) in e_iter.into_iter() {
-            data.entry(y).or_default();
+        let size = e_iter.into_iter().fold(0, |acc, (x, y)| {
+            data.entry(y.clone()).or_default();
             data.entry(x).or_default().insert(y);
-            size += 1;
-        }
+
+            acc + 1
+        });
 
         Self {
             _data: data,
@@ -292,70 +294,63 @@ where
     }
 
     fn has_edge(&self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // Check if first vertex exists.
-        match self._data.get(x) {
-            // No vertex defined.
-            None => panic!(),
-            // Check if second vertex exists.
-            Some(adjacent) => match self._data.contains_key(y) {
-                // No vertex defined.
-                false => panic!(),
-                // Check if it is in the adjacency set.
-                true => adjacent.contains(y),
-            },
-        }
+        // Check vertices indentifiers.
+        assert!(
+            self._data.contains_key(x),
+            "Vertex identifiers does not exist in the graph"
+        );
+        assert!(
+            self._data.contains_key(y),
+            "Vertex identifiers does not exist in the graph"
+        );
+
+        self._data.get(x).unwrap().contains(y)
     }
 
     fn add_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // Check if second vertex exists.
-        match self._data.contains_key(y) {
-            // No vertex defined.
-            false => panic!(),
-            // Get mutable vertex adjacency set.
-            true => match self._data.get_mut(x) {
-                // No vertex defined.
-                None => panic!(),
-                // Try to insert vertex into adjacency set.
-                Some(adjacent) => {
-                    if adjacent.insert(*y) {
-                        // Update size.
-                        self._size += 1;
+        // Check vertices indentifiers.
+        assert!(
+            self._data.contains_key(x),
+            "Vertex identifiers does not exist in the graph"
+        );
+        assert!(
+            self._data.contains_key(y),
+            "Vertex identifiers does not exist in the graph"
+        );
 
-                        return true;
-                    }
-                }
-            },
+        // Get mutable reference to adjacency set.
+        if self._data.get_mut(x).unwrap().insert(y) {
+            // Update size.
+            self._size += 1;
+
+            return true;
         }
 
         false
     }
 
     fn del_edge(&mut self, x: &Self::Vertex, y: &Self::Vertex) -> bool {
-        // Check if second vertex exists.
-        match self._data.contains_key(y) {
-            // No vertex defined.
-            false => panic!(),
-            // Get mutable vertex adjacency set.
-            true => match self._data.get_mut(x) {
-                // No vertex defined.
-                None => panic!(),
-                // Try to remove vertex from adjacency set.
-                Some(adjacent) => {
-                    if adjacent.remove(y) {
-                        // Update size.
-                        self._size -= 1;
+        // Check vertices indentifiers.
+        assert!(
+            self._data.contains_key(x),
+            "Vertex identifiers does not exist in the graph"
+        );
+        assert!(
+            self._data.contains_key(y),
+            "Vertex identifiers does not exist in the graph"
+        );
 
-                        return true;
-                    }
-                }
-            },
+        // Get mutable reference to adjacency set.
+        if self._data.get_mut(x).unwrap().remove(y) {
+            // Update size.
+            self._size -= 1;
+
+            return true;
         }
 
         false
     }
 }
-
-crate::traits::impl_capacity!(DirectedAdjacencyList);
 
 impl<V, A> Connectivity for DirectedAdjacencyList<V, A>
 where
@@ -385,25 +380,10 @@ where
     V: Vertex,
     A: WithAttributes<V>,
 {
-    fn edge_list(&self) -> EdgeList<Self::Vertex> {
-        let mut out = EdgeList::<Self::Vertex>::new();
-        for (x, y) in E!(self) {
-            out.insert((*x, *y));
-        }
-
-        out
-    }
-
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
-        let mut out = AdjacencyList::<Self::Vertex>::new();
-        for x in V!(self) {
-            out.entry(*x).or_default();
-        }
-        for (x, y) in E!(self) {
-            out.entry(*x).or_default().insert(*y);
-        }
-
-        out
+        V!(self)
+            .map(|x| (x, FromIterator::from_iter(Ch!(self, x).cloned())))
+            .collect()
     }
 
     fn dense_adjacency_matrix(&self) -> DenseAdjacencyMatrix {
@@ -470,6 +450,36 @@ where
         }
 
         out
+    }
+
+    fn dense_mark_matrix(&self) -> DenseMarkMatrix {
+        self.dense_adjacency_matrix().mapv(|x| match x {
+            false => M::None,
+            true => M::TailHead,
+        })
+    }
+
+    fn sparse_mark_matrix(&self) -> SparseMarkMatrix {
+        self.sparse_adjacency_matrix()
+            .into_iter()
+            .map(|(&x, (i, j))| {
+                let x = match x {
+                    false => M::None,
+                    true => M::TailHead,
+                };
+                (x, i, j)
+            })
+            .fold(
+                {
+                    let (n, m) = (self.order(), self.size());
+                    SparseMarkMatrix::with_capacity((n, n), m)
+                },
+                |mut acc, (x, i, j)| {
+                    acc.add_triplet(i, j, x);
+
+                    acc
+                },
+            )
     }
 }
 
