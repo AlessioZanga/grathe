@@ -31,6 +31,20 @@ mod directions {
                 }
 
                 #[test]
+                #[ignore]
+                fn from_mixed() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
+                #[ignore]
+                fn from_partially_mixed() {
+                    // FIXME:
+                    todo!()
+                }
+
+                #[test]
                 fn neighbors_iter() {
                     // Test `G::neighbors_iter(i32) -> Iter<Item = i32>`.
 

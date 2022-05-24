@@ -40,7 +40,7 @@ where
     /// Build a Possible-D-Sep search structure.
     pub fn new(g: &'a G, x: &'a G::Vertex, y: Option<&'a G::Vertex>) -> Self {
         // Assert source vertex is in graph.
-        assert!(g.has_vertex(x) && (y.is_none() || g.has_vertex(y.clone().unwrap())));
+        assert!(g.has_vertex(x) && (y.is_none() || g.has_vertex(y.unwrap())));
 
         Self {
             // Set target graph.

@@ -16,7 +16,7 @@ pub trait Mixed: PartiallyDirected {
     {
         Self::new_with_mark(
             V!(other).cloned(),
-            other.edges_with_mark_iter().map(|(x, y, m)| (x.clone(), y.clone(), *m)),
+            other.edges_with_mark_iter().map(|(x, y, m)| (*x, *y, *m)),
         )
     }
 }

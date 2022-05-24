@@ -181,7 +181,7 @@ where
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
         let size = e_iter.into_iter().fold(0, |acc, (x, y)| {
-            data.entry(x.clone()).or_default().insert(y.clone());
+            data.entry(x).or_default().insert(y);
             data.entry(y).or_default().insert(x);
 
             acc + 1
@@ -218,7 +218,7 @@ where
         let data: Vec<_> = iter.into_iter().collect();
         let data: AdjacencyList<_> = data
             .iter()
-            .map(|x| (x.clone(), BTreeSet::from_iter(data.clone())))
+            .map(|x| (*x, BTreeSet::from_iter(data.clone())))
             .collect();
         // Compute the final size.
         let size = (data.len() * (data.len() + 1)) / 2;
@@ -319,9 +319,9 @@ where
         );
 
         // Get mutable reference to adjacency set.
-        if self._data.get_mut(x).unwrap().insert(y.clone()) {
+        if self._data.get_mut(x).unwrap().insert(*y) {
             // Update reverse reference.
-            self._data.get_mut(y).unwrap().insert(x.clone());
+            self._data.get_mut(y).unwrap().insert(*x);
             // Update size.
             self._size += 1;
 

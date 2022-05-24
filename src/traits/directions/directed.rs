@@ -13,7 +13,7 @@ pub trait Directed: Storage {
     where
         G: Directed<Vertex = Self::Vertex, Direction = directions::Directed>,
     {
-        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (*x, *y)))
     }
 
     /// Ancestors iterator.

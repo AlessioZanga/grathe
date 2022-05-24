@@ -11,7 +11,7 @@ pub trait PartiallyMixed: Mixed {
     where
         G: Undirected<Vertex = Self::Vertex>,
     {
-        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), M::CircCirc)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (*x, *y, M::CircCirc)))
     }
 
     /// Constructs from another mixed graph.
@@ -21,7 +21,7 @@ pub trait PartiallyMixed: Mixed {
     {
         Self::new_with_mark(
             V!(other).cloned(),
-            other.edges_with_mark_iter().map(|(x, y, m)| (x.clone(), y.clone(), *m)),
+            other.edges_with_mark_iter().map(|(x, y, m)| (*x, *y, *m)),
         )
     }
 }

@@ -14,7 +14,7 @@ pub trait Convert: Storage {
     /// Return the edge list representing the graph.
     ///
     fn edge_list(&self) -> EdgeList<Self::Vertex> {
-        E!(self).map(|(x, y)| (x.clone(), y.clone())).collect()
+        E!(self).map(|(x, y)| (*x, *y)).collect()
     }
 
     /// Adjacency list adapter.
@@ -23,7 +23,7 @@ pub trait Convert: Storage {
     ///
     fn adjacency_list(&self) -> AdjacencyList<Self::Vertex> {
         V!(self)
-            .map(|x| (x.clone(), FromIterator::from_iter(Adj!(self, x).cloned())))
+            .map(|x| (*x, FromIterator::from_iter(Adj!(self, x).cloned())))
             .collect()
     }
 

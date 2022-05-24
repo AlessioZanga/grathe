@@ -11,7 +11,7 @@ pub trait PartiallyDirected: Undirected + Directed {
     where
         G: Undirected<Vertex = Self::Vertex>,
     {
-        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), M::TailTail)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (*x, *y, M::TailTail)))
     }
 
     /// Constructs from a directed graph.
@@ -19,7 +19,7 @@ pub trait PartiallyDirected: Undirected + Directed {
     where
         G: Directed<Vertex = Self::Vertex>,
     {
-        Self::new_with_mark([], E!(g).map(|(x, y)| (x.clone(), y.clone(), M::TailHead)))
+        Self::new_with_mark([], E!(g).map(|(x, y)| (*x, *y, M::TailHead)))
     }
 
     /// Constructs from another partially-directed graph.
@@ -29,7 +29,7 @@ pub trait PartiallyDirected: Undirected + Directed {
     {
         Self::new_with_mark(
             V!(other).cloned(),
-            other.edges_with_mark_iter().map(|(x, y, m)| (x.clone(), y.clone(), *m)),
+            other.edges_with_mark_iter().map(|(x, y, m)| (*x, *y, *m)),
         )
     }
 

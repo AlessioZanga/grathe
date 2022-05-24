@@ -1,5 +1,5 @@
 use crate::{
-    traits::{Directed, PartiallyDirected, Storage},
+    traits::{Directed, Mixed, PartiallyDirected, PartiallyMixed, Storage},
     types::{directions, VertexIterator},
     E, V,
 };
@@ -11,7 +11,7 @@ pub trait Undirected: Storage {
     where
         G: Undirected<Vertex = Self::Vertex, Direction = directions::Undirected>,
     {
-        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (*x, *y)))
     }
 
     /// Constructs from a directed graph by making any edge undirected.
@@ -19,7 +19,7 @@ pub trait Undirected: Storage {
     where
         G: Directed<Vertex = Self::Vertex, Direction = directions::Directed>,
     {
-        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (*x, *y)))
     }
 
     /// Constructs from a partially-directed graph by making any edge undirected.
@@ -27,7 +27,23 @@ pub trait Undirected: Storage {
     where
         G: PartiallyDirected<Vertex = Self::Vertex, Direction = directions::PartiallyDirected>,
     {
-        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (x.clone(), y.clone())))
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (*x, *y)))
+    }
+
+    /// Constructs from a mixed graph by making any edge undirected.
+    fn from_mixed<G>(other: G) -> Self
+    where
+        G: Mixed<Vertex = Self::Vertex, Direction = directions::Mixed>,
+    {
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (*x, *y)))
+    }
+
+    /// Constructs from a partially-mixed graph by making any edge undirected.
+    fn from_partially_mixed<G>(other: G) -> Self
+    where
+        G: PartiallyMixed<Vertex = Self::Vertex, Direction = directions::PartiallyMixed>,
+    {
+        Self::new(V!(other).cloned(), E!(other).map(|(x, y)| (*x, *y)))
     }
 
     /// Neighbor iterator.

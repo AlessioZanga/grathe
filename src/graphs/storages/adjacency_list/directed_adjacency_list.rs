@@ -180,7 +180,7 @@ where
         let mut data: AdjacencyList<Self::Vertex> = v_iter.into_iter().map(|x| (x, Default::default())).collect();
         // Fill the data storage using the edge set.
         let size = e_iter.into_iter().fold(0, |acc, (x, y)| {
-            data.entry(y.clone()).or_default();
+            data.entry(y).or_default();
             data.entry(x).or_default().insert(y);
 
             acc + 1

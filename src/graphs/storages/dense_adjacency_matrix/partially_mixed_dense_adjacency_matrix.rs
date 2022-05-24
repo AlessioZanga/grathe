@@ -70,8 +70,8 @@ where
 
         // Fill the data storage using the edge set.
         for (x, y) in e_iter {
-            g.add_vertex(x.clone());
-            g.add_vertex(y.clone());
+            g.add_vertex(x);
+            g.add_vertex(y);
             g.add_edge(&x, &y);
         }
 
@@ -494,8 +494,8 @@ where
 
         // Fill the data storage using the edge set.
         for (x, y, m) in e_iter {
-            g.add_vertex(x.clone());
-            g.add_vertex(y.clone());
+            g.add_vertex(x);
+            g.add_vertex(y);
             g.set_mark(&x, &y, m);
         }
 
